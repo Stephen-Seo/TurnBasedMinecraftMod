@@ -1,6 +1,6 @@
 [
 {
-  "modid": "com.seodisparate.TurnBasedMinecraft",
+  "modid": "com.seodisparate.turnbasedminecraft",
   "name": "Turn Based Minecraft",
   "description": "Changes battles to be turn-based.",
   "version": "${version}",
