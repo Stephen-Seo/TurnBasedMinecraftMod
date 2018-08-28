@@ -1,11 +1,15 @@
 package com.seodisparate.TurnBasedMinecraft;
 
-import net.minecraft.init.Blocks;
+import org.apache.logging.log4j.Logger;
+
+import com.seodisparate.TurnBasedMinecraft.common.BattleManager;
+
+import net.minecraft.entity.Entity;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.Logger;
 
 @Mod(modid = TurnBasedMinecraftMod.MODID, name = TurnBasedMinecraftMod.NAME, version = TurnBasedMinecraftMod.VERSION)
 public class TurnBasedMinecraftMod
@@ -15,6 +19,9 @@ public class TurnBasedMinecraftMod
     public static final String VERSION = "1.0";
 
     private static Logger logger;
+    private static BattleManager battleManager;
+
+    public static Entity attackingEntity;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -25,7 +32,16 @@ public class TurnBasedMinecraftMod
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        // some example code
-        logger.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        battleManager = new BattleManager();
+    }
+
+    @EventHandler
+    public void entityAttacked(LivingAttackEvent event)
+    {
+        if(!event.getEntity().equals(attackingEntity) && battleManager.checkAttack(event))
+        {
+            logger.debug("Canceled LivingAttackEvent between " + attackingEntity + " and " + event.getEntity());
+            event.setCanceled(true);
+        }
     }
 }
