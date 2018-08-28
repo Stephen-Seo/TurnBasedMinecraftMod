@@ -1,0 +1,16 @@
+[
+{
+  "modid": "com.seodisparate.TurnBasedMinecraft",
+  "name": "Turn Based Minecraft",
+  "description": "Changes battles to be turn-based.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Stephen Seo"],
+  "credits": "The Forge and FML guys, for making this possible",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
