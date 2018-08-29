@@ -2,35 +2,104 @@ package com.seodisparate.TurnBasedMinecraft.common;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
+
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class Battle
 {
-    private int id;
-    private Map<Integer, Entity> sideA;
-    private Map<Integer, Entity> sideB;
+    private final int id;
+    private Map<Integer, Combatant> sideA;
+    private Map<Integer, Combatant> sideB;
     
     private Instant lastUpdated;
+    private State state;
+    private int playerCount;
+    private int undecidedCount;
+    private Duration timer;
+    
+    public enum State
+    {
+        DECISION,
+        ATTACK,
+        HEALTH_CHECK
+    }
+    
+    public enum Decision
+    {
+        UNDECIDED(0),
+        ATTACK(1),
+        DEFEND(2),
+        FLEE(3),
+        USE_ITEM(4);
+        
+        private int value;
+        private static Map<Integer, Decision> map = new HashMap<Integer, Decision>();
+        
+        private Decision(int value)
+        {
+            this.value = value;
+        }
+        
+        public int getValue()
+        {
+            return value;
+        }
+        
+        static
+        {
+            for(Decision decision : Decision.values())
+            {
+                map.put(decision.value, decision);
+            }
+        }
+        
+        public static Decision valueOf(int decisionType)
+        {
+            return map.get(decisionType);
+        }
+    }
 
     public Battle(int id, Collection<Entity> sideA, Collection<Entity> sideB)
     {
         this.id = id;
-        this.sideA = new Hashtable<Integer, Entity>();
-        this.sideB = new Hashtable<Integer, Entity>();
-        for(Entity e : sideA)
+        this.sideA = new Hashtable<Integer, Combatant>();
+        this.sideB = new Hashtable<Integer, Combatant>();
+        playerCount = 0;
+        if(sideA != null)
         {
-            this.sideA.put(e.getEntityId(), e);
+            for(Entity e : sideA)
+            {
+                this.sideA.put(e.getEntityId(), new Combatant(e));
+                if(e instanceof EntityPlayer)
+                {
+                    ++playerCount;
+                }
+            }
         }
-        for(Entity e : sideB)
+        if(sideB != null)
         {
-            this.sideB.put(e.getEntityId(), e);
+            for(Entity e : sideB)
+            {
+                this.sideB.put(e.getEntityId(), new Combatant(e));
+                if(e instanceof EntityPlayer)
+                {
+                    ++playerCount;
+                }
+            }
         }
         
         lastUpdated = null;
+        state = State.DECISION;
+        undecidedCount = playerCount;
+        timer = TurnBasedMinecraftMod.BattleDecisionTime;
     }
 
     public int getId()
@@ -50,12 +119,104 @@ public class Battle
     
     public void addCombatantToSideA(Entity e)
     {
-        sideA.put(e.getEntityId(), e);
+        sideA.put(e.getEntityId(), new Combatant(e));
+        if(e instanceof EntityPlayer)
+        {
+            ++playerCount;
+            if(state == State.DECISION)
+            {
+                ++undecidedCount;
+            }
+        }
     }
     
     public void addCombatantToSideB(Entity e)
     {
-        sideB.put(e.getEntityId(), e);
+        sideB.put(e.getEntityId(), new Combatant(e));
+        if(e instanceof EntityPlayer)
+        {
+            ++playerCount;
+            if(state == State.DECISION)
+            {
+                ++undecidedCount;
+            }
+        }
+    }
+    
+    public void clearCombatants()
+    {
+        sideA.clear();
+        sideB.clear();
+        playerCount = 0;
+        undecidedCount = 0;
+    }
+    
+    public Collection<Combatant> getSideA()
+    {
+        return sideA.values();
+    }
+    
+    public Collection<Combatant> getSideB()
+    {
+        return sideB.values();
+    }
+    
+    public Collection<Integer> getSideAIDs()
+    {
+        Collection<Integer> sideAIDs = new ArrayList<Integer>(sideA.size());
+        for(Combatant combatant : sideA.values())
+        {
+            sideAIDs.add(combatant.entity.getEntityId());
+        }
+        return sideAIDs;
+    }
+    
+    public Collection<Integer> getSideBIDs()
+    {
+        Collection<Integer> sideBIDs = new ArrayList<Integer>(sideB.size());
+        for(Combatant combatant : sideB.values())
+        {
+            sideBIDs.add(combatant.entity.getEntityId());
+        }
+        return sideBIDs;
+    }
+    
+    public Combatant getCombatantByID(int entityID)
+    {
+        Combatant combatant = sideA.get(entityID);
+        if(combatant == null)
+        {
+            combatant = sideB.get(entityID);
+        }
+        return combatant;
+    }
+    
+    public void setDecision(int entityID, Decision decision)
+    {
+        if(state != State.DECISION)
+        {
+            return;
+        }
+        Combatant combatant = sideA.get(entityID);
+        if(combatant == null)
+        {
+            combatant = sideB.get(entityID);
+            if(combatant == null)
+            {
+                return;
+            }
+        }
+        
+        if(combatant.entity instanceof EntityPlayer)
+        {
+            combatant.decision = decision;
+            --undecidedCount;
+        }
+    }
+    
+    public State getState()
+    {
+        return state;
     }
     
     public void update()
@@ -73,7 +234,25 @@ public class Battle
         }
     }
     
-    private void update(Duration dt)
+    private void update(final Duration dt)
     {
+        switch(state)
+        {
+        case DECISION:
+            timer = timer.minus(dt);
+            if(timer.isNegative() || timer.isZero())
+            {
+                state = State.ATTACK;
+                timer = TurnBasedMinecraftMod.BattleDecisionTime;
+                update(Duration.ZERO);
+            }
+            break;
+        case ATTACK:
+            // TODO
+            break;
+        case HEALTH_CHECK:
+            // TODO
+            break;
+        }
     }
 }

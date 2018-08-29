@@ -5,8 +5,12 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleEntered;
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 
 public class BattleManager
@@ -36,36 +40,39 @@ public class BattleManager
         Entity inBattle = null;
         Entity notInBattle = null;
         Battle battle = null;
+        
         for(Battle b : battleMap.values())
         {
             if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
             {
-                inBattle = event.getSource().getTrueSource();
-                battle = b;
-                break;
+                if(inBattle != null)
+                {
+                    // both combatants are in battle
+                    return true;
+                }
+                else
+                {
+                    inBattle = event.getSource().getTrueSource();
+                    notInBattle = event.getEntity();
+                    battle = b;
+                }
             }
-        }
-        if(inBattle != null)
-        {
-            notInBattle = event.getEntity();
-        } else
-        {
-            notInBattle = event.getSource().getTrueSource();
-        }
-        for(Battle b : battleMap.values())
-        {
             if(b.hasCombatant(event.getEntity().getEntityId()))
             {
                 if(inBattle != null)
                 {
-                    // both combatants in battle
+                    // both combatants are in battle
                     return true;
                 }
-                inBattle = event.getEntity();
-                battle = b;
-                break;
+                else
+                {
+                    inBattle = event.getEntity();
+                    notInBattle = event.getSource().getTrueSource();
+                    battle = b;
+                }
             }
         }
+        
         if(inBattle == null)
         {
             // neither entity is in battle
@@ -90,6 +97,11 @@ public class BattleManager
         {
             battle.addCombatantToSideA(notInBattle);
         }
+        
+        if(notInBattle instanceof EntityPlayerMP)
+        {
+            PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)notInBattle);
+        }
         return true;
     }
     
@@ -101,6 +113,25 @@ public class BattleManager
         }
         Battle newBattle = new Battle(IDCounter, sideA, sideB);
         battleMap.put(IDCounter, newBattle);
+        for(Entity e : sideA)
+        {
+            if(e instanceof EntityPlayerMP)
+            {
+                PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)e);
+            }
+        }
+        for(Entity e : sideB)
+        {
+            if(e instanceof EntityPlayerMP)
+            {
+                PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)e);
+            }
+        }
         return newBattle;
+    }
+    
+    public Battle getBattleByID(int id)
+    {
+        return battleMap.get(id);
     }
 }

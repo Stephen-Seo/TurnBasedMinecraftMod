@@ -2,20 +2,30 @@ package com.seodisparate.TurnBasedMinecraft.common;
 
 public class BattleUpdater implements Runnable
 {
-    BattleManager manager;
+    private BattleManager manager;
+    private boolean isRunning;
     
     public BattleUpdater(BattleManager manager)
     {
         this.manager = manager;
+        isRunning = true;
     }
 
     @Override
     public void run()
     {
-        for(Battle e : manager.battleMap.values())
+        while(isRunning)
         {
-            e.update();
+            for(Battle e : manager.battleMap.values())
+            {
+                e.update();
+            }
+            try { Thread.sleep(250); } catch (Exception e) { /* ignored */ }
         }
-        try { Thread.sleep(250); } catch (Exception e) { /* ignored */ }
+    }
+    
+    public void setIsRunning(boolean isRunning)
+    {
+        this.isRunning = isRunning;
     }
 }
