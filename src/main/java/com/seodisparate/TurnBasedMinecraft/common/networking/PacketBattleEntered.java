@@ -31,13 +31,13 @@ public class PacketBattleEntered implements IMessage
         buf.writeInt(battleID);
     }
 
-    public static class HandlerBattleEntered implements IMessageHandler<PacketBattleEntered, PacketBattleRequestInfo>
+    public static class HandlerBattleEntered implements IMessageHandler<PacketBattleEntered, IMessage>
     {
         @Override
-        public PacketBattleRequestInfo onMessage(PacketBattleEntered message, MessageContext ctx)
+        public IMessage onMessage(PacketBattleEntered message, MessageContext ctx)
         {
             TurnBasedMinecraftMod.currentBattle = new Battle(message.battleID, null, null);
-            return new PacketBattleRequestInfo(message.battleID);
+            return null;
         }
     }
 }

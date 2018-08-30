@@ -102,6 +102,8 @@ public class BattleManager
         {
             PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)notInBattle);
         }
+        
+        battle.notifyPlayersBattleInfo();
         return true;
     }
     
@@ -127,6 +129,7 @@ public class BattleManager
                 PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)e);
             }
         }
+        newBattle.notifyPlayersBattleInfo();
         return newBattle;
     }
     

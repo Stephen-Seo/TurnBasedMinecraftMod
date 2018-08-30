@@ -36,7 +36,7 @@ public class PacketBattleRequestInfo implements IMessage
         @Override
         public PacketBattleInfo onMessage(PacketBattleRequestInfo message, MessageContext ctx)
         {
-            Battle b = TurnBasedMinecraftMod.battleManager.getBattleByID(message.battleID);
+            Battle b = TurnBasedMinecraftMod.getBattleManager().getBattleByID(message.battleID);
             if(b == null)
             {
                 return null;

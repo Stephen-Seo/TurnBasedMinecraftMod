@@ -6,18 +6,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 public class Battle
 {
     private final int id;
     private Map<Integer, Combatant> sideA;
     private Map<Integer, Combatant> sideB;
+    private Map<Integer, EntityPlayer> players;
     
     private Instant lastUpdated;
     private State state;
@@ -72,6 +77,7 @@ public class Battle
         this.id = id;
         this.sideA = new Hashtable<Integer, Combatant>();
         this.sideB = new Hashtable<Integer, Combatant>();
+        players = new HashMap<Integer, EntityPlayer>();
         playerCount = 0;
         if(sideA != null)
         {
@@ -81,6 +87,7 @@ public class Battle
                 if(e instanceof EntityPlayer)
                 {
                     ++playerCount;
+                    players.put(e.getEntityId(), (EntityPlayer)e);
                 }
             }
         }
@@ -92,6 +99,7 @@ public class Battle
                 if(e instanceof EntityPlayer)
                 {
                     ++playerCount;
+                    players.put(e.getEntityId(), (EntityPlayer)e);
                 }
             }
         }
@@ -123,6 +131,7 @@ public class Battle
         if(e instanceof EntityPlayer)
         {
             ++playerCount;
+            players.put(e.getEntityId(), (EntityPlayer)e);
             if(state == State.DECISION)
             {
                 ++undecidedCount;
@@ -136,6 +145,7 @@ public class Battle
         if(e instanceof EntityPlayer)
         {
             ++playerCount;
+            players.put(e.getEntityId(), (EntityPlayer)e);
             if(state == State.DECISION)
             {
                 ++undecidedCount;
@@ -147,6 +157,7 @@ public class Battle
     {
         sideA.clear();
         sideB.clear();
+        players.clear();
         playerCount = 0;
         undecidedCount = 0;
     }
@@ -217,6 +228,19 @@ public class Battle
     public State getState()
     {
         return state;
+    }
+    
+    public void notifyPlayersBattleInfo()
+    {
+        if(TurnBasedMinecraftMod.getBattleManager() == null)
+        {
+            return;
+        }
+        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs());
+        for(EntityPlayer p : players.values())
+        {
+            PacketHandler.INSTANCE.sendTo(infoPacket, (EntityPlayerMP)p);
+        }
     }
     
     public void update()

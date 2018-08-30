@@ -30,7 +30,7 @@ public class TurnBasedMinecraftMod
     public static final Duration BattleDecisionTime = Duration.ofSeconds(15);
 
     private static Logger logger;
-    public static BattleManager battleManager;
+    private static BattleManager battleManager;
     private static int packetHandlerID = 0;
     public static Entity attackingEntity;
     
@@ -102,5 +102,10 @@ public class TurnBasedMinecraftMod
             logger.debug("Canceled LivingAttackEvent between " + attackingEntity + " and " + event.getEntity());
             event.setCanceled(true);
         }
+    }
+    
+    public static BattleManager getBattleManager()
+    {
+        return battleManager;
     }
 }
