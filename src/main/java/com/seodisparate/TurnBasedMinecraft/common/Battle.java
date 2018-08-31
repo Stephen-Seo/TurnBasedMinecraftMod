@@ -264,7 +264,7 @@ public class Battle
         {
         case DECISION:
             timer = timer.minus(dt);
-            if(timer.isNegative() || timer.isZero())
+            if(timer.isNegative() || timer.isZero() || undecidedCount <= 0)
             {
                 state = State.ATTACK;
                 timer = TurnBasedMinecraftMod.BattleDecisionTime;

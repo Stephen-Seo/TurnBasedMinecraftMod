@@ -43,7 +43,7 @@ public class PacketBattleDecision implements IMessage
         public IMessage onMessage(PacketBattleDecision message, MessageContext ctx)
         {
             Battle b = TurnBasedMinecraftMod.getBattleManager().getBattleByID(message.battleID);
-            if(b != null && b.getState() == Battle.State.DECISION)
+            if(b != null)
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 b.setDecision(player.getEntityId(), message.decision);

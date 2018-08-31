@@ -1,5 +1,9 @@
 <TurnBasedMinecraftConfig>
 	<Version>1</Version>
+	<IgnoreBattleTypes>
+		<Passive></Passive>
+		<Boss></Boss>
+	</IgnoreBattleTypes>
 	<EntityStats>
 		<net.minecraft.entity.monster.EntityBlaze>
 			<AttackPower Probability="50">5</AttackPower>
@@ -130,5 +134,108 @@
 			<AttackPower Probability="70">3</AttackPower>
 			<Evasion>5</Evasion>
 		</net.minecraft.entity.monster.EntityZombieVillager>
+		<net.minecraft.entity.passive.EntityBat
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>35</Evasion>
+		</net.minecraft.entity.passive.EntityBat>
+		<net.minecraft.entity.passive.EntityChicken
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>10</Evasion>
+		</net.minecraft.entity.passive.EntityChicken>
+		<net.minecraft.entity.passive.EntityCow
+			Passive="true">
+			<AttackPower Probability="50">0</AttackPower>
+			<Evasion>1</Evasion>
+			<Conflicts>
+				<net.minecraft.entity.passive.EntityMooshroom></net.minecraft.entity.passive.EntityMooshroom>
+			</Conflicts>
+		</net.minecraft.entity.passive.EntityCow>
+		<net.minecraft.entity.passive.EntityDonkey
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>10</Evasion>
+		</net.minecraft.entity.passive.EntityDonkey>
+		<net.minecraft.entity.passive.EntityHorse
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>10</Evasion>
+		</net.minecraft.entity.passive.EntityHorse>
+		<net.minecraft.entity.passive.EntityLlama
+			Passive="true">
+			<AttackPower Probability="70">1</AttackPower>
+			<Evasion>10</Evasion>
+		</net.minecraft.entity.passive.EntityLlama>
+		<net.minecraft.entity.passive.EntityMooshroom
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>1</Evasion>
+		</net.minecraft.entity.passive.EntityMooshroom>
+		<net.minecraft.entity.passive.EntityMule
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>10</Evasion>
+		</net.minecraft.entity.passive.EntityMule>
+		<net.minecraft.entity.passive.EntityOcelot
+			Passive="true">
+			<AttackPower Probability="70" Variance="1">1</AttackPower>
+			<Evasion>10</Evasion>
+		</net.minecraft.entity.passive.EntityOcelot>
+		<net.minecraft.entity.passive.EntityParrot
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>35</Evasion>
+		</net.minecraft.entity.passive.EntityParrot>
+		<net.minecraft.entity.passive.EntityPig
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>10</Evasion>
+		</net.minecraft.entity.passive.EntityPig>
+		<net.minecraft.entity.passive.EntityRabbit
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>40</Evasion>
+		</net.minecraft.entity.passive.EntityRabbit>
+		<net.minecraft.entity.passive.EntitySheep
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>5</Evasion>
+		</net.minecraft.entity.passive.EntitySheep>
+		<net.minecraft.entity.passive.EntitySkeletonHorse
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>5</Evasion>
+		</net.minecraft.entity.passive.EntitySkeletonHorse>
+		<net.minecraft.entity.passive.EntitySquid
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>15</Evasion>
+		</net.minecraft.entity.passive.EntitySquid>
+		<net.minecraft.entity.passive.EntityVillager
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>5</Evasion>
+		</net.minecraft.entity.passive.EntityVillager>
+		<net.minecraft.entity.passive.EntityWolf>
+			<AttackPower Probability="70">4</AttackPower>
+			<Evasion>20</Evasion>
+		</net.minecraft.entity.passive.EntityWolf>
+		<net.minecraft.entity.passive.EntityZombieHorse
+			Passive="true">
+			<AttackPower Probability="70">0</AttackPower>
+			<Evasion>8</Evasion>
+		</net.minecraft.entity.passive.EntityZombieHorse>
+		<net.minecraft.entity.boss.EntityDragon
+			Boss="true">
+			<AttackPower Probability="70" Variance="2">10</AttackPower>
+			<Evasion>27</Evasion>
+		</net.minecraft.entity.boss.EntityDragon>
+		<net.minecraft.entity.boss.EntityWither
+			Boss="true">
+			<AttackPower Probability="70">8</AttackPower>
+			<Evasion>20</Evasion>
+			<AttackEffect Probability="90">wither</AttackEffect>
+		</net.minecraft.entity.boss.EntityWither>
 	</EntityStats>
 </TurnBasedMinecraftConfig>
