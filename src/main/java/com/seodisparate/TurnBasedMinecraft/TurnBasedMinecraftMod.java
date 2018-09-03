@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.BattleManager;
+import com.seodisparate.TurnBasedMinecraft.common.Config;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleEntered;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleExited;
@@ -18,6 +19,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -28,11 +30,16 @@ public class TurnBasedMinecraftMod
     public static final String NAME = "Turn Based Minecraft Mod";
     public static final String VERSION = "1.0";
     public static final Duration BattleDecisionTime = Duration.ofSeconds(15);
+    public static final String CONFIG_FILENAME = "TBM_Config.xml";
+    public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
+    public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;
+    public static final int CONFIG_FILE_VERSION = 1; // TODO derive this from internal config
 
     private static Logger logger;
     private static BattleManager battleManager;
     private static int packetHandlerID = 0;
     public static Entity attackingEntity;
+    private static Config config;
     
     public static Battle currentBattle;
 
@@ -83,12 +90,14 @@ public class TurnBasedMinecraftMod
             Side.SERVER);
     }
     
-    /*
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+        if(battleManager != null)
+        {
+            config = new Config(logger);
+        }
     }
-    */
 
     @EventHandler
     public void entityAttacked(LivingAttackEvent event)
