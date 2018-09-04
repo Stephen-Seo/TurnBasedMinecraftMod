@@ -1,19 +1,23 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class EntityInfo
 {
     public Class classType;
     public List<Class> conflictingTypes;
+    public boolean ignoreBattle;
     public int attackPower;
     public int attackProbability;
+    public int attackVariance;
     public Effect attackEffect;
     public int attackEffectProbability;
     public int defenseDamage;
     public int defenseDamageProbability;
     public int evasion;
+    public int speed;
     public Category category;
     
     public enum Category
@@ -193,13 +197,16 @@ public class EntityInfo
     {
         classType = null;
         conflictingTypes = new ArrayList<Class>();
+        ignoreBattle = false;
         attackPower = 0;
         attackProbability = 70;
+        attackVariance = 0;
         attackEffect = Effect.UNKNOWN;
         attackEffectProbability = 50;
         defenseDamage = 0;
         defenseDamageProbability = 0;
         evasion = 15;
+        speed = 50;
         category = Category.UNKNOWN;
     }
     
@@ -212,13 +219,16 @@ public class EntityInfo
         {
             newEntityInfo.conflictingTypes.add(c);
         }
+        newEntityInfo.ignoreBattle = ignoreBattle;
         newEntityInfo.attackPower = attackPower;
         newEntityInfo.attackProbability = attackProbability;
+        newEntityInfo.attackVariance = attackVariance;
         newEntityInfo.attackEffect = attackEffect;
         newEntityInfo.attackEffectProbability = attackEffectProbability;
         newEntityInfo.defenseDamage = defenseDamage;
         newEntityInfo.defenseDamageProbability = defenseDamageProbability;
         newEntityInfo.evasion = evasion;
+        newEntityInfo.speed = speed;
         newEntityInfo.category = category;
         return newEntityInfo;
     }

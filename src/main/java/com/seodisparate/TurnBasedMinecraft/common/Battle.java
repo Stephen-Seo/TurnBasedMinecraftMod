@@ -7,6 +7,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
@@ -21,12 +26,13 @@ public class Battle
     private final int id;
     private Map<Integer, Combatant> sideA;
     private Map<Integer, Combatant> sideB;
-    private Map<Integer, EntityPlayer> players;
+    private Map<Integer, Combatant> players;
+    private PriorityQueue<Combatant> turnOrderQueue;
     
     private Instant lastUpdated;
     private State state;
-    private int playerCount;
-    private int undecidedCount;
+    private AtomicInteger playerCount;
+    private AtomicInteger undecidedCount;
     private Duration timer;
     
     public enum State
@@ -76,17 +82,26 @@ public class Battle
         this.id = id;
         this.sideA = new Hashtable<Integer, Combatant>();
         this.sideB = new Hashtable<Integer, Combatant>();
-        players = new HashMap<Integer, EntityPlayer>();
-        playerCount = 0;
+        players = new Hashtable<Integer, Combatant>();
+        turnOrderQueue = new PriorityQueue<Combatant>(new Combatant.CombatantComparator());
+        playerCount = new AtomicInteger(0);
+        undecidedCount = new AtomicInteger(0);
         if(sideA != null)
         {
             for(Entity e : sideA)
             {
-                this.sideA.put(e.getEntityId(), new Combatant(e));
+                EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
+                if(entityInfo == null && !(e instanceof EntityPlayer))
+                {
+                    continue;
+                }
+                Combatant newCombatant = new Combatant(e, entityInfo);
+                this.sideA.put(e.getEntityId(), newCombatant);
                 if(e instanceof EntityPlayer)
                 {
-                    ++playerCount;
-                    players.put(e.getEntityId(), (EntityPlayer)e);
+                    newCombatant.recalcSpeedOnCompare = true;
+                    playerCount.incrementAndGet();
+                    players.put(e.getEntityId(), newCombatant);
                 }
             }
         }
@@ -94,18 +109,25 @@ public class Battle
         {
             for(Entity e : sideB)
             {
-                this.sideB.put(e.getEntityId(), new Combatant(e));
+                EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
+                if(entityInfo == null && !(e instanceof EntityPlayer))
+                {
+                    continue;
+                }
+                Combatant newCombatant = new Combatant(e, entityInfo);
+                this.sideB.put(e.getEntityId(), newCombatant);
                 if(e instanceof EntityPlayer)
                 {
-                    ++playerCount;
-                    players.put(e.getEntityId(), (EntityPlayer)e);
+                    newCombatant.recalcSpeedOnCompare = true;
+                    playerCount.incrementAndGet();
+                    players.put(e.getEntityId(), newCombatant);
                 }
             }
         }
         
         lastUpdated = null;
         state = State.DECISION;
-        undecidedCount = playerCount;
+        undecidedCount.set(playerCount.get());
         timer = TurnBasedMinecraftMod.BattleDecisionTime;
     }
 
@@ -126,28 +148,42 @@ public class Battle
     
     public void addCombatantToSideA(Entity e)
     {
-        sideA.put(e.getEntityId(), new Combatant(e));
+        EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
+        if(entityInfo == null && !(e instanceof EntityPlayer))
+        {
+            return;
+        }
+        Combatant newCombatant = new Combatant(e, entityInfo);
+        sideA.put(e.getEntityId(), newCombatant);
         if(e instanceof EntityPlayer)
         {
-            ++playerCount;
-            players.put(e.getEntityId(), (EntityPlayer)e);
+            newCombatant.recalcSpeedOnCompare = true;
+            playerCount.incrementAndGet();
+            players.put(e.getEntityId(), newCombatant);
             if(state == State.DECISION)
             {
-                ++undecidedCount;
+                undecidedCount.incrementAndGet();
             }
         }
     }
     
     public void addCombatantToSideB(Entity e)
     {
-        sideB.put(e.getEntityId(), new Combatant(e));
+        EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
+        if(entityInfo == null && !(e instanceof EntityPlayer))
+        {
+            return;
+        }
+        Combatant newCombatant = new Combatant(e, entityInfo);
+        sideB.put(e.getEntityId(), newCombatant);
         if(e instanceof EntityPlayer)
         {
-            ++playerCount;
-            players.put(e.getEntityId(), (EntityPlayer)e);
+            newCombatant.recalcSpeedOnCompare = true;
+            playerCount.incrementAndGet();
+            players.put(e.getEntityId(), newCombatant);
             if(state == State.DECISION)
             {
-                ++undecidedCount;
+                undecidedCount.incrementAndGet();
             }
         }
     }
@@ -157,8 +193,8 @@ public class Battle
         sideA.clear();
         sideB.clear();
         players.clear();
-        playerCount = 0;
-        undecidedCount = 0;
+        playerCount.set(0);
+        undecidedCount.set(0);
     }
     
     public Collection<Combatant> getSideA()
@@ -201,27 +237,20 @@ public class Battle
         return combatant;
     }
     
-    public void setDecision(int entityID, Decision decision)
+    public void setDecision(int entityID, Decision decision, int targetEntityID)
     {
         if(state != State.DECISION)
         {
             return;
         }
-        Combatant combatant = sideA.get(entityID);
+        Combatant combatant = players.get(entityID);
         if(combatant == null)
         {
-            combatant = sideB.get(entityID);
-            if(combatant == null)
-            {
-                return;
-            }
+            return;
         }
-        
-        if(combatant.entity instanceof EntityPlayer)
-        {
-            combatant.decision = decision;
-            --undecidedCount;
-        }
+        combatant.decision = decision;
+        combatant.targetEntityID = targetEntityID;
+        undecidedCount.decrementAndGet();
     }
     
     public State getState()
@@ -236,9 +265,9 @@ public class Battle
             return;
         }
         PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs());
-        for(EntityPlayer p : players.values())
+        for(Combatant p : players.values())
         {
-            PacketHandler.INSTANCE.sendTo(infoPacket, (EntityPlayerMP)p);
+            PacketHandler.INSTANCE.sendTo(infoPacket, (EntityPlayerMP)p.entity);
         }
     }
     
@@ -263,15 +292,29 @@ public class Battle
         {
         case DECISION:
             timer = timer.minus(dt);
-            if(timer.isNegative() || timer.isZero() || undecidedCount <= 0)
+            if(timer.isNegative() || timer.isZero() || undecidedCount.get() <= 0)
             {
                 state = State.ATTACK;
                 timer = TurnBasedMinecraftMod.BattleDecisionTime;
+                turnOrderQueue.clear();
+                for(Combatant c : sideA.values())
+                {
+                    turnOrderQueue.add(c);
+                }
+                for(Combatant c : sideB.values())
+                {
+                    turnOrderQueue.add(c);
+                }
                 update(Duration.ZERO);
             }
             break;
         case ATTACK:
-            // TODO
+            Combatant next = turnOrderQueue.poll();
+            while(next != null)
+            {
+                // TODO attack per entity here
+                next = turnOrderQueue.poll();
+            }
             break;
         case HEALTH_CHECK:
             // TODO

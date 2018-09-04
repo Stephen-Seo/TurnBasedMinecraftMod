@@ -24,9 +24,12 @@ import com.seodisparate.TurnBasedMinecraft.common.EntityInfo.Category;
 
 public class Config
 {
-    private Map<Class, EntityInfo> entityInfoMap;
+    private Map<String, EntityInfo> entityInfoMap;
     private Set<EntityInfo.Category> ignoreBattleTypes;
     private Logger logger;
+    private int playerSpeed;
+    private int playerHasteSpeed;
+    private int playerSlowSpeed;
     
     private enum ConfigParseResult
     {
@@ -36,7 +39,7 @@ public class Config
     
     public Config(Logger logger)
     {
-        entityInfoMap = new HashMap<Class, EntityInfo>();
+        entityInfoMap = new HashMap<String, EntityInfo>();
         ignoreBattleTypes = new HashSet<EntityInfo.Category>();
         this.logger = logger;
         
@@ -65,6 +68,7 @@ public class Config
             ConfigParseResult result = parseConfig(configFile);
             if(result == ConfigParseResult.IS_OLD)
             {
+                logger.warn("Config file " + TurnBasedMinecraftMod.CONFIG_FILENAME + " is older version, renaming...");
                 moveOldConfig();
                 writeConfig();
                 ConfigParseResult resultSecond = parseConfig(configFile);
@@ -109,8 +113,10 @@ public class Config
         File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
         if(configFile.exists())
         {
-            configFile.renameTo(new File(TurnBasedMinecraftMod.CONFIG_DIRECTORY + "_"
-                    + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(Instant.now())));
+            configFile.renameTo(new File(TurnBasedMinecraftMod.CONFIG_DIRECTORY
+                    + "TBM_Config_"
+                    + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(Instant.now())
+                    + ".xml"));
         }
     }
     
@@ -149,6 +155,28 @@ public class Config
                         }
                     } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("IgnoreBattleTypes")));
                 }
+                else if(xmlReader.getLocalName().equals("PlayerStats"))
+                {
+                    do
+                    {
+                        xmlReader.next();
+                        if(xmlReader.isStartElement())
+                        {
+                            if(xmlReader.getLocalName().equals("Speed"))
+                            {
+                                playerSpeed = Integer.parseInt(xmlReader.getElementText());
+                            }
+                            else if(xmlReader.getLocalName().equals("HasteSpeed"))
+                            {
+                                playerHasteSpeed = Integer.parseInt(xmlReader.getElementText());
+                            }
+                            else if(xmlReader.getLocalName().equals("SlowSpeed"))
+                            {
+                                playerSlowSpeed = Integer.parseInt(xmlReader.getElementText());
+                            }
+                        }
+                    } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("PlayerStats")));
+                }
                 else if(xmlReader.getLocalName().equals("EntityStats"))
                 {
                     do
@@ -178,6 +206,10 @@ public class Config
                                             if(xmlReader.getAttributeLocalName(i).equals("Probability"))
                                             {
                                                 eInfo.attackProbability = Integer.parseInt(xmlReader.getAttributeValue(i));
+                                            }
+                                            else if(xmlReader.getAttributeLocalName(i).equals("Variance"))
+                                            {
+                                                eInfo.attackVariance = Integer.parseInt(xmlReader.getAttributeValue(i));
                                             }
                                         }
                                         eInfo.attackPower = Integer.parseInt(xmlReader.getElementText());
@@ -230,9 +262,20 @@ public class Config
                                             }
                                         } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Conflicts")));
                                     }
+                                    else if(xmlReader.getLocalName().equals("IgnoreBattle"))
+                                    {
+                                        if(xmlReader.getElementText().toLowerCase().equals("true"))
+                                        {
+                                            eInfo.ignoreBattle = true;
+                                        }
+                                    }
+                                    else if(xmlReader.getLocalName().equals("Speed"))
+                                    {
+                                        eInfo.speed = Integer.parseInt(xmlReader.getElementText());
+                                    }
                                 }
                             } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals(classType)));
-                            entityInfoMap.put(eInfo.classType, eInfo);
+                            entityInfoMap.put(eInfo.classType.getName(), eInfo);
                         }
                     } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("EntityStats")));
                 }
@@ -241,5 +284,52 @@ public class Config
         xmlReader.close();
         fis.close();
         return ConfigParseResult.SUCCESS;
+    }
+    
+    public int getPlayerSpeed()
+    {
+        return playerSpeed;
+    }
+
+    public int getPlayerHasteSpeed()
+    {
+        return playerHasteSpeed;
+    }
+
+    public int getPlayerSlowSpeed()
+    {
+        return playerSlowSpeed;
+    }
+
+    /**
+     * Returns a clone of an EntityInfo (to prevent editing it).
+     * @param classFullName
+     * @return a clone of the stored EntityInfo or null if invalid String
+     */
+    public EntityInfo getEntityInfo(String classFullName)
+    {
+        return entityInfoMap.get(classFullName).clone();
+    }
+    
+    protected EntityInfo getEntityInfoReference(String classFullName)
+    {
+        return entityInfoMap.get(classFullName);
+    }
+    
+    protected EntityInfo getMatchingEntityInfo(Object entity)
+    {
+        EntityInfo matching = entityInfoMap.get(entity.getClass().getName());
+        if(matching.classType.isInstance(entity))
+        {
+            for(Class c : matching.conflictingTypes)
+            {
+                if(c.isInstance(entity))
+                {
+                    return entityInfoMap.get(c.getName());
+                }
+            }
+            return matching;
+        }
+        return null;
     }
 }

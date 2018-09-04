@@ -1,116 +1,152 @@
 <TurnBasedMinecraftConfig>
+	<!-- If the mod has a newer version config, it will rename the existing config and place the new config -->
 	<Version>1</Version>
+	<!-- Types that will not initiate battle with player. They are listed as "Category" per EntiytStats entity. -->
 	<IgnoreBattleTypes>
 		<Passive></Passive>
 		<Boss></Boss>
 	</IgnoreBattleTypes>
+	<PlayerStats>
+		<Speed>50</Speed>
+		<HasteSpeed>80</HasteSpeed>
+		<SlowSpeed>20</SlowSpeed>
+	</PlayerStats>
+	<!-- Battle stats for entities should be specified here. If an entity is not listed it cannot enter battle. -->
 	<EntityStats>
+		<!-- AttackPower: How much damage an entity does per attack. Usually has a "Probability" attribute between 0 and 100. Also may have a "Variance" attribute that varies the attack power by the specified amount randomly. -->
+		<!-- AttackEffect: (Optional) Applies effect to target entity with "Probability" success rate. -->
+		<!-- DefenseDamage: (Optional) Applies damage to an attacker when attacked with "Probability" success rate. -->
+		<!-- Evasion: Determines the percentage of evading attacks between 0 and 100. -->
+		<!-- Speed: Value in range of 0 to 100 that determines the order entities act in battle. Higher is sooner. Entities with same speed will take their turn as a group in random order (not at the same time). -->
+		<!-- IgnoreBattle: (Optional) Per entity setting to not enter turn-based-battle if value is "true". If "true" these stats will not apply to the entity as they are only used in turn-based-battle. -->
+		<!-- Category: Sets the type of the entity, used by "IgnoreBattleTypes" to determine what types ignore battle. -->
+		<!-- Conflicts: (Optional) Tells the mod that this entity should not be mistaken for the listed entities (possible because some entities derive from others; CaveSpiders are also Spiders). -->
 		<net.minecraft.entity.monster.EntityBlaze>
 			<AttackPower Probability="50">5</AttackPower>
 			<AttackEffect Probability="75">fire</AttackEffect>
 			<Evasion>5</Evasion>
 			<Category>monster</Category>
+			<Speed>45</Speed>
 		</net.minecraft.entity.monster.EntityBlaze>
 		<net.minecraft.entity.monster.EntityCaveSpider>
 			<AttackPower Probability="75">2</AttackPower>
 			<AttackEffect Probability="90">poison</AttackEffect>
 			<Evasion>35</Evasion>
 			<Category>monster</Category>
+			<Speed>75</Speed>
 		</net.minecraft.entity.monster.EntityCaveSpider>
 		<net.minecraft.entity.monster.EntityCreeper>
 			<IgnoreBattle>true</IgnoreBattle>
 			<AttackPower Probability="17" Variance="7">15</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>monster</Category>
+			<Speed>25</Speed>
 		</net.minecraft.entity.monster.EntityCreeper>
 		<net.minecraft.entity.monster.EntityElderGuardian>
 			<AttackPower Probability="65">8</AttackPower>
 			<DefenseDamage Probability="35">2</DefenseDamage>
 			<Evasion>25</Evasion>
 			<Category>monster</Category>
+			<Speed>45</Speed>
 		</net.minecraft.entity.monster.EntityElderGuardian>
 		<net.minecraft.entity.monster.EntityEnderman>
 			<AttackPower Probability="80">7</AttackPower>
 			<Evasion>40</Evasion>
 			<Category>monster</Category>
+			<Speed>70</Speed>
 		</net.minecraft.entity.monster.EntityEnderman>
 		<net.minecraft.entity.monster.EntityEndermite>
 			<AttackPower Probability="80">2</AttackPower>
 			<Evasion>40</Evasion>
 			<Category>monster</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.monster.EntityEndermite>
 		<net.minecraft.entity.monster.EntityEvoker>
 			<AttackPower Probability="60">6</AttackPower>
 			<Evasion>35</Evasion>
 			<Category>monster</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.monster.EntityEvoker>
 		<net.minecraft.entity.monster.EntityGhast>
 			<IgnoreBattle>true</IgnoreBattle>
 			<AttackPower Probability="20">13</AttackPower>
 			<Evasion>35</Evasion>
 			<Category>monster</Category>
+			<Speed>60</Speed>
 		</net.minecraft.entity.monster.EntityGhast>
 		<net.minecraft.entity.monster.EntityGiantZombie>
 			<AttackPower Probability="35">11</AttackPower>
 			<Evasion>2</Evasion>
 			<Category>monster</Category>
+			<Speed>45</Speed>
 		</net.minecraft.entity.monster.EntityGiantZombie>
 		<net.minecraft.entity.monster.EntityGuardian>
 			<AttackPower Probability="55">6</AttackPower>
 			<DefenseDamage Probability="30">2</DefenseDamage>
 			<Evasion>25</Evasion>
 			<Category>monster</Category>
+			<Speed>50</Speed>
 		</net.minecraft.entity.monster.EntityGuardian>
 		<net.minecraft.entity.monster.EntityHusk>
 			<AttackPower Probability="70">3</AttackPower>
 			<AttackEffect Probability="95">hunger</AttackEffect>
 			<Evasion>5</Evasion>
 			<Category>monster</Category>
+			<Speed>25</Speed>
 		</net.minecraft.entity.monster.EntityHusk>
 		<net.minecraft.entity.monster.EntityIronGolem>
 			<AttackPower Probability="85" Variance="7">14</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>monster</Category>
+			<Speed>45</Speed>
 		</net.minecraft.entity.monster.EntityIronGolem>
 		<net.minecraft.entity.monster.EntityMagmaCube>
 			<AttackPower Probability="35">3</AttackPower>
 			<Evasion>12</Evasion>
 			<Category>monster</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.monster.EntityMagmaCube>
 		<net.minecraft.entity.monster.EntityPigZombie>
 			<AttackPower Probability="70">8</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>monster</Category>
+			<Speed>50</Speed>
 		</net.minecraft.entity.monster.EntityPigZombie>
 		<net.minecraft.entity.monster.EntityPolarBear>
 			<AttackPower Probability="67">6</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>animal</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.monster.EntityPolarBear>
 		<net.minecraft.entity.monster.EntityShulker>
 			<AttackPower Probability="80">4</AttackPower>
 			<Evasion>15</Evasion>
 			<Category>monster</Category>
+			<Speed>10</Speed>
 		</net.minecraft.entity.monster.EntityShulker>
 		<net.minecraft.entity.monster.EntitySilverFish>
 			<AttackPower Probability="85">1</AttackPower>
 			<Evasion>37</Evasion>
 			<Category>monster</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.monster.EntitySilverFish>
 		<net.minecraft.entity.monster.EntitySkeleton>
 			<AttackPower Probability="75" Variance="1">3</AttackPower>
 			<Evasion>13</Evasion>
 			<Category>monster</Category>
+			<Speed>30</Speed>
 		</net.minecraft.entity.monster.EntitySkeleton>
 		<net.minecraft.entity.monster.EntitySlime>
 			<AttackPower Probability="35">2</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>monster</Category>
+			<Speed>30</Speed>
 		</net.minecraft.entity.monster.EntitySlime>
 		<net.minecraft.entity.monster.EntitySnowman>
 			<AttackPower Probability="80">0</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>passive</Category>
+			<Speed>60</Speed>
 		</net.minecraft.entity.monster.EntitySnowman>
 		<net.minecraft.entity.monster.EntitySpider>
 			<AttackPower Probability="70">2</AttackPower>
@@ -119,33 +155,39 @@
 				<net.minecraft.entity.monster.EntityCaveSpider></net.minecraft.entity.monster.EntityCaveSpider>
 			</Conflicts>
 			<Category>monster</Category>
+			<Speed>70</Speed>
 		</net.minecraft.entity.monster.EntitySpider>
 		<net.minecraft.entity.monster.EntityStray>
 			<AttackPower Probability="75" Variance="1">3</AttackPower>
 			<AttackEffect Probability="90">slow</AttackEffect>
 			<Evasion>13</Evasion>
 			<Category>monster</Category>
+			<Speed>30</Speed>
 		</net.minecraft.entity.monster.EntityStray>
 		<net.minecraft.entity.monster.EntityVex>
 			<AttackPower Probability="65">9</AttackPower>
 			<Evasion>30</Evasion>
 			<Category>monster</Category>
+			<Speed>80</Speed>
 		</net.minecraft.entity.monster.EntityVex>
 		<net.minecraft.entity.monster.EntityVindicator>
 			<AttackPower Probability="70">13</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>monster</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.monster.EntityVindicator>
 		<net.minecraft.entity.monster.EntityWitch>
 			<AttackPower Probability="75" Variance="1">5</AttackPower>
 			<Evasion>8</Evasion>
 			<Category>monster</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.monster.EntityWitch>
 		<net.minecraft.entity.monster.EntityWitherSkeleton>
 			<AttackPower Probability="70">8</AttackPower>
 			<AttackEffect Probability="90">wither</AttackEffect>
 			<Evasion>7</Evasion>
 			<Category>monster</Category>
+			<Speed>65</Speed>
 		</net.minecraft.entity.monster.EntityWitherSkeleton>
 		<net.minecraft.entity.monster.EntityZombie>
 			<AttackPower Probability="70">3</AttackPower>
@@ -155,21 +197,25 @@
 			</Conflicts>
 			<Evasion>5</Evasion>
 			<Category>monster</Category>
+			<Speed>25</Speed>
 		</net.minecraft.entity.monster.EntityZombie>
 		<net.minecraft.entity.monster.EntityZombieVillager>
 			<AttackPower Probability="70">3</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>monster</Category>
+			<Speed>25</Speed>
 		</net.minecraft.entity.monster.EntityZombieVillager>
 		<net.minecraft.entity.passive.EntityBat>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>35</Evasion>
 			<Category>passive</Category>
+			<Speed>75</Speed>
 		</net.minecraft.entity.passive.EntityBat>
 		<net.minecraft.entity.passive.EntityChicken>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>passive</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.passive.EntityChicken>
 		<net.minecraft.entity.passive.EntityCow>
 			<AttackPower Probability="50">0</AttackPower>
@@ -178,92 +224,110 @@
 				<net.minecraft.entity.passive.EntityMooshroom></net.minecraft.entity.passive.EntityMooshroom>
 			</Conflicts>
 			<Category>passive</Category>
+			<Speed>20</Speed>
 		</net.minecraft.entity.passive.EntityCow>
 		<net.minecraft.entity.passive.EntityDonkey>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>passive</Category>
+			<Speed>65</Speed>
 		</net.minecraft.entity.passive.EntityDonkey>
 		<net.minecraft.entity.passive.EntityHorse>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>passive</Category>
+			<Speed>65</Speed>
 		</net.minecraft.entity.passive.EntityHorse>
 		<net.minecraft.entity.passive.EntityLlama>
 			<AttackPower Probability="70">1</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>passive</Category>
+			<Speed>50</Speed>
 		</net.minecraft.entity.passive.EntityLlama>
 		<net.minecraft.entity.passive.EntityMooshroom>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>1</Evasion>
 			<Category>passive</Category>
+			<Speed>20</Speed>
 		</net.minecraft.entity.passive.EntityMooshroom>
 		<net.minecraft.entity.passive.EntityMule>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>passive</Category>
+			<Speed>50</Speed>
 		</net.minecraft.entity.passive.EntityMule>
 		<net.minecraft.entity.passive.EntityOcelot>
 			<AttackPower Probability="70" Variance="1">1</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>passive</Category>
+			<Speed>75</Speed>
 		</net.minecraft.entity.passive.EntityOcelot>
 		<net.minecraft.entity.passive.EntityParrot>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>35</Evasion>
 			<Category>passive</Category>
+			<Speed>70</Speed>
 		</net.minecraft.entity.passive.EntityParrot>
 		<net.minecraft.entity.passive.EntityPig>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>10</Evasion>
 			<Category>passive</Category>
+			<Speed>30</Speed>
 		</net.minecraft.entity.passive.EntityPig>
 		<net.minecraft.entity.passive.EntityRabbit>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>40</Evasion>
 			<Category>passive</Category>
+			<Speed>75</Speed>
 		</net.minecraft.entity.passive.EntityRabbit>
 		<net.minecraft.entity.passive.EntitySheep>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>passive</Category>
+			<Speed>30</Speed>
 		</net.minecraft.entity.passive.EntitySheep>
 		<net.minecraft.entity.passive.EntitySkeletonHorse>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>passive</Category>
+			<Speed>65</Speed>
 		</net.minecraft.entity.passive.EntitySkeletonHorse>
 		<net.minecraft.entity.passive.EntitySquid>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>15</Evasion>
 			<Category>passive</Category>
+			<Speed>40</Speed>
 		</net.minecraft.entity.passive.EntitySquid>
 		<net.minecraft.entity.passive.EntityVillager>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>5</Evasion>
 			<Category>passive</Category>
+			<Speed>35</Speed>
 		</net.minecraft.entity.passive.EntityVillager>
 		<net.minecraft.entity.passive.EntityWolf>
 			<AttackPower Probability="70">4</AttackPower>
 			<Evasion>20</Evasion>
 			<Category>animal</Category>
+			<Speed>70</Speed>
 		</net.minecraft.entity.passive.EntityWolf>
 		<net.minecraft.entity.passive.EntityZombieHorse>
 			<AttackPower Probability="70">0</AttackPower>
 			<Evasion>8</Evasion>
 			<Category>passive</Category>
+			<Speed>65</Speed>
 		</net.minecraft.entity.passive.EntityZombieHorse>
 		<net.minecraft.entity.boss.EntityDragon>
 			<AttackPower Probability="70" Variance="2">10</AttackPower>
 			<Evasion>27</Evasion>
 			<Category>boss</Category>
+			<Speed>63</Speed>
 		</net.minecraft.entity.boss.EntityDragon>
 		<net.minecraft.entity.boss.EntityWither>
 			<AttackPower Probability="70">8</AttackPower>
 			<Evasion>20</Evasion>
 			<AttackEffect Probability="90">wither</AttackEffect>
 			<Category>boss</Category>
+			<Speed>68</Speed>
 		</net.minecraft.entity.boss.EntityWither>
 	</EntityStats>
 </TurnBasedMinecraftConfig>

@@ -39,7 +39,7 @@ public class TurnBasedMinecraftMod
     private static BattleManager battleManager;
     private static int packetHandlerID = 0;
     public static Entity attackingEntity;
-    private static Config config;
+    public static Config config;
     
     public static Battle currentBattle;
 

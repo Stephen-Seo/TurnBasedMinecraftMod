@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 
+import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleEntered;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
@@ -36,6 +37,12 @@ public class BattleManager
      */
     public boolean checkAttack(final LivingAttackEvent event)
     {
+        // verify that both entities are EntityPlayer or has a corresponding EntityInfo
+        if(!(event.getEntity() instanceof EntityPlayer || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getEntity().getClass().getName()) != null)
+            || !(event.getSource().getTrueSource() instanceof EntityPlayer || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null))
+        {
+            return false;
+        }
         // check if one is in battle
         Entity inBattle = null;
         Entity notInBattle = null;
