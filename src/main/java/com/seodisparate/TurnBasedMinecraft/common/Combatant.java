@@ -18,11 +18,14 @@ public class Combatant
     public EntityInfo entityInfo;
     public boolean recalcSpeedOnCompare;
     public int targetEntityID;
+    public boolean isSideA;
+    public int remainingDefenses;
     
     public Combatant()
     {
         decision = Battle.Decision.UNDECIDED;
         recalcSpeedOnCompare = false;
+        remainingDefenses = 0;
     }
     
     public Combatant(Entity e, EntityInfo entityInfo)
@@ -31,6 +34,7 @@ public class Combatant
         decision = Battle.Decision.UNDECIDED;
         this.entityInfo = entityInfo;
         recalcSpeedOnCompare = false;
+        remainingDefenses = 0;
     }
     
     /**

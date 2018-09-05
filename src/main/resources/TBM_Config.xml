@@ -10,7 +10,14 @@
 		<Speed>50</Speed>
 		<HasteSpeed>80</HasteSpeed>
 		<SlowSpeed>20</SlowSpeed>
+		<AttackProbability>90</AttackProbability>
+		<Evasion>10</Evasion>
 	</PlayerStats>
+	<!-- Determines how many attacks a "defense" move can block before that entity's next turn. -->
+	<DefenseDuration>1</DefenseDuration>
+	<!-- Probability of escaping battle. If entity's speed is greater than the enemy team's speediest entity, then good probability is used. -->
+	<FleeGoodProbability>90</FleeGoodProbability>
+	<FleeBadProbability>40</FleeBadProbability>
 	<!-- Battle stats for entities should be specified here. If an entity is not listed it cannot enter battle. -->
 	<EntityStats>
 		<!-- AttackPower: How much damage an entity does per attack. Usually has a "Probability" attribute between 0 and 100. Also may have a "Variance" attribute that varies the attack power by the specified amount randomly. -->

@@ -18,8 +18,10 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.DamageSource;
 
 public class Battle
 {
@@ -38,7 +40,7 @@ public class Battle
     public enum State
     {
         DECISION,
-        ATTACK,
+        ACTION,
         HEALTH_CHECK
     }
     
@@ -96,6 +98,7 @@ public class Battle
                     continue;
                 }
                 Combatant newCombatant = new Combatant(e, entityInfo);
+                newCombatant.isSideA = true;
                 this.sideA.put(e.getEntityId(), newCombatant);
                 if(e instanceof EntityPlayer)
                 {
@@ -115,6 +118,7 @@ public class Battle
                     continue;
                 }
                 Combatant newCombatant = new Combatant(e, entityInfo);
+                newCombatant.isSideA = false;
                 this.sideB.put(e.getEntityId(), newCombatant);
                 if(e instanceof EntityPlayer)
                 {
@@ -154,6 +158,7 @@ public class Battle
             return;
         }
         Combatant newCombatant = new Combatant(e, entityInfo);
+        newCombatant.isSideA = true;
         sideA.put(e.getEntityId(), newCombatant);
         if(e instanceof EntityPlayer)
         {
@@ -175,6 +180,7 @@ public class Battle
             return;
         }
         Combatant newCombatant = new Combatant(e, entityInfo);
+        newCombatant.isSideA = false;
         sideB.put(e.getEntityId(), newCombatant);
         if(e instanceof EntityPlayer)
         {
@@ -237,19 +243,26 @@ public class Battle
         return combatant;
     }
     
-    public void setDecision(int entityID, Decision decision, int targetEntityID)
+    public void setDecision(int entityID, Decision decision, int targetIDOrItemID)
     {
         if(state != State.DECISION)
         {
             return;
         }
         Combatant combatant = players.get(entityID);
-        if(combatant == null)
+        if(combatant == null || combatant.decision != Decision.UNDECIDED)
         {
             return;
         }
         combatant.decision = decision;
-        combatant.targetEntityID = targetEntityID;
+        if(decision == Decision.ATTACK)
+        {
+            combatant.targetEntityID = targetIDOrItemID;
+        }
+        else if(decision == Decision.USE_ITEM)
+        {
+            combatant.itemToUse = targetIDOrItemID;
+        }
         undecidedCount.decrementAndGet();
     }
     
@@ -294,7 +307,7 @@ public class Battle
             timer = timer.minus(dt);
             if(timer.isNegative() || timer.isZero() || undecidedCount.get() <= 0)
             {
-                state = State.ATTACK;
+                state = State.ACTION;
                 timer = TurnBasedMinecraftMod.BattleDecisionTime;
                 turnOrderQueue.clear();
                 for(Combatant c : sideA.values())
@@ -306,16 +319,264 @@ public class Battle
                     turnOrderQueue.add(c);
                 }
                 update(Duration.ZERO);
+                // TODO assign decisions to non-players
             }
             break;
-        case ATTACK:
+        case ACTION:
+        {
             Combatant next = turnOrderQueue.poll();
             while(next != null)
             {
-                // TODO attack per entity here
+                if(!next.entity.isEntityAlive())
+                {
+                    next = turnOrderQueue.poll();
+                    continue;
+                }
+                switch(next.decision)
+                {
+                case UNDECIDED:
+                    next = turnOrderQueue.poll();
+                    continue;
+                case ATTACK:
+                    Combatant target = null;
+                    if(next.entity instanceof EntityPlayer)
+                    {
+                        if(next.isSideA)
+                        {
+                            target = sideB.get(next.targetEntityID);
+                        }
+                        else
+                        {
+                            target = sideA.get(next.targetEntityID);
+                        }
+                        if(target == null || !target.entity.isEntityAlive())
+                        {
+                            next = turnOrderQueue.poll();
+                            continue;
+                        }
+                        int hitChance = TurnBasedMinecraftMod.config.getPlayerAttackProbability();
+                        if(target.entity instanceof EntityPlayer)
+                        {
+                            hitChance -= TurnBasedMinecraftMod.config.getPlayerEvasion();
+                        }
+                        else
+                        {
+                            hitChance -= target.entityInfo.evasion;
+                        }
+                        if((int)(Math.random() * 100) < hitChance)
+                        {
+                            if(target.remainingDefenses <= 0)
+                            {
+                                // attack
+                                // TODO damage via bow and arrow
+                                TurnBasedMinecraftMod.attackingEntity = next.entity;
+                                ((EntityPlayer)next.entity).attackTargetEntityWithCurrentItem(target.entity);
+                                TurnBasedMinecraftMod.attackingEntity = null;
+                                if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
+                                {
+                                    if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
+                                    {
+                                        // defense damage
+                                        DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
+                                        TurnBasedMinecraftMod.attackingEntity = target.entity;
+                                        next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
+                                        TurnBasedMinecraftMod.attackingEntity = null;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // blocked
+                                --target.remainingDefenses;
+                            }
+                        }
+                        else
+                        {
+                            // miss
+                        }
+                    }
+                    else
+                    {
+                        if(next.isSideA)
+                        {
+                            int randomTargetIndex = (int)(Math.random() * sideB.size());
+                            for(Combatant c : sideB.values())
+                            {
+                                if(randomTargetIndex-- == 0)
+                                {
+                                    target = c;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            int randomTargetIndex = (int)(Math.random() * sideA.size());
+                            for(Combatant c : sideA.values())
+                            {
+                                if(randomTargetIndex-- == 0)
+                                {
+                                    target = c;
+                                    break;
+                                }
+                            }
+                        }
+                        if(target == null || !target.entity.isEntityAlive())
+                        {
+                            next = turnOrderQueue.poll();
+                            continue;
+                        }
+                        int hitChance = next.entityInfo.attackProbability;
+                        if(target.entity instanceof EntityPlayer)
+                        {
+                            hitChance -= TurnBasedMinecraftMod.config.getPlayerEvasion();
+                        }
+                        else
+                        {
+                            hitChance -= target.entityInfo.evasion;
+                        }
+                        if((int)(Math.random() * 100) < hitChance)
+                        {
+                            if(target.remainingDefenses <= 0)
+                            {
+                                DamageSource damageSource = DamageSource.causeMobDamage((EntityLivingBase)next.entity);
+                                int damageAmount = next.entityInfo.attackPower;
+                                if(next.entityInfo.attackVariance > 0)
+                                {
+                                    damageAmount += (int)(Math.random() * (next.entityInfo.attackVariance * 2 + 1)) - next.entityInfo.attackVariance;
+                                }
+                                // attack
+                                TurnBasedMinecraftMod.attackingEntity = next.entity;
+                                target.entity.attackEntityFrom(damageSource, next.entityInfo.attackPower);
+                                TurnBasedMinecraftMod.attackingEntity = null;
+                                if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
+                                {
+                                    if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
+                                    {
+                                        // defense damage
+                                        DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
+                                        TurnBasedMinecraftMod.attackingEntity = target.entity;
+                                        next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
+                                        TurnBasedMinecraftMod.attackingEntity = null;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // blocked
+                                --target.remainingDefenses;
+                            }
+                        }
+                        else
+                        {
+                            // miss
+                        }
+                    }
+                    break;
+                case DEFEND:
+                    next.remainingDefenses = TurnBasedMinecraftMod.config.getDefenseDuration();
+                    break;
+                case FLEE:
+                    int fastestEnemySpeed = 0;
+                    if(next.isSideA)
+                    {
+                        for(Combatant c : sideB.values())
+                        {
+                            if(c.entity instanceof EntityPlayer)
+                            {
+                                if(TurnBasedMinecraftMod.config.getPlayerSpeed() > fastestEnemySpeed)
+                                {
+                                    fastestEnemySpeed = TurnBasedMinecraftMod.config.getPlayerSpeed();
+                                }
+                            }
+                            else
+                            {
+                                if(c.entityInfo.speed > fastestEnemySpeed)
+                                {
+                                    fastestEnemySpeed = c.entityInfo.speed;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for(Combatant c : sideA.values())
+                        {
+                            if(c.entity instanceof EntityPlayer)
+                            {
+                                if(TurnBasedMinecraftMod.config.getPlayerSpeed() > fastestEnemySpeed)
+                                {
+                                    fastestEnemySpeed = TurnBasedMinecraftMod.config.getPlayerSpeed();
+                                }
+                            }
+                            else
+                            {
+                                if(c.entityInfo.speed > fastestEnemySpeed)
+                                {
+                                    fastestEnemySpeed = c.entityInfo.speed;
+                                }
+                            }
+                        }
+                    }
+                    int fleeProbability = 0;
+                    if(next.entity instanceof EntityPlayer)
+                    {
+                        if(fastestEnemySpeed >= TurnBasedMinecraftMod.config.getPlayerSpeed())
+                        {
+                            fleeProbability = TurnBasedMinecraftMod.config.getFleeBadProbability();
+                        }
+                        else
+                        {
+                            fleeProbability = TurnBasedMinecraftMod.config.getFleeGoodProbability();
+                        }
+                    }
+                    else
+                    {
+                        if(fastestEnemySpeed >= next.entityInfo.speed)
+                        {
+                            fleeProbability = TurnBasedMinecraftMod.config.getFleeBadProbability();
+                        }
+                        else
+                        {
+                            fleeProbability = TurnBasedMinecraftMod.config.getFleeGoodProbability();
+                        }
+                    }
+                    if((int)(Math.random() * 100) < fleeProbability)
+                    {
+                        // flee success
+                        if(next.isSideA)
+                        {
+                            sideA.remove(next.entity.getEntityId());
+                        }
+                        else
+                        {
+                            sideB.remove(next.entity.getEntityId());
+                        }
+                        if(next.entity instanceof EntityPlayer)
+                        {
+                            players.remove(next.entity.getEntityId());
+                            playerCount.decrementAndGet();
+                            // TODO notify player exited battle
+                        }
+                    }
+                    break;
+                case USE_ITEM:
+                    break;
+                }
                 next = turnOrderQueue.poll();
             }
+            for(Combatant c : sideA.values())
+            {
+                c.decision = Decision.UNDECIDED;
+            }
+            for(Combatant c : sideB.values())
+            {
+                c.decision = Decision.UNDECIDED;
+            }
+            state = State.HEALTH_CHECK;
+            update(Duration.ZERO);
             break;
+        }
         case HEALTH_CHECK:
             // TODO
             break;

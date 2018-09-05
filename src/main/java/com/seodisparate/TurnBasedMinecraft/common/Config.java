@@ -30,6 +30,11 @@ public class Config
     private int playerSpeed;
     private int playerHasteSpeed;
     private int playerSlowSpeed;
+    private int playerAttackProbability = 100;
+    private int playerEvasion = 10;
+    private int defenseDuration = 1;
+    private int fleeGoodProbability = 90;
+    private int fleeBadProbability = 40;
     
     private enum ConfigParseResult
     {
@@ -174,8 +179,28 @@ public class Config
                             {
                                 playerSlowSpeed = Integer.parseInt(xmlReader.getElementText());
                             }
+                            else if(xmlReader.getLocalName().equals("AttackProbability"))
+                            {
+                                playerAttackProbability = Integer.parseInt(xmlReader.getElementText());
+                            }
+                            else if(xmlReader.getLocalName().equals("Evasion"))
+                            {
+                                playerEvasion = Integer.parseInt(xmlReader.getElementText());
+                            }
                         }
                     } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("PlayerStats")));
+                }
+                else if(xmlReader.getLocalName().equals("DefenseDuration"))
+                {
+                    defenseDuration = Integer.parseInt(xmlReader.getElementText());
+                }
+                else if(xmlReader.getLocalName().equals("FleeGoodProbability"))
+                {
+                    fleeGoodProbability = Integer.parseInt(xmlReader.getElementText());
+                }
+                else if(xmlReader.getLocalName().equals("FleeBadProbability"))
+                {
+                    fleeBadProbability = Integer.parseInt(xmlReader.getElementText());
                 }
                 else if(xmlReader.getLocalName().equals("EntityStats"))
                 {
@@ -300,7 +325,32 @@ public class Config
     {
         return playerSlowSpeed;
     }
+    
+    public int getPlayerAttackProbability()
+    {
+        return playerAttackProbability;
+    }
 
+    public int getPlayerEvasion()
+    {
+        return playerEvasion;
+    }
+    
+    public int getDefenseDuration()
+    {
+        return defenseDuration;
+    }
+    
+    public int getFleeGoodProbability()
+    {
+        return fleeGoodProbability;
+    }
+    
+    public int getFleeBadProbability()
+    {
+        return fleeBadProbability;
+    }
+    
     /**
      * Returns a clone of an EntityInfo (to prevent editing it).
      * @param classFullName

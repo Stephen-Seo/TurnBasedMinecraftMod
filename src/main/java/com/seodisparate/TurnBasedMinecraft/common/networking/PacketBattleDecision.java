@@ -14,15 +14,15 @@ public class PacketBattleDecision implements IMessage
 {
     private int battleID;
     private Battle.Decision decision;
-    private int targetEntityID;
+    private int targetIDOrItemID;
     
     public PacketBattleDecision() {}
     
-    public PacketBattleDecision(int battleID, Battle.Decision decision, int targetEntityID)
+    public PacketBattleDecision(int battleID, Battle.Decision decision, int targetIDOrItemID)
     {
         this.battleID = battleID;
         this.decision = decision;
-        this.targetEntityID = targetEntityID;
+        this.targetIDOrItemID = targetIDOrItemID;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class PacketBattleDecision implements IMessage
     {
         battleID = buf.readInt();
         decision = Decision.valueOf(buf.readInt());
-        targetEntityID = buf.readInt();
+        targetIDOrItemID = buf.readInt();
     }
 
     @Override
@@ -38,7 +38,7 @@ public class PacketBattleDecision implements IMessage
     {
         buf.writeInt(battleID);
         buf.writeInt(decision.getValue());
-        buf.writeInt(targetEntityID);
+        buf.writeInt(targetIDOrItemID);
     }
 
     public static class HandleBattleDecision implements IMessageHandler<PacketBattleDecision, IMessage>
@@ -50,7 +50,7 @@ public class PacketBattleDecision implements IMessage
             if(b != null)
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
-                b.setDecision(player.getEntityId(), message.decision, message.targetEntityID);
+                b.setDecision(player.getEntityId(), message.decision, message.targetIDOrItemID);
             }
             return null;
         }
