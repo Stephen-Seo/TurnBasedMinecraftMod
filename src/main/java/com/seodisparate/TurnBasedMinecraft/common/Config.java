@@ -27,9 +27,9 @@ public class Config
     private Map<String, EntityInfo> entityInfoMap;
     private Set<EntityInfo.Category> ignoreBattleTypes;
     private Logger logger;
-    private int playerSpeed;
-    private int playerHasteSpeed;
-    private int playerSlowSpeed;
+    private int playerSpeed = 50;
+    private int playerHasteSpeed = 80;
+    private int playerSlowSpeed = 20;
     private int playerAttackProbability = 100;
     private int playerEvasion = 10;
     private int defenseDuration = 1;
@@ -298,6 +298,28 @@ public class Config
                                     {
                                         eInfo.speed = Integer.parseInt(xmlReader.getElementText());
                                     }
+                                    else if(xmlReader.getLocalName().equals("Decision"))
+                                    {
+                                        do
+                                        {
+                                            xmlReader.next();
+                                            if(xmlReader.isStartElement())
+                                            {
+                                                if(xmlReader.getLocalName().equals("Attack"))
+                                                {
+                                                    eInfo.decisionAttack = Integer.parseInt(xmlReader.getElementText());
+                                                }
+                                                else if(xmlReader.getLocalName().equals("Defend"))
+                                                {
+                                                    eInfo.decisionDefend = Integer.parseInt(xmlReader.getElementText());
+                                                }
+                                                else if(xmlReader.getLocalName().equals("Flee"))
+                                                {
+                                                    eInfo.decisionFlee = Integer.parseInt(xmlReader.getElementText());
+                                                }
+                                            }
+                                        } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Decision")));
+                                    }
                                 }
                             } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals(classType)));
                             entityInfoMap.put(eInfo.classType.getName(), eInfo);
@@ -368,6 +390,10 @@ public class Config
     
     protected EntityInfo getMatchingEntityInfo(Object entity)
     {
+        if(entity == null)
+        {
+            return null;
+        }
         EntityInfo matching = entityInfoMap.get(entity.getClass().getName());
         if(matching.classType.isInstance(entity))
         {

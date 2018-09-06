@@ -8,9 +8,8 @@ import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.BattleManager;
 import com.seodisparate.TurnBasedMinecraft.common.Config;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleEntered;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleExited;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleRequestInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
@@ -39,6 +38,7 @@ public class TurnBasedMinecraftMod
     private static BattleManager battleManager;
     private static int packetHandlerID = 0;
     public static Entity attackingEntity;
+    public static int attackingDamage = 0;
     public static Config config;
     
     public static Battle currentBattle;
@@ -64,16 +64,6 @@ public class TurnBasedMinecraftMod
         
         // register packets
         PacketHandler.INSTANCE.registerMessage(
-            PacketBattleEntered.HandlerBattleEntered.class,
-            PacketBattleEntered.class,
-            packetHandlerID++,
-            Side.CLIENT);
-        PacketHandler.INSTANCE.registerMessage(
-            PacketBattleExited.HandlerBattleExited.class,
-            PacketBattleExited.class,
-            packetHandlerID++,
-            Side.CLIENT);
-        PacketHandler.INSTANCE.registerMessage(
             PacketBattleInfo.HandlerBattleInfo.class,
             PacketBattleInfo.class,
             packetHandlerID++,
@@ -88,6 +78,11 @@ public class TurnBasedMinecraftMod
             PacketBattleDecision.class,
             packetHandlerID++,
             Side.SERVER);
+        PacketHandler.INSTANCE.registerMessage(
+            PacketBattleMessage.HandlerBattleMessage.class,
+            PacketBattleMessage.class,
+            packetHandlerID++,
+            Side.CLIENT);
     }
     
     @EventHandler
@@ -111,6 +106,7 @@ public class TurnBasedMinecraftMod
             logger.debug("Canceled LivingAttackEvent between " + attackingEntity + " and " + event.getEntity());
             event.setCanceled(true);
         }
+        attackingDamage = (int) event.getAmount();
     }
     
     public static BattleManager getBattleManager()

@@ -19,6 +19,9 @@ public class EntityInfo
     public int evasion;
     public int speed;
     public Category category;
+    public int decisionAttack;
+    public int decisionDefend;
+    public int decisionFlee;
     
     public enum Category
     {
@@ -208,6 +211,9 @@ public class EntityInfo
         evasion = 15;
         speed = 50;
         category = Category.UNKNOWN;
+        decisionAttack = 70;
+        decisionDefend = 20;
+        decisionFlee = 10;
     }
     
     public EntityInfo clone()
@@ -230,6 +236,9 @@ public class EntityInfo
         newEntityInfo.evasion = evasion;
         newEntityInfo.speed = speed;
         newEntityInfo.category = category;
+        newEntityInfo.decisionAttack = decisionAttack;
+        newEntityInfo.decisionDefend = decisionDefend;
+        newEntityInfo.decisionFlee = decisionFlee;
         return newEntityInfo;
     }
 }

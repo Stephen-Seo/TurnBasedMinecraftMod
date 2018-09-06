@@ -6,12 +6,9 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleEntered;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 
 public class BattleManager
@@ -104,13 +101,7 @@ public class BattleManager
         {
             battle.addCombatantToSideA(notInBattle);
         }
-        
-        if(notInBattle instanceof EntityPlayerMP)
-        {
-            PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)notInBattle);
-        }
-        
-        battle.notifyPlayersBattleInfo();
+
         return true;
     }
     
@@ -120,22 +111,8 @@ public class BattleManager
         {
             ++IDCounter;
         }
-        Battle newBattle = new Battle(IDCounter, sideA, sideB);
+        Battle newBattle = new Battle(IDCounter, sideA, sideB, true);
         battleMap.put(IDCounter, newBattle);
-        for(Entity e : sideA)
-        {
-            if(e instanceof EntityPlayerMP)
-            {
-                PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)e);
-            }
-        }
-        for(Entity e : sideB)
-        {
-            if(e instanceof EntityPlayerMP)
-            {
-                PacketHandler.INSTANCE.sendTo(new PacketBattleEntered(IDCounter), (EntityPlayerMP)e);
-            }
-        }
         newBattle.notifyPlayersBattleInfo();
         return newBattle;
     }

@@ -1,5 +1,8 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 public class BattleUpdater implements Runnable
 {
     private BattleManager manager;
@@ -14,11 +17,22 @@ public class BattleUpdater implements Runnable
     @Override
     public void run()
     {
+        Queue<Integer> endedQueue = new ArrayDeque<Integer>();
+        Integer ended;
         while(isRunning)
         {
             for(Battle e : manager.battleMap.values())
             {
-                e.update();
+                if(e.update())
+                {
+                    endedQueue.add(e.getId());
+                }
+            }
+            ended = endedQueue.poll();
+            while(ended != null)
+            {
+                manager.battleMap.remove(ended);
+                ended = endedQueue.poll();
             }
             try { Thread.sleep(250); } catch (Exception e) { /* ignored */ }
         }
