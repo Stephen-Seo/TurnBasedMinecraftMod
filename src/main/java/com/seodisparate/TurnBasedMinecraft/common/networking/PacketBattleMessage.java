@@ -13,6 +13,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -30,7 +31,8 @@ public class PacketBattleMessage implements IMessage
         DEFENSE_DAMAGE(6),
         MISS(7),
         DEFENDING(8),
-        DID_NOTHING(9);
+        DID_NOTHING(9),
+        USED_ITEM(10);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -59,12 +61,47 @@ public class PacketBattleMessage implements IMessage
         }
     }
     
+    public enum UsedItemAction
+    {
+        USED_NOTHING(0),
+        USED_INVALID(1),
+        USED_FOOD(2),
+        USED_POTION(3);
+        
+        private int value;
+        private static Map<Integer, UsedItemAction> map = new HashMap<Integer, UsedItemAction>();
+        
+        private UsedItemAction(int value)
+        {
+            this.value = value;
+        }
+        
+        public int getValue()
+        {
+            return value;
+        }
+        
+        static
+        {
+            for(UsedItemAction type : UsedItemAction.values())
+            {
+                map.put(type.getValue(), type);
+            }
+        }
+        
+        public static UsedItemAction valueOf(int value)
+        {
+            return map.get(value);
+        }
+    }
+    
     MessageType messageType;
     int entityIDFrom;
     int entityIDTo;
     int amount;
+    String custom;
     
-    public PacketBattleMessage() {}
+    public PacketBattleMessage() { custom = new String(); }
     
     public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, int amount)
     {
@@ -72,6 +109,16 @@ public class PacketBattleMessage implements IMessage
         this.entityIDFrom = entityIDFrom;
         this.entityIDTo = entityIDTo;
         this.amount = amount;
+        custom = new String();
+    }
+    
+    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, int amount, String custom)
+    {
+        this.messageType = messageType;
+        this.entityIDFrom = entityIDFrom;
+        this.entityIDTo = entityIDTo;
+        this.amount = amount;
+        this.custom = custom;
     }
 
     @Override
@@ -81,6 +128,7 @@ public class PacketBattleMessage implements IMessage
         entityIDFrom = buf.readInt();
         entityIDTo = buf.readInt();
         amount = buf.readInt();
+        custom = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
@@ -90,6 +138,7 @@ public class PacketBattleMessage implements IMessage
         buf.writeInt(entityIDFrom);
         buf.writeInt(entityIDTo);
         buf.writeInt(amount);
+        ByteBufUtils.writeUTF8String(buf, custom);
     }
 
     public static class HandlerBattleMessage implements IMessageHandler<PacketBattleMessage, IMessage>
@@ -225,6 +274,27 @@ public class PacketBattleMessage implements IMessage
             case DID_NOTHING:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                     from + " did nothing!"));
+                break;
+            case USED_ITEM:
+                switch(UsedItemAction.valueOf(message.amount))
+                {
+                case USED_NOTHING:
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                            from + " tried to use nothing!"));
+                    break;
+                case USED_INVALID:
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                            from + " tried to consume " + message.custom + " and failed!"));
+                    break;
+                case USED_FOOD:
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                            from + " ate a " + message.custom + "!"));
+                    break;
+                case USED_POTION:
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                            from + " drank a " + message.custom + "!"));
+                    break;
+                }
                 break;
             }
             return null;

@@ -21,6 +21,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemLingeringPotion;
+import net.minecraft.item.ItemPotion;
+import net.minecraft.item.ItemSplashPotion;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
 public class Battle
@@ -43,8 +50,7 @@ public class Battle
     public enum State
     {
         DECISION,
-        ACTION,
-        HEALTH_CHECK
+        ACTION
     }
     
     public enum Decision
@@ -357,6 +363,76 @@ public class Battle
         }
     }
     
+    private void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount, String custom)
+    {
+        if(!isServer)
+        {
+            return;
+        }
+        for(Combatant p : players.values())
+        {
+            if(p.entity.isEntityAlive())
+            {
+                PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(type, from, to, amount, custom), (EntityPlayerMP)p.entity);
+            }
+        }
+    }
+    
+    /**
+     * @return true if at least one combatant was removed
+     */
+    private boolean healthCheck()
+    {
+        Queue<Integer> removeQueue = new ArrayDeque<Integer>();
+        for(Combatant c : sideA.values())
+        {
+            if(!c.entity.isEntityAlive())
+            {
+                removeQueue.add(c.entity.getEntityId());
+                if(c.entity instanceof EntityPlayer)
+                {
+                    PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
+                }
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
+            }
+        }
+        for(Combatant c : sideB.values())
+        {
+            if(!c.entity.isEntityAlive())
+            {
+                removeQueue.add(c.entity.getEntityId());
+                if(c.entity instanceof EntityPlayer)
+                {
+                    PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
+                }
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
+            }
+        }
+        boolean didRemove = !removeQueue.isEmpty();
+        Integer toRemove = removeQueue.poll();
+        while(toRemove != null)
+        {
+            sideA.remove(toRemove);
+            sideB.remove(toRemove);
+            if(players.remove(toRemove) != null)
+            {
+                playerCount.decrementAndGet();
+            }
+            toRemove = removeQueue.poll();
+        }
+        if(players.isEmpty() || sideA.isEmpty() || sideB.isEmpty())
+        {
+            battleEnded = true;
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENDED, 0, 0, 0);
+        }
+        else if(didRemove)
+        {
+            notifyPlayersBattleInfo();
+        }
+        
+        return didRemove;
+    }
+    
     private boolean update(final Duration dt)
     {
         if(battleEnded)
@@ -421,330 +497,303 @@ public class Battle
                 }
                 update(Duration.ZERO);
             }
+            else
+            {
+                healthCheck();
+            }
             break;
         case ACTION:
-        {
-            Combatant next = turnOrderQueue.poll();
-            while(next != null)
             {
-                if(!next.entity.isEntityAlive())
+                Combatant next = turnOrderQueue.poll();
+                while(next != null)
                 {
-                    next = turnOrderQueue.poll();
-                    continue;
-                }
-                switch(next.decision)
-                {
-                case UNDECIDED:
-                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.DID_NOTHING, next.entity.getEntityId(), 0, 0);
-                    next = turnOrderQueue.poll();
-                    continue;
-                case ATTACK:
-                    Combatant target = null;
-                    if(next.entity instanceof EntityPlayer)
+                    if(!next.entity.isEntityAlive())
                     {
-                        if(next.isSideA)
-                        {
-                            target = sideB.get(next.targetEntityID);
-                        }
-                        else
-                        {
-                            target = sideA.get(next.targetEntityID);
-                        }
-                        if(target == null || !target.entity.isEntityAlive())
-                        {
-                            next = turnOrderQueue.poll();
-                            continue;
-                        }
-                        int hitChance = TurnBasedMinecraftMod.config.getPlayerAttackProbability();
-                        if(target.entity instanceof EntityPlayer)
-                        {
-                            hitChance -= TurnBasedMinecraftMod.config.getPlayerEvasion();
-                        }
-                        else
-                        {
-                            hitChance -= target.entityInfo.evasion;
-                        }
-                        if((int)(Math.random() * 100) < hitChance)
-                        {
-                            if(target.remainingDefenses <= 0)
-                            {
-                                // attack
-                                // TODO damage via bow and arrow
-                                TurnBasedMinecraftMod.attackingEntity = next.entity;
-                                ((EntityPlayer)next.entity).attackTargetEntityWithCurrentItem(target.entity);
-                                TurnBasedMinecraftMod.attackingEntity = null;
-                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, next.entity.getEntityId(), target.entity.getEntityId(), TurnBasedMinecraftMod.attackingDamage);
-                                if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
-                                {
-                                    if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
-                                    {
-                                        // defense damage
-                                        DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
-                                        TurnBasedMinecraftMod.attackingEntity = target.entity;
-                                        next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
-                                        TurnBasedMinecraftMod.attackingEntity = null;
-                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, target.entity.getEntityId(), next.entity.getEntityId(), target.entityInfo.defenseDamage);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // blocked
-                                --target.remainingDefenses;
-                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFEND, target.entity.getEntityId(), next.entity.getEntityId(), 0);
-                            }
-                        }
-                        else
-                        {
-                            // miss
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.MISS, next.entity.getEntityId(), target.entity.getEntityId(), 0);
-                        }
+                        next = turnOrderQueue.poll();
+                        continue;
                     }
-                    else
+                    switch(next.decision)
                     {
-                        if(next.isSideA)
-                        {
-                            int randomTargetIndex = (int)(Math.random() * sideB.size());
-                            for(Combatant c : sideB.values())
-                            {
-                                if(randomTargetIndex-- == 0)
-                                {
-                                    target = c;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            int randomTargetIndex = (int)(Math.random() * sideA.size());
-                            for(Combatant c : sideA.values())
-                            {
-                                if(randomTargetIndex-- == 0)
-                                {
-                                    target = c;
-                                    break;
-                                }
-                            }
-                        }
-                        if(target == null || !target.entity.isEntityAlive())
-                        {
-                            next = turnOrderQueue.poll();
-                            continue;
-                        }
-                        int hitChance = next.entityInfo.attackProbability;
-                        if(target.entity instanceof EntityPlayer)
-                        {
-                            hitChance -= TurnBasedMinecraftMod.config.getPlayerEvasion();
-                        }
-                        else
-                        {
-                            hitChance -= target.entityInfo.evasion;
-                        }
-                        if((int)(Math.random() * 100) < hitChance)
-                        {
-                            if(target.remainingDefenses <= 0)
-                            {
-                                DamageSource damageSource = DamageSource.causeMobDamage((EntityLivingBase)next.entity);
-                                int damageAmount = next.entityInfo.attackPower;
-                                if(next.entityInfo.attackVariance > 0)
-                                {
-                                    damageAmount += (int)(Math.random() * (next.entityInfo.attackVariance * 2 + 1)) - next.entityInfo.attackVariance;
-                                }
-                                // attack
-                                TurnBasedMinecraftMod.attackingEntity = next.entity;
-                                target.entity.attackEntityFrom(damageSource, damageAmount);
-                                TurnBasedMinecraftMod.attackingEntity = null;
-                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, next.entity.getEntityId(), target.entity.getEntityId(), damageAmount);
-                                if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
-                                {
-                                    if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
-                                    {
-                                        // defense damage
-                                        DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
-                                        TurnBasedMinecraftMod.attackingEntity = target.entity;
-                                        next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
-                                        TurnBasedMinecraftMod.attackingEntity = null;
-                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, target.entity.getEntityId(), next.entity.getEntityId(), target.entityInfo.defenseDamage);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // blocked
-                                --target.remainingDefenses;
-                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFEND, target.entity.getEntityId(), next.entity.getEntityId(), 0);
-                            }
-                        }
-                        else
-                        {
-                            // miss
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.MISS, next.entity.getEntityId(), target.entity.getEntityId(), 0);
-                        }
-                    }
-                    break;
-                case DEFEND:
-                    next.remainingDefenses = TurnBasedMinecraftMod.config.getDefenseDuration();
-                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENDING, next.entity.getEntityId(), 0, 0);
-                    break;
-                case FLEE:
-                    int fastestEnemySpeed = 0;
-                    if(next.isSideA)
-                    {
-                        for(Combatant c : sideB.values())
-                        {
-                            if(c.entity instanceof EntityPlayer)
-                            {
-                                if(TurnBasedMinecraftMod.config.getPlayerSpeed() > fastestEnemySpeed)
-                                {
-                                    fastestEnemySpeed = TurnBasedMinecraftMod.config.getPlayerSpeed();
-                                }
-                            }
-                            else
-                            {
-                                if(c.entityInfo.speed > fastestEnemySpeed)
-                                {
-                                    fastestEnemySpeed = c.entityInfo.speed;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for(Combatant c : sideA.values())
-                        {
-                            if(c.entity instanceof EntityPlayer)
-                            {
-                                if(TurnBasedMinecraftMod.config.getPlayerSpeed() > fastestEnemySpeed)
-                                {
-                                    fastestEnemySpeed = TurnBasedMinecraftMod.config.getPlayerSpeed();
-                                }
-                            }
-                            else
-                            {
-                                if(c.entityInfo.speed > fastestEnemySpeed)
-                                {
-                                    fastestEnemySpeed = c.entityInfo.speed;
-                                }
-                            }
-                        }
-                    }
-                    int fleeProbability = 0;
-                    if(next.entity instanceof EntityPlayer)
-                    {
-                        if(fastestEnemySpeed >= TurnBasedMinecraftMod.config.getPlayerSpeed())
-                        {
-                            fleeProbability = TurnBasedMinecraftMod.config.getFleeBadProbability();
-                        }
-                        else
-                        {
-                            fleeProbability = TurnBasedMinecraftMod.config.getFleeGoodProbability();
-                        }
-                    }
-                    else
-                    {
-                        if(fastestEnemySpeed >= next.entityInfo.speed)
-                        {
-                            fleeProbability = TurnBasedMinecraftMod.config.getFleeBadProbability();
-                        }
-                        else
-                        {
-                            fleeProbability = TurnBasedMinecraftMod.config.getFleeGoodProbability();
-                        }
-                    }
-                    if((int)(Math.random() * 100) < fleeProbability)
-                    {
-                        // flee success
-                        if(next.isSideA)
-                        {
-                            sideA.remove(next.entity.getEntityId());
-                        }
-                        else
-                        {
-                            sideB.remove(next.entity.getEntityId());
-                        }
-                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getEntityId(), 0, 1);
+                    case UNDECIDED:
+                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.DID_NOTHING, next.entity.getEntityId(), 0, 0);
+                        break;
+                    case ATTACK:
+                        Combatant target = null;
                         if(next.entity instanceof EntityPlayer)
                         {
-                            players.remove(next.entity.getEntityId());
-                            playerCount.decrementAndGet();
-                            PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0), (EntityPlayerMP)next.entity);
+                            if(next.isSideA)
+                            {
+                                target = sideB.get(next.targetEntityID);
+                            }
+                            else
+                            {
+                                target = sideA.get(next.targetEntityID);
+                            }
+                            if(target == null || !target.entity.isEntityAlive())
+                            {
+                                break;
+                            }
+                            int hitChance = TurnBasedMinecraftMod.config.getPlayerAttackProbability();
+                            if(target.entity instanceof EntityPlayer)
+                            {
+                                hitChance -= TurnBasedMinecraftMod.config.getPlayerEvasion();
+                            }
+                            else
+                            {
+                                hitChance -= target.entityInfo.evasion;
+                            }
+                            if((int)(Math.random() * 100) < hitChance)
+                            {
+                                if(target.remainingDefenses <= 0)
+                                {
+                                    // attack
+                                    // TODO damage via bow and arrow
+                                    TurnBasedMinecraftMod.attackingEntity = next.entity;
+                                    ((EntityPlayer)next.entity).attackTargetEntityWithCurrentItem(target.entity);
+                                    TurnBasedMinecraftMod.attackingEntity = null;
+                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, next.entity.getEntityId(), target.entity.getEntityId(), TurnBasedMinecraftMod.attackingDamage);
+                                    if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
+                                    {
+                                        if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
+                                        {
+                                            // defense damage
+                                            DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
+                                            TurnBasedMinecraftMod.attackingEntity = target.entity;
+                                            next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
+                                            TurnBasedMinecraftMod.attackingEntity = null;
+                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, target.entity.getEntityId(), next.entity.getEntityId(), target.entityInfo.defenseDamage);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // blocked
+                                    --target.remainingDefenses;
+                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFEND, target.entity.getEntityId(), next.entity.getEntityId(), 0);
+                                }
+                            }
+                            else
+                            {
+                                // miss
+                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.MISS, next.entity.getEntityId(), target.entity.getEntityId(), 0);
+                            }
                         }
+                        else
+                        {
+                            if(next.isSideA)
+                            {
+                                int randomTargetIndex = (int)(Math.random() * sideB.size());
+                                for(Combatant c : sideB.values())
+                                {
+                                    if(randomTargetIndex-- == 0)
+                                    {
+                                        target = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                int randomTargetIndex = (int)(Math.random() * sideA.size());
+                                for(Combatant c : sideA.values())
+                                {
+                                    if(randomTargetIndex-- == 0)
+                                    {
+                                        target = c;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(target == null || !target.entity.isEntityAlive())
+                            {
+                                next = turnOrderQueue.poll();
+                                continue;
+                            }
+                            int hitChance = next.entityInfo.attackProbability;
+                            if(target.entity instanceof EntityPlayer)
+                            {
+                                hitChance -= TurnBasedMinecraftMod.config.getPlayerEvasion();
+                            }
+                            else
+                            {
+                                hitChance -= target.entityInfo.evasion;
+                            }
+                            if((int)(Math.random() * 100) < hitChance)
+                            {
+                                if(target.remainingDefenses <= 0)
+                                {
+                                    DamageSource damageSource = DamageSource.causeMobDamage((EntityLivingBase)next.entity);
+                                    int damageAmount = next.entityInfo.attackPower;
+                                    if(next.entityInfo.attackVariance > 0)
+                                    {
+                                        damageAmount += (int)(Math.random() * (next.entityInfo.attackVariance * 2 + 1)) - next.entityInfo.attackVariance;
+                                    }
+                                    // attack
+                                    TurnBasedMinecraftMod.attackingEntity = next.entity;
+                                    target.entity.attackEntityFrom(damageSource, damageAmount);
+                                    TurnBasedMinecraftMod.attackingEntity = null;
+                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, next.entity.getEntityId(), target.entity.getEntityId(), damageAmount);
+                                    if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
+                                    {
+                                        if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
+                                        {
+                                            // defense damage
+                                            DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
+                                            TurnBasedMinecraftMod.attackingEntity = target.entity;
+                                            next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
+                                            TurnBasedMinecraftMod.attackingEntity = null;
+                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, target.entity.getEntityId(), next.entity.getEntityId(), target.entityInfo.defenseDamage);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // blocked
+                                    --target.remainingDefenses;
+                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFEND, target.entity.getEntityId(), next.entity.getEntityId(), 0);
+                                }
+                            }
+                            else
+                            {
+                                // miss
+                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.MISS, next.entity.getEntityId(), target.entity.getEntityId(), 0);
+                            }
+                        }
+                        break;
+                    case DEFEND:
+                        next.remainingDefenses = TurnBasedMinecraftMod.config.getDefenseDuration();
+                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENDING, next.entity.getEntityId(), 0, 0);
+                        break;
+                    case FLEE:
+                        int fastestEnemySpeed = 0;
+                        if(next.isSideA)
+                        {
+                            for(Combatant c : sideB.values())
+                            {
+                                if(c.entity instanceof EntityPlayer)
+                                {
+                                    if(TurnBasedMinecraftMod.config.getPlayerSpeed() > fastestEnemySpeed)
+                                    {
+                                        fastestEnemySpeed = TurnBasedMinecraftMod.config.getPlayerSpeed();
+                                    }
+                                }
+                                else
+                                {
+                                    if(c.entityInfo.speed > fastestEnemySpeed)
+                                    {
+                                        fastestEnemySpeed = c.entityInfo.speed;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for(Combatant c : sideA.values())
+                            {
+                                if(c.entity instanceof EntityPlayer)
+                                {
+                                    if(TurnBasedMinecraftMod.config.getPlayerSpeed() > fastestEnemySpeed)
+                                    {
+                                        fastestEnemySpeed = TurnBasedMinecraftMod.config.getPlayerSpeed();
+                                    }
+                                }
+                                else
+                                {
+                                    if(c.entityInfo.speed > fastestEnemySpeed)
+                                    {
+                                        fastestEnemySpeed = c.entityInfo.speed;
+                                    }
+                                }
+                            }
+                        }
+                        int fleeProbability = 0;
+                        if(next.entity instanceof EntityPlayer)
+                        {
+                            if(fastestEnemySpeed >= TurnBasedMinecraftMod.config.getPlayerSpeed())
+                            {
+                                fleeProbability = TurnBasedMinecraftMod.config.getFleeBadProbability();
+                            }
+                            else
+                            {
+                                fleeProbability = TurnBasedMinecraftMod.config.getFleeGoodProbability();
+                            }
+                        }
+                        else
+                        {
+                            if(fastestEnemySpeed >= next.entityInfo.speed)
+                            {
+                                fleeProbability = TurnBasedMinecraftMod.config.getFleeBadProbability();
+                            }
+                            else
+                            {
+                                fleeProbability = TurnBasedMinecraftMod.config.getFleeGoodProbability();
+                            }
+                        }
+                        if((int)(Math.random() * 100) < fleeProbability)
+                        {
+                            // flee success
+                            if(next.isSideA)
+                            {
+                                sideA.remove(next.entity.getEntityId());
+                            }
+                            else
+                            {
+                                sideB.remove(next.entity.getEntityId());
+                            }
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getEntityId(), 0, 1);
+                            if(next.entity instanceof EntityPlayer)
+                            {
+                                players.remove(next.entity.getEntityId());
+                                playerCount.decrementAndGet();
+                                PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0), (EntityPlayerMP)next.entity);
+                            }
+                        }
+                        else
+                        {
+                            // flee fail
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getEntityId(), 0, 0);
+                        }
+                        break;
+                    case USE_ITEM:
+                        ItemStack targetItemStack = ((EntityPlayer)next.entity).inventory.getStackInSlot(next.itemToUse);
+                        Item targetItem = targetItemStack.getItem();
+                        if(targetItem == null)
+                        {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_NOTHING.getValue());
+                            break;
+                        }
+                        if(targetItem instanceof ItemFood)
+                        {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName());
+                            ((ItemFood)targetItem).onItemUseFinish(targetItemStack, next.entity.world, (EntityLivingBase)next.entity);
+                        }
+                        else if(targetItem instanceof ItemPotion && !(targetItem instanceof ItemSplashPotion) && !(targetItem instanceof ItemLingeringPotion))
+                        {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName());
+                            ((ItemPotion)targetItem).onItemUseFinish(targetItemStack, next.entity.world, (EntityLivingBase)next.entity);
+                            ((EntityPlayer)next.entity).inventory.setInventorySlotContents(next.itemToUse, new ItemStack(Items.GLASS_BOTTLE));
+                        }
+                        else
+                        {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName());
+                        }
+                        break;
                     }
-                    else
-                    {
-                        // flee fail
-                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getEntityId(), 0, 0);
-                    }
-                    break;
-                case USE_ITEM:
-                    break;
+                    next = turnOrderQueue.poll();
                 }
-                next = turnOrderQueue.poll();
-            }
-            for(Combatant c : sideA.values())
-            {
-                c.decision = Decision.UNDECIDED;
-            }
-            for(Combatant c : sideB.values())
-            {
-                c.decision = Decision.UNDECIDED;
-            }
-            state = State.HEALTH_CHECK;
-            update(Duration.ZERO);
-            break;
-        }
-        case HEALTH_CHECK:
-            Queue<Integer> removeQueue = new ArrayDeque<Integer>();
-            for(Combatant c : sideA.values())
-            {
-                if(!c.entity.isEntityAlive())
+                for(Combatant c : sideA.values())
                 {
-                    removeQueue.add(c.entity.getEntityId());
-                    if(c.entity instanceof EntityPlayer)
-                    {
-                        PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
-                    }
-                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
+                    c.decision = Decision.UNDECIDED;
                 }
-            }
-            for(Combatant c : sideB.values())
-            {
-                if(!c.entity.isEntityAlive())
+                for(Combatant c : sideB.values())
                 {
-                    removeQueue.add(c.entity.getEntityId());
-                    if(c.entity instanceof EntityPlayer)
-                    {
-                        PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
-                    }
-                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
+                    c.decision = Decision.UNDECIDED;
                 }
-            }
-            boolean didRemove = !removeQueue.isEmpty();
-            Integer toRemove = removeQueue.poll();
-            while(toRemove != null)
-            {
-                sideA.remove(toRemove);
-                sideB.remove(toRemove);
-                if(players.remove(toRemove) != null)
-                {
-                    playerCount.decrementAndGet();
-                }
-                toRemove = removeQueue.poll();
-            }
-            if(players.isEmpty() || sideA.isEmpty() || sideB.isEmpty())
-            {
-                battleEnded = true;
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENDED, 0, 0, 0);
-            }
-            else if(didRemove)
-            {
-                notifyPlayersBattleInfo();
-            }
-            state = State.DECISION;
-            undecidedCount.set(playerCount.get());
-            timer = TurnBasedMinecraftMod.BattleDecisionTime;
-            break;
-        }
+                state = State.DECISION;
+                healthCheck();
+                break;
+            } // case ACTION
+        } // switch(state)
         return battleEnded;
-    }
+    } // update(final Duration dt)
 }

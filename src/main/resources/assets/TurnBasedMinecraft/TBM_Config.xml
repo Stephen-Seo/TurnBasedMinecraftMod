@@ -212,7 +212,7 @@
 				<Flee>0</Flee>
 			</Decision>
 		</net.minecraft.entity.monster.EntityShulker>
-		<net.minecraft.entity.monster.EntitySilverFish>
+		<net.minecraft.entity.monster.EntitySilverfish>
 			<AttackPower Probability="85">1</AttackPower>
 			<Evasion>37</Evasion>
 			<Category>monster</Category>
@@ -222,7 +222,7 @@
 				<Defend>0</Defend>
 				<Flee>0</Flee>
 			</Decision>
-		</net.minecraft.entity.monster.EntitySilverFish>
+		</net.minecraft.entity.monster.EntitySilverfish>
 		<net.minecraft.entity.monster.EntitySkeleton>
 			<AttackPower Probability="75" Variance="1">3</AttackPower>
 			<Evasion>13</Evasion>

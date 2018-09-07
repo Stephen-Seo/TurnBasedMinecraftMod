@@ -2,10 +2,11 @@ package com.seodisparate.TurnBasedMinecraft.common;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,17 +37,31 @@ public class Config
     private int fleeGoodProbability = 90;
     private int fleeBadProbability = 40;
     
-    private enum ConfigParseResult
-    {
-        IS_OLD,
-        SUCCESS
-    }
-    
     public Config(Logger logger)
     {
         entityInfoMap = new HashMap<String, EntityInfo>();
         ignoreBattleTypes = new HashSet<EntityInfo.Category>();
         this.logger = logger;
+        
+        int internalVersion = 0;
+        try
+        {
+            InputStream is = getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_INTERNAL_PATH);
+            if(is == null)
+            {
+                logger.error("Internal resource is null");
+            }
+            internalVersion = getConfigFileVersion(is);
+        } catch (Exception e) {}
+        
+        if(internalVersion == 0)
+        {
+            logger.error("Failed to check version of internal config file");
+        }
+        else
+        {
+            TurnBasedMinecraftMod.setConfigVersion(internalVersion);
+        }
         
         try
         {
@@ -68,27 +83,26 @@ public class Config
             logger.error("Failed to read/parse config file " + TurnBasedMinecraftMod.CONFIG_FILE_PATH);
             return;
         }
+        
+        int configVersion = getConfigFileVersion(configFile);
+        if(configVersion < TurnBasedMinecraftMod.getConfigVersion())
+        {
+            logger.warn("Config file " + TurnBasedMinecraftMod.CONFIG_FILENAME + " is older version, renaming...");
+            moveOldConfig();
+            try
+            {
+                writeConfig();
+            } catch (Exception e)
+            {
+                logger.error("Failed to write config file!");
+            }
+        }
         try
         {
-            ConfigParseResult result = parseConfig(configFile);
-            if(result == ConfigParseResult.IS_OLD)
-            {
-                logger.warn("Config file " + TurnBasedMinecraftMod.CONFIG_FILENAME + " is older version, renaming...");
-                moveOldConfig();
-                writeConfig();
-                ConfigParseResult resultSecond = parseConfig(configFile);
-                if(resultSecond != ConfigParseResult.SUCCESS)
-                {
-                    logger.error("Failed to parse config file " + TurnBasedMinecraftMod.CONFIG_FILE_PATH);
-                }
-            }
-            else if(result != ConfigParseResult.SUCCESS)
-            {
-                logger.error("Failed to parse config file " + TurnBasedMinecraftMod.CONFIG_FILE_PATH);
-            }
+            parseConfig(configFile);
         } catch (Exception e)
         {
-            logger.error("Failed to parse config file " + TurnBasedMinecraftMod.CONFIG_FILE_PATH);
+            logger.error("Failed to parse config file!");
         }
     }
     
@@ -97,7 +111,7 @@ public class Config
         File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
         File dirs = configFile.getParentFile();
         dirs.mkdirs();
-        InputStream configStream = this.getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_FILENAME);
+        InputStream configStream = this.getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_INTERNAL_PATH);
         FileOutputStream configOutput = new FileOutputStream(configFile);
         byte[] buf = new byte[4096];
         int read = 0;
@@ -120,12 +134,12 @@ public class Config
         {
             configFile.renameTo(new File(TurnBasedMinecraftMod.CONFIG_DIRECTORY
                     + "TBM_Config_"
-                    + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(Instant.now())
+                    + DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now())
                     + ".xml"));
         }
     }
     
-    private ConfigParseResult parseConfig(File configFile) throws XMLStreamException, FactoryConfigurationError, IOException
+    private boolean parseConfig(File configFile) throws XMLStreamException, FactoryConfigurationError, IOException
     {
         FileInputStream fis = new FileInputStream(configFile);
         XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(fis);
@@ -140,13 +154,6 @@ public class Config
                 }
                 else if(xmlReader.getLocalName().equals("Version"))
                 {
-                    if(Integer.parseInt(xmlReader.getElementText()) < TurnBasedMinecraftMod.CONFIG_FILE_VERSION)
-                    {
-                        logger.info("Config file is older version, moving it and writing a new one in its place");
-                        xmlReader.close();
-                        fis.close();
-                        return ConfigParseResult.IS_OLD;
-                    }
                     continue;
                 }
                 else if(xmlReader.getLocalName().equals("IgnoreBattleTypes"))
@@ -217,7 +224,6 @@ public class Config
                             } catch (ClassNotFoundException e)
                             {
                                 logger.error("Failed to get class of name " + classType);
-                                continue;
                             }
                             do
                             {
@@ -322,7 +328,10 @@ public class Config
                                     }
                                 }
                             } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals(classType)));
-                            entityInfoMap.put(eInfo.classType.getName(), eInfo);
+                            if(eInfo.classType != null)
+                            {
+                                entityInfoMap.put(eInfo.classType.getName(), eInfo);
+                            }
                         }
                     } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("EntityStats")));
                 }
@@ -330,7 +339,7 @@ public class Config
         }
         xmlReader.close();
         fis.close();
-        return ConfigParseResult.SUCCESS;
+        return true;
     }
     
     public int getPlayerSpeed()
@@ -407,5 +416,41 @@ public class Config
             return matching;
         }
         return null;
+    }
+    
+    private int getConfigFileVersion(File configFile)
+    {
+        try
+        {
+            return getConfigFileVersion(new FileInputStream(configFile));
+        } catch(FileNotFoundException e)
+        {
+            return 0;
+        }
+    }
+    
+    private int getConfigFileVersion(InputStream configStream)
+    {
+        int configVersion = 1;
+
+        try
+        {
+            XMLStreamReader xmlReader = XMLInputFactory.newInstance().createXMLStreamReader(configStream);
+            while(xmlReader.hasNext())
+            {
+                xmlReader.next();
+                if(xmlReader.isStartElement() && xmlReader.getLocalName().equals("Version"))
+                {
+                    configVersion = Integer.parseInt(xmlReader.getElementText());
+                    break;
+                }
+            }
+            xmlReader.close();
+        } catch (Exception e)
+        {
+            return 0;
+        }
+        
+        return configVersion;
     }
 }

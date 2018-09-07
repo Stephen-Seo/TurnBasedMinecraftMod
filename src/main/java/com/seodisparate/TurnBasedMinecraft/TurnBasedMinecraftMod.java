@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = TurnBasedMinecraftMod.MODID, name = TurnBasedMinecraftMod.NAME, version = TurnBasedMinecraftMod.VERSION)
@@ -32,7 +33,8 @@ public class TurnBasedMinecraftMod
     public static final String CONFIG_FILENAME = "TBM_Config.xml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
     public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;
-    public static final int CONFIG_FILE_VERSION = 1; // TODO derive this from internal config
+    public static final String CONFIG_INTERNAL_PATH = "/assets/TurnBasedMinecraft/" + CONFIG_FILENAME;
+    private static int CONFIG_FILE_VERSION = 0;
 
     private static Logger logger;
     private static BattleManager battleManager;
@@ -47,6 +49,7 @@ public class TurnBasedMinecraftMod
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        logger.debug("PREINIT");
     }
 
     @EventHandler
@@ -83,6 +86,7 @@ public class TurnBasedMinecraftMod
             PacketBattleMessage.class,
             packetHandlerID++,
             Side.CLIENT);
+        logger.debug("INIT");
     }
     
     @EventHandler
@@ -92,9 +96,10 @@ public class TurnBasedMinecraftMod
         {
             config = new Config(logger);
         }
+        logger.debug("POSTINIT");
     }
 
-    @EventHandler
+    @SubscribeEvent
     public void entityAttacked(LivingAttackEvent event)
     {
         if(battleManager == null)
@@ -112,5 +117,15 @@ public class TurnBasedMinecraftMod
     public static BattleManager getBattleManager()
     {
         return battleManager;
+    }
+    
+    public static void setConfigVersion(int version)
+    {
+        CONFIG_FILE_VERSION = version;
+    }
+    
+    public static int getConfigVersion()
+    {
+        return CONFIG_FILE_VERSION;
     }
 }
