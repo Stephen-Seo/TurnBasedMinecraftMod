@@ -15,17 +15,20 @@ public class PacketBattleInfo implements IMessage
 {
     private Collection<Integer> sideA;
     private Collection<Integer> sideB;
+    private long decisionNanos;
     
     public PacketBattleInfo()
     {
         sideA = new ArrayList<Integer>();
         sideB = new ArrayList<Integer>();
+        decisionNanos = TurnBasedMinecraftMod.BattleDecisionTime.getSeconds() * 1000000000;
     }
     
-    public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB)
+    public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos)
     {
         this.sideA = sideA;
         this.sideB = sideB;
+        this.decisionNanos = decisionNanos;
     }
     
     @Override
@@ -41,6 +44,7 @@ public class PacketBattleInfo implements IMessage
         {
             sideB.add(buf.readInt());
         }
+        decisionNanos = buf.readLong();
     }
 
     @Override
@@ -56,6 +60,7 @@ public class PacketBattleInfo implements IMessage
         {
             buf.writeInt(id);
         }
+        buf.writeLong(decisionNanos);
     }
 
     public static class HandlerBattleInfo implements IMessageHandler<PacketBattleInfo, IMessage>
@@ -75,6 +80,10 @@ public class PacketBattleInfo implements IMessage
             for(Integer id : message.sideB)
             {
                 TurnBasedMinecraftMod.currentBattle.addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
+            }
+            if(TurnBasedMinecraftMod.currentBattleGui != null)
+            {
+                TurnBasedMinecraftMod.currentBattleGui.timeRemaining.set((int)(message.decisionNanos / 1000000000));
             }
             return null;
         }

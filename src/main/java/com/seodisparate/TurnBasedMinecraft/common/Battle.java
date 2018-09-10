@@ -1,7 +1,5 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,19 +36,46 @@ public class Battle
     private Map<Integer, Combatant> players;
     private PriorityQueue<Combatant> turnOrderQueue;
     
-    private Instant lastUpdated;
     private State state;
     private AtomicInteger playerCount;
     private AtomicInteger undecidedCount;
-    private Duration timer;
+    private long lastInstant;
+    private long timer;
     
     private boolean isServer;
     private boolean battleEnded;
     
     public enum State
     {
-        DECISION,
-        ACTION
+        DECISION(0),
+        ACTION(1),
+        DECISION_PLAYER_READY(2);
+        
+        private int value;
+        private static Map<Integer, State> map = new HashMap<Integer, State>();
+        
+        private State(int value)
+        {
+            this.value = value;
+        }
+        
+        public int getValue()
+        {
+            return value;
+        }
+        
+        static
+        {
+            for(State state : State.values())
+            {
+                map.put(state.value, state);
+            }
+        }
+        
+        public static State valueOf(int stateType)
+        {
+            return map.get(stateType);
+        }
     }
     
     public enum Decision
@@ -148,10 +173,10 @@ public class Battle
             sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
         }
         
-        lastUpdated = null;
+        lastInstant = System.nanoTime();
         state = State.DECISION;
         undecidedCount.set(playerCount.get());
-        timer = TurnBasedMinecraftMod.BattleDecisionTime;
+        timer = TurnBasedMinecraftMod.BattleDecisionTime.getSeconds() * 1000000000;
         battleEnded = false;
         
         notifyPlayersBattleInfo();
@@ -312,39 +337,26 @@ public class Battle
         return state;
     }
     
+    public void setState(State state)
+    {
+        this.state = state;
+    }
+    
+    public long getTimerSeconds()
+    {
+        return timer / 1000000000;
+    }
+    
     protected void notifyPlayersBattleInfo()
     {
         if(!isServer)
         {
             return;
         }
-        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs());
+        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer);
         for(Combatant p : players.values())
         {
             PacketHandler.INSTANCE.sendTo(infoPacket, (EntityPlayerMP)p.entity);
-        }
-    }
-    
-    /**
-     * @return True if battle has ended
-     */
-    public boolean update()
-    {
-        if(battleEnded)
-        {
-            return true;
-        }
-        if(lastUpdated == null)
-        {
-            lastUpdated = Instant.now();
-            return update(Duration.ZERO);
-        }
-        else
-        {
-            Instant now = Instant.now();
-            Duration dt = Duration.between(lastUpdated, now);
-            lastUpdated = now;
-            return update(dt);
         }
     }
     
@@ -433,7 +445,22 @@ public class Battle
         return didRemove;
     }
     
-    private boolean update(final Duration dt)
+    /**
+     * @return True if battle has ended
+     */
+    public boolean update()
+    {
+        if(battleEnded)
+        {
+            return true;
+        }
+        long nextInstant = System.nanoTime();
+        long dt = nextInstant - lastInstant;
+        lastInstant = nextInstant;
+        return update(dt);
+    }
+    
+    private boolean update(final long dt)
     {
         if(battleEnded)
         {
@@ -442,8 +469,8 @@ public class Battle
         switch(state)
         {
         case DECISION:
-            timer = timer.minus(dt);
-            if(timer.isNegative() || timer.isZero() || undecidedCount.get() <= 0)
+            timer -= dt;
+            if(timer <= 0 || undecidedCount.get() <= 0)
             {
                 for(Combatant c : sideA.values())
                 {
@@ -485,7 +512,8 @@ public class Battle
                     }
                 }
                 state = State.ACTION;
-                timer = TurnBasedMinecraftMod.BattleDecisionTime;
+                timer = TurnBasedMinecraftMod.BattleDecisionTime.getSeconds() * 1000000000;
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_BEGIN, 0, 0, 0);
                 turnOrderQueue.clear();
                 for(Combatant c : sideA.values())
                 {
@@ -495,7 +523,7 @@ public class Battle
                 {
                     turnOrderQueue.add(c);
                 }
-                update(Duration.ZERO);
+                update(0);
             }
             else
             {
@@ -791,9 +819,13 @@ public class Battle
                 }
                 state = State.DECISION;
                 healthCheck();
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
                 break;
             } // case ACTION
+        default:
+            state = State.DECISION;
+            break;
         } // switch(state)
         return battleEnded;
-    } // update(final Duration dt)
+    } // update(final long dt)
 }

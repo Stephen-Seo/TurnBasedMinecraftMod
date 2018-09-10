@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import org.apache.logging.log4j.Logger;
 
+import com.seodisparate.TurnBasedMinecraft.client.BattleGui;
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.BattleManager;
 import com.seodisparate.TurnBasedMinecraft.common.Config;
@@ -34,6 +35,7 @@ public class TurnBasedMinecraftMod
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
     public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;
     public static final String CONFIG_INTERNAL_PATH = "/assets/TurnBasedMinecraft/" + CONFIG_FILENAME;
+    
     private static int CONFIG_FILE_VERSION = 0;
 
     private static Logger logger;
@@ -43,7 +45,8 @@ public class TurnBasedMinecraftMod
     public static int attackingDamage = 0;
     public static Config config;
     
-    public static Battle currentBattle;
+    public static Battle currentBattle = null;
+    public static BattleGui currentBattleGui = null;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -102,7 +105,7 @@ public class TurnBasedMinecraftMod
     @SubscribeEvent
     public void entityAttacked(LivingAttackEvent event)
     {
-        if(battleManager == null)
+        if(battleManager == null || event.getEntity().world.isRemote)
         {
             return;
         }

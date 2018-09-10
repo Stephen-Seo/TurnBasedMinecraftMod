@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
+import com.seodisparate.TurnBasedMinecraft.client.BattleGui;
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 
 import io.netty.buffer.ByteBuf;
@@ -32,7 +33,9 @@ public class PacketBattleMessage implements IMessage
         MISS(7),
         DEFENDING(8),
         DID_NOTHING(9),
-        USED_ITEM(10);
+        USED_ITEM(10),
+        TURN_BEGIN(11),
+        TURN_END(12);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -228,6 +231,13 @@ public class PacketBattleMessage implements IMessage
                 {
                     TurnBasedMinecraftMod.currentBattle = new Battle(message.amount, null, null, false);
                 }
+                if(TurnBasedMinecraftMod.currentBattleGui == null)
+                {
+                    Minecraft.getMinecraft().addScheduledTask(() -> {
+                        TurnBasedMinecraftMod.currentBattleGui = new BattleGui();
+                        Minecraft.getMinecraft().displayGuiScreen(TurnBasedMinecraftMod.currentBattleGui);
+                    });
+                }
                 break;
             case FLEE:
                 if(message.amount != 0)
@@ -249,7 +259,10 @@ public class PacketBattleMessage implements IMessage
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                         "Battle has ended!"));
                 TurnBasedMinecraftMod.currentBattle = null;
-                // TODO kick player out of battle
+                Minecraft.getMinecraft().addScheduledTask(() -> {
+                    TurnBasedMinecraftMod.currentBattleGui = null;
+                    Minecraft.getMinecraft().setIngameFocus();
+                });
                 break;
             case ATTACK:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
@@ -294,6 +307,22 @@ public class PacketBattleMessage implements IMessage
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                             from + " drank a " + message.custom + "!"));
                     break;
+                }
+                break;
+            case TURN_BEGIN:
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                        "The turn begins!"));
+                if(TurnBasedMinecraftMod.currentBattleGui != null)
+                {
+                    TurnBasedMinecraftMod.currentBattleGui.turnBegin();
+                }
+                break;
+            case TURN_END:
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                        "The turn ended!"));
+                if(TurnBasedMinecraftMod.currentBattleGui != null)
+                {
+                    TurnBasedMinecraftMod.currentBattleGui.turnEnd();
                 }
                 break;
             }

@@ -41,7 +41,7 @@ public class PacketBattleRequestInfo implements IMessage
             {
                 return null;
             }
-            PacketBattleInfo battleInfo = new PacketBattleInfo(b.getSideAIDs(), b.getSideBIDs());
+            PacketBattleInfo battleInfo = new PacketBattleInfo(b.getSideAIDs(), b.getSideBIDs(), b.getTimerSeconds());
             return battleInfo;
         }
     }
