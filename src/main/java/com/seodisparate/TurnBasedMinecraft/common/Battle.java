@@ -795,6 +795,11 @@ public class Battle
                         }
                         break;
                     case USE_ITEM:
+                        if(next.itemToUse < 0 || next.itemToUse > 8)
+                        {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue());
+                            break;
+                        }
                         ItemStack targetItemStack = ((EntityPlayer)next.entity).inventory.getStackInSlot(next.itemToUse);
                         Item targetItem = targetItemStack.getItem();
                         if(targetItem == null)
@@ -819,8 +824,13 @@ public class Battle
                         }
                         break;
                     case SWITCH_ITEM:
+                        if(next.itemToUse < 0 || next.itemToUse > 8)
+                        {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 0);
+                            break;
+                        }
                         ((EntityPlayer)next.entity).inventory.currentItem = next.itemToUse;
-                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 0);
+                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 1);
                         break;
                     }
                     next = turnOrderQueue.poll();

@@ -297,8 +297,16 @@ public class PacketBattleMessage implements IMessage
                             from + " tried to use nothing!"));
                     break;
                 case USED_INVALID:
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " tried to consume " + message.custom + " and failed!"));
+                    if(message.custom.length() > 0)
+                    {
+                        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                                from + " tried to consume " + message.custom + " and failed!"));
+                    }
+                    else
+                    {
+                        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                                from + " tried to consume an invalid item and failed!"));
+                    }
                     break;
                 case USED_FOOD:
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
@@ -327,8 +335,16 @@ public class PacketBattleMessage implements IMessage
                 }
                 break;
             case SWITCHED_ITEM:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        to + " switched to a different item!"));
+                if(message.amount != 0)
+                {
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                            to + " switched to a different item!"));
+                }
+                else
+                {
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                            to + " switched to a different item but failed because it was invalid!"));
+                }
                 break;
             }
             return null;

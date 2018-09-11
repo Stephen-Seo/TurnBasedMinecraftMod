@@ -268,6 +268,7 @@ public class BattleGui extends GuiScreen
             break;
         case DECIDE_USE_ITEM:
             setState(MenuState.USE_ITEM);
+            break;
         case CANCEL:
             setState(MenuState.MAIN_MENU);
             break;
