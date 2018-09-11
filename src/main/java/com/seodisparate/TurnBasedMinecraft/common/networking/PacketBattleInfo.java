@@ -84,6 +84,7 @@ public class PacketBattleInfo implements IMessage
             if(TurnBasedMinecraftMod.currentBattleGui != null)
             {
                 TurnBasedMinecraftMod.currentBattleGui.timeRemaining.set((int)(message.decisionNanos / 1000000000));
+                TurnBasedMinecraftMod.currentBattleGui.battleChanged();
             }
             return null;
         }

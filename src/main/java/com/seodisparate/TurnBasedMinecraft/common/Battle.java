@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
@@ -84,7 +85,8 @@ public class Battle
         ATTACK(1),
         DEFEND(2),
         FLEE(3),
-        USE_ITEM(4);
+        USE_ITEM(4),
+        SWITCH_ITEM(5);
         
         private int value;
         private static Map<Integer, Decision> map = new HashMap<Integer, Decision>();
@@ -279,6 +281,16 @@ public class Battle
         return sideB.values();
     }
     
+    public Set<Map.Entry<Integer, Combatant>> getSideAEntrySet()
+    {
+        return sideA.entrySet();
+    }
+    
+    public Set<Map.Entry<Integer, Combatant>> getSideBEntrySet()
+    {
+        return sideB.entrySet();
+    }
+    
     public Collection<Integer> getSideAIDs()
     {
         Collection<Integer> sideAIDs = new ArrayList<Integer>(sideA.size());
@@ -325,7 +337,7 @@ public class Battle
         {
             combatant.targetEntityID = targetIDOrItemID;
         }
-        else if(decision == Decision.USE_ITEM)
+        else if(decision == Decision.USE_ITEM || decision == Decision.SWITCH_ITEM)
         {
             combatant.itemToUse = targetIDOrItemID;
         }
@@ -805,6 +817,10 @@ public class Battle
                         {
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName());
                         }
+                        break;
+                    case SWITCH_ITEM:
+                        ((EntityPlayer)next.entity).inventory.currentItem = next.itemToUse;
+                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 0);
                         break;
                     }
                     next = turnOrderQueue.poll();

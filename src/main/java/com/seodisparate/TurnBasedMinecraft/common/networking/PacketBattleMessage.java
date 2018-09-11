@@ -35,7 +35,8 @@ public class PacketBattleMessage implements IMessage
         DID_NOTHING(9),
         USED_ITEM(10),
         TURN_BEGIN(11),
-        TURN_END(12);
+        TURN_END(12),
+        SWITCHED_ITEM(13);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -324,6 +325,10 @@ public class PacketBattleMessage implements IMessage
                 {
                     TurnBasedMinecraftMod.currentBattleGui.turnEnd();
                 }
+                break;
+            case SWITCHED_ITEM:
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                        to + " switched to a different item!"));
                 break;
             }
             return null;
