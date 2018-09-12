@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -590,7 +589,7 @@ public class Battle
                                     // have player look at attack target
                                     final Entity nextEntity = next.entity;
                                     final Entity targetEntity = target.entity;
-                                    Minecraft.getMinecraft().addScheduledTask(() -> {
+                                    next.entity.getServer().addScheduledTask(() -> {
                                         ((EntityPlayerMP)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, Utility.yawDirection(nextEntity.posX, nextEntity.posZ, targetEntity.posX, targetEntity.posZ), Utility.pitchDirection(nextEntity.posX, nextEntity.posY, nextEntity.posZ, targetEntity.posX, targetEntity.posY, targetEntity.posZ));
                                     });
                                     TurnBasedMinecraftMod.attackingEntity = next.entity;
