@@ -11,11 +11,11 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -588,7 +588,14 @@ public class Battle
                                 {
                                     // attack
                                     // TODO damage via bow and arrow
+                                    // have player look at attack target
+                                    final Entity nextEntity = next.entity;
+                                    final Entity targetEntity = target.entity;
+                                    Minecraft.getMinecraft().addScheduledTask(() -> {
+                                        ((EntityPlayerMP)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, Utility.yawDirection(nextEntity.posX, nextEntity.posZ, targetEntity.posX, targetEntity.posZ), Utility.pitchDirection(nextEntity.posX, nextEntity.posY, nextEntity.posZ, targetEntity.posX, targetEntity.posY, targetEntity.posZ));
+                                    });
                                     TurnBasedMinecraftMod.attackingEntity = next.entity;
+                                    TurnBasedMinecraftMod.attackingDamage = 0;
                                     ((EntityPlayer)next.entity).attackTargetEntityWithCurrentItem(target.entity);
                                     TurnBasedMinecraftMod.attackingEntity = null;
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, next.entity.getEntityId(), target.entity.getEntityId(), TurnBasedMinecraftMod.attackingDamage);
@@ -844,6 +851,7 @@ public class Battle
                     c.decision = Decision.UNDECIDED;
                 }
                 state = State.DECISION;
+                undecidedCount.set(players.size());
                 healthCheck();
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
                 break;

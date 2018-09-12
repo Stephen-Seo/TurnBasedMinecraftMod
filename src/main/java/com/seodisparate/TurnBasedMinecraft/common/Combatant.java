@@ -2,8 +2,6 @@ package com.seodisparate.TurnBasedMinecraft.common;
 
 import java.util.Comparator;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;

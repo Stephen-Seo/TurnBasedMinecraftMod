@@ -3,9 +3,9 @@ package com.seodisparate.TurnBasedMinecraft.common.networking;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.client.BattleGui;
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
+import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -327,8 +327,11 @@ public class PacketBattleMessage implements IMessage
                 }
                 break;
             case TURN_END:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                if(TurnBasedMinecraftMod.currentBattle != null)
+                {
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                         "The turn ended!"));
+                }
                 if(TurnBasedMinecraftMod.currentBattleGui != null)
                 {
                     TurnBasedMinecraftMod.currentBattleGui.turnEnd();

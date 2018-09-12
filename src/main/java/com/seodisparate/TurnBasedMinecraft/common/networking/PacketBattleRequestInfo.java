@@ -1,7 +1,7 @@
 package com.seodisparate.TurnBasedMinecraft.common.networking;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
+import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

@@ -20,7 +20,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.logging.log4j.Logger;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.EntityInfo.Category;
 
 public class Config
@@ -404,7 +403,7 @@ public class Config
             return null;
         }
         EntityInfo matching = entityInfoMap.get(entity.getClass().getName());
-        if(matching.classType.isInstance(entity))
+        if(matching != null && matching.classType.isInstance(entity))
         {
             for(Class c : matching.conflictingTypes)
             {
@@ -452,5 +451,10 @@ public class Config
         }
         
         return configVersion;
+    }
+    
+    public boolean isIgnoreBattleType(Category type)
+    {
+        return ignoreBattleTypes.contains(type);
     }
 }

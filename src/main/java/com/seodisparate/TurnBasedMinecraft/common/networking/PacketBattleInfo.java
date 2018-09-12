@@ -3,7 +3,7 @@ package com.seodisparate.TurnBasedMinecraft.common.networking;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
+import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;

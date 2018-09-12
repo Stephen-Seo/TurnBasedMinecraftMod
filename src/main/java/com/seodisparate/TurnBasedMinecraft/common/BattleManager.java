@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Map;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
+import org.apache.logging.log4j.Logger;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,9 +16,11 @@ public class BattleManager
     private int IDCounter = 0;
     protected Map<Integer, Battle> battleMap;
     private Thread updaterThread;
+    private Logger logger;
     
-    public BattleManager()
+    public BattleManager(Logger logger)
     {
+        this.logger = logger;
         battleMap = new Hashtable<Integer, Battle>();
         updaterThread = new Thread(new BattleUpdater(this));
         updaterThread.start();
@@ -40,6 +42,39 @@ public class BattleManager
         {
             return false;
         }
+        
+        // check if ignore battle in config
+        EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(event.getEntity());
+        if(entityInfo != null && (TurnBasedMinecraftMod.config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
+        {
+            // attacked entity ignores battle
+            for(Battle b : battleMap.values())
+            {
+                if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
+                {
+                    logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
+                    return true;
+                }
+            }
+            logger.debug("Attack Not Canceled: attacked ignores battle");
+            return false;
+        }
+        entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(event.getSource().getTrueSource());
+        if(entityInfo != null && (TurnBasedMinecraftMod.config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
+        {
+            // attacker entity ignores battle
+            for(Battle b : battleMap.values())
+            {
+                if(b.hasCombatant(event.getEntity().getEntityId()))
+                {
+                    logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
+                    return true;
+                }
+            }
+            logger.debug("Attack Not Canceled: attacker ignores battle");
+            return false;
+        }
+        
         // check if one is in battle
         Entity inBattle = null;
         Entity notInBattle = null;
@@ -52,6 +87,7 @@ public class BattleManager
                 if(inBattle != null)
                 {
                     // both combatants are in battle
+                    logger.debug("Attack Canceled: both are in battle");
                     return true;
                 }
                 else
@@ -66,6 +102,7 @@ public class BattleManager
                 if(inBattle != null)
                 {
                     // both combatants are in battle
+                    logger.debug("Attack Canceled: both are in battle");
                     return true;
                 }
                 else
@@ -88,6 +125,11 @@ public class BattleManager
                 sideA.add(event.getEntity());
                 sideB.add(event.getSource().getTrueSource());
                 createBattle(sideA, sideB);
+                logger.debug("Attack Not Canceled: new battle created");
+            }
+            else
+            {
+                logger.debug("Attack Not Canceled: neither are in battle or players");
             }
             return false;
         }
@@ -102,6 +144,7 @@ public class BattleManager
             battle.addCombatantToSideA(notInBattle);
         }
 
+        logger.debug("Attack Canceled: one is in battle");
         return true;
     }
     

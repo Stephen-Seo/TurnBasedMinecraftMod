@@ -1,13 +1,10 @@
-package com.seodisparate.TurnBasedMinecraft;
+package com.seodisparate.TurnBasedMinecraft.common;
 
 import java.time.Duration;
 
 import org.apache.logging.log4j.Logger;
 
 import com.seodisparate.TurnBasedMinecraft.client.BattleGui;
-import com.seodisparate.TurnBasedMinecraft.common.Battle;
-import com.seodisparate.TurnBasedMinecraft.common.BattleManager;
-import com.seodisparate.TurnBasedMinecraft.common.Config;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
@@ -15,6 +12,7 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleRequest
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.entity.Entity;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -38,12 +36,12 @@ public class TurnBasedMinecraftMod
     
     private static int CONFIG_FILE_VERSION = 0;
 
-    private static Logger logger;
-    private static BattleManager battleManager;
+    protected static Logger logger;
+    protected static BattleManager battleManager;
     private static int packetHandlerID = 0;
-    public static Entity attackingEntity;
-    public static int attackingDamage = 0;
-    public static Config config;
+    protected static Entity attackingEntity;
+    protected static int attackingDamage = 0;
+    protected static Config config;
     
     public static Battle currentBattle = null;
     public static BattleGui currentBattleGui = null;
@@ -59,14 +57,8 @@ public class TurnBasedMinecraftMod
     public void init(FMLInitializationEvent event)
     {
         currentBattle = null;
-        if(event.getSide() == Side.SERVER)
-        {
-            battleManager = new BattleManager();
-        }
-        else
-        {
-            battleManager = null;
-        }
+        battleManager = null;
+        config = new Config(logger);
         
         // register packets
         PacketHandler.INSTANCE.registerMessage(
@@ -90,31 +82,15 @@ public class TurnBasedMinecraftMod
             packetHandlerID++,
             Side.CLIENT);
         logger.debug("INIT");
+        
+        // register event handler(s)
+        MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
     }
     
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-        if(battleManager != null)
-        {
-            config = new Config(logger);
-        }
         logger.debug("POSTINIT");
-    }
-
-    @SubscribeEvent
-    public void entityAttacked(LivingAttackEvent event)
-    {
-        if(battleManager == null || event.getEntity().world.isRemote)
-        {
-            return;
-        }
-        if(!event.getSource().getTrueSource().equals(attackingEntity) && battleManager.checkAttack(event))
-        {
-            logger.debug("Canceled LivingAttackEvent between " + attackingEntity + " and " + event.getEntity());
-            event.setCanceled(true);
-        }
-        attackingDamage = (int) event.getAmount();
     }
     
     public static BattleManager getBattleManager()

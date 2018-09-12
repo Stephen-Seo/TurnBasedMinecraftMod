@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.seodisparate.TurnBasedMinecraft.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.Combatant;
+import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 
@@ -125,7 +126,10 @@ public class BattleGui extends GuiScreen
     
     public void turnEnd()
     {
-        TurnBasedMinecraftMod.currentBattle.setState(Battle.State.DECISION);
+        if(TurnBasedMinecraftMod.currentBattle != null)
+        {
+            TurnBasedMinecraftMod.currentBattle.setState(Battle.State.DECISION);
+        }
         timeRemaining.set((int)TurnBasedMinecraftMod.BattleDecisionTime.getSeconds());
         setState(MenuState.MAIN_MENU);
     }
@@ -148,36 +152,36 @@ public class BattleGui extends GuiScreen
         {
         case MAIN_MENU:
             info = "What will you do?";
-            buttonList.add(new GuiButton(ButtonAction.ATTACK.getValue(), width*2/7 - 40, height - 120, 80, 20, "Attack"));
-            buttonList.add(new GuiButton(ButtonAction.DEFEND.getValue(), width*3/7 - 40, height - 120, 80, 20, "Defend"));
-            buttonList.add(new GuiButton(ButtonAction.ITEM.getValue(), width*4/7 - 40, height - 120, 80, 20, "Item"));
-            buttonList.add(new GuiButton(ButtonAction.FLEE.getValue(), width*5/7 - 40, height - 120, 80, 20, "Flee"));
+            buttonList.add(new GuiButton(ButtonAction.ATTACK.getValue(), width*2/7 - 30, height - 120, 60, 20, "Attack"));
+            buttonList.add(new GuiButton(ButtonAction.DEFEND.getValue(), width*3/7 - 30, height - 120, 60, 20, "Defend"));
+            buttonList.add(new GuiButton(ButtonAction.ITEM.getValue(), width*4/7 - 30, height - 120, 60, 20, "Item"));
+            buttonList.add(new GuiButton(ButtonAction.FLEE.getValue(), width*5/7 - 30, height - 120, 60, 20, "Flee"));
             break;
         case ATTACK_TARGET:
             info = "Who will you attack?";
-            int y = 50;
+            int y = 30;
             for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.currentBattle.getSideAEntrySet())
             {
                 if(e.getValue().entity != null)
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 100, y, e.getValue().entity.getName(), e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey()));
                 }
                 else
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 100, y, "Unknown", e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, "Unknown", e.getKey()));
                 }
                 y += 20;
             }
-            y = 50;
+            y = 30;
             for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.currentBattle.getSideBEntrySet())
             {
                 if(e.getValue().entity != null)
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 100, y, e.getValue().entity.getName(), e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey()));
                 }
                 else
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 100, y, "Unknown", e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, "Unknown", e.getKey()));
                 }
                 y += 20;
             }
@@ -214,6 +218,11 @@ public class BattleGui extends GuiScreen
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
+        if(TurnBasedMinecraftMod.currentBattle == null)
+        {
+            drawHoveringText("Waiting...", width / 2 - 50, height / 2);
+            return;
+        }
         if(TurnBasedMinecraftMod.currentBattle.getState() == Battle.State.DECISION && timeRemaining.get() > 0)
         {
             long nextInstant = System.nanoTime();
@@ -230,7 +239,25 @@ public class BattleGui extends GuiScreen
         
         super.drawScreen(mouseX, mouseY, partialTicks);
         
-        drawHoveringText(info, width / 2 - 50, height - 50);
+        String timeRemainingString = "Time remaining: ";
+        int timeRemainingInt = timeRemaining.get();
+        if(timeRemainingInt > 8)
+        {
+            timeRemainingString += "\u00A7a";
+        }
+        else if(timeRemainingInt > 4)
+        {
+            timeRemainingString += "\u00A7e";
+        }
+        else
+        {
+            timeRemainingString += "\u00A7c";
+        }
+        timeRemainingString += Integer.toString(timeRemainingInt);
+        int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(timeRemainingString);
+        Minecraft.getMinecraft().fontRenderer.drawString(timeRemainingString, width/2 - stringWidth/2, 5, 0xFFFFFFFF);
+        stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(info);
+        Minecraft.getMinecraft().fontRenderer.drawString(info, width/2 - stringWidth/2, 20, 0xFFFFFFFF);
     }
 
     @Override
@@ -276,6 +303,10 @@ public class BattleGui extends GuiScreen
             if(button instanceof ItemSelectionButton)
             {
                 PacketHandler.INSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton)button).itemStackID));
+                if(((ItemSelectionButton)button).itemStackID >= 0 && ((ItemSelectionButton)button).itemStackID < 9)
+                {
+                    Minecraft.getMinecraft().player.inventory.currentItem = ((ItemSelectionButton)button).itemStackID;
+                }
                 setState(MenuState.WAITING);
             }
             else
