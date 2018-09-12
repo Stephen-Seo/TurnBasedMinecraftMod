@@ -131,6 +131,8 @@ public class BattleGui extends GuiScreen
             TurnBasedMinecraftMod.currentBattle.setState(Battle.State.DECISION);
         }
         timeRemaining.set((int)TurnBasedMinecraftMod.BattleDecisionTime.getSeconds());
+        elapsedTime = 0;
+        lastInstant = System.nanoTime();
         setState(MenuState.MAIN_MENU);
     }
     

@@ -3,14 +3,12 @@ package com.seodisparate.TurnBasedMinecraft.common.networking;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.seodisparate.TurnBasedMinecraft.client.BattleGui;
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.text.TextComponentString;
@@ -232,13 +230,7 @@ public class PacketBattleMessage implements IMessage
                 {
                     TurnBasedMinecraftMod.currentBattle = new Battle(message.amount, null, null, false);
                 }
-                if(TurnBasedMinecraftMod.currentBattleGui == null)
-                {
-                    Minecraft.getMinecraft().addScheduledTask(() -> {
-                        TurnBasedMinecraftMod.currentBattleGui = new BattleGui();
-                        Minecraft.getMinecraft().displayGuiScreen(TurnBasedMinecraftMod.currentBattleGui);
-                    });
-                }
+                TurnBasedMinecraftMod.commonProxy.setBattleGuiAsGui();
                 break;
             case FLEE:
                 if(message.amount != 0)
@@ -261,7 +253,6 @@ public class PacketBattleMessage implements IMessage
                         "Battle has ended!"));
                 TurnBasedMinecraftMod.currentBattle = null;
                 Minecraft.getMinecraft().addScheduledTask(() -> {
-                    TurnBasedMinecraftMod.currentBattleGui = null;
                     Minecraft.getMinecraft().setIngameFocus();
                 });
                 break;
@@ -321,10 +312,7 @@ public class PacketBattleMessage implements IMessage
             case TURN_BEGIN:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                         "The turn begins!"));
-                if(TurnBasedMinecraftMod.currentBattleGui != null)
-                {
-                    TurnBasedMinecraftMod.currentBattleGui.turnBegin();
-                }
+                TurnBasedMinecraftMod.commonProxy.battleGuiTurnBegin();
                 break;
             case TURN_END:
                 if(TurnBasedMinecraftMod.currentBattle != null)
@@ -332,10 +320,7 @@ public class PacketBattleMessage implements IMessage
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                         "The turn ended!"));
                 }
-                if(TurnBasedMinecraftMod.currentBattleGui != null)
-                {
-                    TurnBasedMinecraftMod.currentBattleGui.turnEnd();
-                }
+                TurnBasedMinecraftMod.commonProxy.battleGuiTurnEnd();
                 break;
             case SWITCHED_ITEM:
                 if(message.amount != 0)

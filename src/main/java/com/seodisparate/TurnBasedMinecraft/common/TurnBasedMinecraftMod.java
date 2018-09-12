@@ -4,7 +4,6 @@ import java.time.Duration;
 
 import org.apache.logging.log4j.Logger;
 
-import com.seodisparate.TurnBasedMinecraft.client.BattleGui;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
@@ -13,13 +12,12 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = TurnBasedMinecraftMod.MODID, name = TurnBasedMinecraftMod.NAME, version = TurnBasedMinecraftMod.VERSION)
@@ -44,7 +42,9 @@ public class TurnBasedMinecraftMod
     protected static Config config;
     
     public static Battle currentBattle = null;
-    public static BattleGui currentBattleGui = null;
+    
+    @SidedProxy(modId=MODID, serverSide="com.seodisparate.TurnBasedMinecraft.common.CommonProxy", clientSide="com.seodisparate.TurnBasedMinecraft.client.ClientProxy")
+    public static CommonProxy commonProxy;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)

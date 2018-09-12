@@ -81,11 +81,8 @@ public class PacketBattleInfo implements IMessage
             {
                 TurnBasedMinecraftMod.currentBattle.addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
             }
-            if(TurnBasedMinecraftMod.currentBattleGui != null)
-            {
-                TurnBasedMinecraftMod.currentBattleGui.timeRemaining.set((int)(message.decisionNanos / 1000000000));
-                TurnBasedMinecraftMod.currentBattleGui.battleChanged();
-            }
+            TurnBasedMinecraftMod.commonProxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000));
+            TurnBasedMinecraftMod.commonProxy.setBattleGuiBattleChanged();
             return null;
         }
     }
