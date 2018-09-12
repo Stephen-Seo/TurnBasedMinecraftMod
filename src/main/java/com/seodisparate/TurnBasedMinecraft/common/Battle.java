@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -368,7 +367,7 @@ public class Battle
         PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer);
         for(Combatant p : players.values())
         {
-            PacketHandler.INSTANCE.sendTo(infoPacket, (EntityPlayerMP)p.entity);
+            TurnBasedMinecraftMod.NWINSTANCE.sendTo(infoPacket, (EntityPlayerMP)p.entity);
         }
     }
     
@@ -382,7 +381,7 @@ public class Battle
         {
             if(p.entity.isEntityAlive())
             {
-                PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(type, from, to, amount), (EntityPlayerMP)p.entity);
+                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(type, from, to, amount), (EntityPlayerMP)p.entity);
             }
         }
     }
@@ -397,7 +396,7 @@ public class Battle
         {
             if(p.entity.isEntityAlive())
             {
-                PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(type, from, to, amount, custom), (EntityPlayerMP)p.entity);
+                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(type, from, to, amount, custom), (EntityPlayerMP)p.entity);
             }
         }
     }
@@ -415,7 +414,7 @@ public class Battle
                 removeQueue.add(c.entity.getEntityId());
                 if(c.entity instanceof EntityPlayer)
                 {
-                    PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
+                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
                 }
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
             }
@@ -427,7 +426,7 @@ public class Battle
                 removeQueue.add(c.entity.getEntityId());
                 if(c.entity instanceof EntityPlayer)
                 {
-                    PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
+                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
                 }
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
             }
@@ -792,7 +791,7 @@ public class Battle
                             {
                                 players.remove(next.entity.getEntityId());
                                 playerCount.decrementAndGet();
-                                PacketHandler.INSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0), (EntityPlayerMP)next.entity);
+                                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0), (EntityPlayerMP)next.entity);
                             }
                         }
                         else

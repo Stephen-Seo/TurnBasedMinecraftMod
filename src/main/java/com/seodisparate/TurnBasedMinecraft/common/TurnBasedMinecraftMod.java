@@ -8,7 +8,6 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecisio
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleRequestInfo;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +17,8 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = TurnBasedMinecraftMod.MODID, name = TurnBasedMinecraftMod.NAME, version = TurnBasedMinecraftMod.VERSION)
@@ -33,6 +34,8 @@ public class TurnBasedMinecraftMod
     public static final String CONFIG_INTERNAL_PATH = "/assets/TurnBasedMinecraft/" + CONFIG_FILENAME;
     
     private static int CONFIG_FILE_VERSION = 0;
+    
+    public static final SimpleNetworkWrapper NWINSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("seodisparate.tbmc");
 
     protected static Logger logger;
     protected static BattleManager battleManager;
@@ -61,22 +64,22 @@ public class TurnBasedMinecraftMod
         config = new Config(logger);
         
         // register packets
-        PacketHandler.INSTANCE.registerMessage(
+        NWINSTANCE.registerMessage(
             PacketBattleInfo.HandlerBattleInfo.class,
             PacketBattleInfo.class,
             packetHandlerID++,
             Side.CLIENT);
-        PacketHandler.INSTANCE.registerMessage(
+        NWINSTANCE.registerMessage(
             PacketBattleRequestInfo.HandlerBattleRequestInfo.class,
             PacketBattleRequestInfo.class,
             packetHandlerID++,
             Side.SERVER);
-        PacketHandler.INSTANCE.registerMessage(
+        NWINSTANCE.registerMessage(
             PacketBattleDecision.HandleBattleDecision.class,
             PacketBattleDecision.class,
             packetHandlerID++,
             Side.SERVER);
-        PacketHandler.INSTANCE.registerMessage(
+        NWINSTANCE.registerMessage(
             PacketBattleMessage.HandlerBattleMessage.class,
             PacketBattleMessage.class,
             packetHandlerID++,

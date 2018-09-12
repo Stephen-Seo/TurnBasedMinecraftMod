@@ -9,7 +9,6 @@ import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.Combatant;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketHandler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -271,20 +270,20 @@ public class BattleGui extends GuiScreen
             setState(MenuState.ATTACK_TARGET);
             break;
         case DEFEND:
-            PacketHandler.INSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.DEFEND, 0));
+            TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.DEFEND, 0));
             setState(MenuState.WAITING);
             break;
         case ITEM:
             setState(MenuState.ITEM_ACTION);
             break;
         case FLEE:
-            PacketHandler.INSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.FLEE, 0));
+            TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.FLEE, 0));
             setState(MenuState.WAITING);
             break;
         case ATTACK_TARGET:
             if(button instanceof EntitySelectionButton)
             {
-                PacketHandler.INSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.ATTACK, ((EntitySelectionButton)button).entityID));
+                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.ATTACK, ((EntitySelectionButton)button).entityID));
                 setState(MenuState.WAITING);
             }
             else
@@ -304,7 +303,7 @@ public class BattleGui extends GuiScreen
         case DO_ITEM_SWITCH:
             if(button instanceof ItemSelectionButton)
             {
-                PacketHandler.INSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton)button).itemStackID));
+                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton)button).itemStackID));
                 if(((ItemSelectionButton)button).itemStackID >= 0 && ((ItemSelectionButton)button).itemStackID < 9)
                 {
                     Minecraft.getMinecraft().player.inventory.currentItem = ((ItemSelectionButton)button).itemStackID;
@@ -319,7 +318,7 @@ public class BattleGui extends GuiScreen
         case DO_USE_ITEM:
             if(button instanceof ItemSelectionButton)
             {
-                PacketHandler.INSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.USE_ITEM, ((ItemSelectionButton)button).itemStackID));
+                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.USE_ITEM, ((ItemSelectionButton)button).itemStackID));
                 setState(MenuState.WAITING);
             }
             else
