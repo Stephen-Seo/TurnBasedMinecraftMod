@@ -10,7 +10,6 @@ import net.minecraft.potion.PotionEffect;
 public class EntityInfo
 {
     public Class classType;
-    public List<Class> conflictingTypes;
     public boolean ignoreBattle;
     public int attackPower;
     public int attackProbability;
@@ -310,7 +309,6 @@ public class EntityInfo
     public EntityInfo()
     {
         classType = null;
-        conflictingTypes = new ArrayList<Class>();
         ignoreBattle = false;
         attackPower = 0;
         attackProbability = 70;
@@ -331,11 +329,6 @@ public class EntityInfo
     {
         EntityInfo newEntityInfo = new EntityInfo();
         newEntityInfo.classType = classType;
-        newEntityInfo.conflictingTypes = new ArrayList<Class>();
-        for(Class c : conflictingTypes)
-        {
-            newEntityInfo.conflictingTypes.add(c);
-        }
         newEntityInfo.ignoreBattle = ignoreBattle;
         newEntityInfo.attackPower = attackPower;
         newEntityInfo.attackProbability = attackProbability;

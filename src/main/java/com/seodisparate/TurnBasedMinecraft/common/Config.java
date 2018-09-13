@@ -281,24 +281,6 @@ public class Config
                                     {
                                         eInfo.category = xmlReader.getElementText().toLowerCase();
                                     }
-                                    else if(xmlReader.getLocalName().equals("Conflicts"))
-                                    {
-                                        do
-                                        {
-                                            xmlReader.next();
-                                            if(xmlReader.isStartElement())
-                                            {
-                                                try
-                                                {
-                                                    Class conflictingType = Class.forName(xmlReader.getLocalName());
-                                                    eInfo.conflictingTypes.add(conflictingType);
-                                                } catch(ClassNotFoundException e)
-                                                {
-                                                    logger.warn("Invalid conflicting type for entity " + eInfo.classType.getName());
-                                                }
-                                            }
-                                        } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Conflicts")));
-                                    }
                                     else if(xmlReader.getLocalName().equals("IgnoreBattle"))
                                     {
                                         if(xmlReader.getElementText().toLowerCase().equals("true"))
@@ -412,13 +394,6 @@ public class Config
         EntityInfo matching = entityInfoMap.get(entity.getClass().getName());
         if(matching != null && matching.classType.isInstance(entity))
         {
-            for(Class c : matching.conflictingTypes)
-            {
-                if(c.isInstance(entity))
-                {
-                    return entityInfoMap.get(c.getName());
-                }
-            }
             return matching;
         }
         return null;

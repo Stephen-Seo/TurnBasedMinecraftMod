@@ -31,7 +31,6 @@
 		<!-- Speed: Value in range of 0 to 100 that determines the order entities act in battle. Higher is sooner. Entities with same speed will take their turn as a group in random order (not at the same time). -->
 		<!-- IgnoreBattle: (Optional) Per entity setting to not enter turn-based-battle if value is "true". If "true" these stats will not apply to the entity as they are only used in turn-based-battle. -->
 		<!-- Category: Sets the type of the entity, used by "IgnoreBattleTypes" to determine what types ignore battle. -->
-		<!-- Conflicts: (Optional) Tells the mod that this entity should not be mistaken for the listed entities (possible because some entities derive from others; CaveSpiders are also Spiders). -->
 		<!-- Decision: Lists percentages of what action taken by the entity, one of Attack, Defend, or Flee. If the sum is less than 100, the mob has a chance to do nothing with the remaining percentage -->
 		<net.minecraft.entity.monster.EntityBlaze>
 			<AttackPower Probability="50">5</AttackPower>
@@ -263,9 +262,6 @@
 		<net.minecraft.entity.monster.EntitySpider>
 			<AttackPower Probability="70">2</AttackPower>
 			<Evasion>25</Evasion>
-			<Conflicts>
-				<net.minecraft.entity.monster.EntityCaveSpider></net.minecraft.entity.monster.EntityCaveSpider>
-			</Conflicts>
 			<Category>monster</Category>
 			<Speed>70</Speed>
 			<Decision>
@@ -333,10 +329,6 @@
 		</net.minecraft.entity.monster.EntityWitherSkeleton>
 		<net.minecraft.entity.monster.EntityZombie>
 			<AttackPower Probability="70">3</AttackPower>
-			<Conflicts>
-				<net.minecraft.entity.monster.EntityHusk></net.minecraft.entity.monster.EntityHusk>
-				<net.minecraft.entity.monster.EntityZombieVillager></net.minecraft.entity.monster.EntityZombieVillager>
-			</Conflicts>
 			<Evasion>5</Evasion>
 			<Category>monster</Category>
 			<Speed>25</Speed>
@@ -382,9 +374,6 @@
 		<net.minecraft.entity.passive.EntityCow>
 			<AttackPower Probability="50">0</AttackPower>
 			<Evasion>1</Evasion>
-			<Conflicts>
-				<net.minecraft.entity.passive.EntityMooshroom></net.minecraft.entity.passive.EntityMooshroom>
-			</Conflicts>
 			<Category>passive</Category>
 			<Speed>20</Speed>
 			<Decision>

@@ -36,9 +36,9 @@ public class BattleManager
      */
     public boolean checkAttack(final LivingAttackEvent event)
     {
-        // verify that both entities are EntityPlayer or has a corresponding EntityInfo
-        if(!(event.getEntity() instanceof EntityPlayer || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getEntity().getClass().getName()) != null)
-            || !(event.getSource().getTrueSource() instanceof EntityPlayer || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null))
+        // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
+        if(!((event.getEntity() instanceof EntityPlayer && !((EntityPlayer)event.getEntity()).isCreative()) || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getEntity().getClass().getName()) != null)
+            || !((event.getSource().getTrueSource() instanceof EntityPlayer && !((EntityPlayer)event.getSource().getTrueSource()).isCreative()) || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null))
         {
             return false;
         }
