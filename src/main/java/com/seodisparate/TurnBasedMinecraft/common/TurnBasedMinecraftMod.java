@@ -26,7 +26,7 @@ public class TurnBasedMinecraftMod
 {
     public static final String MODID = "com.seodisparate.turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "0.1";
     public static final Duration BattleDecisionTime = Duration.ofSeconds(15);
     public static final String CONFIG_FILENAME = "TBM_Config.xml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
