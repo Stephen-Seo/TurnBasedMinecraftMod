@@ -337,7 +337,7 @@ public class PacketBattleMessage implements IMessage
                 break;
             case WAS_AFFECTED:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " was " + message.custom + " by " + to + "!"));
+                        to + " was " + message.custom + " by " + from + "!"));
                 break;
             }
             return null;
