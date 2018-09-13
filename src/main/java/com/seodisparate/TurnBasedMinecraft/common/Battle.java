@@ -550,6 +550,9 @@ public class Battle
                         next = turnOrderQueue.poll();
                         continue;
                     }
+                    
+                    next.remainingDefenses = 0;
+                    
                     switch(next.decision)
                     {
                     case UNDECIDED:
@@ -580,9 +583,9 @@ public class Battle
                             {
                                 hitChance -= target.entityInfo.evasion;
                             }
-                            if(hitChance < 1)
+                            if(hitChance < TurnBasedMinecraftMod.config.getMinimumHitPercentage())
                             {
-                                hitChance = 1;
+                                hitChance = TurnBasedMinecraftMod.config.getMinimumHitPercentage();
                             }
                             if((int)(Math.random() * 100) < hitChance)
                             {
@@ -667,9 +670,9 @@ public class Battle
                             {
                                 hitChance -= target.entityInfo.evasion;
                             }
-                            if(hitChance < 1)
+                            if(hitChance < TurnBasedMinecraftMod.config.getMinimumHitPercentage())
                             {
-                                hitChance = 1;
+                                hitChance = TurnBasedMinecraftMod.config.getMinimumHitPercentage();
                             }
                             if((int)(Math.random() * 100) < hitChance)
                             {

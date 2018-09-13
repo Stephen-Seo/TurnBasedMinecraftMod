@@ -327,12 +327,12 @@ public class PacketBattleMessage implements IMessage
                 if(message.amount != 0)
                 {
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            to + " switched to a different item!"));
+                            from + " switched to a different item!"));
                 }
                 else
                 {
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            to + " switched to a different item but failed because it was invalid!"));
+                            from + " switched to a different item but failed because it was invalid!"));
                 }
                 break;
             case WAS_AFFECTED:

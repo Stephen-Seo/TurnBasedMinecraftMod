@@ -1,6 +1,6 @@
 <TurnBasedMinecraftConfig>
 	<!-- If the mod has a newer version config, it will rename the existing config and place the new config -->
-	<Version>1</Version>
+	<Version>2</Version>
 	<!-- Types that will not initiate battle with player. They are listed as "Category" per EntiytStats entity.
 		 Note that items listed in "IgnoreBattleTypes" and "Category" are converted to lowercase before being compared. -->
 	<IgnoreBattleTypes>
@@ -19,6 +19,8 @@
 	<!-- Probability of escaping battle. If entity's speed is greater than the enemy team's speediest entity, then good probability is used. -->
 	<FleeGoodProbability>90</FleeGoodProbability>
 	<FleeBadProbability>40</FleeBadProbability>
+	<!-- Minimum hit percentage for every entity. If less than 1, it will be stored as 1 anyways. -->
+	<MinimumHitPercentage>4</MinimumHitPercentage>
 	<!-- Battle stats for entities should be specified here. If an entity is not listed it cannot enter battle. -->
 	<EntityStats>
 		<!-- AttackPower: How much damage an entity does per attack. Usually has a "Probability" attribute between 0 and 100. Also may have a "Variance" attribute that varies the attack power by the specified amount randomly. -->

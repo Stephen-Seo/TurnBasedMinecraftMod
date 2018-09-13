@@ -33,6 +33,7 @@ public class Config
     private int defenseDuration = 1;
     private int fleeGoodProbability = 90;
     private int fleeBadProbability = 40;
+    private int minimumHitPercentage = 1;
     
     public Config(Logger logger)
     {
@@ -205,6 +206,14 @@ public class Config
                 else if(xmlReader.getLocalName().equals("FleeBadProbability"))
                 {
                     fleeBadProbability = Integer.parseInt(xmlReader.getElementText());
+                }
+                else if(xmlReader.getLocalName().equals("MinimumHitPercentage"))
+                {
+                    minimumHitPercentage = Integer.parseInt(xmlReader.getElementText());
+                    if(minimumHitPercentage < 1)
+                    {
+                        minimumHitPercentage = 1;
+                    }
                 }
                 else if(xmlReader.getLocalName().equals("EntityStats"))
                 {
@@ -454,5 +463,10 @@ public class Config
     public boolean isIgnoreBattleType(String type)
     {
         return ignoreBattleTypes.contains(type);
+    }
+    
+    public int getMinimumHitPercentage()
+    {
+        return minimumHitPercentage;
     }
 }
