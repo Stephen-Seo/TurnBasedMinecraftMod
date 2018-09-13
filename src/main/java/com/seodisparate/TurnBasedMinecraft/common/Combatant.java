@@ -50,7 +50,7 @@ public class Combatant
                 boolean isSlow = false;
                 for(PotionEffect e : c0Entity.getActivePotionEffects())
                 {
-                    if(e.getEffectName().equals(MobEffects.HASTE.getName()))
+                    if(e.getEffectName().equals(MobEffects.HASTE.getName()) || e.getEffectName().equals(MobEffects.SPEED.getName()))
                     {
                         isHaste = true;
                     }

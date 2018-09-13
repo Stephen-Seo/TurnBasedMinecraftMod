@@ -580,6 +580,10 @@ public class Battle
                             {
                                 hitChance -= target.entityInfo.evasion;
                             }
+                            if(hitChance < 1)
+                            {
+                                hitChance = 1;
+                            }
                             if((int)(Math.random() * 100) < hitChance)
                             {
                                 if(target.remainingDefenses <= 0)
@@ -662,6 +666,10 @@ public class Battle
                             else
                             {
                                 hitChance -= target.entityInfo.evasion;
+                            }
+                            if(hitChance < 1)
+                            {
+                                hitChance = 1;
                             }
                             if((int)(Math.random() * 100) < hitChance)
                             {

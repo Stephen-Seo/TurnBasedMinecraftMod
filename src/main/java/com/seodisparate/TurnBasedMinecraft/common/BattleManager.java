@@ -52,11 +52,11 @@ public class BattleManager
             {
                 if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
                 {
-                    logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
+//                    logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
                     return true;
                 }
             }
-            logger.debug("Attack Not Canceled: attacked ignores battle");
+//            logger.debug("Attack Not Canceled: attacked ignores battle");
             return false;
         }
         entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(event.getSource().getTrueSource());
@@ -67,11 +67,11 @@ public class BattleManager
             {
                 if(b.hasCombatant(event.getEntity().getEntityId()))
                 {
-                    logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
+//                    logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
                     return true;
                 }
             }
-            logger.debug("Attack Not Canceled: attacker ignores battle");
+//            logger.debug("Attack Not Canceled: attacker ignores battle");
             return false;
         }
         
@@ -87,7 +87,7 @@ public class BattleManager
                 if(inBattle != null)
                 {
                     // both combatants are in battle
-                    logger.debug("Attack Canceled: both are in battle");
+//                    logger.debug("Attack Canceled: both are in battle");
                     return true;
                 }
                 else
@@ -102,7 +102,7 @@ public class BattleManager
                 if(inBattle != null)
                 {
                     // both combatants are in battle
-                    logger.debug("Attack Canceled: both are in battle");
+//                    logger.debug("Attack Canceled: both are in battle");
                     return true;
                 }
                 else
@@ -125,11 +125,11 @@ public class BattleManager
                 sideA.add(event.getEntity());
                 sideB.add(event.getSource().getTrueSource());
                 createBattle(sideA, sideB);
-                logger.debug("Attack Not Canceled: new battle created");
+//                logger.debug("Attack Not Canceled: new battle created");
             }
             else
             {
-                logger.debug("Attack Not Canceled: neither are in battle or players");
+//                logger.debug("Attack Not Canceled: neither are in battle or players");
             }
             return false;
         }
@@ -144,7 +144,7 @@ public class BattleManager
             battle.addCombatantToSideA(notInBattle);
         }
 
-        logger.debug("Attack Canceled: one is in battle");
+//        logger.debug("Attack Canceled: one is in battle");
         return true;
     }
     

@@ -21,44 +21,10 @@ public class EntityInfo
     public int defenseDamageProbability;
     public int evasion;
     public int speed;
-    public Category category;
+    public String category;
     public int decisionAttack;
     public int decisionDefend;
     public int decisionFlee;
-    
-    public enum Category
-    {
-        MONSTER,
-        PASSIVE,
-        ANIMAL,
-        BOSS,
-        UNKNOWN;
-        
-        public static Category fromString(String c)
-        {
-            c = c.toLowerCase();
-            if(c.equals("monster"))
-            {
-                return MONSTER;
-            }
-            else if(c.equals("passive"))
-            {
-                return PASSIVE;
-            }
-            else if(c.equals("animal"))
-            {
-                return ANIMAL;
-            }
-            else if(c.equals("boss"))
-            {
-                return BOSS;
-            }
-            else
-            {
-                return UNKNOWN;
-            }
-        }
-    }
     
     public enum Effect
     {
@@ -355,7 +321,7 @@ public class EntityInfo
         defenseDamageProbability = 0;
         evasion = 15;
         speed = 50;
-        category = Category.UNKNOWN;
+        category = "unknown";
         decisionAttack = 70;
         decisionDefend = 20;
         decisionFlee = 10;

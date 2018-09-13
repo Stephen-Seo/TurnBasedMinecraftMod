@@ -20,12 +20,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.logging.log4j.Logger;
 
-import com.seodisparate.TurnBasedMinecraft.common.EntityInfo.Category;
-
 public class Config
 {
     private Map<String, EntityInfo> entityInfoMap;
-    private Set<EntityInfo.Category> ignoreBattleTypes;
+    private Set<String> ignoreBattleTypes;
     private Logger logger;
     private int playerSpeed = 50;
     private int playerHasteSpeed = 80;
@@ -39,7 +37,7 @@ public class Config
     public Config(Logger logger)
     {
         entityInfoMap = new HashMap<String, EntityInfo>();
-        ignoreBattleTypes = new HashSet<EntityInfo.Category>();
+        ignoreBattleTypes = new HashSet<String>();
         this.logger = logger;
         
         int internalVersion = 0;
@@ -162,7 +160,7 @@ public class Config
                         xmlReader.next();
                         if(xmlReader.isStartElement())
                         {
-                            ignoreBattleTypes.add(Category.fromString(xmlReader.getLocalName()));
+                            ignoreBattleTypes.add(xmlReader.getLocalName().toLowerCase());
                         }
                     } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("IgnoreBattleTypes")));
                 }
@@ -272,7 +270,7 @@ public class Config
                                     }
                                     else if(xmlReader.getLocalName().equals("Category"))
                                     {
-                                        eInfo.category = Category.fromString(xmlReader.getElementText());
+                                        eInfo.category = xmlReader.getElementText().toLowerCase();
                                     }
                                     else if(xmlReader.getLocalName().equals("Conflicts"))
                                     {
@@ -453,7 +451,7 @@ public class Config
         return configVersion;
     }
     
-    public boolean isIgnoreBattleType(Category type)
+    public boolean isIgnoreBattleType(String type)
     {
         return ignoreBattleTypes.contains(type);
     }

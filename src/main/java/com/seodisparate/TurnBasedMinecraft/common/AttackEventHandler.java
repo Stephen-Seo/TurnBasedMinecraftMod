@@ -10,7 +10,6 @@ public class AttackEventHandler
     {
         if(event.getEntity().world.isRemote)
         {
-            TurnBasedMinecraftMod.logger.debug("isRemote");
             return;
         }
         else if(TurnBasedMinecraftMod.battleManager == null)
@@ -20,12 +19,12 @@ public class AttackEventHandler
         
         if(!(event.getSource().getTrueSource() == null || event.getSource().getTrueSource().equals(TurnBasedMinecraftMod.attackingEntity)) && TurnBasedMinecraftMod.battleManager.checkAttack(event))
         {
-            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.attackingEntity + " and " + event.getEntity());
+//            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.attackingEntity + " and " + event.getEntity());
             event.setCanceled(true);
         }
         else
         {
-            TurnBasedMinecraftMod.logger.debug("Did not cancel attack");
+//            TurnBasedMinecraftMod.logger.debug("Did not cancel attack");
         }
         if(TurnBasedMinecraftMod.attackingDamage < (int) event.getAmount())
         {
