@@ -61,7 +61,6 @@ public class TurnBasedMinecraftMod
     {
         currentBattle = null;
         battleManager = null;
-        config = new Config(logger);
         
         // register packets
         NWINSTANCE.registerMessage(
@@ -93,6 +92,7 @@ public class TurnBasedMinecraftMod
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+        config = new Config(logger);
         logger.debug("POSTINIT");
     }
     
