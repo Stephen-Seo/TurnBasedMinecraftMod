@@ -34,7 +34,8 @@ public class PacketBattleMessage implements IMessage
         USED_ITEM(10),
         TURN_BEGIN(11),
         TURN_END(12),
-        SWITCHED_ITEM(13);
+        SWITCHED_ITEM(13),
+        WAS_AFFECTED(14);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -333,6 +334,10 @@ public class PacketBattleMessage implements IMessage
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                             to + " switched to a different item but failed because it was invalid!"));
                 }
+                break;
+            case WAS_AFFECTED:
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                        from + " was " + message.custom + " by " + to + "!"));
                 break;
             }
             return null;

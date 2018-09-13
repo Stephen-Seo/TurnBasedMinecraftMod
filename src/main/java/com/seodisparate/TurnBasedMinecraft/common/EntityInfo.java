@@ -3,6 +3,10 @@ package com.seodisparate.TurnBasedMinecraft.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
+
 public class EntityInfo
 {
     public Class classType;
@@ -191,6 +195,148 @@ public class EntityInfo
             else
             {
                 return UNKNOWN;
+            }
+        }
+        
+        public PotionEffect getPotionEffect()
+        {
+            return getPotionEffect(20 * 7, 0);
+        }
+        
+        public PotionEffect getPotionEffect(int duration, int amplifier)
+        {
+            switch(this)
+            {
+            case SPEED:
+                return new PotionEffect(MobEffects.SPEED, duration, amplifier);
+            case SLOW:
+                return new PotionEffect(MobEffects.SLOWNESS, duration, amplifier);
+            case HASTE:
+                return new PotionEffect(MobEffects.HASTE, duration, amplifier);
+            case MINING_FATIGUE:
+                return new PotionEffect(MobEffects.MINING_FATIGUE, duration, amplifier);
+            case STRENGTH:
+                return new PotionEffect(MobEffects.STRENGTH, duration, amplifier);
+            case JUMP_BOOST:
+                return new PotionEffect(MobEffects.JUMP_BOOST, duration, amplifier);
+            case NAUSEA:
+                return new PotionEffect(MobEffects.NAUSEA, duration, amplifier);
+            case REGENERATION:
+                return new PotionEffect(MobEffects.REGENERATION, duration, amplifier);
+            case RESISTANCE:
+                return new PotionEffect(MobEffects.RESISTANCE, duration, amplifier);
+            case FIRE_RESISTANCE:
+                return new PotionEffect(MobEffects.FIRE_RESISTANCE, duration, amplifier);
+            case WATER_BREATHING:
+                return new PotionEffect(MobEffects.WATER_BREATHING, duration, amplifier);
+            case INVISIBILITY:
+                return new PotionEffect(MobEffects.INVISIBILITY, duration, amplifier);
+            case BLINDNESS:
+                return new PotionEffect(MobEffects.BLINDNESS, duration, amplifier);
+            case NIGHT_VISION:
+                return new PotionEffect(MobEffects.NIGHT_VISION, duration, amplifier);
+            case HUNGER:
+                return new PotionEffect(MobEffects.HUNGER, duration, amplifier);
+            case WEAKNESS:
+                return new PotionEffect(MobEffects.WEAKNESS, duration, amplifier);
+            case POISON:
+                return new PotionEffect(MobEffects.POISON, duration, amplifier);
+            case WITHER:
+                return new PotionEffect(MobEffects.WITHER, duration, amplifier);
+            case ABSORPTION:
+                return new PotionEffect(MobEffects.ABSORPTION, duration, amplifier);
+            case SATURATION:
+                return new PotionEffect(MobEffects.SATURATION, duration, amplifier);
+            case GLOWING:
+                return new PotionEffect(MobEffects.GLOWING, duration, amplifier);
+            case LEVITATION:
+                return new PotionEffect(MobEffects.LEVITATION, duration, amplifier);
+            case LUCK:
+                return new PotionEffect(MobEffects.LUCK, duration, amplifier);
+            case UNLUCK:
+                return new PotionEffect(MobEffects.UNLUCK, duration, amplifier);
+            case FIRE:
+                // FIRE is not a PotionEffect and must be applied directly to the Entity
+                return null;
+            default:
+                return null;
+            }
+        }
+        
+        public void applyEffectToEntity(EntityLivingBase entity)
+        {
+            applyEffectToEntity(entity, 20 * 7, 0);
+        }
+        
+        public void applyEffectToEntity(EntityLivingBase entity, int duration, int amplifier)
+        {
+            if(this == FIRE)
+            {
+                entity.setFire(duration / 20);
+                return;
+            }
+            else if(this != UNKNOWN)
+            {
+                entity.addPotionEffect(getPotionEffect(duration, amplifier));
+            }
+        }
+        
+        public String getAffectedString()
+        {
+            switch(this)
+            {
+            case SPEED:
+                return "made faster";
+            case SLOW:
+                return "made slower";
+            case HASTE:
+                return "made hastier";
+            case MINING_FATIGUE:
+                return "fatigued";
+            case STRENGTH:
+                return "strengthened";
+            case JUMP_BOOST:
+                return "jump boosted";
+            case NAUSEA:
+                return "made nauseous";
+            case REGENERATION:
+                return "given regeneration";
+            case RESISTANCE:
+                return "given resistance";
+            case FIRE_RESISTANCE:
+                return "given fire resistance";
+            case WATER_BREATHING:
+                return "made able to breathe underwater";
+            case INVISIBILITY:
+                return "given invisibility";
+            case BLINDNESS:
+                return "made blind";
+            case NIGHT_VISION:
+                return "given night vision";
+            case HUNGER:
+                return "made hungry";
+            case WEAKNESS:
+                return "made weak";
+            case POISON:
+                return "poisoned";
+            case WITHER:
+                return "withered";
+            case ABSORPTION:
+                return "given absorption";
+            case SATURATION:
+                return "given saturation";
+            case GLOWING:
+                return "made to glow";
+            case LEVITATION:
+                return "made to levitate";
+            case LUCK:
+                return "given luck";
+            case UNLUCK:
+                return "made unlucky";
+            case FIRE:
+                return "set on fire";
+            default:
+                return "given unknown";
             }
         }
     }

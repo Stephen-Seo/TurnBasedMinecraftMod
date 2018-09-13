@@ -690,6 +690,16 @@ public class Battle
                                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, target.entity.getEntityId(), next.entity.getEntityId(), target.entityInfo.defenseDamage);
                                         }
                                     }
+                                    // attack effect
+                                    if(next.entityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && next.entityInfo.attackEffectProbability > 0)
+                                    {
+                                        int effectChance = (int)(Math.random() * 100);
+                                        if(effectChance < next.entityInfo.attackEffectProbability)
+                                        {
+                                            next.entityInfo.attackEffect.applyEffectToEntity((EntityLivingBase)target.entity);
+                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, next.entity.getEntityId(), target.entity.getEntityId(), 0, next.entityInfo.attackEffect.getAffectedString());
+                                        }
+                                    }
                                 }
                                 else
                                 {
