@@ -9,6 +9,18 @@
 		<passive></passive>
 		<boss></boss>
 	</IgnoreBattleTypes>
+	<!-- BattleMusic determines what categories a type will play music for. -->
+	<!-- Music is placed in "config/TurnBasedMinecraft/Music/battle/" and "config/TurnBasedMinecraft/Music/silly/" -->
+	<BattleMusic>
+		<Normal>
+			<monster></monster>
+			<animal></animal>
+			<boss></boss>
+		</Normal>
+		<Silly>
+			<passive></passive>
+		</Silly>
+	</BattleMusic>
 	<PlayerStats>
 		<Speed>50</Speed>
 		<HasteSpeed>80</HasteSpeed> <!-- Speed used if the player entity has "speed" or "haste" effects -->

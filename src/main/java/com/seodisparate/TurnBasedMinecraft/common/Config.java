@@ -35,12 +35,16 @@ public class Config
     private int fleeBadProbability = 40;
     private int minimumHitPercentage = 1;
     private int maxInBattle = 8;
+    private Set<String> musicBattleTypes;
+    private Set<String> musicSillyTypes;
     
     public Config(Logger logger)
     {
         entityInfoMap = new HashMap<String, EntityInfo>();
         ignoreBattleTypes = new HashSet<String>();
         this.logger = logger;
+        musicBattleTypes = new HashSet<String>();
+        musicSillyTypes = new HashSet<String>();
         
         int internalVersion = 0;
         try
@@ -169,6 +173,38 @@ public class Config
                             ignoreBattleTypes.add(xmlReader.getLocalName().toLowerCase());
                         }
                     } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("IgnoreBattleTypes")));
+                }
+                else if(xmlReader.getLocalName().equals("BattleMusic"))
+                {
+                    do
+                    {
+                        xmlReader.next();
+                        if(xmlReader.isStartElement())
+                        {
+                            if(xmlReader.getLocalName().equals("Normal"))
+                            {
+                                do
+                                {
+                                    xmlReader.next();
+                                    if(xmlReader.isStartElement())
+                                    {
+                                        musicBattleTypes.add(xmlReader.getLocalName().toLowerCase());
+                                    }
+                                } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Normal")));
+                            }
+                            else if(xmlReader.getLocalName().equals("Silly"))
+                            {
+                                do
+                                {
+                                    xmlReader.next();
+                                    if(xmlReader.isStartElement())
+                                    {
+                                        musicSillyTypes.add(xmlReader.getLocalName().toLowerCase());
+                                    }
+                                } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Silly")));
+                            }
+                        }
+                    } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("BattleMusic")));
                 }
                 else if(xmlReader.getLocalName().equals("PlayerStats"))
                 {
@@ -453,5 +489,15 @@ public class Config
     public int getMaxInBattle()
     {
         return maxInBattle;
+    }
+    
+    public boolean isBattleMusicType(String type)
+    {
+        return musicBattleTypes.contains(type.toLowerCase());
+    }
+    
+    public boolean isSillyMusicType(String type)
+    {
+        return musicSillyTypes.contains(type.toLowerCase());
     }
 }

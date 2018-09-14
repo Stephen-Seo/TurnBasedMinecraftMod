@@ -233,6 +233,14 @@ public class PacketBattleMessage implements IMessage
                     TurnBasedMinecraftMod.currentBattle = new Battle(message.amount, null, null, false);
                 }
                 TurnBasedMinecraftMod.commonProxy.setBattleGuiAsGui();
+                if(message.custom.isEmpty())
+                {
+                    TurnBasedMinecraftMod.commonProxy.typeEnteredBattle(null);
+                }
+                else
+                {
+                    TurnBasedMinecraftMod.commonProxy.typeEnteredBattle(message.custom);
+                }
                 break;
             case FLEE:
                 if(message.amount != 0)
@@ -254,6 +262,7 @@ public class PacketBattleMessage implements IMessage
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                         "Battle has ended!"));
                 TurnBasedMinecraftMod.commonProxy.battleEnded();
+                TurnBasedMinecraftMod.commonProxy.stopMusic();
                 break;
             case ATTACK:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(

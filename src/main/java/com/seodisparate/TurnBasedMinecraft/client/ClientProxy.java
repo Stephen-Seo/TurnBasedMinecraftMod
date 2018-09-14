@@ -1,6 +1,9 @@
 package com.seodisparate.TurnBasedMinecraft.client;
 
+import org.apache.logging.log4j.Logger;
+
 import com.seodisparate.TurnBasedMinecraft.common.CommonProxy;
+import com.seodisparate.TurnBasedMinecraft.common.Config;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.client.Minecraft;
@@ -8,11 +11,15 @@ import net.minecraft.client.Minecraft;
 public class ClientProxy extends CommonProxy
 {
     private BattleGui battleGui;
+    private BattleMusic battleMusic;
+    private Logger logger;
+    private Config config;
     
     public ClientProxy()
     {
         super();
         battleGui = new BattleGui();
+        battleMusic = null; // will be initialized in postInit()
     }
     
     @Override
@@ -59,5 +66,79 @@ public class ClientProxy extends CommonProxy
             Minecraft.getMinecraft().displayGuiScreen(null);
             Minecraft.getMinecraft().setIngameFocus();
         });
+    }
+
+    @Override
+    public void postInit()
+    {
+        battleMusic = new BattleMusic(logger);
+    }
+
+    @Override
+    public void setLogger(Logger logger)
+    {
+        this.logger = logger;
+    }
+
+    @Override
+    public void playBattleMusic()
+    {
+        battleMusic.playBattle();
+    }
+
+    @Override
+    public void playSillyMusic()
+    {
+        battleMusic.playSilly();
+    }
+
+    @Override
+    public void stopMusic()
+    {
+        battleMusic.stopMusic();
+    }
+
+    /**
+     * Sets what music to play based on type and loaded Config
+     */
+    @Override
+    public void typeEnteredBattle(String type)
+    {
+        if(type == null || type.isEmpty() || config.isBattleMusicType(type))
+        {
+            if(battleMusic.isPlaying())
+            {
+                if(battleMusic.isPlayingSilly())
+                {
+                    stopMusic();
+                    playBattleMusic();
+                }
+            }
+            else
+            {
+                playBattleMusic();
+            }
+        }
+        else if(config.isSillyMusicType(type))
+        {
+            if(battleMusic.isPlaying())
+            {
+                if(!battleMusic.isPlayingSilly())
+                {
+                    stopMusic();
+                    playSillyMusic();
+                }
+            }
+            else
+            {
+                playSillyMusic();
+            }
+        }
+    }
+
+    @Override
+    public void setConfig(Config config)
+    {
+        this.config = config;
     }
 }

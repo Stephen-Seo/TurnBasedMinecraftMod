@@ -32,6 +32,9 @@ public class TurnBasedMinecraftMod
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
     public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;
     public static final String CONFIG_INTERNAL_PATH = "/assets/TurnBasedMinecraft/" + CONFIG_FILENAME;
+    public static final String MUSIC_ROOT = CONFIG_DIRECTORY + "Music/";
+    public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
+    public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
     
     private static int CONFIG_FILE_VERSION = 0;
     
@@ -61,6 +64,7 @@ public class TurnBasedMinecraftMod
     {
         currentBattle = null;
         battleManager = null;
+        commonProxy.setLogger(logger);
         
         // register packets
         NWINSTANCE.registerMessage(
@@ -93,6 +97,8 @@ public class TurnBasedMinecraftMod
     public void postInit(FMLPostInitializationEvent event)
     {
         config = new Config(logger);
+        commonProxy.setConfig(config);
+        commonProxy.postInit();
         logger.debug("POSTINIT");
     }
     

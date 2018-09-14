@@ -166,11 +166,25 @@ public class Battle
         
         for(Combatant c : this.sideA.values())
         {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
+            if(c.entityInfo != null)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
+            }
+            else
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
+            }
         }
         for(Combatant c : this.sideB.values())
         {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
+            if(c.entityInfo != null)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
+            }
+            else
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
+            }
         }
         
         lastInstant = System.nanoTime();
@@ -232,7 +246,14 @@ public class Battle
                 undecidedCount.incrementAndGet();
             }
         }
-        sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+        if(newCombatant.entityInfo != null)
+        {
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
+        }
+        else
+        {
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+        }
         notifyPlayersBattleInfo();
     }
     
@@ -256,7 +277,14 @@ public class Battle
                 undecidedCount.incrementAndGet();
             }
         }
-        sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+        if(newCombatant.entityInfo != null)
+        {
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
+        }
+        else
+        {
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+        }
         notifyPlayersBattleInfo();
     }
     
