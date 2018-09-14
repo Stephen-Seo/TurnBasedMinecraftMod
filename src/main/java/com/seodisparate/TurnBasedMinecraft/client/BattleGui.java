@@ -165,11 +165,11 @@ public class BattleGui extends GuiScreen
             {
                 if(e.getValue().entity != null)
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey(), true));
                 }
                 else
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, "Unknown", e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, "Unknown", e.getKey(), true));
                 }
                 y += 20;
             }
@@ -178,11 +178,11 @@ public class BattleGui extends GuiScreen
             {
                 if(e.getValue().entity != null)
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey(), false));
                 }
                 else
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, "Unknown", e.getKey()));
+                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, "Unknown", e.getKey(), false));
                 }
                 y += 20;
             }
@@ -350,6 +350,9 @@ public class BattleGui extends GuiScreen
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException
     {
-        // left blank to prevent the player from exiting the gui
+        if(Minecraft.getMinecraft().player.isCreative())
+        {
+            super.keyTyped(typedChar, keyCode);
+        }
     }
 }

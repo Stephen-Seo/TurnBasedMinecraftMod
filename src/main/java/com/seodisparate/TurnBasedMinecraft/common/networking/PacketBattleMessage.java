@@ -35,7 +35,8 @@ public class PacketBattleMessage implements IMessage
         TURN_BEGIN(11),
         TURN_END(12),
         SWITCHED_ITEM(13),
-        WAS_AFFECTED(14);
+        WAS_AFFECTED(14),
+        BECAME_CREATIVE(15);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -252,10 +253,7 @@ public class PacketBattleMessage implements IMessage
             case ENDED:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                         "Battle has ended!"));
-                TurnBasedMinecraftMod.currentBattle = null;
-                Minecraft.getMinecraft().addScheduledTask(() -> {
-                    Minecraft.getMinecraft().setIngameFocus();
-                });
+                TurnBasedMinecraftMod.commonProxy.battleEnded();
                 break;
             case ATTACK:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
@@ -286,33 +284,33 @@ public class PacketBattleMessage implements IMessage
                 {
                 case USED_NOTHING:
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " tried to use nothing!"));
+                        from + " tried to use nothing!"));
                     break;
                 case USED_INVALID:
                     if(message.custom.length() > 0)
                     {
                         Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                                from + " tried to consume " + message.custom + " and failed!"));
+                            from + " tried to consume " + message.custom + " and failed!"));
                     }
                     else
                     {
                         Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                                from + " tried to consume an invalid item and failed!"));
+                            from + " tried to consume an invalid item and failed!"));
                     }
                     break;
                 case USED_FOOD:
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " ate a " + message.custom + "!"));
+                        from + " ate a " + message.custom + "!"));
                     break;
                 case USED_POTION:
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " drank a " + message.custom + "!"));
+                        from + " drank a " + message.custom + "!"));
                     break;
                 }
                 break;
             case TURN_BEGIN:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        "The turn begins!"));
+                    "The turn begins!"));
                 TurnBasedMinecraftMod.commonProxy.battleGuiTurnBegin();
                 break;
             case TURN_END:
@@ -327,17 +325,21 @@ public class PacketBattleMessage implements IMessage
                 if(message.amount != 0)
                 {
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " switched to a different item!"));
+                        from + " switched to a different item!"));
                 }
                 else
                 {
                     Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " switched to a different item but failed because it was invalid!"));
+                        from + " switched to a different item but failed because it was invalid!"));
                 }
                 break;
             case WAS_AFFECTED:
                 Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
                         to + " was " + message.custom + " by " + from + "!"));
+                break;
+            case BECAME_CREATIVE:
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
+                        from + " entered creative mode and left battle!"));
                 break;
             }
             return null;

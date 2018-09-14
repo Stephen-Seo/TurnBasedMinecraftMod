@@ -133,8 +133,13 @@ public class BattleManager
             }
             return false;
         }
-        
+
         // at this point only one entity is in battle, so add entity to other side
+        if(battle.getSize() >= TurnBasedMinecraftMod.config.getMaxInBattle())
+        {
+            // battle limit reached, cannot add to battle
+            return true;
+        }
         if(battle.hasCombatantInSideA(inBattle.getEntityId()))
         {
             battle.addCombatantToSideB(notInBattle);

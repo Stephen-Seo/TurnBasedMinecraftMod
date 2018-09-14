@@ -1,11 +1,13 @@
 <TurnBasedMinecraftConfig>
 	<!-- If the mod has a newer version config, it will rename the existing config and place the new config -->
 	<Version>2</Version>
+	<!-- If there are "MaxInBattle" amount of entities in battle, other entities cannot join until combatants leave battle. -->
+	<MaxInBattle>8</MaxInBattle>
 	<!-- Types that will not initiate battle with player. They are listed as "Category" per EntiytStats entity.
 		 Note that items listed in "IgnoreBattleTypes" and "Category" are converted to lowercase before being compared. -->
 	<IgnoreBattleTypes>
-		<Passive></Passive>
-		<Boss></Boss>
+		<passive></passive>
+		<boss></boss>
 	</IgnoreBattleTypes>
 	<PlayerStats>
 		<Speed>50</Speed>

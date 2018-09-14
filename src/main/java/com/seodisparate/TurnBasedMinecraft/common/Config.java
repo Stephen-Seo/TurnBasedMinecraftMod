@@ -34,6 +34,7 @@ public class Config
     private int fleeGoodProbability = 90;
     private int fleeBadProbability = 40;
     private int minimumHitPercentage = 1;
+    private int maxInBattle = 8;
     
     public Config(Logger logger)
     {
@@ -153,6 +154,10 @@ public class Config
                 else if(xmlReader.getLocalName().equals("Version"))
                 {
                     continue;
+                }
+                else if(xmlReader.getLocalName().equals("MaxInBattle"))
+                {
+                    maxInBattle = Integer.parseInt(xmlReader.getElementText());
                 }
                 else if(xmlReader.getLocalName().equals("IgnoreBattleTypes"))
                 {
@@ -443,5 +448,10 @@ public class Config
     public int getMinimumHitPercentage()
     {
         return minimumHitPercentage;
+    }
+    
+    public int getMaxInBattle()
+    {
+        return maxInBattle;
     }
 }

@@ -357,6 +357,11 @@ public class Battle
         return timer / 1000000000;
     }
     
+    public int getSize()
+    {
+        return sideA.size() + sideB.size();
+    }
+    
     protected void notifyPlayersBattleInfo()
     {
         if(!isServer)
@@ -455,6 +460,28 @@ public class Battle
         return didRemove;
     }
     
+    private void isCreativeCheck()
+    {
+        Queue<Integer> removeQueue = new ArrayDeque<Integer>();
+        for(Combatant c : players.values())
+        {
+            if(c.entity != null && ((EntityPlayer)c.entity).isCreative())
+            {
+                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
+                removeQueue.add(c.entity.getEntityId());
+            }
+        }
+        Integer toRemove = removeQueue.poll();
+        while(toRemove != null)
+        {
+            sideA.remove(toRemove);
+            sideB.remove(toRemove);
+            players.remove(toRemove);
+            playerCount.decrementAndGet();
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.BECAME_CREATIVE, toRemove, 0, 0);
+        }
+    }
+    
     /**
      * @return True if battle has ended
      */
@@ -538,6 +565,7 @@ public class Battle
             else
             {
                 healthCheck();
+				isCreativeCheck();
             }
             break;
         case ACTION:
@@ -872,6 +900,7 @@ public class Battle
                 state = State.DECISION;
                 undecidedCount.set(players.size());
                 healthCheck();
+				isCreativeCheck();
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
                 break;
             } // case ACTION

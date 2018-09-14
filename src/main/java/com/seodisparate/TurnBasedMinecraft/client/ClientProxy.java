@@ -1,6 +1,7 @@
 package com.seodisparate.TurnBasedMinecraft.client;
 
 import com.seodisparate.TurnBasedMinecraft.common.CommonProxy;
+import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.client.Minecraft;
 
@@ -48,5 +49,15 @@ public class ClientProxy extends CommonProxy
     public void battleGuiTurnEnd()
     {
         battleGui.turnEnd();
+    }
+
+    @Override
+    public void battleEnded()
+    {
+        TurnBasedMinecraftMod.currentBattle = null;
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            Minecraft.getMinecraft().displayGuiScreen(null);
+            Minecraft.getMinecraft().setIngameFocus();
+        });
     }
 }
