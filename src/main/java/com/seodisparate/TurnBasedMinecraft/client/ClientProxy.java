@@ -7,6 +7,8 @@ import com.seodisparate.TurnBasedMinecraft.common.Config;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.text.TextComponentString;
 
 public class ClientProxy extends CommonProxy
 {
@@ -140,5 +142,17 @@ public class ClientProxy extends CommonProxy
     public void setConfig(Config config)
     {
         this.config = config;
+    }
+
+    @Override
+    public void displayString(String message)
+    {
+        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(message));
+    }
+
+    @Override
+    public Entity getEntityByID(int id)
+    {
+        return Minecraft.getMinecraft().world.getEntityByID(id);
     }
 }

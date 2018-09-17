@@ -7,11 +7,9 @@ import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.ScorePlayerTeam;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -150,7 +148,7 @@ public class PacketBattleMessage implements IMessage
         @Override
         public IMessage onMessage(PacketBattleMessage message, MessageContext ctx)
         {
-            Entity fromEntity = Minecraft.getMinecraft().world.getEntityByID(message.entityIDFrom);
+            Entity fromEntity = TurnBasedMinecraftMod.commonProxy.getEntityByID(message.entityIDFrom);
             String from = "Unknown";
             if(fromEntity != null)
             {
@@ -186,7 +184,7 @@ public class PacketBattleMessage implements IMessage
                     }
                 }
             }
-            Entity toEntity = Minecraft.getMinecraft().world.getEntityByID(message.entityIDTo);
+            Entity toEntity = TurnBasedMinecraftMod.commonProxy.getEntityByID(message.entityIDTo);
             String to = "Unknown";
             if(toEntity != null)
             {
@@ -226,8 +224,7 @@ public class PacketBattleMessage implements IMessage
             switch(message.messageType)
             {
             case ENTERED:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " entered battle!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " entered battle!");
                 if(TurnBasedMinecraftMod.currentBattle == null || TurnBasedMinecraftMod.currentBattle.getId() != message.amount)
                 {
                     TurnBasedMinecraftMod.currentBattle = new Battle(message.amount, null, null, false);
@@ -245,110 +242,89 @@ public class PacketBattleMessage implements IMessage
             case FLEE:
                 if(message.amount != 0)
                 {
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " fled battle!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString(from + " fled battle!");
                 }
                 else
                 {
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " tried to flee battle but failed!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to flee battle but failed!");
                 }
                 break;
             case DIED:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " died in battle!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " died in battle!");
                 break;
             case ENDED:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        "Battle has ended!"));
+                TurnBasedMinecraftMod.commonProxy.displayString("Battle has ended!");
                 TurnBasedMinecraftMod.commonProxy.battleEnded();
                 TurnBasedMinecraftMod.commonProxy.stopMusic();
                 break;
             case ATTACK:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " attacked " + to + " and dealt " + message.amount + " damage!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " attacked " + to + " and dealt " + message.amount + " damage!");
                 break;
             case DEFEND:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " blocked " + to + "'s attack!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " blocked " + to + "'s attack!");
                 break;
             case DEFENSE_DAMAGE:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " retaliated from " + to + "'s attack and dealt " + message.amount + " damage!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " retaliated from " + to + "'s attack and dealt " + message.amount + " damage!");
                 break;
             case MISS:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " attacked " + to + " but missed!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " attacked " + to + " but missed!");
                 break;
             case DEFENDING:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " is defending!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " is defending!");
                 break;
             case DID_NOTHING:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    from + " did nothing!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " did nothing!");
                 break;
             case USED_ITEM:
                 switch(UsedItemAction.valueOf(message.amount))
                 {
                 case USED_NOTHING:
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " tried to use nothing!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to use nothing!");
                     break;
                 case USED_INVALID:
                     if(message.custom.length() > 0)
                     {
-                        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " tried to consume " + message.custom + " and failed!"));
+                        TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to consume " + message.custom + " and failed!");
                     }
                     else
                     {
-                        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                            from + " tried to consume an invalid item and failed!"));
+                        TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to consume an invalid item and failed!");
                     }
                     break;
                 case USED_FOOD:
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " ate a " + message.custom + "!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString(from + " ate a " + message.custom + "!");
                     break;
                 case USED_POTION:
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " drank a " + message.custom + "!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString(from + " drank a " + message.custom + "!");
                     break;
                 }
                 break;
             case TURN_BEGIN:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                    "The turn begins!"));
+                TurnBasedMinecraftMod.commonProxy.displayString("The turn begins!");
                 TurnBasedMinecraftMod.commonProxy.battleGuiTurnBegin();
                 break;
             case TURN_END:
                 if(TurnBasedMinecraftMod.currentBattle != null)
                 {
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        "The turn ended!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString("The turn ended!");
                 }
                 TurnBasedMinecraftMod.commonProxy.battleGuiTurnEnd();
                 break;
             case SWITCHED_ITEM:
                 if(message.amount != 0)
                 {
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " switched to a different item!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString(from + " switched to a different item!");
                 }
                 else
                 {
-                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " switched to a different item but failed because it was invalid!"));
+                    TurnBasedMinecraftMod.commonProxy.displayString(from + " switched to a different item but failed because it was invalid!");
                 }
                 break;
             case WAS_AFFECTED:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        to + " was " + message.custom + " by " + from + "!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(to + " was " + message.custom + " by " + from + "!");
                 break;
             case BECAME_CREATIVE:
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(
-                        from + " entered creative mode and left battle!"));
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " entered creative mode and left battle!");
                 break;
             }
             return null;

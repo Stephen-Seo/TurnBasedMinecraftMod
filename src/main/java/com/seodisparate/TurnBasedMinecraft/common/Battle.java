@@ -26,6 +26,7 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemSplashPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class Battle
 {
@@ -652,26 +653,27 @@ public class Battle
                                     // have player look at attack target
                                     final Entity nextEntity = next.entity;
                                     final Entity targetEntity = target.entity;
+                                    final EntityInfo targetEntityInfo = target.entityInfo;
                                     next.entity.getServer().addScheduledTask(() -> {
                                         ((EntityPlayerMP)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, Utility.yawDirection(nextEntity.posX, nextEntity.posZ, targetEntity.posX, targetEntity.posZ), Utility.pitchDirection(nextEntity.posX, nextEntity.posY, nextEntity.posZ, targetEntity.posX, targetEntity.posY, targetEntity.posZ));
-                                    });
-                                    TurnBasedMinecraftMod.attackingEntity = next.entity;
-                                    TurnBasedMinecraftMod.attackingDamage = 0;
-                                    ((EntityPlayer)next.entity).attackTargetEntityWithCurrentItem(target.entity);
-                                    TurnBasedMinecraftMod.attackingEntity = null;
-                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, next.entity.getEntityId(), target.entity.getEntityId(), TurnBasedMinecraftMod.attackingDamage);
-                                    if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
-                                    {
-                                        if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
+                                        TurnBasedMinecraftMod.attackingEntity = nextEntity;
+                                        TurnBasedMinecraftMod.attackingDamage = 0;
+                                        ((EntityPlayer)nextEntity).attackTargetEntityWithCurrentItem(targetEntity);
+                                        TurnBasedMinecraftMod.attackingEntity = null;
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getEntityId(), targetEntity.getEntityId(), TurnBasedMinecraftMod.attackingDamage);
+                                        if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0)
                                         {
-                                            // defense damage
-                                            DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
-                                            TurnBasedMinecraftMod.attackingEntity = target.entity;
-                                            next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
-                                            TurnBasedMinecraftMod.attackingEntity = null;
-                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, target.entity.getEntityId(), next.entity.getEntityId(), target.entityInfo.defenseDamage);
+                                            if((int)(Math.random() * 100) < targetEntityInfo.defenseDamageProbability)
+                                            {
+                                                // defense damage
+                                                DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)targetEntity);
+                                                TurnBasedMinecraftMod.attackingEntity = targetEntity;
+                                                nextEntity.attackEntityFrom(defenseDamageSource, targetEntityInfo.defenseDamage);
+                                                TurnBasedMinecraftMod.attackingEntity = null;
+                                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getEntityId(), nextEntity.getEntityId(), targetEntityInfo.defenseDamage);
+                                            }
                                         }
-                                    }
+                                    });
                                 }
                                 else
                                 {
@@ -741,32 +743,39 @@ public class Battle
                                         damageAmount += (int)(Math.random() * (next.entityInfo.attackVariance * 2 + 1)) - next.entityInfo.attackVariance;
                                     }
                                     // attack
-                                    TurnBasedMinecraftMod.attackingEntity = next.entity;
-                                    target.entity.attackEntityFrom(damageSource, damageAmount);
-                                    TurnBasedMinecraftMod.attackingEntity = null;
-                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, next.entity.getEntityId(), target.entity.getEntityId(), damageAmount);
-                                    if(!(target.entity instanceof EntityPlayer) && target.entityInfo.defenseDamage > 0)
-                                    {
-                                        if((int)(Math.random() * 100) < target.entityInfo.defenseDamageProbability)
+                                    final Entity nextEntity = next.entity;
+                                    final EntityInfo nextEntityInfo = next.entityInfo;
+                                    final Entity targetEntity = target.entity;
+                                    final EntityInfo targetEntityInfo = target.entityInfo;
+                                    final int finalDamageAmount = damageAmount;
+                                    next.entity.getServer().addScheduledTask(() -> {
+                                        TurnBasedMinecraftMod.attackingEntity = nextEntity;
+                                        targetEntity.attackEntityFrom(damageSource, finalDamageAmount);
+                                        TurnBasedMinecraftMod.attackingEntity = null;
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getEntityId(), targetEntity.getEntityId(), finalDamageAmount);
+                                        if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0)
                                         {
-                                            // defense damage
-                                            DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)target.entity);
-                                            TurnBasedMinecraftMod.attackingEntity = target.entity;
-                                            next.entity.attackEntityFrom(defenseDamageSource, target.entityInfo.defenseDamage);
-                                            TurnBasedMinecraftMod.attackingEntity = null;
-                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, target.entity.getEntityId(), next.entity.getEntityId(), target.entityInfo.defenseDamage);
+                                            if((int)(Math.random() * 100) < targetEntityInfo.defenseDamageProbability)
+                                            {
+                                                // defense damage
+                                                DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)targetEntity);
+                                                TurnBasedMinecraftMod.attackingEntity = targetEntity;
+                                                nextEntity.attackEntityFrom(defenseDamageSource, targetEntityInfo.defenseDamage);
+                                                TurnBasedMinecraftMod.attackingEntity = null;
+                                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getEntityId(), nextEntity.getEntityId(), targetEntityInfo.defenseDamage);
+                                            }
                                         }
-                                    }
-                                    // attack effect
-                                    if(next.entityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && next.entityInfo.attackEffectProbability > 0)
-                                    {
-                                        int effectChance = (int)(Math.random() * 100);
-                                        if(effectChance < next.entityInfo.attackEffectProbability)
+                                        // attack effect
+                                        if(nextEntityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && nextEntityInfo.attackEffectProbability > 0)
                                         {
-                                            next.entityInfo.attackEffect.applyEffectToEntity((EntityLivingBase)target.entity);
-                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, next.entity.getEntityId(), target.entity.getEntityId(), 0, next.entityInfo.attackEffect.getAffectedString());
+                                            int effectChance = (int)(Math.random() * 100);
+                                            if(effectChance < nextEntityInfo.attackEffectProbability)
+                                            {
+                                                nextEntityInfo.attackEffect.applyEffectToEntity((EntityLivingBase)targetEntity);
+                                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, nextEntity.getEntityId(), targetEntity.getEntityId(), 0, nextEntityInfo.attackEffect.getAffectedString());
+                                            }
                                         }
-                                    }
+                                    });
                                 }
                                 else
                                 {
@@ -892,13 +901,20 @@ public class Battle
                         if(targetItem instanceof ItemFood)
                         {
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName());
-                            ((ItemFood)targetItem).onItemUseFinish(targetItemStack, next.entity.world, (EntityLivingBase)next.entity);
+                            final Entity nextEntity = next.entity;
+                            next.entity.getServer().addScheduledTask(() -> {
+                                ((ItemFood)targetItem).onItemUseFinish(targetItemStack, nextEntity.world, (EntityLivingBase)nextEntity);
+                            });
                         }
                         else if(targetItem instanceof ItemPotion && !(targetItem instanceof ItemSplashPotion) && !(targetItem instanceof ItemLingeringPotion))
                         {
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName());
-                            ((ItemPotion)targetItem).onItemUseFinish(targetItemStack, next.entity.world, (EntityLivingBase)next.entity);
-                            ((EntityPlayer)next.entity).inventory.setInventorySlotContents(next.itemToUse, new ItemStack(Items.GLASS_BOTTLE));
+                            final Entity nextEntity = next.entity;
+                            final int nextItemToUse = next.itemToUse;
+                            next.entity.getServer().addScheduledTask(() -> {
+                                ((ItemPotion)targetItem).onItemUseFinish(targetItemStack, nextEntity.world, (EntityLivingBase)nextEntity);
+                                ((EntityPlayer)nextEntity).inventory.setInventorySlotContents(nextItemToUse, new ItemStack(Items.GLASS_BOTTLE));
+                            });
                         }
                         else
                         {
@@ -911,7 +927,11 @@ public class Battle
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 0);
                             break;
                         }
-                        ((EntityPlayer)next.entity).inventory.currentItem = next.itemToUse;
+                        final Entity nextEntity = next.entity;
+                        final int nextItemToUse = next.itemToUse;
+                        next.entity.getServer().addScheduledTask(() -> {
+                            ((EntityPlayer)nextEntity).inventory.currentItem = nextItemToUse;
+                        });
                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 1);
                         break;
                     }
@@ -929,7 +949,9 @@ public class Battle
                 undecidedCount.set(players.size());
                 healthCheck();
 				isCreativeCheck();
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
+				FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> {
+				    sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
+				});
                 break;
             } // case ACTION
         default:
