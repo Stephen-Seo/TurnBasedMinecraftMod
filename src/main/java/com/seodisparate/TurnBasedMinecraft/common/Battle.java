@@ -20,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemLingeringPotion;
 import net.minecraft.item.ItemPotion;
@@ -135,6 +136,7 @@ public class Battle
                 }
                 Combatant newCombatant = new Combatant(e, entityInfo);
                 newCombatant.isSideA = true;
+                newCombatant.battleID = getId();
                 this.sideA.put(e.getEntityId(), newCombatant);
                 if(e instanceof EntityPlayer)
                 {
@@ -155,6 +157,7 @@ public class Battle
                 }
                 Combatant newCombatant = new Combatant(e, entityInfo);
                 newCombatant.isSideA = false;
+                newCombatant.battleID = getId();
                 this.sideB.put(e.getEntityId(), newCombatant);
                 if(e instanceof EntityPlayer)
                 {
@@ -236,6 +239,7 @@ public class Battle
         }
         Combatant newCombatant = new Combatant(e, entityInfo);
         newCombatant.isSideA = true;
+        newCombatant.battleID = getId();
         sideA.put(e.getEntityId(), newCombatant);
         if(e instanceof EntityPlayer)
         {
@@ -267,6 +271,7 @@ public class Battle
         }
         Combatant newCombatant = new Combatant(e, entityInfo);
         newCombatant.isSideA = false;
+        newCombatant.battleID = getId();
         sideB.put(e.getEntityId(), newCombatant);
         if(e instanceof EntityPlayer)
         {
@@ -404,7 +409,7 @@ public class Battle
         }
     }
     
-    private void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount)
+    protected void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount)
     {
         if(!isServer)
         {
@@ -419,7 +424,7 @@ public class Battle
         }
     }
     
-    private void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount, String custom)
+    protected void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount, String custom)
     {
         if(!isServer)
         {
@@ -631,6 +636,32 @@ public class Battle
                             {
                                 break;
                             }
+                            ItemStack heldItemStack = ((EntityPlayer)next.entity).getHeldItemMainhand();
+                            if(heldItemStack.getItem() instanceof ItemBow)
+                            {
+                                if(Utility.doesPlayerHaveArrows((EntityPlayer)next.entity))
+                                {
+                                    final Entity nextEntity = next.entity;
+                                    final Entity targetEntity = target.entity;
+                                    next.entity.getServer().addScheduledTask(() -> {
+                                        // have player look at attack target
+                                        ((EntityPlayerMP)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, Utility.yawDirection(nextEntity.posX, nextEntity.posZ, targetEntity.posX, targetEntity.posZ), Utility.pitchDirection(nextEntity.posX, nextEntity.posY, nextEntity.posZ, targetEntity.posX, targetEntity.posY, targetEntity.posZ));
+                                        ItemBow itemBow = (ItemBow)heldItemStack.getItem();
+                                        synchronized(TurnBasedMinecraftMod.attackerViaBow)
+                                        {
+                                            TurnBasedMinecraftMod.attackerViaBow.add(new AttackerViaBow(nextEntity, getId()));
+                                        }
+                                        itemBow.onPlayerStoppedUsing(((EntityPlayer)nextEntity).getHeldItemMainhand(), nextEntity.getEntityWorld(), (EntityLivingBase)nextEntity, (int)(Math.random() * (itemBow.getMaxItemUseDuration(heldItemStack)) / 3));
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getEntityId(), targetEntity.getEntityId(), 0);
+                                    });
+                                }
+                                else
+                                {
+                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.BOW_NO_AMMO, next.entity.getEntityId(), 0, 0);
+                                }
+                                next = turnOrderQueue.poll();
+                                continue;
+                            }
                             int hitChance = TurnBasedMinecraftMod.config.getPlayerAttackProbability();
                             if(target.entity instanceof EntityPlayer)
                             {
@@ -649,12 +680,11 @@ public class Battle
                                 if(target.remainingDefenses <= 0)
                                 {
                                     // attack
-                                    // TODO damage via bow and arrow
-                                    // have player look at attack target
                                     final Entity nextEntity = next.entity;
                                     final Entity targetEntity = target.entity;
                                     final EntityInfo targetEntityInfo = target.entityInfo;
                                     next.entity.getServer().addScheduledTask(() -> {
+                                        // have player look at attack target
                                         ((EntityPlayerMP)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, Utility.yawDirection(nextEntity.posX, nextEntity.posZ, targetEntity.posX, targetEntity.posZ), Utility.pitchDirection(nextEntity.posX, nextEntity.posY, nextEntity.posZ, targetEntity.posX, targetEntity.posY, targetEntity.posZ));
                                         TurnBasedMinecraftMod.attackingEntity = nextEntity;
                                         TurnBasedMinecraftMod.attackingDamage = 0;

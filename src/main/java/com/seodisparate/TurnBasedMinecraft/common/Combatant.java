@@ -18,6 +18,7 @@ public class Combatant
     public int targetEntityID;
     public boolean isSideA;
     public int remainingDefenses;
+    public int battleID;
     
     public Combatant()
     {

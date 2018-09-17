@@ -1,10 +1,60 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
+
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class AttackEventHandler
 {
+    private boolean isAttackerValid(LivingAttackEvent event)
+    {
+        if(event.getSource().getTrueSource() == null)
+        {
+            return false;
+        }
+        else if(event.getSource().getTrueSource().equals(TurnBasedMinecraftMod.attackingEntity))
+        {
+            return true;
+        }
+        else
+        {
+            Queue<AttackerViaBow> removeQueue = new ArrayDeque<AttackerViaBow>();
+            final long now = System.nanoTime();
+            boolean isValid = false;
+            synchronized(TurnBasedMinecraftMod.attackerViaBow)
+            {
+                for(AttackerViaBow attacker : TurnBasedMinecraftMod.attackerViaBow)
+                {
+                    if(now - attacker.attackTime >= AttackerViaBow.ATTACK_TIMEOUT)
+                    {
+                        removeQueue.add(attacker);
+                    }
+                    else if(event.getSource().getTrueSource().equals(attacker.entity) && event.getSource().isProjectile())
+                    {
+                        removeQueue.add(attacker);
+                        isValid = true;
+                        Battle b = TurnBasedMinecraftMod.battleManager.getBattleByID(attacker.battleID);
+                        if(b != null)
+                        {
+                            b.sendMessageToAllPlayers(PacketBattleMessage.MessageType.ARROW_HIT, attacker.entity.getEntityId(), event.getEntity().getEntityId(), 0);
+                        }
+                    }
+                }
+                AttackerViaBow next = removeQueue.poll();
+                while(next != null)
+                {
+                    TurnBasedMinecraftMod.attackerViaBow.remove(next);
+                    next = removeQueue.poll();
+                }
+            }
+            return isValid;
+        }
+    }
+    
     @SubscribeEvent
     public void entityAttacked(LivingAttackEvent event)
     {
@@ -17,7 +67,7 @@ public class AttackEventHandler
             TurnBasedMinecraftMod.battleManager = new BattleManager(TurnBasedMinecraftMod.logger);
         }
         
-        if(!(event.getSource().getTrueSource() == null || event.getSource().getTrueSource().equals(TurnBasedMinecraftMod.attackingEntity)) && TurnBasedMinecraftMod.battleManager.checkAttack(event))
+        if(!isAttackerValid(event) && event.getEntity() != null && event.getSource().getTrueSource() != null && TurnBasedMinecraftMod.battleManager.checkAttack(event))
         {
 //            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.attackingEntity + " and " + event.getEntity());
             event.setCanceled(true);

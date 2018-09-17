@@ -1,5 +1,8 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemArrow;
+
 public class Utility
 {
     public static float yawDirection(double posX, double posZ, double targetX, double targetZ)
@@ -27,5 +30,17 @@ public class Utility
         {
             return (float)(-Math.atan(diffY / distance) * 180.0 / Math.PI);
         }
+    }
+    
+    public static boolean doesPlayerHaveArrows(EntityPlayer player)
+    {
+        for(int i = 0; i < player.inventory.getSizeInventory(); ++i)
+        {
+            if(player.inventory.getStackInSlot(i).getItem() instanceof ItemArrow)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

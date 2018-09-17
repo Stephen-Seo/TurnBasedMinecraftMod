@@ -1,8 +1,5 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;

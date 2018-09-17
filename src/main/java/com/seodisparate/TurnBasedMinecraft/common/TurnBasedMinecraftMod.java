@@ -1,6 +1,8 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
 
@@ -45,6 +47,7 @@ public class TurnBasedMinecraftMod
     private static int packetHandlerID = 0;
     protected static Entity attackingEntity;
     protected static int attackingDamage = 0;
+    protected static Set<AttackerViaBow> attackerViaBow;
     protected static Config config;
     
     public static Battle currentBattle = null;
@@ -64,6 +67,7 @@ public class TurnBasedMinecraftMod
     {
         currentBattle = null;
         battleManager = null;
+        attackerViaBow = new HashSet<AttackerViaBow>();
         commonProxy.setLogger(logger);
         
         // register packets

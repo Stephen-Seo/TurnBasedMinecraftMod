@@ -34,7 +34,10 @@ public class PacketBattleMessage implements IMessage
         TURN_END(12),
         SWITCHED_ITEM(13),
         WAS_AFFECTED(14),
-        BECAME_CREATIVE(15);
+        BECAME_CREATIVE(15),
+        FIRED_ARROW(16),
+        ARROW_HIT(17),
+        BOW_NO_AMMO(18);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -325,6 +328,15 @@ public class PacketBattleMessage implements IMessage
                 break;
             case BECAME_CREATIVE:
                 TurnBasedMinecraftMod.commonProxy.displayString(from + " entered creative mode and left battle!");
+                break;
+            case FIRED_ARROW:
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " let loose an arrow towards " + to + "!");
+                break;
+            case ARROW_HIT:
+                TurnBasedMinecraftMod.commonProxy.displayString(to + " was hit by " + from + "'s arrow!");
+                break;
+            case BOW_NO_AMMO:
+                TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to use their bow but ran out of ammo!");
                 break;
             }
             return null;
