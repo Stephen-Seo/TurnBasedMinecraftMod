@@ -61,6 +61,12 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
+    public void battleStarted()
+    {
+        setBattleGuiAsGui();
+    }
+
+    @Override
     public void battleEnded()
     {
         TurnBasedMinecraftMod.currentBattle = null;
@@ -68,6 +74,7 @@ public class ClientProxy extends CommonProxy
             Minecraft.getMinecraft().displayGuiScreen(null);
             Minecraft.getMinecraft().setIngameFocus();
         });
+        stopMusic();
     }
 
     @Override

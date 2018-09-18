@@ -17,6 +17,8 @@ public class CommonProxy
     
     public void battleGuiTurnEnd() {}
     
+    public void battleStarted() {}
+    
     public void battleEnded() {}
     
     public void postInit() {}
