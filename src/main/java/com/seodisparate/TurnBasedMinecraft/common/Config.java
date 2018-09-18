@@ -37,6 +37,7 @@ public class Config
     private int maxInBattle = 8;
     private Set<String> musicBattleTypes;
     private Set<String> musicSillyTypes;
+    private boolean freezeCombatantsInBattle = false;
     
     public Config(Logger logger)
     {
@@ -163,6 +164,10 @@ public class Config
                 {
                     maxInBattle = Integer.parseInt(xmlReader.getElementText());
                 }
+                else if(xmlReader.getLocalName().equals("FreezeBattleCombatants"))
+                {
+                    freezeCombatantsInBattle = !xmlReader.getElementText().toLowerCase().equals("false");
+                }
                 else if(xmlReader.getLocalName().equals("IgnoreBattleTypes"))
                 {
                     do
@@ -263,103 +268,108 @@ public class Config
                         xmlReader.next();
                         if(xmlReader.isStartElement())
                         {
-                            String classType = xmlReader.getLocalName();
-                            EntityInfo eInfo = new EntityInfo();
-                            try
+                            if(xmlReader.getLocalName().equals("Entry"))
                             {
-                                eInfo.classType = Class.forName(classType);
-                            } catch (ClassNotFoundException e)
-                            {
-                                logger.error("Failed to get class of name " + classType);
-                            }
-                            do
-                            {
-                                xmlReader.next();
-                                if(xmlReader.isStartElement())
+                                EntityInfo eInfo = new EntityInfo();
+                                do
                                 {
-                                    if(xmlReader.getLocalName().equals("AttackPower"))
+                                    xmlReader.next();
+                                    if(xmlReader.isStartElement())
                                     {
-                                        for(int i = 0; i < xmlReader.getAttributeCount(); ++i)
+                                        if(xmlReader.getLocalName().equals("Name"))
                                         {
-                                            if(xmlReader.getAttributeLocalName(i).equals("Probability"))
+                                            try
                                             {
-                                                eInfo.attackProbability = Integer.parseInt(xmlReader.getAttributeValue(i));
-                                            }
-                                            else if(xmlReader.getAttributeLocalName(i).equals("Variance"))
+                                                eInfo.classType = Class.forName(xmlReader.getElementText());
+                                            } catch (ClassNotFoundException e)
                                             {
-                                                eInfo.attackVariance = Integer.parseInt(xmlReader.getAttributeValue(i));
-                                            }
-                                        }
-                                        eInfo.attackPower = Integer.parseInt(xmlReader.getElementText());
-                                    }
-                                    else if(xmlReader.getLocalName().equals("AttackEffect"))
-                                    {
-                                        for(int i = 0; i < xmlReader.getAttributeCount(); ++i)
-                                        {
-                                            if(xmlReader.getAttributeLocalName(i).equals("Probability"))
-                                            {
-                                                eInfo.attackEffectProbability = Integer.parseInt(xmlReader.getAttributeValue(i));
+                                                logger.error("Failed to get class of name " + xmlReader.getElementText());
                                             }
                                         }
-                                        eInfo.attackEffect = EntityInfo.Effect.fromString(xmlReader.getElementText());
-                                    }
-                                    else if(xmlReader.getLocalName().equals("Evasion"))
-                                    {
-                                        eInfo.evasion = Integer.parseInt(xmlReader.getElementText());
-                                    }
-                                    else if(xmlReader.getLocalName().equals("DefenseDamage"))
-                                    {
-                                        for(int i = 0; i < xmlReader.getAttributeCount(); ++i)
+                                        else if(xmlReader.getLocalName().equals("AttackPower"))
                                         {
-                                            if(xmlReader.getAttributeLocalName(i).equals("Probability"))
+                                            for(int i = 0; i < xmlReader.getAttributeCount(); ++i)
                                             {
-                                                eInfo.defenseDamageProbability = Integer.parseInt(xmlReader.getAttributeValue(i));
-                                            }
-                                        }
-                                        eInfo.defenseDamage = Integer.parseInt(xmlReader.getElementText());
-                                    }
-                                    else if(xmlReader.getLocalName().equals("Category"))
-                                    {
-                                        eInfo.category = xmlReader.getElementText().toLowerCase();
-                                    }
-                                    else if(xmlReader.getLocalName().equals("IgnoreBattle"))
-                                    {
-                                        if(xmlReader.getElementText().toLowerCase().equals("true"))
-                                        {
-                                            eInfo.ignoreBattle = true;
-                                        }
-                                    }
-                                    else if(xmlReader.getLocalName().equals("Speed"))
-                                    {
-                                        eInfo.speed = Integer.parseInt(xmlReader.getElementText());
-                                    }
-                                    else if(xmlReader.getLocalName().equals("Decision"))
-                                    {
-                                        do
-                                        {
-                                            xmlReader.next();
-                                            if(xmlReader.isStartElement())
-                                            {
-                                                if(xmlReader.getLocalName().equals("Attack"))
+                                                if(xmlReader.getAttributeLocalName(i).equals("Probability"))
                                                 {
-                                                    eInfo.decisionAttack = Integer.parseInt(xmlReader.getElementText());
+                                                    eInfo.attackProbability = Integer.parseInt(xmlReader.getAttributeValue(i));
                                                 }
-                                                else if(xmlReader.getLocalName().equals("Defend"))
+                                                else if(xmlReader.getAttributeLocalName(i).equals("Variance"))
                                                 {
-                                                    eInfo.decisionDefend = Integer.parseInt(xmlReader.getElementText());
-                                                }
-                                                else if(xmlReader.getLocalName().equals("Flee"))
-                                                {
-                                                    eInfo.decisionFlee = Integer.parseInt(xmlReader.getElementText());
+                                                    eInfo.attackVariance = Integer.parseInt(xmlReader.getAttributeValue(i));
                                                 }
                                             }
-                                        } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Decision")));
+                                            eInfo.attackPower = Integer.parseInt(xmlReader.getElementText());
+                                        }
+                                        else if(xmlReader.getLocalName().equals("AttackEffect"))
+                                        {
+                                            for(int i = 0; i < xmlReader.getAttributeCount(); ++i)
+                                            {
+                                                if(xmlReader.getAttributeLocalName(i).equals("Probability"))
+                                                {
+                                                    eInfo.attackEffectProbability = Integer.parseInt(xmlReader.getAttributeValue(i));
+                                                }
+                                            }
+                                            eInfo.attackEffect = EntityInfo.Effect.fromString(xmlReader.getElementText());
+                                        }
+                                        else if(xmlReader.getLocalName().equals("Evasion"))
+                                        {
+                                            eInfo.evasion = Integer.parseInt(xmlReader.getElementText());
+                                        }
+                                        else if(xmlReader.getLocalName().equals("DefenseDamage"))
+                                        {
+                                            for(int i = 0; i < xmlReader.getAttributeCount(); ++i)
+                                            {
+                                                if(xmlReader.getAttributeLocalName(i).equals("Probability"))
+                                                {
+                                                    eInfo.defenseDamageProbability = Integer.parseInt(xmlReader.getAttributeValue(i));
+                                                }
+                                            }
+                                            eInfo.defenseDamage = Integer.parseInt(xmlReader.getElementText());
+                                        }
+                                        else if(xmlReader.getLocalName().equals("Category"))
+                                        {
+                                            eInfo.category = xmlReader.getElementText().toLowerCase();
+                                        }
+                                        else if(xmlReader.getLocalName().equals("IgnoreBattle"))
+                                        {
+                                            if(xmlReader.getElementText().toLowerCase().equals("true"))
+                                            {
+                                                eInfo.ignoreBattle = true;
+                                            }
+                                        }
+                                        else if(xmlReader.getLocalName().equals("Speed"))
+                                        {
+                                            eInfo.speed = Integer.parseInt(xmlReader.getElementText());
+                                        }
+                                        else if(xmlReader.getLocalName().equals("Decision"))
+                                        {
+                                            do
+                                            {
+                                                xmlReader.next();
+                                                if(xmlReader.isStartElement())
+                                                {
+                                                    if(xmlReader.getLocalName().equals("Attack"))
+                                                    {
+                                                        eInfo.decisionAttack = Integer.parseInt(xmlReader.getElementText());
+                                                    }
+                                                    else if(xmlReader.getLocalName().equals("Defend"))
+                                                    {
+                                                        eInfo.decisionDefend = Integer.parseInt(xmlReader.getElementText());
+                                                    }
+                                                    else if(xmlReader.getLocalName().equals("Flee"))
+                                                    {
+                                                        eInfo.decisionFlee = Integer.parseInt(xmlReader.getElementText());
+                                                    }
+                                                }
+                                            } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Decision")));
+                                        }
                                     }
+                                } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("Entry")));
+                                if(eInfo.classType != null)
+                                {
+                                    entityInfoMap.put(eInfo.classType.getName(), eInfo);
                                 }
-                            } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals(classType)));
-                            if(eInfo.classType != null)
-                            {
-                                entityInfoMap.put(eInfo.classType.getName(), eInfo);
                             }
                         }
                     } while(!(xmlReader.isEndElement() && xmlReader.getLocalName().equals("EntityStats")));
@@ -499,5 +509,10 @@ public class Config
     public boolean isSillyMusicType(String type)
     {
         return musicSillyTypes.contains(type.toLowerCase());
+    }
+    
+    public boolean isFreezeCombatantsEnabled()
+    {
+        return freezeCombatantsInBattle;
     }
 }

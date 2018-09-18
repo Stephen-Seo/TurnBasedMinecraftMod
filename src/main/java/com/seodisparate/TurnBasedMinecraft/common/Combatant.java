@@ -19,6 +19,11 @@ public class Combatant
     public boolean isSideA;
     public int remainingDefenses;
     public int battleID;
+    public double x;
+    public double y;
+    public double z;
+    public float yaw;
+    public float pitch;
     
     public Combatant()
     {

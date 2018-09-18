@@ -36,19 +36,20 @@ public class AttackEventHandler
                     else if(event.getSource().getTrueSource().equals(attacker.entity) && event.getSource().isProjectile())
                     {
                         removeQueue.add(attacker);
-                        isValid = true;
-                        Battle b = TurnBasedMinecraftMod.battleManager.getBattleByID(attacker.battleID);
-                        if(b != null)
+                        if(!isValid)
                         {
-                            b.sendMessageToAllPlayers(PacketBattleMessage.MessageType.ARROW_HIT, attacker.entity.getEntityId(), event.getEntity().getEntityId(), 0);
+                            Battle b = TurnBasedMinecraftMod.battleManager.getBattleByID(attacker.battleID);
+                            if(b != null)
+                            {
+                                b.sendMessageToAllPlayers(PacketBattleMessage.MessageType.ARROW_HIT, attacker.entity.getEntityId(), event.getEntity().getEntityId(), 0);
+                            }
+                            isValid = true;
                         }
                     }
                 }
-                AttackerViaBow next = removeQueue.poll();
-                while(next != null)
+                for(AttackerViaBow next = removeQueue.poll(); next != null; next = removeQueue.poll())
                 {
                     TurnBasedMinecraftMod.attackerViaBow.remove(next);
-                    next = removeQueue.poll();
                 }
             }
             return isValid;
