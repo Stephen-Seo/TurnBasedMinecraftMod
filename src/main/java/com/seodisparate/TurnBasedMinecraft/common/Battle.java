@@ -502,8 +502,7 @@ public class Battle
             }
         }
         boolean didRemove = !removeQueue.isEmpty();
-        Integer toRemove = removeQueue.poll();
-        while(toRemove != null)
+        for(Integer toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
         {
             sideA.remove(toRemove);
             sideB.remove(toRemove);
@@ -511,7 +510,6 @@ public class Battle
             {
                 playerCount.decrementAndGet();
             }
-            toRemove = removeQueue.poll();
         }
         if(players.isEmpty() || sideA.isEmpty() || sideB.isEmpty())
         {
@@ -521,12 +519,13 @@ public class Battle
         else if(didRemove)
         {
             notifyPlayersBattleInfo();
+            resetUndecidedCount();
         }
         
         return didRemove;
     }
     
-    private void isCreativeCheck()
+    private boolean isCreativeCheck()
     {
         Queue<Integer> removeQueue = new ArrayDeque<Integer>();
         for(Combatant c : players.values())
@@ -537,14 +536,37 @@ public class Battle
                 removeQueue.add(c.entity.getEntityId());
             }
         }
-        Integer toRemove = removeQueue.poll();
-        while(toRemove != null)
+        boolean didRemove = false;
+        for(Integer toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
         {
+            didRemove = true;
             sideA.remove(toRemove);
             sideB.remove(toRemove);
             players.remove(toRemove);
             playerCount.decrementAndGet();
             sendMessageToAllPlayers(PacketBattleMessage.MessageType.BECAME_CREATIVE, toRemove, 0, 0);
+        }
+        if(didRemove)
+        {
+            notifyPlayersBattleInfo();
+            resetUndecidedCount();
+        }
+        
+        return didRemove;
+    }
+    
+    private void resetUndecidedCount()
+    {
+        if(state == State.DECISION)
+        {
+            undecidedCount.set(0);
+            for(Combatant p : players.values())
+            {
+                if(p.decision == Decision.UNDECIDED)
+                {
+                    undecidedCount.incrementAndGet();
+                }
+            }
         }
     }
     
