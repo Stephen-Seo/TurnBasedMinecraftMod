@@ -63,10 +63,6 @@ public class AttackEventHandler
         {
             return;
         }
-        else if(TurnBasedMinecraftMod.battleManager == null)
-        {
-            TurnBasedMinecraftMod.battleManager = new BattleManager(TurnBasedMinecraftMod.logger);
-        }
         
         if(!isAttackerValid(event) && event.getEntity() != null && event.getSource().getTrueSource() != null && TurnBasedMinecraftMod.battleManager.checkAttack(event))
         {

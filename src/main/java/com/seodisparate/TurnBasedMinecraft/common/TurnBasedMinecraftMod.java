@@ -19,6 +19,8 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -59,12 +61,12 @@ public class TurnBasedMinecraftMod
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
-        logger.debug("PREINIT");
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+        commonProxy.initialize();
         currentBattle = null;
         battleManager = null;
         attackerViaBow = new HashSet<AttackerViaBow>();
@@ -91,7 +93,6 @@ public class TurnBasedMinecraftMod
             PacketBattleMessage.class,
             packetHandlerID++,
             Side.CLIENT);
-        logger.debug("INIT");
         
         // register event handler(s)
         MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
@@ -103,7 +104,26 @@ public class TurnBasedMinecraftMod
         config = new Config(logger);
         commonProxy.setConfig(config);
         commonProxy.postInit();
-        logger.debug("POSTINIT");
+    }
+    
+    @EventHandler
+    public void serverStarting(FMLServerStartingEvent event)
+    {
+        logger.debug("About to initialize BattleManager");
+        if(commonProxy.initializeBattleManager())
+        {
+            logger.debug("Initialized BattleManager");
+        }
+    }
+    
+    @EventHandler
+    public void serverStopping(FMLServerStoppingEvent event)
+    {
+        logger.debug("About to cleanup BattleManager");
+        if(commonProxy.cleanupBattleManager())
+        {
+            logger.debug("Cleaned up BattleManager");
+        }
     }
     
     public static BattleManager getBattleManager()

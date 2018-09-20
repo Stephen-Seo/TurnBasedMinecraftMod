@@ -16,13 +16,15 @@ public class BattleManager
     private int IDCounter = 0;
     protected Map<Integer, Battle> battleMap;
     private Thread updaterThread;
+    private BattleUpdater battleUpdater;
     private Logger logger;
     
     public BattleManager(Logger logger)
     {
         this.logger = logger;
         battleMap = new Hashtable<Integer, Battle>();
-        updaterThread = new Thread(new BattleUpdater(this));
+        battleUpdater = new BattleUpdater(this);
+        updaterThread = new Thread(battleUpdater);
         updaterThread.start();
     }
     
@@ -168,5 +170,13 @@ public class BattleManager
     public Battle getBattleByID(int id)
     {
         return battleMap.get(id);
+    }
+    
+    public void cleanup()
+    {
+        battleUpdater.setIsRunning(false);
+        battleUpdater = null;
+        updaterThread = null;
+        battleMap.clear();
     }
 }

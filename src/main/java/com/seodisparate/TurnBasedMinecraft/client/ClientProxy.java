@@ -17,13 +17,13 @@ public class ClientProxy extends CommonProxy
     private Logger logger;
     private Config config;
     
-    public ClientProxy()
+    @Override
+    public void initialize()
     {
-        super();
         battleGui = new BattleGui();
         battleMusic = null; // will be initialized in postInit()
     }
-    
+
     @Override
     public void setBattleGuiTime(int timeRemaining)
     {

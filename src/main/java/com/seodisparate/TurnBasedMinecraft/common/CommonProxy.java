@@ -7,6 +7,29 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class CommonProxy
 {
+    public void initialize() {}
+    
+    public boolean initializeBattleManager()
+    {
+        if(TurnBasedMinecraftMod.battleManager == null)
+        {
+            TurnBasedMinecraftMod.battleManager = new BattleManager(TurnBasedMinecraftMod.logger);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean cleanupBattleManager ()
+    {
+        if(TurnBasedMinecraftMod.battleManager != null)
+        {
+            TurnBasedMinecraftMod.battleManager.cleanup();
+            TurnBasedMinecraftMod.battleManager = null;
+            return true;
+        }
+        return false;
+    }
+    
     public void setBattleGuiTime(int timeRemaining) {}
     
     public void setBattleGuiBattleChanged() {}
