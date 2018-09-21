@@ -130,7 +130,7 @@ public class Battle
             for(Entity e : sideA)
             {
                 EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-                if(entityInfo == null && !(e instanceof EntityPlayer))
+                if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
                 {
                     continue;
                 }
@@ -159,7 +159,7 @@ public class Battle
             for(Entity e : sideB)
             {
                 EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-                if(entityInfo == null && !(e instanceof EntityPlayer))
+                if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
                 {
                     continue;
                 }
@@ -249,7 +249,7 @@ public class Battle
     public void addCombatantToSideA(Entity e)
     {
         EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-        if(entityInfo == null && !(e instanceof EntityPlayer))
+        if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
         {
             return;
         }
@@ -289,7 +289,7 @@ public class Battle
     public void addCombatantToSideB(Entity e)
     {
         EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-        if(entityInfo == null && !(e instanceof EntityPlayer))
+        if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
         {
             return;
         }
