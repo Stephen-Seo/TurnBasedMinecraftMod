@@ -10,6 +10,7 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequencer;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
 import org.apache.logging.log4j.Logger;
@@ -119,10 +120,10 @@ public class BattleMusic
             sillyMusic.add(f);
         }
         
+        initialized = true;
+        
         pickNextBattle();
         pickNextSilly();
-        
-        initialized = true;
     }
     
     private void pickNextBattle()
@@ -145,32 +146,41 @@ public class BattleMusic
         nextSilly = sillyMusic.get((int)(Math.random() * sillyMusic.size()));
     }
     
-    public void playBattle()
+    public void playBattle(float volume)
     {
-        if(!initialized)
+        if(!initialized || volume <= 0.0f)
         {
             return;
         }
-        play(nextBattle);
+        else if(volume > 1.0f)
+        {
+            volume = 1.0f;
+        }
+        play(nextBattle, volume);
         pickNextBattle();
         playingIsSilly = false;
     }
     
-    public void playSilly()
+    public void playSilly(float volume)
     {
-        if(!initialized)
+        if(!initialized || volume <= 0.0f)
         {
             return;
         }
-        play(nextSilly);
+        else if(volume > 1.0f)
+        {
+            volume = 1.0f;
+        }
+        play(nextSilly, volume);
         pickNextSilly();
         playingIsSilly = true;
     }
     
-    private void play(File next)
+    private void play(File next, float volume)
     {
         if(initialized && next != null)
         {
+            logger.debug("play called with file " + next.getName() + " and vol " + volume);
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 Minecraft.getMinecraft().getSoundHandler().pauseSounds();
             });
@@ -193,6 +203,7 @@ public class BattleMusic
                     logger.error("Failed to play battle music (midi)");
                     return;
                 }
+                
                 sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
                 sequencer.start();
             }
@@ -215,6 +226,11 @@ public class BattleMusic
                     logger.error("Failed to load battle music (wav)");
                     return;
                 }
+                
+                // set volume
+                FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(volume * 20.0f - 20.0f); // in decibels
+                
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
             }

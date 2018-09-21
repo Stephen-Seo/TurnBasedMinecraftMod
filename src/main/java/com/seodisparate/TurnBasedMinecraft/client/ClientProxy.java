@@ -8,6 +8,7 @@ import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentString;
 
 public class ClientProxy extends CommonProxy
@@ -92,13 +93,13 @@ public class ClientProxy extends CommonProxy
     @Override
     public void playBattleMusic()
     {
-        battleMusic.playBattle();
+        battleMusic.playBattle(Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.MUSIC));
     }
 
     @Override
     public void playSillyMusic()
     {
-        battleMusic.playSilly();
+        battleMusic.playSilly(Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.MUSIC));
     }
 
     @Override
