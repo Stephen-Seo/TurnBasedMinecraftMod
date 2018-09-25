@@ -37,6 +37,8 @@
 	<FleeBadProbability>40</FleeBadProbability>
 	<!-- Minimum hit percentage for every entity. If less than 1, it will be stored as 1 anyways. -->
 	<MinimumHitPercentage>4</MinimumHitPercentage>
+	<!-- Number of seconds to wait in battle for all players to make a decision. Minimum of 5 and maximum of 60. -->
+	<BattleTurnTimeSeconds>15</BattleTurnTimeSeconds>
 	
 	<!-- Battle stats for entities should be specified here. If an entity is not listed it cannot enter battle. -->
 	<!-- Name: The full class name of an entity. -->

@@ -33,7 +33,7 @@ public class BattleUpdater implements Runnable
             {
                 manager.battleMap.remove(ended);
             }
-            try { Thread.sleep(250); } catch (Exception e) { /* ignored */ }
+            try { Thread.sleep(250); } catch (Throwable t) { /* ignored */ }
         }
     }
     

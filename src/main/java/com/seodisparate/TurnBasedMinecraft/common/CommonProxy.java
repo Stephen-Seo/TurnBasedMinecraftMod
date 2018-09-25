@@ -64,4 +64,9 @@ public class CommonProxy
     {
         return FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getEntityByID(id);
     }
+    
+    public boolean isServerRunning()
+    {
+        return TurnBasedMinecraftMod.battleManager != null;
+    }
 }

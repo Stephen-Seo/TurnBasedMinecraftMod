@@ -41,7 +41,7 @@ public class BattleMusic
         try {
             sequencer = MidiSystem.getSequencer();
             sequencer.open();
-        } catch (Exception e)
+        } catch (Throwable t)
         {
             logger.error("Failed to load midi sequencer");
             return;
@@ -198,7 +198,7 @@ public class BattleMusic
                 }
                 try {
                     sequencer.setSequence(new BufferedInputStream(new FileInputStream(next)));
-                } catch (Exception e)
+                } catch (Throwable t)
                 {
                     logger.error("Failed to play battle music (midi)");
                     return;
@@ -221,7 +221,7 @@ public class BattleMusic
                 try
                 {
                     clip.open(AudioSystem.getAudioInputStream(next));
-                } catch(Exception e)
+                } catch(Throwable t)
                 {
                     logger.error("Failed to load battle music (wav)");
                     return;

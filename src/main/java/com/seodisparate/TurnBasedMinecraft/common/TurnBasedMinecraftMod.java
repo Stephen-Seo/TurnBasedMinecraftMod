@@ -1,6 +1,5 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,7 +30,6 @@ public class TurnBasedMinecraftMod
     public static final String MODID = "com.seodisparate.turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
     public static final String VERSION = "0.3";
-    public static final Duration BattleDecisionTime = Duration.ofSeconds(15);
     public static final String CONFIG_FILENAME = "TBM_Config.xml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
     public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;
@@ -51,6 +49,10 @@ public class TurnBasedMinecraftMod
     protected static int attackingDamage = 0;
     protected static Set<AttackerViaBow> attackerViaBow;
     protected static Config config;
+    public static final long BATTLE_DECISION_DURATION_NANO_MIN = 5000000000L;
+    public static final long BATTLE_DECISION_DURATION_NANO_MAX = 60000000000L;
+    public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = 15000000000L;
+    private static long BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_DEFAULT;
     
     public static Battle currentBattle = null;
     
@@ -139,5 +141,28 @@ public class TurnBasedMinecraftMod
     public static int getConfigVersion()
     {
         return CONFIG_FILE_VERSION;
+    }
+    
+    public static long getBattleDurationNanos()
+    {
+        return BATTLE_DECISION_DURATION_NANOSECONDS;
+    }
+    
+    public static int getBattleDurationSeconds()
+    {
+        return (int)(BATTLE_DECISION_DURATION_NANOSECONDS / 1000000000L);
+    }
+    
+    protected static void setBattleDurationSeconds(long seconds)
+    {
+        BATTLE_DECISION_DURATION_NANOSECONDS = seconds * 1000000000L;
+        if(BATTLE_DECISION_DURATION_NANOSECONDS < BATTLE_DECISION_DURATION_NANO_MIN)
+        {
+            BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_MIN;
+        }
+        else if(BATTLE_DECISION_DURATION_NANOSECONDS > BATTLE_DECISION_DURATION_NANO_MAX)
+        {
+            BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_MAX;
+        }
     }
 }

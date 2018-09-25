@@ -55,8 +55,11 @@ public class Config
             {
                 logger.error("Internal resource is null");
             }
-            internalVersion = getConfigFileVersion(is);
-        } catch (Exception e) {}
+            else
+            {
+                internalVersion = getConfigFileVersion(is);
+            }
+        } catch (Throwable t) {}
         
         if(internalVersion == 0)
         {
@@ -75,7 +78,7 @@ public class Config
                 writeConfig();
             }
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
             logger.error("Failed to check/create-new config file");
         }
@@ -96,7 +99,7 @@ public class Config
             try
             {
                 writeConfig();
-            } catch (Exception e)
+            } catch (Throwable t)
             {
                 logger.error("Failed to write config file!");
             }
@@ -104,7 +107,7 @@ public class Config
         try
         {
             parseConfig(configFile);
-        } catch (Exception e)
+        } catch (Throwable t)
         {
             logger.error("Failed to parse config file!");
         }
@@ -259,6 +262,19 @@ public class Config
                     if(minimumHitPercentage < 1)
                     {
                         minimumHitPercentage = 1;
+                    }
+                }
+                else if(xmlReader.getLocalName().equals("BattleTurnTimeSeconds"))
+                {
+                    int seconds = TurnBasedMinecraftMod.getBattleDurationSeconds();
+                    try
+                    {
+                        seconds = Integer.parseInt(xmlReader.getElementText());
+                        TurnBasedMinecraftMod.setBattleDurationSeconds(seconds);
+                    } catch (Throwable t)
+                    {
+                        logger.warn("Unable to get value for \"BattleTurnTimeSeconds\" from config, using default");
+                        TurnBasedMinecraftMod.setBattleDurationSeconds(TurnBasedMinecraftMod.BATTLE_DECISION_DURATION_NANO_DEFAULT / 1000000000L);
                     }
                 }
                 else if(xmlReader.getLocalName().equals("EntityEntry"))
@@ -468,7 +484,7 @@ public class Config
                 }
             }
             xmlReader.close();
-        } catch (Exception e)
+        } catch (Throwable t)
         {
             return 0;
         }

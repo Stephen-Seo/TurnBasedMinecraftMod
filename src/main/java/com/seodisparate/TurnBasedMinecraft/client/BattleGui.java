@@ -104,7 +104,7 @@ public class BattleGui extends GuiScreen
     
     public BattleGui()
     {
-        timeRemaining = new AtomicInteger((int)TurnBasedMinecraftMod.BattleDecisionTime.getSeconds());
+        timeRemaining = new AtomicInteger(TurnBasedMinecraftMod.getBattleDurationSeconds());
         lastInstant = System.nanoTime();
         elapsedTime = 0;
         state = MenuState.MAIN_MENU;
@@ -129,7 +129,7 @@ public class BattleGui extends GuiScreen
         {
             TurnBasedMinecraftMod.currentBattle.setState(Battle.State.DECISION);
         }
-        timeRemaining.set((int)TurnBasedMinecraftMod.BattleDecisionTime.getSeconds());
+        timeRemaining.set(TurnBasedMinecraftMod.getBattleDurationSeconds());
         elapsedTime = 0;
         lastInstant = System.nanoTime();
         setState(MenuState.MAIN_MENU);

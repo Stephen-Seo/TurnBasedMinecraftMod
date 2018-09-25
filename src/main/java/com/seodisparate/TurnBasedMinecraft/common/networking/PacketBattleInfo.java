@@ -21,7 +21,7 @@ public class PacketBattleInfo implements IMessage
     {
         sideA = new ArrayList<Integer>();
         sideB = new ArrayList<Integer>();
-        decisionNanos = TurnBasedMinecraftMod.BattleDecisionTime.getSeconds() * 1000000000;
+        decisionNanos = TurnBasedMinecraftMod.getBattleDurationNanos();
     }
     
     public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos)
@@ -81,7 +81,7 @@ public class PacketBattleInfo implements IMessage
             {
                 TurnBasedMinecraftMod.currentBattle.addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
             }
-            TurnBasedMinecraftMod.commonProxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000));
+            TurnBasedMinecraftMod.commonProxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000L));
             TurnBasedMinecraftMod.commonProxy.setBattleGuiBattleChanged();
             return null;
         }

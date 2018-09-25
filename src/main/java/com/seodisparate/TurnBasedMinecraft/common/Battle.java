@@ -130,7 +130,7 @@ public class Battle
             for(Entity e : sideA)
             {
                 EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-                if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
+                if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.commonProxy.isServerRunning())
                 {
                     continue;
                 }
@@ -159,7 +159,7 @@ public class Battle
             for(Entity e : sideB)
             {
                 EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-                if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
+                if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.commonProxy.isServerRunning())
                 {
                     continue;
                 }
@@ -210,7 +210,7 @@ public class Battle
         lastInstant = System.nanoTime();
         state = State.DECISION;
         undecidedCount.set(playerCount.get());
-        timer = TurnBasedMinecraftMod.BattleDecisionTime.getSeconds() * 1000000000;
+        timer = TurnBasedMinecraftMod.getBattleDurationNanos();
         battleEnded = false;
         
         notifyPlayersBattleInfo();
@@ -249,7 +249,7 @@ public class Battle
     public void addCombatantToSideA(Entity e)
     {
         EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-        if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
+        if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.commonProxy.isServerRunning())
         {
             return;
         }
@@ -289,7 +289,7 @@ public class Battle
     public void addCombatantToSideB(Entity e)
     {
         EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(e);
-        if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.battleManager != null)
+        if(entityInfo == null && !(e instanceof EntityPlayer) && TurnBasedMinecraftMod.commonProxy.isServerRunning())
         {
             return;
         }
@@ -653,7 +653,7 @@ public class Battle
                     }
                 }
                 state = State.ACTION;
-                timer = TurnBasedMinecraftMod.BattleDecisionTime.getSeconds() * 1000000000;
+                timer = TurnBasedMinecraftMod.getBattleDurationNanos();
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_BEGIN, 0, 0, 0);
                 turnOrderQueue.clear();
                 for(Combatant c : sideA.values())
