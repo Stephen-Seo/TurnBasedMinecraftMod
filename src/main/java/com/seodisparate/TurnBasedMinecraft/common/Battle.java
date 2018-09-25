@@ -147,7 +147,6 @@ public class Battle
                 if(TurnBasedMinecraftMod.config.isFreezeCombatantsEnabled())
                 {
                     newCombatant.x = e.posX;
-                    newCombatant.y = e.posY;
                     newCombatant.z = e.posZ;
                     newCombatant.yaw = e.rotationYaw;
                     newCombatant.pitch = e.rotationPitch;
@@ -176,7 +175,6 @@ public class Battle
                 if(TurnBasedMinecraftMod.config.isFreezeCombatantsEnabled())
                 {
                     newCombatant.x = e.posX;
-                    newCombatant.y = e.posY;
                     newCombatant.z = e.posZ;
                     newCombatant.yaw = e.rotationYaw;
                     newCombatant.pitch = e.rotationPitch;
@@ -270,7 +268,6 @@ public class Battle
         if(TurnBasedMinecraftMod.config.isFreezeCombatantsEnabled())
         {
             newCombatant.x = e.posX;
-            newCombatant.y = e.posY;
             newCombatant.z = e.posZ;
             newCombatant.yaw = e.rotationYaw;
             newCombatant.pitch = e.rotationPitch;
@@ -310,7 +307,6 @@ public class Battle
         if(TurnBasedMinecraftMod.config.isFreezeCombatantsEnabled())
         {
             newCombatant.x = e.posX;
-            newCombatant.y = e.posY;
             newCombatant.z = e.posZ;
             newCombatant.yaw = e.rotationYaw;
             newCombatant.pitch = e.rotationPitch;
@@ -574,11 +570,11 @@ public class Battle
     {
         for(Combatant c : sideA.values())
         {
-            c.entity.setPositionAndRotation(c.x, c.y, c.z, c.yaw, c.pitch);
+            c.entity.setPositionAndRotation(c.x, c.entity.posY, c.z, c.yaw, c.pitch);
         }
         for(Combatant c : sideB.values())
         {
-            c.entity.setPositionAndRotation(c.x, c.y, c.z, c.yaw, c.pitch);
+            c.entity.setPositionAndRotation(c.x, c.entity.posY, c.z, c.yaw, c.pitch);
         }
     }
     

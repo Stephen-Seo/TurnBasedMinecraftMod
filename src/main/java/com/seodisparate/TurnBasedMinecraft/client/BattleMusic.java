@@ -148,7 +148,7 @@ public class BattleMusic
     
     public void playBattle(float volume)
     {
-        if(!initialized || volume <= 0.0f)
+        if(!initialized || volume <= 0.0f || battleMusic.isEmpty())
         {
             return;
         }
@@ -163,7 +163,7 @@ public class BattleMusic
     
     public void playSilly(float volume)
     {
-        if(!initialized || volume <= 0.0f)
+        if(!initialized || volume <= 0.0f || sillyMusic.isEmpty())
         {
             return;
         }

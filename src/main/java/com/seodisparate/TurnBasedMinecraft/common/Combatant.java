@@ -20,7 +20,7 @@ public class Combatant
     public int remainingDefenses;
     public int battleID;
     public double x;
-    public double y;
+    //public double y; // y is ignored to prevent perpetual fall damage when FreezeBattleCombatants is enabled
     public double z;
     public float yaw;
     public float pitch;
