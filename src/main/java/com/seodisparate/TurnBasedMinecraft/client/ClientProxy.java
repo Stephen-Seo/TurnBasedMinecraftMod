@@ -75,7 +75,7 @@ public class ClientProxy extends CommonProxy
             Minecraft.getMinecraft().displayGuiScreen(null);
             Minecraft.getMinecraft().setIngameFocus();
         });
-        stopMusic();
+        stopMusic(true);
     }
 
     @Override
@@ -103,9 +103,9 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void stopMusic()
+    public void stopMusic(boolean resumeMCSounds)
     {
-        battleMusic.stopMusic();
+        battleMusic.stopMusic(resumeMCSounds);
     }
 
     /**
@@ -120,7 +120,7 @@ public class ClientProxy extends CommonProxy
             {
                 if(battleMusic.isPlayingSilly())
                 {
-                    stopMusic();
+                    stopMusic(false);
                     playBattleMusic();
                 }
             }
@@ -135,7 +135,7 @@ public class ClientProxy extends CommonProxy
             {
                 if(!battleMusic.isPlayingSilly())
                 {
-                    stopMusic();
+                    stopMusic(false);
                     playSillyMusic();
                 }
             }

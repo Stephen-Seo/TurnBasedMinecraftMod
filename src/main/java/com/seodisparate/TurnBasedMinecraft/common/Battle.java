@@ -36,6 +36,8 @@ public class Battle
     private Map<Integer, Combatant> sideB;
     private Map<Integer, Combatant> players;
     private PriorityQueue<Combatant> turnOrderQueue;
+    private Queue<Combatant> sideAEntryQueue;
+    private Queue<Combatant> sideBEntryQueue;
     
     private State state;
     private AtomicInteger playerCount;
@@ -123,6 +125,8 @@ public class Battle
         this.sideB = new Hashtable<Integer, Combatant>();
         players = new Hashtable<Integer, Combatant>();
         turnOrderQueue = new PriorityQueue<Combatant>(new Combatant.CombatantComparator());
+        sideAEntryQueue = new ArrayDeque<Combatant>();
+        sideBEntryQueue = new ArrayDeque<Combatant>();
         playerCount = new AtomicInteger(0);
         undecidedCount = new AtomicInteger(0);
         if(sideA != null)
@@ -254,7 +258,17 @@ public class Battle
         Combatant newCombatant = new Combatant(e, entityInfo);
         newCombatant.isSideA = true;
         newCombatant.battleID = getId();
-        sideA.put(e.getEntityId(), newCombatant);
+        if(isServer)
+        {
+            synchronized(sideAEntryQueue)
+            {
+                sideAEntryQueue.add(newCombatant);
+            }
+        }
+        else
+        {
+            sideA.put(e.getEntityId(), newCombatant);
+        }
         if(e instanceof EntityPlayer)
         {
             newCombatant.recalcSpeedOnCompare = true;
@@ -293,7 +307,17 @@ public class Battle
         Combatant newCombatant = new Combatant(e, entityInfo);
         newCombatant.isSideA = false;
         newCombatant.battleID = getId();
-        sideB.put(e.getEntityId(), newCombatant);
+        if(isServer)
+        {
+            synchronized(sideBEntryQueue)
+            {
+                sideBEntryQueue.add(newCombatant);
+            }
+        }
+        else
+        {
+            sideB.put(e.getEntityId(), newCombatant);
+        }
         if(e instanceof EntityPlayer)
         {
             newCombatant.recalcSpeedOnCompare = true;
@@ -583,7 +607,11 @@ public class Battle
      */
     public boolean update()
     {
-        if(battleEnded)
+        if(!isServer)
+        {
+            return false;
+        }
+        else if(battleEnded)
         {
             return true;
         }
@@ -598,6 +626,20 @@ public class Battle
         if(battleEnded)
         {
             return true;
+        }
+        synchronized(sideAEntryQueue)
+        {
+            for(Combatant c = sideAEntryQueue.poll(); c != null; c = sideAEntryQueue.poll())
+            {
+                sideA.put(c.entity.getEntityId(), c);
+            }
+        }
+        synchronized(sideBEntryQueue)
+        {
+            for(Combatant c = sideBEntryQueue.poll(); c != null; c = sideBEntryQueue.poll())
+            {
+                sideB.put(c.entity.getEntityId(), c);
+            }
         }
         if(TurnBasedMinecraftMod.config.isFreezeCombatantsEnabled())
         {

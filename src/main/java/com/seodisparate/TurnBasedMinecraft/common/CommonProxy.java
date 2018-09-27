@@ -52,7 +52,7 @@ public class CommonProxy
     
     public void playSillyMusic() {}
     
-    public void stopMusic() {}
+    public void stopMusic(boolean resumeMCSounds) {}
     
     public void typeEnteredBattle(String type) {}
     

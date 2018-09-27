@@ -30,6 +30,7 @@ public class BattleMusic
     private Sequencer sequencer;
     private Clip clip;
     private boolean playingIsSilly;
+    private boolean isPlaying;
     
     public BattleMusic(Logger logger)
     {
@@ -37,6 +38,7 @@ public class BattleMusic
         this.logger = logger;
         battleMusic = new ArrayList<File>();
         sillyMusic = new ArrayList<File>();
+        isPlaying = false;
         
         try {
             sequencer = MidiSystem.getSequencer();
@@ -159,6 +161,7 @@ public class BattleMusic
         play(nextBattle, volume);
         pickNextBattle();
         playingIsSilly = false;
+        isPlaying = true;
     }
     
     public void playSilly(float volume)
@@ -174,6 +177,7 @@ public class BattleMusic
         play(nextSilly, volume);
         pickNextSilly();
         playingIsSilly = true;
+        isPlaying = true;
     }
     
     private void play(File next, float volume)
@@ -237,7 +241,7 @@ public class BattleMusic
         }
     }
     
-    public void stopMusic()
+    public void stopMusic(boolean resumeMCSounds)
     {
         if(sequencer.isRunning())
         {
@@ -248,6 +252,13 @@ public class BattleMusic
             clip.stop();
             clip.close();
         }
+        if(resumeMCSounds)
+        {
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                Minecraft.getMinecraft().getSoundHandler().resumeSounds();
+            });
+        }
+        isPlaying = false;
     }
     
     public boolean isPlayingSilly()
@@ -257,6 +268,6 @@ public class BattleMusic
     
     public boolean isPlaying()
     {
-        return sequencer.isRunning() || clip.isActive();
+        return isPlaying || sequencer.isRunning() || clip.isActive();
     }
 }
