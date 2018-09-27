@@ -133,9 +133,11 @@ public class BattleMusic
         if(!initialized || battleMusic.isEmpty())
         {
             nextBattle = null;
-            return;
         }
-        nextBattle = battleMusic.get((int)(Math.random() * battleMusic.size()));
+        else
+        {
+            nextBattle = battleMusic.get((int)(Math.random() * battleMusic.size()));
+        }
     }
     
     private void pickNextSilly()
@@ -143,9 +145,11 @@ public class BattleMusic
         if(!initialized || sillyMusic.isEmpty())
         {
             nextSilly = null;
-            return;
         }
-        nextSilly = sillyMusic.get((int)(Math.random() * sillyMusic.size()));
+        else
+        {
+            nextSilly = sillyMusic.get((int)(Math.random() * sillyMusic.size()));
+        }
     }
     
     public void playBattle(float volume)
@@ -191,15 +195,9 @@ public class BattleMusic
             String suffix = next.getName().substring(next.getName().length() - 3).toLowerCase();
             if(suffix.equals("mid"))
             {
-                if(sequencer.isRunning())
-                {
-                    sequencer.stop();
-                }
-                if(clip.isActive())
-                {
-                    clip.stop();
-                    clip.close();
-                }
+                sequencer.stop();
+                clip.stop();
+                clip.close();
                 try {
                     sequencer.setSequence(new BufferedInputStream(new FileInputStream(next)));
                 } catch (Throwable t)
@@ -243,15 +241,9 @@ public class BattleMusic
     
     public void stopMusic(boolean resumeMCSounds)
     {
-        if(sequencer.isRunning())
-        {
-            sequencer.stop();
-        }
-        if(clip.isActive())
-        {
-            clip.stop();
-            clip.close();
-        }
+        sequencer.stop();
+        clip.stop();
+        clip.close();
         if(resumeMCSounds)
         {
             Minecraft.getMinecraft().addScheduledTask(() -> {
@@ -269,5 +261,15 @@ public class BattleMusic
     public boolean isPlaying()
     {
         return isPlaying || sequencer.isRunning() || clip.isActive();
+    }
+    
+    public boolean hasBattleMusic()
+    {
+        return !battleMusic.isEmpty();
+    }
+    
+    public boolean hasSillyMusic()
+    {
+        return !sillyMusic.isEmpty();
     }
 }

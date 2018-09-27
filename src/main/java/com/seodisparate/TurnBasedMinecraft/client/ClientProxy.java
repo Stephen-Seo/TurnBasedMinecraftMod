@@ -17,12 +17,16 @@ public class ClientProxy extends CommonProxy
     private BattleMusic battleMusic;
     private Logger logger;
     private Config config;
+    private int battleMusicCount;
+    private int sillyMusicCount;
     
     @Override
     public void initialize()
     {
         battleGui = new BattleGui();
         battleMusic = null; // will be initialized in postInit()
+        battleMusicCount = 0;
+        sillyMusicCount = 0;
     }
 
     @Override
@@ -76,6 +80,8 @@ public class ClientProxy extends CommonProxy
             Minecraft.getMinecraft().setIngameFocus();
         });
         stopMusic(true);
+        battleMusicCount = 0;
+        sillyMusicCount = 0;
     }
 
     @Override
@@ -114,36 +120,45 @@ public class ClientProxy extends CommonProxy
     @Override
     public void typeEnteredBattle(String type)
     {
+        if(TurnBasedMinecraftMod.currentBattle == null)
+        {
+            return;
+        }
         if(type == null || type.isEmpty() || config.isBattleMusicType(type))
         {
-            if(battleMusic.isPlaying())
-            {
-                if(battleMusic.isPlayingSilly())
-                {
-                    stopMusic(false);
-                    playBattleMusic();
-                }
-            }
-            else
-            {
-                playBattleMusic();
-            }
+            ++battleMusicCount;
         }
         else if(config.isSillyMusicType(type))
         {
-            if(battleMusic.isPlaying())
-            {
-                if(!battleMusic.isPlayingSilly())
-                {
-                    stopMusic(false);
-                    playSillyMusic();
-                }
-            }
-            else
-            {
-                playSillyMusic();
-            }
+            ++sillyMusicCount;
         }
+        else
+        {
+            ++battleMusicCount;
+        }
+        checkBattleTypes();
+    }
+
+    @Override
+    public void typeLeftBattle(String type)
+    {
+        if(TurnBasedMinecraftMod.currentBattle == null)
+        {
+            return;
+        }
+        if(type == null || type.isEmpty() || config.isBattleMusicType(type))
+        {
+            --battleMusicCount;
+        }
+        else if(config.isSillyMusicType(type))
+        {
+            --sillyMusicCount;
+        }
+        else
+        {
+            --battleMusicCount;
+        }
+        checkBattleTypes();
     }
 
     @Override
@@ -162,5 +177,39 @@ public class ClientProxy extends CommonProxy
     public Entity getEntityByID(int id)
     {
         return Minecraft.getMinecraft().world.getEntityByID(id);
+    }
+    
+    private void checkBattleTypes()
+    {
+        if(battleMusicCount <= 1 && sillyMusicCount > 0)
+        {
+            if(battleMusic.isPlaying())
+            {
+                if(!battleMusic.isPlayingSilly() && battleMusic.hasSillyMusic())
+                {
+                    stopMusic(false);
+                    playSillyMusic();
+                }
+            }
+            else if(battleMusic.hasSillyMusic())
+            {
+                playSillyMusic();
+            }
+        }
+        else
+        {
+            if(battleMusic.isPlaying())
+            {
+                if(battleMusic.isPlayingSilly() && battleMusic.hasBattleMusic())
+                {
+                    stopMusic(false);
+                    playBattleMusic();
+                }
+            }
+            else if(battleMusic.hasBattleMusic())
+            {
+                playBattleMusic();
+            }
+        }
     }
 }

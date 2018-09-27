@@ -56,6 +56,8 @@ public class CommonProxy
     
     public void typeEnteredBattle(String type) {}
     
+    public void typeLeftBattle(String type) {}
+    
     public void setConfig(Config config) {}
     
     public void displayString(String message) {}

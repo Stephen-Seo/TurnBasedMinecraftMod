@@ -18,6 +18,7 @@
 			<monster></monster>
 			<animal></animal>
 			<boss></boss>
+			<player></player>
 		</Normal>
 		<Silly>
 			<passive></passive>

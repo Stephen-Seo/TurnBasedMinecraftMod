@@ -192,6 +192,10 @@ public class Battle
             {
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
             }
+            else if(c.entity instanceof EntityPlayer)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, "player");
+            }
             else
             {
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
@@ -202,6 +206,10 @@ public class Battle
             if(c.entityInfo != null)
             {
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
+            }
+            else if(c.entity instanceof EntityPlayer)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, "player");
             }
             else
             {
@@ -290,6 +298,10 @@ public class Battle
         {
             sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
         }
+        else if(newCombatant.entity instanceof EntityPlayer)
+        {
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, "player");
+        }
         else
         {
             sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
@@ -339,6 +351,10 @@ public class Battle
         {
             sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
         }
+        else if(newCombatant.entity instanceof EntityPlayer)
+        {
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, "player");
+        }
         else
         {
             sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
@@ -350,6 +366,8 @@ public class Battle
     {
         sideA.clear();
         sideB.clear();
+        sideAEntryQueue.clear();
+        sideBEntryQueue.clear();
         players.clear();
         playerCount.set(0);
         undecidedCount.set(0);
@@ -506,7 +524,16 @@ public class Battle
                 {
                     TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
                 }
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
+                String category = new String();
+                if(c.entityInfo != null)
+                {
+                    category = c.entityInfo.category;
+                }
+                else if(c.entity instanceof EntityPlayer)
+                {
+                    category = "player";
+                }
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0, category);
             }
         }
         for(Combatant c : sideB.values())
@@ -518,7 +545,16 @@ public class Battle
                 {
                     TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
                 }
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0);
+                String category = new String();
+                if(c.entityInfo != null)
+                {
+                    category = c.entityInfo.category;
+                }
+                else if(c.entity instanceof EntityPlayer)
+                {
+                    category = "player";
+                }
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0, category);
             }
         }
         boolean didRemove = !removeQueue.isEmpty();
@@ -538,13 +574,15 @@ public class Battle
         }
         else if(didRemove)
         {
-            notifyPlayersBattleInfo();
             resetUndecidedCount();
         }
         
         return didRemove;
     }
     
+    /**
+     * @return true if at least one combatant was removed
+     */
     private boolean isCreativeCheck()
     {
         Queue<Integer> removeQueue = new ArrayDeque<Integer>();
@@ -568,7 +606,6 @@ public class Battle
         }
         if(didRemove)
         {
-            notifyPlayersBattleInfo();
             resetUndecidedCount();
         }
         
@@ -627,11 +664,13 @@ public class Battle
         {
             return true;
         }
+        boolean combatantsChanged = false;
         synchronized(sideAEntryQueue)
         {
             for(Combatant c = sideAEntryQueue.poll(); c != null; c = sideAEntryQueue.poll())
             {
                 sideA.put(c.entity.getEntityId(), c);
+                combatantsChanged = true;
             }
         }
         synchronized(sideBEntryQueue)
@@ -639,6 +678,7 @@ public class Battle
             for(Combatant c = sideBEntryQueue.poll(); c != null; c = sideBEntryQueue.poll())
             {
                 sideB.put(c.entity.getEntityId(), c);
+                combatantsChanged = true;
             }
         }
         if(TurnBasedMinecraftMod.config.isFreezeCombatantsEnabled())
@@ -706,8 +746,14 @@ public class Battle
             }
             else
             {
-                healthCheck();
-				isCreativeCheck();
+                if(healthCheck())
+                {
+                    combatantsChanged = true;
+                }
+                if(isCreativeCheck())
+                {
+                    combatantsChanged = true;
+                }
             }
             break;
         case ACTION:
@@ -1019,7 +1065,17 @@ public class Battle
                             {
                                 sideB.remove(next.entity.getEntityId());
                             }
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getEntityId(), 0, 1);
+                            combatantsChanged = true;
+                            String fleeingCategory = new String();
+                            if(next.entityInfo != null)
+                            {
+                                fleeingCategory = next.entityInfo.category;
+                            }
+                            else if(next.entity instanceof EntityPlayer)
+                            {
+                                fleeingCategory = "player";
+                            }
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getEntityId(), 0, 1, fleeingCategory);
                             if(next.entity instanceof EntityPlayer)
                             {
                                 players.remove(next.entity.getEntityId());
@@ -1094,8 +1150,14 @@ public class Battle
                 }
                 state = State.DECISION;
                 undecidedCount.set(players.size());
-                healthCheck();
-				isCreativeCheck();
+                if(healthCheck())
+                {
+                    combatantsChanged = true;
+                }
+                if(isCreativeCheck())
+                {
+                    combatantsChanged = true;
+                }
 				FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> {
 				    sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
 				});
@@ -1105,6 +1167,10 @@ public class Battle
             state = State.DECISION;
             break;
         } // switch(state)
+        if(combatantsChanged)
+        {
+            notifyPlayersBattleInfo();
+        }
         return battleEnded;
     } // update(final long dt)
 }

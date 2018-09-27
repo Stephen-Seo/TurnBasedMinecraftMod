@@ -233,19 +233,13 @@ public class PacketBattleMessage implements IMessage
                     TurnBasedMinecraftMod.currentBattle = new Battle(message.amount, null, null, false);
                 }
                 TurnBasedMinecraftMod.commonProxy.battleStarted();
-                if(message.custom.isEmpty())
-                {
-                    TurnBasedMinecraftMod.commonProxy.typeEnteredBattle(null);
-                }
-                else
-                {
-                    TurnBasedMinecraftMod.commonProxy.typeEnteredBattle(message.custom);
-                }
+                TurnBasedMinecraftMod.commonProxy.typeEnteredBattle(message.custom);
                 break;
             case FLEE:
                 if(message.amount != 0)
                 {
                     TurnBasedMinecraftMod.commonProxy.displayString(from + " fled battle!");
+                    TurnBasedMinecraftMod.commonProxy.typeLeftBattle(message.custom);
                 }
                 else
                 {
@@ -254,6 +248,7 @@ public class PacketBattleMessage implements IMessage
                 break;
             case DIED:
                 TurnBasedMinecraftMod.commonProxy.displayString(from + " died in battle!");
+                TurnBasedMinecraftMod.commonProxy.typeLeftBattle(message.custom);
                 break;
             case ENDED:
                 TurnBasedMinecraftMod.commonProxy.displayString("Battle has ended!");
