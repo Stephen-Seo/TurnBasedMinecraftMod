@@ -4,6 +4,7 @@ import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.CommonProxy;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentString;
@@ -92,13 +93,15 @@ public class ClientProxy extends CommonProxy
     @Override
     public void playBattleMusic()
     {
-        battleMusic.playBattle(Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.MUSIC));
+        GameSettings gs = Minecraft.getMinecraft().gameSettings;
+        battleMusic.playBattle(gs.getSoundLevel(SoundCategory.MUSIC) * gs.getSoundLevel(SoundCategory.MASTER));
     }
 
     @Override
     public void playSillyMusic()
     {
-        battleMusic.playSilly(Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.MUSIC));
+        GameSettings gs = Minecraft.getMinecraft().gameSettings;
+        battleMusic.playSilly(gs.getSoundLevel(SoundCategory.MUSIC) * gs.getSoundLevel(SoundCategory.MASTER));
     }
 
     @Override
