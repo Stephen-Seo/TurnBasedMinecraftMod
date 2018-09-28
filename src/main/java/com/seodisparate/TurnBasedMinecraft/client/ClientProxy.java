@@ -1,11 +1,7 @@
 package com.seodisparate.TurnBasedMinecraft.client;
 
-import org.apache.logging.log4j.Logger;
-
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.CommonProxy;
-import com.seodisparate.TurnBasedMinecraft.common.Config;
-import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -14,17 +10,16 @@ import net.minecraft.util.text.TextComponentString;
 
 public class ClientProxy extends CommonProxy
 {
-    private BattleGui battleGui;
-    private BattleMusic battleMusic;
-    private Logger logger;
-    private Config config;
-    private int battleMusicCount;
-    private int sillyMusicCount;
-    private Battle localBattle;
+    private BattleGui battleGui = null;
+    private BattleMusic battleMusic = null;
+    private int battleMusicCount = 0;
+    private int sillyMusicCount = 0;
+    private Battle localBattle = null;
     
     @Override
     public void initialize()
     {
+        super.initialize();
         battleGui = new BattleGui();
         battleMusic = null; // will be initialized in postInit()
         battleMusicCount = 0;
@@ -35,7 +30,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public void setBattleGuiTime(int timeRemaining)
     {
-        battleGui.timeRemaining.set(timeRemaining);
+        battleGui.setTimeRemaining(timeRemaining);
     }
 
     @Override
@@ -90,13 +85,8 @@ public class ClientProxy extends CommonProxy
     @Override
     public void postInit()
     {
-        battleMusic = new BattleMusic(logger);
-    }
-
-    @Override
-    public void setLogger(Logger logger)
-    {
-        this.logger = logger;
+        super.postInit();
+        battleMusic = new BattleMusic(getLogger());
     }
 
     @Override
@@ -127,11 +117,11 @@ public class ClientProxy extends CommonProxy
         {
             return;
         }
-        if(type == null || type.isEmpty() || config.isBattleMusicType(type))
+        if(type == null || type.isEmpty() || getConfig().isBattleMusicType(type))
         {
             ++battleMusicCount;
         }
-        else if(config.isSillyMusicType(type))
+        else if(getConfig().isSillyMusicType(type))
         {
             ++sillyMusicCount;
         }
@@ -149,11 +139,11 @@ public class ClientProxy extends CommonProxy
         {
             return;
         }
-        if(type == null || type.isEmpty() || config.isBattleMusicType(type))
+        if(type == null || type.isEmpty() || getConfig().isBattleMusicType(type))
         {
             --battleMusicCount;
         }
-        else if(config.isSillyMusicType(type))
+        else if(getConfig().isSillyMusicType(type))
         {
             --sillyMusicCount;
         }
@@ -162,12 +152,6 @@ public class ClientProxy extends CommonProxy
             --battleMusicCount;
         }
         checkBattleTypes();
-    }
-
-    @Override
-    public void setConfig(Config config)
-    {
-        this.config = config;
     }
 
     @Override
@@ -198,7 +182,7 @@ public class ClientProxy extends CommonProxy
             percentage = 100.0f * (float)sillyMusicCount / (float)(sillyMusicCount + battleMusicCount);
         }
         
-        if(percentage >= (float)TurnBasedMinecraftMod.getConfig().getSillyMusicThreshold())
+        if(percentage >= (float)getConfig().getSillyMusicThreshold())
         {
             if(battleMusic.isPlaying())
             {

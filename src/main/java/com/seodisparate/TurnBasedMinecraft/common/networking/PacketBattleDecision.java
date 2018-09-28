@@ -46,7 +46,7 @@ public class PacketBattleDecision implements IMessage
         @Override
         public IMessage onMessage(PacketBattleDecision message, MessageContext ctx)
         {
-            Battle b = TurnBasedMinecraftMod.getBattleManager().getBattleByID(message.battleID);
+            Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(message.battleID);
             if(b != null)
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;

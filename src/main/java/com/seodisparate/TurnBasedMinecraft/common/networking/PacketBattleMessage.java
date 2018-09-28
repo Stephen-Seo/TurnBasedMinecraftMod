@@ -3,7 +3,6 @@ package com.seodisparate.TurnBasedMinecraft.common.networking;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.ByteBuf;
@@ -151,7 +150,7 @@ public class PacketBattleMessage implements IMessage
         @Override
         public IMessage onMessage(PacketBattleMessage message, MessageContext ctx)
         {
-            Entity fromEntity = TurnBasedMinecraftMod.commonProxy.getEntityByID(message.entityIDFrom);
+            Entity fromEntity = TurnBasedMinecraftMod.proxy.getEntityByID(message.entityIDFrom);
             String from = "Unknown";
             if(fromEntity != null)
             {
@@ -168,9 +167,9 @@ public class PacketBattleMessage implements IMessage
                     from = fromEntity.getName();
                 }
             }
-            else if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
+            else if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
             {
-                fromEntity = TurnBasedMinecraftMod.commonProxy.getLocalBattle().getCombatantEntity(message.entityIDFrom);
+                fromEntity = TurnBasedMinecraftMod.proxy.getLocalBattle().getCombatantEntity(message.entityIDFrom);
                 if(fromEntity != null)
                 {
                     if(fromEntity.hasCustomName())
@@ -187,7 +186,7 @@ public class PacketBattleMessage implements IMessage
                     }
                 }
             }
-            Entity toEntity = TurnBasedMinecraftMod.commonProxy.getEntityByID(message.entityIDTo);
+            Entity toEntity = TurnBasedMinecraftMod.proxy.getEntityByID(message.entityIDTo);
             String to = "Unknown";
             if(toEntity != null)
             {
@@ -204,9 +203,9 @@ public class PacketBattleMessage implements IMessage
                     to = toEntity.getName();
                 }
             }
-            else if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
+            else if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
             {
-                toEntity = TurnBasedMinecraftMod.commonProxy.getLocalBattle().getCombatantEntity(message.entityIDTo);
+                toEntity = TurnBasedMinecraftMod.proxy.getLocalBattle().getCombatantEntity(message.entityIDTo);
                 if(toEntity != null)
                 {
                     if(toEntity.hasCustomName())
@@ -227,110 +226,110 @@ public class PacketBattleMessage implements IMessage
             switch(message.messageType)
             {
             case ENTERED:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " entered battle!");
-                if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() == null || TurnBasedMinecraftMod.commonProxy.getLocalBattle().getId() != message.amount)
+                TurnBasedMinecraftMod.proxy.displayString(from + " entered battle!");
+                if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null || TurnBasedMinecraftMod.proxy.getLocalBattle().getId() != message.amount)
                 {
-                    TurnBasedMinecraftMod.commonProxy.createLocalBattle(message.amount);
+                    TurnBasedMinecraftMod.proxy.createLocalBattle(message.amount);
                 }
-                TurnBasedMinecraftMod.commonProxy.battleStarted();
-                TurnBasedMinecraftMod.commonProxy.typeEnteredBattle(message.custom);
+                TurnBasedMinecraftMod.proxy.battleStarted();
+                TurnBasedMinecraftMod.proxy.typeEnteredBattle(message.custom);
                 break;
             case FLEE:
                 if(message.amount != 0)
                 {
-                    TurnBasedMinecraftMod.commonProxy.displayString(from + " fled battle!");
-                    TurnBasedMinecraftMod.commonProxy.typeLeftBattle(message.custom);
+                    TurnBasedMinecraftMod.proxy.displayString(from + " fled battle!");
+                    TurnBasedMinecraftMod.proxy.typeLeftBattle(message.custom);
                 }
                 else
                 {
-                    TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to flee battle but failed!");
+                    TurnBasedMinecraftMod.proxy.displayString(from + " tried to flee battle but failed!");
                 }
                 break;
             case DIED:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " died in battle!");
-                TurnBasedMinecraftMod.commonProxy.typeLeftBattle(message.custom);
+                TurnBasedMinecraftMod.proxy.displayString(from + " died in battle!");
+                TurnBasedMinecraftMod.proxy.typeLeftBattle(message.custom);
                 break;
             case ENDED:
-                TurnBasedMinecraftMod.commonProxy.displayString("Battle has ended!");
-                TurnBasedMinecraftMod.commonProxy.battleEnded();
+                TurnBasedMinecraftMod.proxy.displayString("Battle has ended!");
+                TurnBasedMinecraftMod.proxy.battleEnded();
                 break;
             case ATTACK:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " attacked " + to + " and dealt " + message.amount + " damage!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " attacked " + to + " and dealt " + message.amount + " damage!");
                 break;
             case DEFEND:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " blocked " + to + "'s attack!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " blocked " + to + "'s attack!");
                 break;
             case DEFENSE_DAMAGE:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " retaliated from " + to + "'s attack and dealt " + message.amount + " damage!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " retaliated from " + to + "'s attack and dealt " + message.amount + " damage!");
                 break;
             case MISS:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " attacked " + to + " but missed!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " attacked " + to + " but missed!");
                 break;
             case DEFENDING:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " is defending!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " is defending!");
                 break;
             case DID_NOTHING:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " did nothing!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " did nothing!");
                 break;
             case USED_ITEM:
                 switch(UsedItemAction.valueOf(message.amount))
                 {
                 case USED_NOTHING:
-                    TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to use nothing!");
+                    TurnBasedMinecraftMod.proxy.displayString(from + " tried to use nothing!");
                     break;
                 case USED_INVALID:
                     if(message.custom.length() > 0)
                     {
-                        TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to consume " + message.custom + " and failed!");
+                        TurnBasedMinecraftMod.proxy.displayString(from + " tried to consume " + message.custom + " and failed!");
                     }
                     else
                     {
-                        TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to consume an invalid item and failed!");
+                        TurnBasedMinecraftMod.proxy.displayString(from + " tried to consume an invalid item and failed!");
                     }
                     break;
                 case USED_FOOD:
-                    TurnBasedMinecraftMod.commonProxy.displayString(from + " ate a " + message.custom + "!");
+                    TurnBasedMinecraftMod.proxy.displayString(from + " ate a " + message.custom + "!");
                     break;
                 case USED_POTION:
-                    TurnBasedMinecraftMod.commonProxy.displayString(from + " drank a " + message.custom + "!");
+                    TurnBasedMinecraftMod.proxy.displayString(from + " drank a " + message.custom + "!");
                     break;
                 }
                 break;
             case TURN_BEGIN:
-                TurnBasedMinecraftMod.commonProxy.displayString("The turn begins!");
-                TurnBasedMinecraftMod.commonProxy.battleGuiTurnBegin();
+                TurnBasedMinecraftMod.proxy.displayString("The turn begins!");
+                TurnBasedMinecraftMod.proxy.battleGuiTurnBegin();
                 break;
             case TURN_END:
-                if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
+                if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
                 {
-                    TurnBasedMinecraftMod.commonProxy.displayString("The turn ended!");
+                    TurnBasedMinecraftMod.proxy.displayString("The turn ended!");
                 }
-                TurnBasedMinecraftMod.commonProxy.battleGuiTurnEnd();
+                TurnBasedMinecraftMod.proxy.battleGuiTurnEnd();
                 break;
             case SWITCHED_ITEM:
                 if(message.amount != 0)
                 {
-                    TurnBasedMinecraftMod.commonProxy.displayString(from + " switched to a different item!");
+                    TurnBasedMinecraftMod.proxy.displayString(from + " switched to a different item!");
                 }
                 else
                 {
-                    TurnBasedMinecraftMod.commonProxy.displayString(from + " switched to a different item but failed because it was invalid!");
+                    TurnBasedMinecraftMod.proxy.displayString(from + " switched to a different item but failed because it was invalid!");
                 }
                 break;
             case WAS_AFFECTED:
-                TurnBasedMinecraftMod.commonProxy.displayString(to + " was " + message.custom + " by " + from + "!");
+                TurnBasedMinecraftMod.proxy.displayString(to + " was " + message.custom + " by " + from + "!");
                 break;
             case BECAME_CREATIVE:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " entered creative mode and left battle!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " entered creative mode and left battle!");
                 break;
             case FIRED_ARROW:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " let loose an arrow towards " + to + "!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " let loose an arrow towards " + to + "!");
                 break;
             case ARROW_HIT:
-                TurnBasedMinecraftMod.commonProxy.displayString(to + " was hit by " + from + "'s arrow!");
+                TurnBasedMinecraftMod.proxy.displayString(to + " was hit by " + from + "'s arrow!");
                 break;
             case BOW_NO_AMMO:
-                TurnBasedMinecraftMod.commonProxy.displayString(from + " tried to use their bow but ran out of ammo!");
+                TurnBasedMinecraftMod.proxy.displayString(from + " tried to use their bow but ran out of ammo!");
                 break;
             }
             return null;

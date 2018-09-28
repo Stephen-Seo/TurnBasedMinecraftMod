@@ -16,7 +16,7 @@ public class AttackEventHandler
         {
             return false;
         }
-        else if(event.getSource().getTrueSource().equals(TurnBasedMinecraftMod.attackingEntity))
+        else if(event.getSource().getTrueSource().equals(TurnBasedMinecraftMod.proxy.getAttackingEntity()))
         {
             return true;
         }
@@ -25,9 +25,9 @@ public class AttackEventHandler
             Queue<AttackerViaBow> removeQueue = new ArrayDeque<AttackerViaBow>();
             final long now = System.nanoTime();
             boolean isValid = false;
-            synchronized(TurnBasedMinecraftMod.attackerViaBow)
+            synchronized(TurnBasedMinecraftMod.proxy.getAttackerViaBowSet())
             {
-                for(AttackerViaBow attacker : TurnBasedMinecraftMod.attackerViaBow)
+                for(AttackerViaBow attacker : TurnBasedMinecraftMod.proxy.getAttackerViaBowSet())
                 {
                     if(now - attacker.attackTime >= AttackerViaBow.ATTACK_TIMEOUT)
                     {
@@ -38,7 +38,7 @@ public class AttackEventHandler
                         removeQueue.add(attacker);
                         if(!isValid)
                         {
-                            Battle b = TurnBasedMinecraftMod.battleManager.getBattleByID(attacker.battleID);
+                            Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(attacker.battleID);
                             if(b != null)
                             {
                                 b.sendMessageToAllPlayers(PacketBattleMessage.MessageType.ARROW_HIT, attacker.entity.getEntityId(), event.getEntity().getEntityId(), 0);
@@ -49,7 +49,7 @@ public class AttackEventHandler
                 }
                 for(AttackerViaBow next = removeQueue.poll(); next != null; next = removeQueue.poll())
                 {
-                    TurnBasedMinecraftMod.attackerViaBow.remove(next);
+                    TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().remove(next);
                 }
             }
             return isValid;
@@ -64,18 +64,18 @@ public class AttackEventHandler
             return;
         }
         
-        if(!isAttackerValid(event) && event.getEntity() != null && event.getSource().getTrueSource() != null && TurnBasedMinecraftMod.battleManager.checkAttack(event))
+        if(!isAttackerValid(event) && event.getEntity() != null && event.getSource().getTrueSource() != null && TurnBasedMinecraftMod.proxy.getBattleManager().checkAttack(event))
         {
-//            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.attackingEntity + " and " + event.getEntity());
+//            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.commonProxy.getAttackingEntity() + " and " + event.getEntity());
             event.setCanceled(true);
         }
         else
         {
 //            TurnBasedMinecraftMod.logger.debug("Did not cancel attack");
         }
-        if(TurnBasedMinecraftMod.attackingDamage < (int) event.getAmount())
+        if(TurnBasedMinecraftMod.proxy.getAttackingDamage() < (int) event.getAmount())
         {
-            TurnBasedMinecraftMod.attackingDamage = (int) event.getAmount();
+            TurnBasedMinecraftMod.proxy.setAttackingDamage((int) event.getAmount());
         }
     }
 }

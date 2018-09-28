@@ -1,5 +1,8 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.entity.Entity;
@@ -7,24 +10,34 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class CommonProxy
 {
-    public void initialize() {}
+    private Set<AttackerViaBow> attackerViaBow = null;
+    private BattleManager battleManager = null;
+    private Entity attackingEntity = null;
+    private int attackingDamage = 0;
+    private Config config = null;
+    private Logger logger = null;
     
-    public boolean initializeBattleManager()
+    public void initialize()
     {
-        if(TurnBasedMinecraftMod.battleManager == null)
+        attackerViaBow = new HashSet<AttackerViaBow>();
+    }
+    
+    public final boolean initializeBattleManager()
+    {
+        if(battleManager == null)
         {
-            TurnBasedMinecraftMod.battleManager = new BattleManager(TurnBasedMinecraftMod.logger);
+            battleManager = new BattleManager(TurnBasedMinecraftMod.logger);
             return true;
         }
         return false;
     }
     
-    public boolean cleanupBattleManager ()
+    public final boolean cleanupBattleManager ()
     {
-        if(TurnBasedMinecraftMod.battleManager != null)
+        if(battleManager != null)
         {
-            TurnBasedMinecraftMod.battleManager.cleanup();
-            TurnBasedMinecraftMod.battleManager = null;
+            battleManager.cleanup();
+            battleManager = null;
             return true;
         }
         return false;
@@ -44,9 +57,15 @@ public class CommonProxy
     
     public void battleEnded() {}
     
-    public void postInit() {}
+    public void postInit()
+    {
+        config = new Config(logger);
+    }
     
-    public void setLogger(Logger logger) {}
+    public final void setLogger(Logger logger)
+    {
+        this.logger = logger;
+    }
     
     public void playBattleMusic() {}
     
@@ -58,8 +77,6 @@ public class CommonProxy
     
     public void typeLeftBattle(String type) {}
     
-    public void setConfig(Config config) {}
-    
     public void displayString(String message) {}
     
     public Entity getEntityByID(int id)
@@ -67,9 +84,9 @@ public class CommonProxy
         return FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getEntityByID(id);
     }
     
-    public boolean isServerRunning()
+    public final boolean isServerRunning()
     {
-        return TurnBasedMinecraftMod.battleManager != null;
+        return battleManager != null;
     }
     
     public Battle getLocalBattle()
@@ -78,4 +95,44 @@ public class CommonProxy
     }
     
     public void createLocalBattle(int id) {}
+    
+    public final Set<AttackerViaBow> getAttackerViaBowSet()
+    {
+        return attackerViaBow;
+    }
+    
+    public final BattleManager getBattleManager()
+    {
+        return battleManager;
+    }
+    
+    protected final void setAttackingEntity(Entity entity)
+    {
+        attackingEntity = entity;
+    }
+    
+    protected final Entity getAttackingEntity()
+    {
+        return attackingEntity;
+    }
+    
+    protected final void setAttackingDamage(int damage)
+    {
+        attackingDamage = damage;
+    }
+    
+    protected final int getAttackingDamage()
+    {
+        return attackingDamage;
+    }
+    
+    protected final Logger getLogger()
+    {
+        return logger;
+    }
+    
+    public final Config getConfig()
+    {
+        return config;
+    }
 }

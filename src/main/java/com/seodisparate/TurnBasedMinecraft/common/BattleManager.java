@@ -39,15 +39,15 @@ public class BattleManager
     public boolean checkAttack(final LivingAttackEvent event)
     {
         // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
-        if(!((event.getEntity() instanceof EntityPlayer && !((EntityPlayer)event.getEntity()).isCreative()) || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getEntity().getClass().getName()) != null)
-            || !((event.getSource().getTrueSource() instanceof EntityPlayer && !((EntityPlayer)event.getSource().getTrueSource()).isCreative()) || TurnBasedMinecraftMod.config.getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null))
+        if(!((event.getEntity() instanceof EntityPlayer && !((EntityPlayer)event.getEntity()).isCreative()) || TurnBasedMinecraftMod.proxy.getConfig().getEntityInfoReference(event.getEntity().getClass().getName()) != null)
+            || !((event.getSource().getTrueSource() instanceof EntityPlayer && !((EntityPlayer)event.getSource().getTrueSource()).isCreative()) || TurnBasedMinecraftMod.proxy.getConfig().getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null))
         {
             return false;
         }
         
         // check if ignore battle in config
-        EntityInfo entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(event.getEntity());
-        if(entityInfo != null && (TurnBasedMinecraftMod.config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
+        EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
+        if(entityInfo != null && (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacked entity ignores battle
             for(Battle b : battleMap.values())
@@ -61,8 +61,8 @@ public class BattleManager
 //            logger.debug("Attack Not Canceled: attacked ignores battle");
             return false;
         }
-        entityInfo = TurnBasedMinecraftMod.config.getMatchingEntityInfo(event.getSource().getTrueSource());
-        if(entityInfo != null && (TurnBasedMinecraftMod.config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
+        entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getSource().getTrueSource());
+        if(entityInfo != null && (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacker entity ignores battle
             for(Battle b : battleMap.values())
@@ -137,7 +137,7 @@ public class BattleManager
         }
 
         // at this point only one entity is in battle, so add entity to other side
-        if(battle.getSize() >= TurnBasedMinecraftMod.config.getMaxInBattle())
+        if(battle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle())
         {
             // battle limit reached, cannot add to battle
             return true;

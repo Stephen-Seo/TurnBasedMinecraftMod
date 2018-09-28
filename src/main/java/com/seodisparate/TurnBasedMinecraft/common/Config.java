@@ -22,6 +22,10 @@ import org.apache.logging.log4j.Logger;
 
 public class Config
 {
+    public static final long BATTLE_DECISION_DURATION_NANO_MIN = 5000000000L;
+    public static final long BATTLE_DECISION_DURATION_NANO_MAX = 60000000000L;
+    public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = 15000000000L;
+    private long battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
     private Map<String, EntityInfo> entityInfoMap;
     private Set<String> ignoreBattleTypes;
     private Logger logger;
@@ -39,6 +43,7 @@ public class Config
     private Set<String> musicSillyTypes;
     private boolean freezeCombatantsInBattle = false;
     private int sillyMusicThreshold = 40;
+    private int configVersion = 0;
     
     public Config(Logger logger)
     {
@@ -68,7 +73,7 @@ public class Config
         }
         else
         {
-            TurnBasedMinecraftMod.setConfigVersion(internalVersion);
+            configVersion = internalVersion;
         }
         
         try
@@ -93,7 +98,7 @@ public class Config
         }
         
         int configVersion = getConfigFileVersion(configFile);
-        if(configVersion < TurnBasedMinecraftMod.getConfigVersion())
+        if(configVersion < this.configVersion)
         {
             logger.warn("Config file " + TurnBasedMinecraftMod.CONFIG_FILENAME + " is older version, renaming...");
             moveOldConfig();
@@ -267,15 +272,22 @@ public class Config
                 }
                 else if(xmlReader.getLocalName().equals("BattleTurnTimeSeconds"))
                 {
-                    int seconds = TurnBasedMinecraftMod.getBattleDurationSeconds();
                     try
                     {
-                        seconds = Integer.parseInt(xmlReader.getElementText());
-                        TurnBasedMinecraftMod.setBattleDurationSeconds(seconds);
+                        int seconds = Integer.parseInt(xmlReader.getElementText());
+                        battleDecisionDurationNanos = (long)(seconds) * 1000000000L;
+                        if(battleDecisionDurationNanos < BATTLE_DECISION_DURATION_NANO_MIN)
+                        {
+                            battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_MIN;
+                        }
+                        else if(battleDecisionDurationNanos > BATTLE_DECISION_DURATION_NANO_MAX)
+                        {
+                            battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_MAX;
+                        }
                     } catch (Throwable t)
                     {
                         logger.warn("Unable to get value for \"BattleTurnTimeSeconds\" from config, using default");
-                        TurnBasedMinecraftMod.setBattleDurationSeconds(TurnBasedMinecraftMod.BATTLE_DECISION_DURATION_NANO_DEFAULT / 1000000000L);
+                        battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
                     }
                 }
                 else if(xmlReader.getLocalName().equals("SillyMusicThreshold"))
@@ -538,5 +550,20 @@ public class Config
     public int getSillyMusicThreshold()
     {
         return sillyMusicThreshold;
+    }
+    
+    public int getConfigVersion()
+    {
+        return configVersion;
+    }
+    
+    public long getDecisionDurationNanos()
+    {
+        return battleDecisionDurationNanos;
+    }
+    
+    public int getDecisionDurationSeconds()
+    {
+        return (int)(battleDecisionDurationNanos / 1000000000L);
     }
 }

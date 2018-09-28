@@ -71,15 +71,15 @@ public class Combatant
                 }
                 if(isHaste && !isSlow)
                 {
-                    c0.entityInfo.speed = TurnBasedMinecraftMod.config.getPlayerHasteSpeed();
+                    c0.entityInfo.speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
                 }
                 else if(isSlow && !isHaste)
                 {
-                    c0.entityInfo.speed = TurnBasedMinecraftMod.config.getPlayerSlowSpeed();
+                    c0.entityInfo.speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
                 }
                 else
                 {
-                    c0.entityInfo.speed = TurnBasedMinecraftMod.config.getPlayerSpeed();
+                    c0.entityInfo.speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                 }
             }
             
@@ -105,15 +105,15 @@ public class Combatant
                 }
                 if(isHaste && !isSlow)
                 {
-                    c1.entityInfo.speed = TurnBasedMinecraftMod.config.getPlayerHasteSpeed();
+                    c1.entityInfo.speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
                 }
                 else if(isSlow && !isHaste)
                 {
-                    c1.entityInfo.speed = TurnBasedMinecraftMod.config.getPlayerSlowSpeed();
+                    c1.entityInfo.speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
                 }
                 else
                 {
-                    c1.entityInfo.speed = TurnBasedMinecraftMod.config.getPlayerSpeed();
+                    c1.entityInfo.speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                 }
             }
             

@@ -21,7 +21,7 @@ public class PacketBattleInfo implements IMessage
     {
         sideA = new ArrayList<Integer>();
         sideB = new ArrayList<Integer>();
-        decisionNanos = TurnBasedMinecraftMod.getBattleDurationNanos();
+        decisionNanos = TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos();
     }
     
     public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos)
@@ -68,21 +68,21 @@ public class PacketBattleInfo implements IMessage
         @Override
         public IMessage onMessage(PacketBattleInfo message, MessageContext ctx)
         {
-            if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() == null)
+            if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null)
             {
                 return null;
             }
-            TurnBasedMinecraftMod.commonProxy.getLocalBattle().clearCombatants();
+            TurnBasedMinecraftMod.proxy.getLocalBattle().clearCombatants();
             for(Integer id : message.sideA)
             {
-                TurnBasedMinecraftMod.commonProxy.getLocalBattle().addCombatantToSideA(Minecraft.getMinecraft().world.getEntityByID(id));
+                TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideA(Minecraft.getMinecraft().world.getEntityByID(id));
             }
             for(Integer id : message.sideB)
             {
-                TurnBasedMinecraftMod.commonProxy.getLocalBattle().addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
+                TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
             }
-            TurnBasedMinecraftMod.commonProxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000L));
-            TurnBasedMinecraftMod.commonProxy.setBattleGuiBattleChanged();
+            TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000L));
+            TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
             return null;
         }
     }

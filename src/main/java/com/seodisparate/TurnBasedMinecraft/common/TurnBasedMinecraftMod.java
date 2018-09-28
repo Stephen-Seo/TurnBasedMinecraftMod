@@ -1,8 +1,5 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.logging.log4j.Logger;
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
@@ -10,7 +7,6 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleRequestInfo;
 
-import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -38,38 +34,24 @@ public class TurnBasedMinecraftMod
     public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
     
-    private static int CONFIG_FILE_VERSION = 0;
-    
     public static final SimpleNetworkWrapper NWINSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("seodisparate.tbmc");
-
     protected static Logger logger;
-    protected static BattleManager battleManager;
     private static int packetHandlerID = 0;
-    protected static Entity attackingEntity;
-    protected static int attackingDamage = 0;
-    protected static Set<AttackerViaBow> attackerViaBow;
-    protected static Config config;
-    public static final long BATTLE_DECISION_DURATION_NANO_MIN = 5000000000L;
-    public static final long BATTLE_DECISION_DURATION_NANO_MAX = 60000000000L;
-    public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = 15000000000L;
-    private static long BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_DEFAULT;
     
     @SidedProxy(modId=MODID, serverSide="com.seodisparate.TurnBasedMinecraft.common.CommonProxy", clientSide="com.seodisparate.TurnBasedMinecraft.client.ClientProxy")
-    public static CommonProxy commonProxy;
+    public static CommonProxy proxy;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
+        proxy.setLogger(logger);
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        commonProxy.initialize();
-        battleManager = null;
-        attackerViaBow = new HashSet<AttackerViaBow>();
-        commonProxy.setLogger(logger);
+        proxy.initialize();
         
         // register packets
         NWINSTANCE.registerMessage(
@@ -100,16 +82,14 @@ public class TurnBasedMinecraftMod
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-        config = new Config(logger);
-        commonProxy.setConfig(config);
-        commonProxy.postInit();
+        proxy.postInit();
     }
     
     @EventHandler
     public void serverStarting(FMLServerStartingEvent event)
     {
         logger.debug("About to initialize BattleManager");
-        if(commonProxy.initializeBattleManager())
+        if(proxy.initializeBattleManager())
         {
             logger.debug("Initialized BattleManager");
         }
@@ -119,52 +99,9 @@ public class TurnBasedMinecraftMod
     public void serverStopping(FMLServerStoppingEvent event)
     {
         logger.debug("About to cleanup BattleManager");
-        if(commonProxy.cleanupBattleManager())
+        if(proxy.cleanupBattleManager())
         {
             logger.debug("Cleaned up BattleManager");
         }
-    }
-    
-    public static BattleManager getBattleManager()
-    {
-        return battleManager;
-    }
-    
-    public static void setConfigVersion(int version)
-    {
-        CONFIG_FILE_VERSION = version;
-    }
-    
-    public static int getConfigVersion()
-    {
-        return CONFIG_FILE_VERSION;
-    }
-    
-    public static long getBattleDurationNanos()
-    {
-        return BATTLE_DECISION_DURATION_NANOSECONDS;
-    }
-    
-    public static int getBattleDurationSeconds()
-    {
-        return (int)(BATTLE_DECISION_DURATION_NANOSECONDS / 1000000000L);
-    }
-    
-    protected static void setBattleDurationSeconds(long seconds)
-    {
-        BATTLE_DECISION_DURATION_NANOSECONDS = seconds * 1000000000L;
-        if(BATTLE_DECISION_DURATION_NANOSECONDS < BATTLE_DECISION_DURATION_NANO_MIN)
-        {
-            BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_MIN;
-        }
-        else if(BATTLE_DECISION_DURATION_NANOSECONDS > BATTLE_DECISION_DURATION_NANO_MAX)
-        {
-            BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_MAX;
-        }
-    }
-    
-    public static Config getConfig()
-    {
-        return config;
     }
 }
