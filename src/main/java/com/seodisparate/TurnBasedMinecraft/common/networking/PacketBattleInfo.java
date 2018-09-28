@@ -68,18 +68,18 @@ public class PacketBattleInfo implements IMessage
         @Override
         public IMessage onMessage(PacketBattleInfo message, MessageContext ctx)
         {
-            if(TurnBasedMinecraftMod.currentBattle == null)
+            if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() == null)
             {
                 return null;
             }
-            TurnBasedMinecraftMod.currentBattle.clearCombatants();
+            TurnBasedMinecraftMod.commonProxy.getLocalBattle().clearCombatants();
             for(Integer id : message.sideA)
             {
-                TurnBasedMinecraftMod.currentBattle.addCombatantToSideA(Minecraft.getMinecraft().world.getEntityByID(id));
+                TurnBasedMinecraftMod.commonProxy.getLocalBattle().addCombatantToSideA(Minecraft.getMinecraft().world.getEntityByID(id));
             }
             for(Integer id : message.sideB)
             {
-                TurnBasedMinecraftMod.currentBattle.addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
+                TurnBasedMinecraftMod.commonProxy.getLocalBattle().addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
             }
             TurnBasedMinecraftMod.commonProxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000L));
             TurnBasedMinecraftMod.commonProxy.setBattleGuiBattleChanged();

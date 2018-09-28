@@ -54,8 +54,6 @@ public class TurnBasedMinecraftMod
     public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = 15000000000L;
     private static long BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_DEFAULT;
     
-    public static Battle currentBattle = null;
-    
     @SidedProxy(modId=MODID, serverSide="com.seodisparate.TurnBasedMinecraft.common.CommonProxy", clientSide="com.seodisparate.TurnBasedMinecraft.client.ClientProxy")
     public static CommonProxy commonProxy;
 
@@ -69,7 +67,6 @@ public class TurnBasedMinecraftMod
     public void init(FMLInitializationEvent event)
     {
         commonProxy.initialize();
-        currentBattle = null;
         battleManager = null;
         attackerViaBow = new HashSet<AttackerViaBow>();
         commonProxy.setLogger(logger);

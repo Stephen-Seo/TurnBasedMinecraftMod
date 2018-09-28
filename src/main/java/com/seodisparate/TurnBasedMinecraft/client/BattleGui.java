@@ -119,15 +119,18 @@ public class BattleGui extends GuiScreen
     
     public void turnBegin()
     {
-        TurnBasedMinecraftMod.currentBattle.setState(Battle.State.ACTION);
+        if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
+        {
+            TurnBasedMinecraftMod.commonProxy.getLocalBattle().setState(Battle.State.ACTION);
+        }
         setState(MenuState.WAITING);
     }
     
     public void turnEnd()
     {
-        if(TurnBasedMinecraftMod.currentBattle != null)
+        if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
         {
-            TurnBasedMinecraftMod.currentBattle.setState(Battle.State.DECISION);
+            TurnBasedMinecraftMod.commonProxy.getLocalBattle().setState(Battle.State.DECISION);
         }
         timeRemaining.set(TurnBasedMinecraftMod.getBattleDurationSeconds());
         elapsedTime = 0;
@@ -161,7 +164,7 @@ public class BattleGui extends GuiScreen
         case ATTACK_TARGET:
             info = "Who will you attack?";
             int y = 30;
-            for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.currentBattle.getSideAEntrySet())
+            for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.commonProxy.getLocalBattle().getSideAEntrySet())
             {
                 if(e.getValue().entity != null)
                 {
@@ -174,7 +177,7 @@ public class BattleGui extends GuiScreen
                 y += 20;
             }
             y = 30;
-            for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.currentBattle.getSideBEntrySet())
+            for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.commonProxy.getLocalBattle().getSideBEntrySet())
             {
                 if(e.getValue().entity != null)
                 {
@@ -219,12 +222,12 @@ public class BattleGui extends GuiScreen
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        if(TurnBasedMinecraftMod.currentBattle == null)
+        if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() == null)
         {
             drawHoveringText("Waiting...", width / 2 - 50, height / 2);
             return;
         }
-        if(TurnBasedMinecraftMod.currentBattle.getState() == Battle.State.DECISION && timeRemaining.get() > 0)
+        if(TurnBasedMinecraftMod.commonProxy.getLocalBattle().getState() == Battle.State.DECISION && timeRemaining.get() > 0)
         {
             long nextInstant = System.nanoTime();
             elapsedTime += nextInstant - lastInstant;
@@ -270,20 +273,20 @@ public class BattleGui extends GuiScreen
             setState(MenuState.ATTACK_TARGET);
             break;
         case DEFEND:
-            TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.DEFEND, 0));
+            TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.commonProxy.getLocalBattle().getId(), Battle.Decision.DEFEND, 0));
             setState(MenuState.WAITING);
             break;
         case ITEM:
             setState(MenuState.ITEM_ACTION);
             break;
         case FLEE:
-            TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.FLEE, 0));
+            TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.commonProxy.getLocalBattle().getId(), Battle.Decision.FLEE, 0));
             setState(MenuState.WAITING);
             break;
         case ATTACK_TARGET:
             if(button instanceof EntitySelectionButton)
             {
-                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.ATTACK, ((EntitySelectionButton)button).entityID));
+                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.commonProxy.getLocalBattle().getId(), Battle.Decision.ATTACK, ((EntitySelectionButton)button).entityID));
                 setState(MenuState.WAITING);
             }
             else
@@ -303,7 +306,7 @@ public class BattleGui extends GuiScreen
         case DO_ITEM_SWITCH:
             if(button instanceof ItemSelectionButton)
             {
-                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton)button).itemStackID));
+                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.commonProxy.getLocalBattle().getId(), Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton)button).itemStackID));
                 if(((ItemSelectionButton)button).itemStackID >= 0 && ((ItemSelectionButton)button).itemStackID < 9)
                 {
                     Minecraft.getMinecraft().player.inventory.currentItem = ((ItemSelectionButton)button).itemStackID;
@@ -318,7 +321,7 @@ public class BattleGui extends GuiScreen
         case DO_USE_ITEM:
             if(button instanceof ItemSelectionButton)
             {
-                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.currentBattle.getId(), Battle.Decision.USE_ITEM, ((ItemSelectionButton)button).itemStackID));
+                TurnBasedMinecraftMod.NWINSTANCE.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.commonProxy.getLocalBattle().getId(), Battle.Decision.USE_ITEM, ((ItemSelectionButton)button).itemStackID));
                 setState(MenuState.WAITING);
             }
             else

@@ -168,9 +168,9 @@ public class PacketBattleMessage implements IMessage
                     from = fromEntity.getName();
                 }
             }
-            else if(TurnBasedMinecraftMod.currentBattle != null)
+            else if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
             {
-                fromEntity = TurnBasedMinecraftMod.currentBattle.getCombatantEntity(message.entityIDFrom);
+                fromEntity = TurnBasedMinecraftMod.commonProxy.getLocalBattle().getCombatantEntity(message.entityIDFrom);
                 if(fromEntity != null)
                 {
                     if(fromEntity.hasCustomName())
@@ -204,9 +204,9 @@ public class PacketBattleMessage implements IMessage
                     to = toEntity.getName();
                 }
             }
-            else if(TurnBasedMinecraftMod.currentBattle != null)
+            else if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
             {
-                toEntity = TurnBasedMinecraftMod.currentBattle.getCombatantEntity(message.entityIDTo);
+                toEntity = TurnBasedMinecraftMod.commonProxy.getLocalBattle().getCombatantEntity(message.entityIDTo);
                 if(toEntity != null)
                 {
                     if(toEntity.hasCustomName())
@@ -228,9 +228,9 @@ public class PacketBattleMessage implements IMessage
             {
             case ENTERED:
                 TurnBasedMinecraftMod.commonProxy.displayString(from + " entered battle!");
-                if(TurnBasedMinecraftMod.currentBattle == null || TurnBasedMinecraftMod.currentBattle.getId() != message.amount)
+                if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() == null || TurnBasedMinecraftMod.commonProxy.getLocalBattle().getId() != message.amount)
                 {
-                    TurnBasedMinecraftMod.currentBattle = new Battle(message.amount, null, null, false);
+                    TurnBasedMinecraftMod.commonProxy.createLocalBattle(message.amount);
                 }
                 TurnBasedMinecraftMod.commonProxy.battleStarted();
                 TurnBasedMinecraftMod.commonProxy.typeEnteredBattle(message.custom);
@@ -301,7 +301,7 @@ public class PacketBattleMessage implements IMessage
                 TurnBasedMinecraftMod.commonProxy.battleGuiTurnBegin();
                 break;
             case TURN_END:
-                if(TurnBasedMinecraftMod.currentBattle != null)
+                if(TurnBasedMinecraftMod.commonProxy.getLocalBattle() != null)
                 {
                     TurnBasedMinecraftMod.commonProxy.displayString("The turn ended!");
                 }

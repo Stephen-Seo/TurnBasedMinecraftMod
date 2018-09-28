@@ -71,4 +71,11 @@ public class CommonProxy
     {
         return TurnBasedMinecraftMod.battleManager != null;
     }
+    
+    public Battle getLocalBattle()
+    {
+        return null;
+    }
+    
+    public void createLocalBattle(int id) {}
 }

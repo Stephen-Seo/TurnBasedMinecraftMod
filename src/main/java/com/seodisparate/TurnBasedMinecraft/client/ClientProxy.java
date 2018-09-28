@@ -2,6 +2,7 @@ package com.seodisparate.TurnBasedMinecraft.client;
 
 import org.apache.logging.log4j.Logger;
 
+import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.CommonProxy;
 import com.seodisparate.TurnBasedMinecraft.common.Config;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
@@ -19,6 +20,7 @@ public class ClientProxy extends CommonProxy
     private Config config;
     private int battleMusicCount;
     private int sillyMusicCount;
+    private Battle localBattle;
     
     @Override
     public void initialize()
@@ -27,6 +29,7 @@ public class ClientProxy extends CommonProxy
         battleMusic = null; // will be initialized in postInit()
         battleMusicCount = 0;
         sillyMusicCount = 0;
+        localBattle = null;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public void battleEnded()
     {
-        TurnBasedMinecraftMod.currentBattle = null;
+        localBattle = null;
         Minecraft.getMinecraft().addScheduledTask(() -> {
             Minecraft.getMinecraft().displayGuiScreen(null);
             Minecraft.getMinecraft().setIngameFocus();
@@ -120,7 +123,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public void typeEnteredBattle(String type)
     {
-        if(TurnBasedMinecraftMod.currentBattle == null)
+        if(localBattle == null)
         {
             return;
         }
@@ -142,7 +145,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public void typeLeftBattle(String type)
     {
-        if(TurnBasedMinecraftMod.currentBattle == null)
+        if(localBattle == null)
         {
             return;
         }
@@ -225,5 +228,17 @@ public class ClientProxy extends CommonProxy
                 playBattleMusic();
             }
         }
+    }
+
+    @Override
+    public Battle getLocalBattle()
+    {
+        return localBattle;
+    }
+
+    @Override
+    public void createLocalBattle(int id)
+    {
+        localBattle = new Battle(id, null, null, false);
     }
 }
