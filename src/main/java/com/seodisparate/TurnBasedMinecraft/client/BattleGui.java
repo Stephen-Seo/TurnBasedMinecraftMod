@@ -260,8 +260,10 @@ public class BattleGui extends GuiScreen
         }
         timeRemainingString += Integer.toString(timeRemainingInt);
         int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(timeRemainingString);
+        drawRect(width/2 - stringWidth/2, 5, width/2 + stringWidth/2, 15, 0x70000000);
         Minecraft.getMinecraft().fontRenderer.drawString(timeRemainingString, width/2 - stringWidth/2, 5, 0xFFFFFFFF);
         stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(info);
+        drawRect(width/2 - stringWidth/2, 20, width/2 + stringWidth/2, 30, 0x70000000);
         Minecraft.getMinecraft().fontRenderer.drawString(info, width/2 - stringWidth/2, 20, 0xFFFFFFFF);
     }
 
