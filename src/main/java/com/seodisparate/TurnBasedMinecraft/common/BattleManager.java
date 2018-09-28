@@ -142,7 +142,7 @@ public class BattleManager
             // battle limit reached, cannot add to battle
             return true;
         }
-        if(battle.hasCombatantInSideA(inBattle.getEntityId()))
+        else if(battle.hasCombatantInSideA(inBattle.getEntityId()))
         {
             battle.addCombatantToSideB(notInBattle);
         }

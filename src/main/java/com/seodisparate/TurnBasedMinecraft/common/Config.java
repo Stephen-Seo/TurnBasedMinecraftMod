@@ -38,6 +38,7 @@ public class Config
     private Set<String> musicBattleTypes;
     private Set<String> musicSillyTypes;
     private boolean freezeCombatantsInBattle = false;
+    private int sillyMusicThreshold = 40;
     
     public Config(Logger logger)
     {
@@ -275,6 +276,18 @@ public class Config
                     {
                         logger.warn("Unable to get value for \"BattleTurnTimeSeconds\" from config, using default");
                         TurnBasedMinecraftMod.setBattleDurationSeconds(TurnBasedMinecraftMod.BATTLE_DECISION_DURATION_NANO_DEFAULT / 1000000000L);
+                    }
+                }
+                else if(xmlReader.getLocalName().equals("SillyMusicThreshold"))
+                {
+                    sillyMusicThreshold = Integer.parseInt(xmlReader.getElementText());
+                    if(sillyMusicThreshold < 0)
+                    {
+                        sillyMusicThreshold = 0;
+                    }
+                    else if(sillyMusicThreshold > 100)
+                    {
+                        sillyMusicThreshold = 100;
                     }
                 }
                 else if(xmlReader.getLocalName().equals("EntityEntry"))
@@ -520,5 +533,10 @@ public class Config
     public boolean isFreezeCombatantsEnabled()
     {
         return freezeCombatantsInBattle;
+    }
+    
+    public int getSillyMusicThreshold()
+    {
+        return sillyMusicThreshold;
     }
 }

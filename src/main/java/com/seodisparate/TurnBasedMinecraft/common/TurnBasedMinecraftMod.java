@@ -165,4 +165,9 @@ public class TurnBasedMinecraftMod
             BATTLE_DECISION_DURATION_NANOSECONDS = BATTLE_DECISION_DURATION_NANO_MAX;
         }
     }
+    
+    public static Config getConfig()
+    {
+        return config;
+    }
 }

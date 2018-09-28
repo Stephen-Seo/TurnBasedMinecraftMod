@@ -181,7 +181,21 @@ public class ClientProxy extends CommonProxy
     
     private void checkBattleTypes()
     {
-        if(battleMusicCount <= 1 && sillyMusicCount > 0)
+        float percentage = 0.0f;
+        if(sillyMusicCount == 0 && battleMusicCount == 0)
+        {
+            percentage = 0.0f;
+        }
+        else if(battleMusicCount == 0)
+        {
+            percentage = 100.0f;
+        }
+        else
+        {
+            percentage = 100.0f * (float)sillyMusicCount / (float)(sillyMusicCount + battleMusicCount);
+        }
+        
+        if(percentage >= (float)TurnBasedMinecraftMod.getConfig().getSillyMusicThreshold())
         {
             if(battleMusic.isPlaying())
             {
