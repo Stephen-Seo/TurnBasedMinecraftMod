@@ -156,10 +156,10 @@ public class BattleGui extends GuiScreen
         {
         case MAIN_MENU:
             info = "What will you do?";
-            buttonList.add(new GuiButton(ButtonAction.ATTACK.getValue(), width*2/7 - 30, height - 120, 60, 20, "Attack"));
-            buttonList.add(new GuiButton(ButtonAction.DEFEND.getValue(), width*3/7 - 30, height - 120, 60, 20, "Defend"));
-            buttonList.add(new GuiButton(ButtonAction.ITEM.getValue(), width*4/7 - 30, height - 120, 60, 20, "Item"));
-            buttonList.add(new GuiButton(ButtonAction.FLEE.getValue(), width*5/7 - 30, height - 120, 60, 20, "Flee"));
+            buttonList.add(new GuiButton(ButtonAction.ATTACK.getValue(), width*3/7 - 25, height - 70, 50, 20, "Attack"));
+            buttonList.add(new GuiButton(ButtonAction.DEFEND.getValue(), width*4/7 - 25, height - 70, 50, 20, "Defend"));
+            buttonList.add(new GuiButton(ButtonAction.ITEM.getValue(), width*3/7 - 25, height - 50, 50, 20, "Item"));
+            buttonList.add(new GuiButton(ButtonAction.FLEE.getValue(), width*4/7 - 25, height - 50, 50, 20, "Flee"));
             break;
         case ATTACK_TARGET:
             info = "Who will you attack?";
