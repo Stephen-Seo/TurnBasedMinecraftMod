@@ -17,10 +17,13 @@ public class CommonProxy
     private Config config = null;
     private Logger logger = null;
     
-    public void initialize()
+    public final void initialize()
     {
         attackerViaBow = new HashSet<AttackerViaBow>();
+        initializeClient();
     }
+    
+    protected void initializeClient() {}
     
     public final boolean initializeBattleManager()
     {
@@ -57,10 +60,13 @@ public class CommonProxy
     
     public void battleEnded() {}
     
-    public void postInit()
+    public final void postInit()
     {
         config = new Config(logger);
+        postInitClient();
     }
+    
+    protected void postInitClient() {}
     
     public final void setLogger(Logger logger)
     {

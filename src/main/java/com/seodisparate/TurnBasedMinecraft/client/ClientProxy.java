@@ -18,9 +18,8 @@ public class ClientProxy extends CommonProxy
     private Battle localBattle = null;
     
     @Override
-    public void initialize()
+    protected void initializeClient()
     {
-        super.initialize();
         battleGui = new BattleGui();
         battleMusic = null; // will be initialized in postInit()
         battleMusicCount = 0;
@@ -84,9 +83,8 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void postInit()
+    protected void postInitClient()
     {
-        super.postInit();
         battleMusic = new BattleMusic(getLogger());
     }
 
