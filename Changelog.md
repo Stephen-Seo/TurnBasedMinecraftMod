@@ -5,7 +5,7 @@ Added commands to enable/disable turn-based-battle on-demand.
 Commands are:
 - "/tbm-enable"
 - "/tbm-disable"
-- "/tbm-set \<player> <true/false>"
+- "/tbm-set \<player> \<true/false>"
 
 There is a config option to allow anyone to use "/tbm-enable" and "/tbm-disable".  
 Only OPs can use "/tbm-set" (permission level 2).
@@ -29,3 +29,4 @@ that activates depending on mob types in battle
 - Can set max battle combatants in config
 - Can use bow/arrows in battle (currently different projectile weapons provided
 by different mods are not supported)
+- Players in creative-mode will not enter turn-based battle
