@@ -5,7 +5,7 @@ Added commands to enable/disable turn-based-battle on-demand.
 Commands are:
 - "/tbm-enable"
 - "/tbm-disable"
-- "/tbm-set <player> <true/false>"
+- "/tbm-set \<player> <true/false>"
 
 There is a config option to allow anyone to use "/tbm-enable" and "/tbm-disable".  
 Only OPs can use "/tbm-set" (permission level 2).
