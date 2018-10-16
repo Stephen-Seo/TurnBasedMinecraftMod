@@ -64,7 +64,12 @@ public class AttackEventHandler
             return;
         }
         
-        if(!isAttackerValid(event) && event.getEntity() != null && event.getSource().getTrueSource() != null && TurnBasedMinecraftMod.proxy.getBattleManager().checkAttack(event))
+        if(!isAttackerValid(event)
+                && event.getEntity() != null
+                && event.getSource().getTrueSource() != null
+                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getSource().getTrueSource().getEntityId())
+                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
+                && TurnBasedMinecraftMod.proxy.getBattleManager().checkAttack(event))
         {
 //            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.commonProxy.getAttackingEntity() + " and " + event.getEntity());
             event.setCanceled(true);

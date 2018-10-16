@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,6 +45,8 @@ public class Config
     private boolean freezeCombatantsInBattle = false;
     private int sillyMusicThreshold = 40;
     private int configVersion = 0;
+    private Set<Integer> battleIgnoringPlayers = null;
+    private boolean onlyOPsSelfDisableTB = true;
     
     public Config(Logger logger)
     {
@@ -52,6 +55,7 @@ public class Config
         this.logger = logger;
         musicBattleTypes = new HashSet<String>();
         musicSillyTypes = new HashSet<String>();
+        battleIgnoringPlayers = new HashSet<Integer>();
         
         int internalVersion = 0;
         try
@@ -168,6 +172,17 @@ public class Config
                 else if(xmlReader.getLocalName().equals("Version"))
                 {
                     continue;
+                }
+                else if(xmlReader.getLocalName().equals("WhoCanDisableTurnBasedForSelf"))
+                {
+                    if(xmlReader.getElementText().toLowerCase().equals("any"))
+                    {
+                        onlyOPsSelfDisableTB = false;
+                    }
+                    else
+                    {
+                        onlyOPsSelfDisableTB = true;
+                    }
                 }
                 else if(xmlReader.getLocalName().equals("MaxInBattle"))
                 {
@@ -565,5 +580,30 @@ public class Config
     public int getDecisionDurationSeconds()
     {
         return (int)(battleDecisionDurationNanos / 1000000000L);
+    }
+    
+    protected void addBattleIgnoringPlayer(int id)
+    {
+        battleIgnoringPlayers.add(id);
+    }
+    
+    protected void removeBattleIgnoringPlayer(int id)
+    {
+        battleIgnoringPlayers.remove(id);
+    }
+    
+    protected void clearBattleIgnoringPlayers()
+    {
+        battleIgnoringPlayers.clear();
+    }
+
+    protected Set<Integer> getBattleIgnoringPlayers()
+    {
+        return battleIgnoringPlayers;
+    }
+    
+    public boolean getIfOnlyOPsCanDisableTurnBasedForSelf()
+    {
+        return onlyOPsSelfDisableTB;
     }
 }

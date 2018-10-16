@@ -1,6 +1,8 @@
 <TurnBasedMinecraftConfig>
 	<!-- If the mod has a newer version config, it will rename the existing config and place the new config -->
-	<Version>3</Version>
+	<Version>4</Version>
+	<!-- Determines who can disable turn-based-battle for themselves via command. Must be "op" or "any". If neither, defaults to "op"-->
+	<WhoCanDisableTurnBasedForSelf>op</WhoCanDisableTurnBasedForSelf>
 	<!-- If there are "MaxInBattle" amount of entities in battle, other entities cannot join until combatants leave battle. -->
 	<MaxInBattle>8</MaxInBattle>
 	<!-- If not set to "false", then when battle starts all combatants will remain in their starting position. -->

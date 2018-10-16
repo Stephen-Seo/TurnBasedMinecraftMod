@@ -6,6 +6,7 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecisio
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleRequestInfo;
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -25,7 +26,7 @@ public class TurnBasedMinecraftMod
 {
     public static final String MODID = "com.seodisparate.turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.1";
     public static final String CONFIG_FILENAME = "TBM_Config.xml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
     public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;
@@ -74,6 +75,11 @@ public class TurnBasedMinecraftMod
             PacketBattleMessage.class,
             packetHandlerID++,
             Side.CLIENT);
+        NWINSTANCE.registerMessage(
+            PacketGeneralMessage.HandlerGeneralMessage.class,
+            PacketGeneralMessage.class,
+            packetHandlerID++,
+            Side.CLIENT);
         
         // register event handler(s)
         MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
@@ -93,6 +99,13 @@ public class TurnBasedMinecraftMod
         {
             logger.debug("Initialized BattleManager");
         }
+        
+        proxy.getConfig().clearBattleIgnoringPlayers();
+        
+        // register commands
+        event.registerServerCommand(new CommandTBMDisable(proxy.getConfig()));
+        event.registerServerCommand(new CommandTBMEnable(proxy.getConfig()));
+        event.registerServerCommand(new CommandTBMSet(proxy.getConfig()));
     }
     
     @EventHandler
