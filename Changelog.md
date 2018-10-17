@@ -1,3 +1,20 @@
+# Version 1.3
+
+"/tbm-enable-all" and "/tbm-disable-all" now notifies all players when they are
+invoked by an OP.
+
+Battles can now be started/joined by hostile mobs when they target a player or
+other entity in battle, instead of just entering on attack. Old
+battle-starting-behavior can be used by setting the related config option.  
+(This change was made to keep zombies from gathering around the player when
+the config option for freezing entities in battle is enabled.)
+
+Non-player entities in battle now primarily attack entities they are already
+targeting (via a call to EntityLiving's "getAttackTarget()").
+
+Note since config version is now 5, older config will be renamed and the new
+config will take its place.
+
 # Version 1.2
 
 Fixed "/tbm-enable" and "/tbm-disable" not working in singleplayer.
