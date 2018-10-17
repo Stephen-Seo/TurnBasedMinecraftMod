@@ -1,3 +1,17 @@
+# Version 1.2
+
+Fixed "/tbm-enable" and "/tbm-disable" not working in singleplayer.
+
+Added commands:
+- "/tbm-enable-all"
+- "/tbm-disable-all"
+
+Only OPs can use these new commands to enable or disable turn-based-battle for
+everyone.  
+Note that if "/tbm-disable-all" is invoked, joining players will also have
+turn-based-battle disabled for them. Invoking "/tbm-enable-all" will change this
+back to the default, where turn-based-battle is enabled for joining players.
+
 # Version 1.1
 
 Added commands to enable/disable turn-based-battle on-demand.
