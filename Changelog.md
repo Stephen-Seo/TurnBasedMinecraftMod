@@ -1,5 +1,10 @@
 # Version 1.3
 
+Added a battle-cooldown and related config option. Now, when leaving battle, a
+cooldown timer (default 5 seconds) prevents entities from
+attacking/being-attacked for the duration of the cooldown. Can be set to a
+minimum of 1 second and maximum of 10 seconds.
+
 "/tbm-enable-all" and "/tbm-disable-all" now notifies all players when they are
 invoked by an OP.
 
