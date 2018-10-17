@@ -49,11 +49,12 @@ public class CommandTBMDisableAll extends CommandBase
         if(senderPlayer != null)
         {
             TurnBasedMinecraftMod.logger.info(senderPlayer.getName() + " disabled turn-based-combat for everyone");
-            TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("You disabled turn-based-combat for everyone"), senderPlayer);
+            TurnBasedMinecraftMod.NWINSTANCE.sendToAll(new PacketGeneralMessage(senderPlayer.getName() + " disabled turn-based-battle for everyone"));
         }
         else
         {
             TurnBasedMinecraftMod.logger.info("An admin disabled turn-based-combat for everyone");
+            TurnBasedMinecraftMod.NWINSTANCE.sendToAll(new PacketGeneralMessage("An admin disabled turn-based-battle for everyone"));
         }
     }
 
