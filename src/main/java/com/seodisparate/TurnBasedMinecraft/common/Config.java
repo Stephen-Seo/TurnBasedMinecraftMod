@@ -47,6 +47,7 @@ public class Config
     private int configVersion = 0;
     private Set<Integer> battleIgnoringPlayers = null;
     private boolean onlyOPsSelfDisableTB = true;
+    private boolean battleDisabledForAll = false;
     
     public Config(Logger logger)
     {
@@ -605,5 +606,15 @@ public class Config
     public boolean getIfOnlyOPsCanDisableTurnBasedForSelf()
     {
         return onlyOPsSelfDisableTB;
+    }
+    
+    protected void setBattleDisabledForAll(boolean isDisabled)
+    {
+        battleDisabledForAll = isDisabled;
+    }
+    
+    protected boolean getBattleDisabledForAll()
+    {
+        return battleDisabledForAll;
     }
 }

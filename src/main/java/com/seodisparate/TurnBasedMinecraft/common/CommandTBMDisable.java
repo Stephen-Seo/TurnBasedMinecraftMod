@@ -35,10 +35,11 @@ public class CommandTBMDisable extends CommandBase
     {
         EntityPlayerMP player = null;
         player = getCommandSenderAsPlayer(sender);
-        if(!config.getIfOnlyOPsCanDisableTurnBasedForSelf() || player.getServer().getPlayerList().getOppedPlayers().getEntry(player.getGameProfile()) != null)
+        if(!config.getIfOnlyOPsCanDisableTurnBasedForSelf() || player.getServer().isSinglePlayer() || player.getServer().getPlayerList().getOppedPlayers().getEntry(player.getGameProfile()) != null)
         {
             config.addBattleIgnoringPlayer(player.getEntityId());
             TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Disabled turn-based-combat for current player"), player);
+            TurnBasedMinecraftMod.logger.info("Disabled turn-based-combat for " + player.getName());
         }
         else
         {

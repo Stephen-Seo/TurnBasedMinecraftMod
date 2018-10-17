@@ -26,7 +26,7 @@ public class TurnBasedMinecraftMod
 {
     public static final String MODID = "com.seodisparate.turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.1";
+    public static final String VERSION = "1.2";
     public static final String CONFIG_FILENAME = "TBM_Config.xml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
     public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;
@@ -83,6 +83,7 @@ public class TurnBasedMinecraftMod
         
         // register event handler(s)
         MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
+        MinecraftForge.EVENT_BUS.register(new PlayerJoinEventHandler());
     }
     
     @EventHandler
@@ -106,6 +107,8 @@ public class TurnBasedMinecraftMod
         event.registerServerCommand(new CommandTBMDisable(proxy.getConfig()));
         event.registerServerCommand(new CommandTBMEnable(proxy.getConfig()));
         event.registerServerCommand(new CommandTBMSet(proxy.getConfig()));
+        event.registerServerCommand(new CommandTBMDisableAll(proxy.getConfig()));
+        event.registerServerCommand(new CommandTBMEnableAll(proxy.getConfig()));
     }
     
     @EventHandler
