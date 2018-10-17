@@ -1,14 +1,22 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
 
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 
@@ -19,6 +27,7 @@ public class BattleManager
     private Thread updaterThread;
     private BattleUpdater battleUpdater;
     private Logger logger;
+    private Map<Integer, Combatant> recentlyLeftBattle;
     
     public BattleManager(Logger logger)
     {
@@ -27,6 +36,7 @@ public class BattleManager
         battleUpdater = new BattleUpdater(this);
         updaterThread = new Thread(battleUpdater);
         updaterThread.start();
+        recentlyLeftBattle = new HashMap<Integer, Combatant>();
     }
     
     /**
@@ -245,7 +255,7 @@ public class BattleManager
         {
             ++IDCounter;
         }
-        Battle newBattle = new Battle(IDCounter, sideA, sideB, true);
+        Battle newBattle = new Battle(this, IDCounter, sideA, sideB, true);
         battleMap.put(IDCounter, newBattle);
         newBattle.notifyPlayersBattleInfo();
         return newBattle;
@@ -262,5 +272,51 @@ public class BattleManager
         battleUpdater = null;
         updaterThread = null;
         battleMap.clear();
+    }
+    
+    protected void addRecentlyLeftBattle(Combatant c)
+    {
+        c.time = System.nanoTime();
+        Config config = TurnBasedMinecraftMod.proxy.getConfig();
+        if(c.entity instanceof EntityPlayerMP)
+        {
+            TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"), (EntityPlayerMP)c.entity);
+        }
+        synchronized(recentlyLeftBattle)
+        {
+            recentlyLeftBattle.put(c.entity.getEntityId(), c);
+        }
+    }
+    
+    protected void updateRecentlyLeftBattle()
+    {
+        long current = System.nanoTime();
+        Queue<Combatant> removeQueue = new ArrayDeque<Combatant>();
+        synchronized(recentlyLeftBattle)
+        {
+            for(Combatant c : recentlyLeftBattle.values())
+            {
+                if(current - c.time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
+                {
+                    removeQueue.add(c);
+                }
+            }
+            for(Combatant c = removeQueue.poll(); c != null; c = removeQueue.poll())
+            {
+                if(c.entity instanceof EntityPlayerMP)
+                {
+                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."), (EntityPlayerMP)c.entity);
+                }
+                recentlyLeftBattle.remove(c.entity.getEntityId());
+            }
+        }
+    }
+    
+    public boolean isRecentlyLeftBattle(int entityID)
+    {
+        synchronized(recentlyLeftBattle)
+        {
+            return recentlyLeftBattle.containsKey(entityID);
+        }
     }
 }

@@ -49,6 +49,8 @@ public class Battle
     private boolean isServer;
     private boolean battleEnded;
     
+    private BattleManager battleManager;
+    
     public enum State
     {
         DECISION(0),
@@ -118,8 +120,9 @@ public class Battle
         }
     }
 
-    public Battle(int id, Collection<Entity> sideA, Collection<Entity> sideB, boolean isServer)
+    public Battle(BattleManager battleManager, int id, Collection<Entity> sideA, Collection<Entity> sideB, boolean isServer)
     {
+        this.battleManager = battleManager;
         this.isServer = isServer;
         this.id = id;
         this.sideA = new Hashtable<Integer, Combatant>();
@@ -515,16 +518,12 @@ public class Battle
      */
     private boolean healthCheck()
     {
-        Queue<Integer> removeQueue = new ArrayDeque<Integer>();
+        Queue<Combatant> removeQueue = new ArrayDeque<Combatant>();
         for(Combatant c : sideA.values())
         {
             if(!c.entity.isEntityAlive())
             {
-                removeQueue.add(c.entity.getEntityId());
-                if(c.entity instanceof EntityPlayer)
-                {
-                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
-                }
+                removeQueue.add(c);
                 String category = new String();
                 if(c.entityInfo != null)
                 {
@@ -541,11 +540,7 @@ public class Battle
         {
             if(!c.entity.isEntityAlive())
             {
-                removeQueue.add(c.entity.getEntityId());
-                if(c.entity instanceof EntityPlayer)
-                {
-                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
-                }
+                removeQueue.add(c);
                 String category = new String();
                 if(c.entityInfo != null)
                 {
@@ -559,14 +554,9 @@ public class Battle
             }
         }
         boolean didRemove = !removeQueue.isEmpty();
-        for(Integer toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
+        for(Combatant toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
         {
-            sideA.remove(toRemove);
-            sideB.remove(toRemove);
-            if(players.remove(toRemove) != null)
-            {
-                playerCount.decrementAndGet();
-            }
+            removeCombatant(toRemove);
         }
         if(players.isEmpty() || sideA.isEmpty() || sideB.isEmpty())
         {
@@ -586,24 +576,20 @@ public class Battle
      */
     private boolean isCreativeCheck()
     {
-        Queue<Integer> removeQueue = new ArrayDeque<Integer>();
+        Queue<Combatant> removeQueue = new ArrayDeque<Combatant>();
         for(Combatant c : players.values())
         {
             if(c.entity != null && ((EntityPlayer)c.entity).isCreative())
             {
-                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, c.entity.getEntityId(), 0, 0), (EntityPlayerMP)c.entity);
-                removeQueue.add(c.entity.getEntityId());
+                removeQueue.add(c);
             }
         }
         boolean didRemove = false;
-        for(Integer toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
+        for(Combatant toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
         {
             didRemove = true;
-            sideA.remove(toRemove);
-            sideB.remove(toRemove);
-            players.remove(toRemove);
-            playerCount.decrementAndGet();
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.BECAME_CREATIVE, toRemove, 0, 0);
+            removeCombatant(toRemove);
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.BECAME_CREATIVE, toRemove.entity.getEntityId(), 0, 0);
         }
         if(didRemove)
         {
@@ -640,6 +626,18 @@ public class Battle
         }
     }
     
+    private void removeCombatant(Combatant c)
+    {
+        sideA.remove(c.entity.getEntityId());
+        sideB.remove(c.entity.getEntityId());
+        if(players.remove(c.entity.getEntityId()) != null)
+        {
+            playerCount.decrementAndGet();
+            TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0), (EntityPlayerMP)c.entity);
+        }
+        battleManager.addRecentlyLeftBattle(c);
+    }
+    
     /**
      * @return True if battle has ended
      */
@@ -651,6 +649,13 @@ public class Battle
         }
         else if(battleEnded)
         {
+            Collection<Combatant> combatants = new ArrayList<Combatant>();
+            combatants.addAll(sideA.values());
+            combatants.addAll(sideB.values());
+            for(Combatant c : combatants)
+            {
+                removeCombatant(c);
+            }
             return true;
         }
         long nextInstant = System.nanoTime();
@@ -663,6 +668,13 @@ public class Battle
     {
         if(battleEnded)
         {
+            Collection<Combatant> combatants = new ArrayList<Combatant>();
+            combatants.addAll(sideA.values());
+            combatants.addAll(sideB.values());
+            for(Combatant c : combatants)
+            {
+                removeCombatant(c);
+            }
             return true;
         }
         boolean combatantsChanged = false;
@@ -1066,14 +1078,6 @@ public class Battle
                         if((int)(Math.random() * 100) < fleeProbability)
                         {
                             // flee success
-                            if(next.isSideA)
-                            {
-                                sideA.remove(next.entity.getEntityId());
-                            }
-                            else
-                            {
-                                sideB.remove(next.entity.getEntityId());
-                            }
                             combatantsChanged = true;
                             String fleeingCategory = new String();
                             if(next.entityInfo != null)
@@ -1085,12 +1089,7 @@ public class Battle
                                 fleeingCategory = "player";
                             }
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getEntityId(), 0, 1, fleeingCategory);
-                            if(next.entity instanceof EntityPlayer)
-                            {
-                                players.remove(next.entity.getEntityId());
-                                playerCount.decrementAndGet();
-                                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0), (EntityPlayerMP)next.entity);
-                            }
+                            removeCombatant(next);
                         }
                         else
                         {
@@ -1179,6 +1178,16 @@ public class Battle
         if(combatantsChanged)
         {
             notifyPlayersBattleInfo();
+        }
+        if(battleEnded)
+        {
+            Collection<Combatant> combatants = new ArrayList<Combatant>();
+            combatants.addAll(sideA.values());
+            combatants.addAll(sideB.values());
+            for(Combatant c : combatants)
+            {
+                removeCombatant(c);
+            }
         }
         return battleEnded;
     } // update(final long dt)

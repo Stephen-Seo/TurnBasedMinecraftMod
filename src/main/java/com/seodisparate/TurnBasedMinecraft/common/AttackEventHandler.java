@@ -64,13 +64,20 @@ public class AttackEventHandler
         {
             return;
         }
-        
-        if(!isAttackerValid(event)
+        Config config = TurnBasedMinecraftMod.proxy.getConfig();
+        BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();
+        if((event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()))
+                || (event.getSource().getTrueSource() != null && battleManager.isRecentlyLeftBattle(event.getSource().getTrueSource().getEntityId())))
+        {
+            event.setCanceled(true);
+            return;
+        }
+        else if(!isAttackerValid(event)
                 && event.getEntity() != null
                 && event.getSource().getTrueSource() != null
-                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getSource().getTrueSource().getEntityId())
-                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
-                && TurnBasedMinecraftMod.proxy.getBattleManager().checkAttack(event))
+                && !config.getBattleIgnoringPlayers().contains(event.getSource().getTrueSource().getEntityId())
+                && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
+                && battleManager.checkAttack(event))
         {
 //            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.commonProxy.getAttackingEntity() + " and " + event.getEntity());
             event.setCanceled(true);
@@ -88,14 +95,19 @@ public class AttackEventHandler
     @SubscribeEvent
     public void entityTargeted(LivingSetAttackTargetEvent event)
     {
-        if(event.getEntity().world.isRemote || TurnBasedMinecraftMod.proxy.getConfig().isOldBattleBehaviorEnabled())
+        Config config = TurnBasedMinecraftMod.proxy.getConfig();
+        BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();
+        if(event.getEntity().world.isRemote
+                || config.isOldBattleBehaviorEnabled()
+                || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()))
+                || (event.getTarget() != null && battleManager.isRecentlyLeftBattle(event.getTarget().getEntityId())))
         {
             return;
         }
         else if(event.getEntity() != null
                 && event.getTarget() != null
-                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
-                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getTarget().getEntityId()))
+                && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
+                && !config.getBattleIgnoringPlayers().contains(event.getTarget().getEntityId()))
         {
             TurnBasedMinecraftMod.proxy.getBattleManager().checkTargeted(event);
         }

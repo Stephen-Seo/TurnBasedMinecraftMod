@@ -24,6 +24,7 @@ public class Combatant
     public double z;
     public float yaw;
     public float pitch;
+    public long time;
     
     public Combatant()
     {

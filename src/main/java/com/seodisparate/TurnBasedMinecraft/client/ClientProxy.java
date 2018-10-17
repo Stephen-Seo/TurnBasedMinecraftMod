@@ -224,6 +224,6 @@ public class ClientProxy extends CommonProxy
     @Override
     public void createLocalBattle(int id)
     {
-        localBattle = new Battle(id, null, null, false);
+        localBattle = new Battle(null, id, null, null, false);
     }
 }

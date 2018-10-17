@@ -5,7 +5,6 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessag
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 

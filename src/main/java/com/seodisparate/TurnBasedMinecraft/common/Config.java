@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,6 +48,7 @@ public class Config
     private boolean onlyOPsSelfDisableTB = true;
     private boolean battleDisabledForAll = false;
     private boolean oldBattleBehaviorEnabled = false;
+    private int leaveBattleCooldownSeconds = 5;
     
     public Config(Logger logger)
     {
@@ -174,6 +174,18 @@ public class Config
                 else if(xmlReader.getLocalName().equals("Version"))
                 {
                     continue;
+                }
+                else if(xmlReader.getLocalName().equals("LeaveBattleCooldown"))
+                {
+                    leaveBattleCooldownSeconds = Integer.parseInt(xmlReader.getElementText());
+                    if(leaveBattleCooldownSeconds <= 0)
+                    {
+                        leaveBattleCooldownSeconds = 1;
+                    }
+                    else if(leaveBattleCooldownSeconds > 10)
+                    {
+                        leaveBattleCooldownSeconds = 10;
+                    }
                 }
                 else if(xmlReader.getLocalName().equals("OldBattleBehavior"))
                 {
@@ -633,5 +645,15 @@ public class Config
     public boolean isOldBattleBehaviorEnabled()
     {
         return oldBattleBehaviorEnabled;
+    }
+    
+    public int getLeaveBattleCooldownSeconds()
+    {
+        return leaveBattleCooldownSeconds;
+    }
+    
+    public long getLeaveBattleCooldownNanos()
+    {
+        return (long)leaveBattleCooldownSeconds * 1000000000L;
     }
 }
