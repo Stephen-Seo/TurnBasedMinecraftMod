@@ -48,6 +48,7 @@ public class Config
     private Set<Integer> battleIgnoringPlayers = null;
     private boolean onlyOPsSelfDisableTB = true;
     private boolean battleDisabledForAll = false;
+    private boolean oldBattleBehaviorEnabled = false;
     
     public Config(Logger logger)
     {
@@ -173,6 +174,17 @@ public class Config
                 else if(xmlReader.getLocalName().equals("Version"))
                 {
                     continue;
+                }
+                else if(xmlReader.getLocalName().equals("OldBattleBehavior"))
+                {
+                    if(xmlReader.getElementText().toLowerCase().equals("false"))
+                    {
+                        oldBattleBehaviorEnabled = false;
+                    }
+                    else
+                    {
+                        oldBattleBehaviorEnabled = true;
+                    }
                 }
                 else if(xmlReader.getLocalName().equals("WhoCanDisableTurnBasedForSelf"))
                 {
@@ -616,5 +628,10 @@ public class Config
     protected boolean getBattleDisabledForAll()
     {
         return battleDisabledForAll;
+    }
+    
+    public boolean isOldBattleBehaviorEnabled()
+    {
+        return oldBattleBehaviorEnabled;
     }
 }

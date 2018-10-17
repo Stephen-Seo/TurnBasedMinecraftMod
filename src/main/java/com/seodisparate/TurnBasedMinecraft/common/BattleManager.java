@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 
 public class BattleManager
 {
@@ -153,6 +154,89 @@ public class BattleManager
 
 //        logger.debug("Attack Canceled: one is in battle");
         return true;
+    }
+    
+    public void checkTargeted(LivingSetAttackTargetEvent event)
+    {
+        EntityInfo attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
+        EntityInfo targetedInfo = event.getTarget() instanceof EntityPlayer ? null : TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getTarget());
+        if((event.getTarget() instanceof EntityPlayer && ((EntityPlayer)event.getTarget()).isCreative())
+                || attackerInfo == null
+                || attackerInfo.ignoreBattle
+                || TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(attackerInfo.category)
+                || (targetedInfo != null
+                    && (targetedInfo.ignoreBattle
+                        || TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(targetedInfo.category))))
+        {
+            return;
+        }
+        
+        Entity inBattle = null;
+        Entity notInBattle = null;
+        Battle battle = null;
+        
+        for(Battle b : battleMap.values())
+        {
+            if(b.hasCombatant(event.getEntity().getEntityId()))
+            {
+                if(inBattle != null)
+                {
+                    // both entities already in battle
+                    return;
+                }
+                else
+                {
+                    inBattle = event.getEntity();
+                    notInBattle = event.getTarget();
+                    battle = b;
+                }
+            }
+            if(b.hasCombatant(event.getTarget().getEntityId()))
+            {
+                if(inBattle != null)
+                {
+                    // both entities already in battle
+                    return;
+                }
+                else
+                {
+                    inBattle = event.getTarget();
+                    notInBattle = event.getEntity();
+                    battle = b;
+                }
+            }
+        }
+        
+        if(battle == null)
+        {
+            // neither in battle
+            if(event.getEntity() instanceof EntityPlayer || event.getTarget() instanceof EntityPlayer)
+            {
+                // at least one is a player, create battle
+                Collection<Entity> sideA = new ArrayList<Entity>(1);
+                Collection<Entity> sideB = new ArrayList<Entity>(1);
+                sideA.add(event.getEntity());
+                sideB.add(event.getTarget());
+                createBattle(sideA, sideB);
+            }
+        }
+        else
+        {
+            // add entity to battle
+            if(battle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle())
+            {
+                // battle max reached, cannot add to battle
+                return;
+            }
+            else if(battle.hasCombatantInSideA(inBattle.getEntityId()))
+            {
+                battle.addCombatantToSideB(notInBattle);
+            }
+            else
+            {
+                battle.addCombatantToSideA(notInBattle);
+            }
+        }
     }
     
     private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB)

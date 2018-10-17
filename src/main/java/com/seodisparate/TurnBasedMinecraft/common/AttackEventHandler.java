@@ -6,6 +6,7 @@ import java.util.Queue;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class AttackEventHandler
@@ -81,6 +82,22 @@ public class AttackEventHandler
         if(TurnBasedMinecraftMod.proxy.getAttackingDamage() < (int) event.getAmount())
         {
             TurnBasedMinecraftMod.proxy.setAttackingDamage((int) event.getAmount());
+        }
+    }
+    
+    @SubscribeEvent
+    public void entityTargeted(LivingSetAttackTargetEvent event)
+    {
+        if(event.getEntity().world.isRemote || TurnBasedMinecraftMod.proxy.getConfig().isOldBattleBehaviorEnabled())
+        {
+            return;
+        }
+        else if(event.getEntity() != null
+                && event.getTarget() != null
+                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
+                && !TurnBasedMinecraftMod.proxy.getConfig().getBattleIgnoringPlayers().contains(event.getTarget().getEntityId()))
+        {
+            TurnBasedMinecraftMod.proxy.getBattleManager().checkTargeted(event);
         }
     }
 }

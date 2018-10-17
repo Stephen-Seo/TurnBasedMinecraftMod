@@ -1,6 +1,9 @@
 <TurnBasedMinecraftConfig>
 	<!-- If the mod has a newer version config, it will rename the existing config and place the new config -->
-	<Version>4</Version>
+	<Version>5</Version>
+	<!-- If not "false", uses old battle behavior where battles only start on attack/hit. Otherwise, battles can
+	start when a hostile mob targets a player or another entity in battle. -->
+	<OldBattleBehavior>false</OldBattleBehavior>
 	<!-- Determines who can disable turn-based-battle for themselves via command. Must be "op" or "any". If neither, defaults to "op"-->
 	<WhoCanDisableTurnBasedForSelf>op</WhoCanDisableTurnBasedForSelf>
 	<!-- If there are "MaxInBattle" amount of entities in battle, other entities cannot join until combatants leave battle. -->

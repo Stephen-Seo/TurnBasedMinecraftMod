@@ -15,6 +15,7 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -885,27 +886,35 @@ public class Battle
                         }
                         else
                         {
-                            if(next.isSideA)
+                            EntityLivingBase attackTarget = ((EntityLiving)next.entity).getAttackTarget();
+                            if(attackTarget != null && hasCombatant(attackTarget.getEntityId()))
                             {
-                                int randomTargetIndex = (int)(Math.random() * sideB.size());
-                                for(Combatant c : sideB.values())
-                                {
-                                    if(randomTargetIndex-- == 0)
-                                    {
-                                        target = c;
-                                        break;
-                                    }
-                                }
+                                target = getCombatantByID(attackTarget.getEntityId());
                             }
                             else
                             {
-                                int randomTargetIndex = (int)(Math.random() * sideA.size());
-                                for(Combatant c : sideA.values())
+                                if(next.isSideA)
                                 {
-                                    if(randomTargetIndex-- == 0)
+                                    int randomTargetIndex = (int)(Math.random() * sideB.size());
+                                    for(Combatant c : sideB.values())
                                     {
-                                        target = c;
-                                        break;
+                                        if(randomTargetIndex-- == 0)
+                                        {
+                                            target = c;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    int randomTargetIndex = (int)(Math.random() * sideA.size());
+                                    for(Combatant c : sideA.values())
+                                    {
+                                        if(randomTargetIndex-- == 0)
+                                        {
+                                            target = c;
+                                            break;
+                                        }
                                     }
                                 }
                             }
