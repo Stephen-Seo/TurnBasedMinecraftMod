@@ -1,3 +1,12 @@
+# Version 1.4
+
+Fix duplicate "... entered battle" messages.
+
+Added max-distance config option for how close a monster must be to initiate
+battle (when triggered by a monster targeting a player or entity in battle).
+
+Some internal fixes and refactorings.
+
 # Version 1.3
 
 Added a battle-cooldown and related config option. Now, when leaving battle, a
