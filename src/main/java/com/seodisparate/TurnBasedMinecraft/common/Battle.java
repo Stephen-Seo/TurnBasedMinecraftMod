@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -518,50 +519,52 @@ public class Battle
      */
     private boolean healthCheck()
     {
-        Queue<Combatant> removeQueue = new ArrayDeque<Combatant>();
-        for(Combatant c : sideA.values())
+        boolean didRemove = false;
+        for(Iterator<Map.Entry<Integer, Combatant>> iter = sideA.entrySet().iterator(); iter.hasNext();)
         {
-            if(!c.entity.isEntityAlive())
+            Map.Entry<Integer, Combatant> entry = iter.next();
+            if(!entry.getValue().entity.isEntityAlive())
             {
-                removeQueue.add(c);
+                iter.remove();
+                players.remove(entry.getKey());
+                removeCombatantPostRemove(entry.getValue());
+                didRemove = true;
                 String category = new String();
-                if(c.entityInfo != null)
+                if(entry.getValue().entityInfo != null)
                 {
-                    category = c.entityInfo.category;
+                    category = entry.getValue().entityInfo.category;
                 }
-                else if(c.entity instanceof EntityPlayer)
+                else if(entry.getValue().entity instanceof EntityPlayer)
                 {
                     category = "player";
                 }
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0, category);
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, entry.getValue().entity.getEntityId(), 0, 0, category);
             }
         }
-        for(Combatant c : sideB.values())
+        for(Iterator<Map.Entry<Integer, Combatant>> iter = sideB.entrySet().iterator(); iter.hasNext();)
         {
-            if(!c.entity.isEntityAlive())
+            Map.Entry<Integer, Combatant> entry = iter.next();
+            if(!entry.getValue().entity.isEntityAlive())
             {
-                removeQueue.add(c);
+                iter.remove();
+                players.remove(entry.getKey());
+                removeCombatantPostRemove(entry.getValue());
+                didRemove = true;
                 String category = new String();
-                if(c.entityInfo != null)
+                if(entry.getValue().entityInfo != null)
                 {
-                    category = c.entityInfo.category;
+                    category = entry.getValue().entityInfo.category;
                 }
-                else if(c.entity instanceof EntityPlayer)
+                else if(entry.getValue().entity instanceof EntityPlayer)
                 {
                     category = "player";
                 }
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, c.entity.getEntityId(), 0, 0, category);
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DIED, entry.getValue().entity.getEntityId(), 0, 0, category);
             }
-        }
-        boolean didRemove = !removeQueue.isEmpty();
-        for(Combatant toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
-        {
-            removeCombatant(toRemove);
         }
         if(players.isEmpty() || sideA.isEmpty() || sideB.isEmpty())
         {
             battleEnded = true;
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENDED, 0, 0, 0);
         }
         else if(didRemove)
         {
@@ -576,20 +579,20 @@ public class Battle
      */
     private boolean isCreativeCheck()
     {
-        Queue<Combatant> removeQueue = new ArrayDeque<Combatant>();
-        for(Combatant c : players.values())
-        {
-            if(c.entity != null && ((EntityPlayer)c.entity).isCreative())
-            {
-                removeQueue.add(c);
-            }
-        }
         boolean didRemove = false;
-        for(Combatant toRemove = removeQueue.poll(); toRemove != null; toRemove = removeQueue.poll())
+        for(Iterator<Map.Entry<Integer, Combatant>> iter = players.entrySet().iterator(); iter.hasNext();)
         {
-            didRemove = true;
-            removeCombatant(toRemove);
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.BECAME_CREATIVE, toRemove.entity.getEntityId(), 0, 0);
+            Map.Entry<Integer, Combatant> entry = iter.next();
+            if(entry.getValue().entity != null && ((EntityPlayer)entry.getValue().entity).isCreative())
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.BECAME_CREATIVE, entry.getValue().entity.getEntityId(), 0, 0);
+                iter.remove();
+                sideA.remove(entry.getKey());
+                sideB.remove(entry.getKey());
+                playerCount.decrementAndGet();
+                removeCombatantPostRemove(entry.getValue());
+                didRemove = true;
+            }
         }
         if(didRemove)
         {
@@ -633,6 +636,14 @@ public class Battle
         if(players.remove(c.entity.getEntityId()) != null)
         {
             playerCount.decrementAndGet();
+        }
+        removeCombatantPostRemove(c);
+    }
+    
+    private void removeCombatantPostRemove(Combatant c)
+    {
+        if(c.entity instanceof EntityPlayer)
+        {
             TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0), (EntityPlayerMP)c.entity);
         }
         battleManager.addRecentlyLeftBattle(c);

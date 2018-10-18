@@ -1,7 +1,7 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BattleUpdater implements Runnable
@@ -18,20 +18,18 @@ public class BattleUpdater implements Runnable
     @Override
     public void run()
     {
-        Queue<Integer> endedQueue = new ArrayDeque<Integer>();
-        Integer ended;
         while(isRunning.get())
         {
-            for(Battle e : manager.battleMap.values())
+            synchronized(manager.battleMap)
             {
-                if(e.update())
+                for(Iterator<Map.Entry<Integer, Battle>> iter = manager.battleMap.entrySet().iterator(); iter.hasNext();)
                 {
-                    endedQueue.add(e.getId());
+                    Map.Entry<Integer, Battle> entry = iter.next();
+                    if(entry.getValue().update())
+                    {
+                        iter.remove();
+                    }
                 }
-            }
-            for(ended = endedQueue.poll(); ended != null; ended = endedQueue.poll())
-            {
-                manager.battleMap.remove(ended);
             }
             manager.updateRecentlyLeftBattle();
             try { Thread.sleep(250); } catch (Throwable t) { /* ignored */ }

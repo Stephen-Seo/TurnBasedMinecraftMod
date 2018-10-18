@@ -1,7 +1,6 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.Iterator;
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
@@ -23,20 +22,20 @@ public class AttackEventHandler
         }
         else
         {
-            Queue<AttackerViaBow> removeQueue = new ArrayDeque<AttackerViaBow>();
             final long now = System.nanoTime();
             boolean isValid = false;
             synchronized(TurnBasedMinecraftMod.proxy.getAttackerViaBowSet())
             {
-                for(AttackerViaBow attacker : TurnBasedMinecraftMod.proxy.getAttackerViaBowSet())
+                for(Iterator<AttackerViaBow> iter = TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().iterator(); iter.hasNext();)
                 {
+                    AttackerViaBow attacker = iter.next();
                     if(now - attacker.attackTime >= AttackerViaBow.ATTACK_TIMEOUT)
                     {
-                        removeQueue.add(attacker);
+                        iter.remove();
                     }
                     else if(event.getSource().getTrueSource().equals(attacker.entity) && event.getSource().isProjectile())
                     {
-                        removeQueue.add(attacker);
+                        iter.remove();
                         if(!isValid)
                         {
                             Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(attacker.battleID);
@@ -47,10 +46,6 @@ public class AttackEventHandler
                             isValid = true;
                         }
                     }
-                }
-                for(AttackerViaBow next = removeQueue.poll(); next != null; next = removeQueue.poll())
-                {
-                    TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().remove(next);
                 }
             }
             return isValid;

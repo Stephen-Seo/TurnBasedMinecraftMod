@@ -1,14 +1,10 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +28,7 @@ public class BattleManager
     public BattleManager(Logger logger)
     {
         this.logger = logger;
-        battleMap = new Hashtable<Integer, Battle>();
+        battleMap = new HashMap<Integer, Battle>();
         battleUpdater = new BattleUpdater(this);
         updaterThread = new Thread(battleUpdater);
         updaterThread.start();
@@ -61,12 +57,15 @@ public class BattleManager
         if(entityInfo != null && (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacked entity ignores battle
-            for(Battle b : battleMap.values())
+            synchronized(battleMap)
             {
-                if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
+                for(Battle b : battleMap.values())
                 {
-//                    logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
-                    return true;
+                    if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
+                    {
+    //                    logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
+                        return true;
+                    }
                 }
             }
 //            logger.debug("Attack Not Canceled: attacked ignores battle");
@@ -76,12 +75,15 @@ public class BattleManager
         if(entityInfo != null && (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacker entity ignores battle
-            for(Battle b : battleMap.values())
+            synchronized(battleMap)
             {
-                if(b.hasCombatant(event.getEntity().getEntityId()))
+                for(Battle b : battleMap.values())
                 {
-//                    logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
-                    return true;
+                    if(b.hasCombatant(event.getEntity().getEntityId()))
+                    {
+    //                    logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
+                        return true;
+                    }
                 }
             }
 //            logger.debug("Attack Not Canceled: attacker ignores battle");
@@ -93,36 +95,39 @@ public class BattleManager
         Entity notInBattle = null;
         Battle battle = null;
         
-        for(Battle b : battleMap.values())
+        synchronized(battleMap)
         {
-            if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
+            for(Battle b : battleMap.values())
             {
-                if(inBattle != null)
+                if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
                 {
-                    // both combatants are in battle
-//                    logger.debug("Attack Canceled: both are in battle");
-                    return true;
+                    if(inBattle != null)
+                    {
+                        // both combatants are in battle
+    //                    logger.debug("Attack Canceled: both are in battle");
+                        return true;
+                    }
+                    else
+                    {
+                        inBattle = event.getSource().getTrueSource();
+                        notInBattle = event.getEntity();
+                        battle = b;
+                    }
                 }
-                else
+                if(b.hasCombatant(event.getEntity().getEntityId()))
                 {
-                    inBattle = event.getSource().getTrueSource();
-                    notInBattle = event.getEntity();
-                    battle = b;
-                }
-            }
-            if(b.hasCombatant(event.getEntity().getEntityId()))
-            {
-                if(inBattle != null)
-                {
-                    // both combatants are in battle
-//                    logger.debug("Attack Canceled: both are in battle");
-                    return true;
-                }
-                else
-                {
-                    inBattle = event.getEntity();
-                    notInBattle = event.getSource().getTrueSource();
-                    battle = b;
+                    if(inBattle != null)
+                    {
+                        // both combatants are in battle
+    //                    logger.debug("Attack Canceled: both are in battle");
+                        return true;
+                    }
+                    else
+                    {
+                        inBattle = event.getEntity();
+                        notInBattle = event.getSource().getTrueSource();
+                        battle = b;
+                    }
                 }
             }
         }
@@ -185,34 +190,37 @@ public class BattleManager
         Entity notInBattle = null;
         Battle battle = null;
         
-        for(Battle b : battleMap.values())
+        synchronized(battleMap)
         {
-            if(b.hasCombatant(event.getEntity().getEntityId()))
+            for(Battle b : battleMap.values())
             {
-                if(inBattle != null)
+                if(b.hasCombatant(event.getEntity().getEntityId()))
                 {
-                    // both entities already in battle
-                    return;
+                    if(inBattle != null)
+                    {
+                        // both entities already in battle
+                        return;
+                    }
+                    else
+                    {
+                        inBattle = event.getEntity();
+                        notInBattle = event.getTarget();
+                        battle = b;
+                    }
                 }
-                else
+                if(b.hasCombatant(event.getTarget().getEntityId()))
                 {
-                    inBattle = event.getEntity();
-                    notInBattle = event.getTarget();
-                    battle = b;
-                }
-            }
-            if(b.hasCombatant(event.getTarget().getEntityId()))
-            {
-                if(inBattle != null)
-                {
-                    // both entities already in battle
-                    return;
-                }
-                else
-                {
-                    inBattle = event.getTarget();
-                    notInBattle = event.getEntity();
-                    battle = b;
+                    if(inBattle != null)
+                    {
+                        // both entities already in battle
+                        return;
+                    }
+                    else
+                    {
+                        inBattle = event.getTarget();
+                        notInBattle = event.getEntity();
+                        battle = b;
+                    }
                 }
             }
         }
@@ -251,19 +259,26 @@ public class BattleManager
     
     private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB)
     {
-        while(battleMap.containsKey(IDCounter))
+        Battle newBattle = null;
+        synchronized(battleMap)
         {
-            ++IDCounter;
+            while(battleMap.containsKey(IDCounter))
+            {
+                ++IDCounter;
+            }
+            newBattle = new Battle(this, IDCounter, sideA, sideB, true);
+            battleMap.put(IDCounter, newBattle);
         }
-        Battle newBattle = new Battle(this, IDCounter, sideA, sideB, true);
-        battleMap.put(IDCounter, newBattle);
         newBattle.notifyPlayersBattleInfo();
         return newBattle;
     }
     
     public Battle getBattleByID(int id)
     {
-        return battleMap.get(id);
+        synchronized(battleMap)
+        {
+            return battleMap.get(id);
+        }
     }
     
     public void cleanup()
@@ -271,7 +286,10 @@ public class BattleManager
         battleUpdater.setIsRunning(false);
         battleUpdater = null;
         updaterThread = null;
-        battleMap.clear();
+        synchronized(battleMap)
+        {
+            battleMap.clear();
+        }
     }
     
     protected void addRecentlyLeftBattle(Combatant c)
@@ -291,23 +309,19 @@ public class BattleManager
     protected void updateRecentlyLeftBattle()
     {
         long current = System.nanoTime();
-        Queue<Combatant> removeQueue = new ArrayDeque<Combatant>();
         synchronized(recentlyLeftBattle)
         {
-            for(Combatant c : recentlyLeftBattle.values())
+            for(Iterator<Map.Entry<Integer, Combatant>> iter = recentlyLeftBattle.entrySet().iterator(); iter.hasNext();)
             {
-                if(current - c.time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
+                Map.Entry<Integer, Combatant> entry = iter.next();
+                if(current - entry.getValue().time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
                 {
-                    removeQueue.add(c);
+                    iter.remove();
+                    if(entry.getValue().entity instanceof EntityPlayerMP)
+                    {
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."), (EntityPlayerMP)entry.getValue().entity);
+                    }
                 }
-            }
-            for(Combatant c = removeQueue.poll(); c != null; c = removeQueue.poll())
-            {
-                if(c.entity instanceof EntityPlayerMP)
-                {
-                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."), (EntityPlayerMP)c.entity);
-                }
-                recentlyLeftBattle.remove(c.entity.getEntityId());
             }
         }
     }
