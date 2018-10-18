@@ -1,6 +1,7 @@
 package com.seodisparate.TurnBasedMinecraft.client;
 
 import java.io.IOException;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -165,32 +166,44 @@ public class BattleGui extends GuiScreen
         case ATTACK_TARGET:
             info = "Who will you attack?";
             int y = 30;
-            for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideAEntrySet())
+            try
             {
-                if(e.getValue().entity != null)
+                for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideAEntrySet())
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey(), true));
+                    if(e.getValue().entity != null)
+                    {
+                        buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey(), true));
+                    }
+                    else
+                    {
+                        buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, "Unknown", e.getKey(), true));
+                    }
+                    y += 20;
                 }
-                else
-                {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width/4 - 60, y, 120, 20, "Unknown", e.getKey(), true));
-                }
-                y += 20;
+            } catch (ConcurrentModificationException e)
+            {
+                // ignored
             }
             y = 30;
-            for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideBEntrySet())
+            try
             {
-                if(e.getValue().entity != null)
+                for(Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideBEntrySet())
                 {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey(), false));
+                    if(e.getValue().entity != null)
+                    {
+                        buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, e.getValue().entity.getName(), e.getKey(), false));
+                    }
+                    else
+                    {
+                        buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, "Unknown", e.getKey(), false));
+                    }
+                    y += 20;
                 }
-                else
-                {
-                    buttonList.add(new EntitySelectionButton(ButtonAction.ATTACK_TARGET.getValue(), width*3/4 - 60, y, 120, 20, "Unknown", e.getKey(), false));
-                }
-                y += 20;
+            } catch (ConcurrentModificationException e)
+            {
+                // ignored
             }
-            buttonList.add(new GuiButton(ButtonAction.CANCEL.getValue(), width/2 - 40, height - 120, 80, 20, "Cancel"));
+            buttonList.add(new GuiButton(ButtonAction.CANCEL.getValue(), width/2 - 30, height - 120, 60, 20, "Cancel"));
             break;
         case ITEM_ACTION:
             info = "What will you do with an item?";

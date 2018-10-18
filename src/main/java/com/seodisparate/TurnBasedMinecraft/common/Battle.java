@@ -256,11 +256,41 @@ public class Battle
     
     public boolean hasCombatant(int entityID)
     {
+        synchronized(sideAEntryQueue)
+        {
+            for(Combatant c : sideAEntryQueue)
+            {
+                if(c.entity.getEntityId() == entityID)
+                {
+                    return true;
+                }
+            }
+        }
+        synchronized(sideBEntryQueue)
+        {
+            for(Combatant c : sideBEntryQueue)
+            {
+                if(c.entity.getEntityId() == entityID)
+                {
+                    return true;
+                }
+            }
+        }
         return sideA.containsKey(entityID) || sideB.containsKey(entityID);
     }
     
     public boolean hasCombatantInSideA(int entityID)
     {
+        synchronized(sideAEntryQueue)
+        {
+            for(Combatant c : sideAEntryQueue)
+            {
+                if(c.entity.getEntityId() == entityID)
+                {
+                    return true;
+                }
+            }
+        }
         return sideA.containsKey(entityID);
     }
     
@@ -775,7 +805,7 @@ public class Battle
                 {
                     turnOrderQueue.add(c);
                 }
-                update(0);
+                return update(0);
             }
             else
             {
