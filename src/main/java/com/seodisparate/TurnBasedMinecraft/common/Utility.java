@@ -1,5 +1,6 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArrow;
 
@@ -42,5 +43,10 @@ public class Utility
             }
         }
         return false;
+    }
+    
+    public static double distanceBetweenEntities(Entity a, Entity b)
+    {
+        return Math.sqrt(Math.pow(a.posX - b.posX, 2.0) + Math.pow(a.posY - b.posY, 2.0) + Math.pow(a.posZ - b.posZ, 2.0));
     }
 }

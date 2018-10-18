@@ -95,7 +95,8 @@ public class AttackEventHandler
         if(event.getEntity().world.isRemote
                 || config.isOldBattleBehaviorEnabled()
                 || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()))
-                || (event.getTarget() != null && battleManager.isRecentlyLeftBattle(event.getTarget().getEntityId())))
+                || (event.getTarget() != null && battleManager.isRecentlyLeftBattle(event.getTarget().getEntityId()))
+                || (event.getEntity() != null && event.getTarget() != null && Utility.distanceBetweenEntities(event.getEntity(), event.getTarget()) > (double)config.getAggroStartBattleDistance()))
         {
             return;
         }

@@ -49,6 +49,7 @@ public class Config
     private boolean battleDisabledForAll = false;
     private boolean oldBattleBehaviorEnabled = false;
     private int leaveBattleCooldownSeconds = 5;
+    private int aggroStartBattleDistance = 8;
     
     public Config(Logger logger)
     {
@@ -185,6 +186,18 @@ public class Config
                     else if(leaveBattleCooldownSeconds > 10)
                     {
                         leaveBattleCooldownSeconds = 10;
+                    }
+                }
+                else if(xmlReader.getLocalName().equals("AggroStartBattleDistance"))
+                {
+                    aggroStartBattleDistance = Integer.parseInt(xmlReader.getElementText());
+                    if(aggroStartBattleDistance < 5)
+                    {
+                        aggroStartBattleDistance = 5;
+                    }
+                    else if(aggroStartBattleDistance > 50)
+                    {
+                        aggroStartBattleDistance = 50;
                     }
                 }
                 else if(xmlReader.getLocalName().equals("OldBattleBehavior"))
@@ -655,5 +668,10 @@ public class Config
     public long getLeaveBattleCooldownNanos()
     {
         return (long)leaveBattleCooldownSeconds * 1000000000L;
+    }
+    
+    public int getAggroStartBattleDistance()
+    {
+        return aggroStartBattleDistance;
     }
 }

@@ -839,17 +839,14 @@ public class Battle
                         Combatant target = null;
                         if(next.entity instanceof EntityPlayer)
                         {
-                            if(next.isSideA)
+                            target = sideA.get(next.targetEntityID);
+                            if(target == null)
                             {
                                 target = sideB.get(next.targetEntityID);
                             }
-                            else
+                            if(target == null || !target.entity.isEntityAlive() || target == next)
                             {
-                                target = sideA.get(next.targetEntityID);
-                            }
-                            if(target == null || !target.entity.isEntityAlive())
-                            {
-                                break;
+                                continue;
                             }
                             ItemStack heldItemStack = ((EntityPlayer)next.entity).getHeldItemMainhand();
                             if(heldItemStack.getItem() instanceof ItemBow)
@@ -980,7 +977,7 @@ public class Battle
                                     }
                                 }
                             }
-                            if(target == null || !target.entity.isEntityAlive())
+                            if(target == null || !target.entity.isEntityAlive() || target == next)
                             {
                                 continue;
                             }
