@@ -191,34 +191,37 @@ public class Battle
             }
         }
         
-        for(Combatant c : this.sideA.values())
+        if(isServer)
         {
-            if(c.entityInfo != null)
+            for(Combatant c : this.sideA.values())
             {
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
+                if(c.entityInfo != null)
+                {
+                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
+                }
+                else if(c.entity instanceof EntityPlayer)
+                {
+                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, "player");
+                }
+                else
+                {
+                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
+                }
             }
-            else if(c.entity instanceof EntityPlayer)
+            for(Combatant c : this.sideB.values())
             {
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, "player");
-            }
-            else
-            {
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
-            }
-        }
-        for(Combatant c : this.sideB.values())
-        {
-            if(c.entityInfo != null)
-            {
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
-            }
-            else if(c.entity instanceof EntityPlayer)
-            {
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, "player");
-            }
-            else
-            {
-                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
+                if(c.entityInfo != null)
+                {
+                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, c.entityInfo.category);
+                }
+                else if(c.entity instanceof EntityPlayer)
+                {
+                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id, "player");
+                }
+                else
+                {
+                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, c.entity.getEntityId(), 0, id);
+                }
             }
         }
         
@@ -299,17 +302,20 @@ public class Battle
             newCombatant.yaw = e.rotationYaw;
             newCombatant.pitch = e.rotationPitch;
         }
-        if(newCombatant.entityInfo != null)
+        if(isServer)
         {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
-        }
-        else if(newCombatant.entity instanceof EntityPlayer)
-        {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, "player");
-        }
-        else
-        {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+            if(newCombatant.entityInfo != null)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
+            }
+            else if(newCombatant.entity instanceof EntityPlayer)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, "player");
+            }
+            else
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+            }
         }
         notifyPlayersBattleInfo();
     }
@@ -352,17 +358,20 @@ public class Battle
             newCombatant.yaw = e.rotationYaw;
             newCombatant.pitch = e.rotationPitch;
         }
-        if(newCombatant.entityInfo != null)
+        if(isServer)
         {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
-        }
-        else if(newCombatant.entity instanceof EntityPlayer)
-        {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, "player");
-        }
-        else
-        {
-            sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+            if(newCombatant.entityInfo != null)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, newCombatant.entityInfo.category);
+            }
+            else if(newCombatant.entity instanceof EntityPlayer)
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id, "player");
+            }
+            else
+            {
+                sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getEntityId(), 0, id);
+            }
         }
         notifyPlayersBattleInfo();
     }
