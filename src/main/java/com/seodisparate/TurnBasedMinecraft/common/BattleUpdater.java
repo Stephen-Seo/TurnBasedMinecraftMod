@@ -64,7 +64,7 @@ public class BattleUpdater implements Runnable
                     if(!updateRunnable.isFinished())
                     {
                         // TODO this is an ugly fix to a still-not-found freeze bug in Battle.update()
-                        TurnBasedMinecraftMod.logger.error("Battle (" + entry.getValue().getId() + ") update timed out!");
+                        TurnBasedMinecraftMod.logger.error("Battle (" + entry.getValue().getId() + "; " + entry.getValue().debugLog + ") update timed out!");
                         updateThread.stop();
                     }
                     else if(updateRunnable.isBattleFinished())

@@ -1,3 +1,10 @@
+# Version 1.5
+
+Fix proper consumption of food/potion items in battle.
+
+Added some debug output on internal freeze occurrence (investigation of the
+freeze bug is still ongoing).
+
 # Version 1.4
 
 Fix duplicate "... entered battle" messages.
