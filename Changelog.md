@@ -1,3 +1,11 @@
+# Version 1.6
+
+Fix bug where player can start battle with self.
+
+Change config to use ".toml" instead of ".xml".
+
+Change how battle info text is displayed.
+
 # Version 1.5
 
 Fix proper consumption of food/potion items in battle.

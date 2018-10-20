@@ -159,6 +159,65 @@ public class EntityInfo
                 return UNKNOWN;
             }
         }
+
+        public String toString()
+        {
+            switch(this)
+            {
+            case SPEED:
+                return "speed";
+            case SLOW:
+                return "slow";
+            case HASTE:
+                return "haste";
+            case MINING_FATIGUE:
+                return "mining_fatigue";
+            case STRENGTH:
+                return "strength";
+            case JUMP_BOOST:
+                return "jump_boost";
+            case NAUSEA:
+                return "nausea";
+            case REGENERATION:
+                return "regeneration";
+            case RESISTANCE:
+                return "resistance";
+            case FIRE_RESISTANCE:
+                return "fire_resistance";
+            case WATER_BREATHING:
+                return "water_breathing";
+            case INVISIBILITY:
+                return "invisibility";
+            case BLINDNESS:
+                return "blindness";
+            case NIGHT_VISION:
+                return "night_vision";
+            case HUNGER:
+                return "hunger";
+            case WEAKNESS:
+                return "weakness";
+            case POISON:
+                return "poison";
+            case WITHER:
+                return "wither";
+            case ABSORPTION:
+                return "absorption";
+            case SATURATION:
+                return "saturation";
+            case GLOWING:
+                return "glowing";
+            case LEVITATION:
+                return "levitation";
+            case LUCK:
+                return "luck";
+            case UNLUCK:
+                return "unluck";
+            case FIRE:
+                return "fire";
+            default:
+                return "unknown";
+            }
+        }
         
         public PotionEffect getPotionEffect()
         {

@@ -9,7 +9,7 @@ public class PlayerJoinEventHandler
     @SubscribeEvent
     public void entityJoinHandler(EntityJoinWorldEvent event)
     {
-        if(event.getEntity().world.isRemote)
+        if(event.getWorld().isRemote)
         {
             return;
         }

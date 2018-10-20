@@ -7,7 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
 public class ClientProxy extends CommonProxy
 {
@@ -158,7 +160,12 @@ public class ClientProxy extends CommonProxy
     @Override
     public void displayString(String message)
     {
-        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString(message));
+        ITextComponent prefix = new TextComponentString("TBM: ");
+        prefix.getStyle().setColor(TextFormatting.GREEN).setBold(true);
+        ITextComponent text = new TextComponentString(message);
+        prefix.appendSibling(text);
+        text.getStyle().setColor(TextFormatting.WHITE).setBold(false);
+        Minecraft.getMinecraft().player.sendMessage(prefix);
     }
 
     @Override
