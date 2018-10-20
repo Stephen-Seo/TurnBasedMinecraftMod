@@ -70,6 +70,7 @@ public class AttackEventHandler
         else if(!isAttackerValid(event)
                 && event.getEntity() != null
                 && event.getSource().getTrueSource() != null
+                && event.getEntity() != event.getSource().getTrueSource()
                 && !config.getBattleIgnoringPlayers().contains(event.getSource().getTrueSource().getEntityId())
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
                 && battleManager.checkAttack(event))
