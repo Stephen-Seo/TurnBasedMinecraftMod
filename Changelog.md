@@ -4,6 +4,9 @@ Fix bug where player can start battle with self.
 
 Change config to use ".toml" instead of ".xml".
 
+Added command "/tbm-edit" that allows OPs to edit entity entries for TBM.  
+Can be used to add mobs from other mods easily.
+
 Change how battle info text is displayed.
 
 # Version 1.5

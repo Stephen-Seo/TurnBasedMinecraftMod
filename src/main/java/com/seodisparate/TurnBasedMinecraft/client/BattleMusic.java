@@ -88,11 +88,7 @@ public class BattleMusic
                     return false;
                 }
                 String ext = name.substring(extIndex + 1).toLowerCase();
-                if(ext.equals("mid") || ext.equals("wav"))
-                {
-                    return true;
-                }
-                return false;
+                return ext.equals("mid") || ext.equals("wav");
             }
         });
         for(File f : battleFiles)
@@ -110,11 +106,7 @@ public class BattleMusic
                     return false;
                 }
                 String ext = name.substring(extIndex + 1).toLowerCase();
-                if(ext.equals("mid") || ext.equals("wav"))
-                {
-                    return true;
-                }
-                return false;
+                return ext.equals("mid") || ext.equals("wav");
             }
         });
         for(File f : sillyFiles)

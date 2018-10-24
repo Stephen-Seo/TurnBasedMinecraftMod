@@ -20,7 +20,6 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFood;
@@ -63,7 +62,7 @@ public class Battle
         private int value;
         private static Map<Integer, State> map = new HashMap<Integer, State>();
         
-        private State(int value)
+        State(int value)
         {
             this.value = value;
         }
@@ -99,7 +98,7 @@ public class Battle
         private int value;
         private static Map<Integer, Decision> map = new HashMap<Integer, Decision>();
         
-        private Decision(int value)
+        Decision(int value)
         {
             this.value = value;
         }
@@ -892,11 +891,11 @@ public class Battle
                             int hitChance = TurnBasedMinecraftMod.proxy.getConfig().getPlayerAttackProbability();
                             if(target.entity instanceof EntityPlayer)
                             {
-                                hitChance -= TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion();
+                                hitChance = hitChance * (100 - TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion()) / 100;
                             }
                             else
                             {
-                                hitChance -= target.entityInfo.evasion;
+                                hitChance = hitChance * (100 - target.entityInfo.evasion) / 100;
                             }
                             if(hitChance < TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage())
                             {
@@ -999,11 +998,11 @@ public class Battle
                             int hitChance = next.entityInfo.attackProbability;
                             if(target.entity instanceof EntityPlayer)
                             {
-                                hitChance -= TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion();
+                                hitChance = hitChance * (100 - TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion()) / 100;
                             }
                             else
                             {
-                                hitChance -= target.entityInfo.evasion;
+                                hitChance = hitChance * (100 - target.entityInfo.evasion) / 100;
                             }
                             if(hitChance < TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage())
                             {
@@ -1019,6 +1018,10 @@ public class Battle
                                     if(next.entityInfo.attackVariance > 0)
                                     {
                                         damageAmount += (int)(Math.random() * (next.entityInfo.attackVariance * 2 + 1)) - next.entityInfo.attackVariance;
+                                    }
+                                    if(damageAmount < 0)
+                                    {
+                                        damageAmount = 0;
                                     }
                                     // attack
                                     final Entity nextEntity = next.entity;

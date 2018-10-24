@@ -1,8 +1,9 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.ITextComponent;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.entity.Entity;
@@ -16,10 +17,12 @@ public class CommonProxy
     private int attackingDamage = 0;
     private Config config = null;
     private Logger logger = null;
+    private Map<Integer, EditingInfo> editingPlayers;
     
     public final void initialize()
     {
         attackerViaBow = new HashSet<AttackerViaBow>();
+        editingPlayers = new Hashtable<Integer, EditingInfo>();
         initializeClient();
     }
     
@@ -84,6 +87,8 @@ public class CommonProxy
     public void typeLeftBattle(String type) {}
     
     public void displayString(String message) {}
+
+    public void displayTextComponent(ITextComponent textComponent) {}
     
     public Entity getEntityByID(int id)
     {
@@ -140,5 +145,20 @@ public class CommonProxy
     public final Config getConfig()
     {
         return config;
+    }
+
+    protected final EditingInfo getEditingInfo(int id)
+    {
+        return editingPlayers.get(id);
+    }
+
+    protected final EditingInfo setEditingPlayer(EntityPlayer player)
+    {
+        return editingPlayers.put(player.getEntityId(), new EditingInfo(player));
+    }
+
+    protected final EditingInfo removeEditingInfo(int id)
+    {
+        return editingPlayers.remove(id);
     }
 }

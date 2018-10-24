@@ -36,7 +36,7 @@ public class BattleGui extends GuiScreen
         
         private int value;
         
-        private MenuState(int value)
+        MenuState(int value)
         {
             this.value = value;
         }
@@ -78,7 +78,7 @@ public class BattleGui extends GuiScreen
         
         private int value;
         
-        private ButtonAction(int value)
+        ButtonAction(int value)
         {
             this.value = value;
         }

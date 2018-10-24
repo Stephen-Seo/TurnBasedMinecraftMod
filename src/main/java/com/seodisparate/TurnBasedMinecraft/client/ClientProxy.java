@@ -169,6 +169,12 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
+    public void displayTextComponent(ITextComponent text)
+    {
+        Minecraft.getMinecraft().player.sendMessage(text);
+    }
+
+    @Override
     public Entity getEntityByID(int id)
     {
         return Minecraft.getMinecraft().world.getEntityByID(id);

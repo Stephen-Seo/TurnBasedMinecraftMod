@@ -41,7 +41,7 @@ public class PacketBattleMessage implements IMessage
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
         
-        private MessageType(int value)
+        MessageType(int value)
         {
             this.value = value;
         }
@@ -75,7 +75,7 @@ public class PacketBattleMessage implements IMessage
         private int value;
         private static Map<Integer, UsedItemAction> map = new HashMap<Integer, UsedItemAction>();
         
-        private UsedItemAction(int value)
+        UsedItemAction(int value)
         {
             this.value = value;
         }

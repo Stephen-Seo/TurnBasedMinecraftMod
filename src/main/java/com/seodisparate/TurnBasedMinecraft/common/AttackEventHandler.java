@@ -4,6 +4,8 @@ import java.util.Iterator;
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketEditingMessage;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -59,8 +61,32 @@ public class AttackEventHandler
         {
             return;
         }
-        Config config = TurnBasedMinecraftMod.proxy.getConfig();
-        BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();
+        CommonProxy proxy = TurnBasedMinecraftMod.proxy;
+        Config config = proxy.getConfig();
+        BattleManager battleManager = proxy.getBattleManager();
+        // handle edit entity, pick entity via attack
+        {
+            EditingInfo editingInfo = null;
+            if(event.getSource().getTrueSource() != null && event.getEntity() != null)
+            {
+                editingInfo = proxy.getEditingInfo(event.getSource().getTrueSource().getEntityId());
+                if(editingInfo != null && editingInfo.isPendingEntitySelection)
+                {
+                    editingInfo.isPendingEntitySelection = false;
+                    event.setCanceled(true);
+                    editingInfo.entityInfo = config.getMatchingEntityInfo(event.getEntity());
+                    if(editingInfo.entityInfo == null)
+                    {
+                        editingInfo.entityInfo = new EntityInfo();
+                        editingInfo.entityInfo.classType = event.getEntity().getClass();
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP)editingInfo.editor);
+                        return;
+                    }
+                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP)editingInfo.editor);
+                    return;
+                }
+            }
+        }
         if((event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()))
                 || (event.getSource().getTrueSource() != null && battleManager.isRecentlyLeftBattle(event.getSource().getTrueSource().getEntityId())))
         {

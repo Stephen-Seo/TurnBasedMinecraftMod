@@ -1,12 +1,7 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
+import com.seodisparate.TurnBasedMinecraft.common.networking.*;
 import org.apache.logging.log4j.Logger;
-
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleRequestInfo;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -80,6 +75,12 @@ public class TurnBasedMinecraftMod
             PacketGeneralMessage.class,
             packetHandlerID++,
             Side.CLIENT);
+        NWINSTANCE.registerMessage(
+            PacketEditingMessage.HandlerEditingMessage.class,
+            PacketEditingMessage.class,
+            packetHandlerID++,
+            Side.CLIENT
+        );
         
         // register event handler(s)
         MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
@@ -109,6 +110,7 @@ public class TurnBasedMinecraftMod
         event.registerServerCommand(new CommandTBMSet(proxy.getConfig()));
         event.registerServerCommand(new CommandTBMDisableAll(proxy.getConfig()));
         event.registerServerCommand(new CommandTBMEnableAll(proxy.getConfig()));
+        event.registerServerCommand(new CommandTBMEdit(proxy.getConfig()));
     }
     
     @EventHandler
