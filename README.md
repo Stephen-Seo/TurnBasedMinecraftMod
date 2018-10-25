@@ -41,8 +41,8 @@ Only `.wav` files are affected by volume options (master and music sliders))
 - Config can be modified (server-side) to add entries of mobs from other mods.
 (by default an unknown mob cannot enter turn-based battle, so the config must be
 configured for them.)
-  - Alternatively, the command "/tbm-edit" can be used in-game to add/edit
-  entities for the mod.
+  - [Alternatively, the command "/tbm-edit" can be used in-game to add/edit
+  entities for the mod.](https://www.youtube.com/watch?v=MK648OVHddE)
 
 # Building
 
