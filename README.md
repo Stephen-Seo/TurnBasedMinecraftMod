@@ -41,8 +41,18 @@ Only `.wav` files are affected by volume options (master and music sliders))
 - Config can be modified (server-side) to add entries of mobs from other mods.
 (by default an unknown mob cannot enter turn-based battle, so the config must be
 configured for them.)
+  - Alternatively, the command "/tbm-edit" can be used in-game to add/edit
+  entities for the mod.
 
 # Building
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
 finished jar will be placed in build/libs/
+
+# Other notes
+
+This mod uses [shadow](https://github.com/johnrengelman/shadow) which is
+licenced under the [Apache License 2.0](https://github.com/johnrengelman/shadow/blob/master/LICENSE).
+
+This mod also uses [Cava-Toml](https://github.com/ConsenSys/cava/tree/master/toml)
+which is licenced under the [Apache License 2.0](https://github.com/ConsenSys/cava/blob/master/LICENSE).
