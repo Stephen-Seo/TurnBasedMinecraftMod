@@ -18,10 +18,11 @@ Minecraft directory. They will typically be located at
 `.minecraft/config/TurnBasedMinecraft`. (for the server they will be in the
 `config` directory in the server directory.)
 
-The config file `.minecraft/config/TurnBasedMinecraft/TBM_Config.xml` is commented
-with info on what each option does. It will also be moved if a newer version
+The config file `.minecraft/config/TurnBasedMinecraft/TBM_Config.toml` is commented
+with info on what each option does. ~~It will also be moved if a newer version
 of this mod has a newer version of the config file (usually renamed with a
-timestamp).
+timestamp).~~ I will try my best to not move the previous version config, but rather
+edit the previous version config to have new options.
 
 Some options in the config file only affect the Server, and some only affect the Client.
 When playing multiplayer, some configuration of the config on the server may be needed.
