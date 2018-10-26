@@ -1,3 +1,7 @@
+# Upcoming changes
+
+Fix bug where more than 8 entities can be in battle.
+
 # Version 1.7
 
 Fix bug where after using "/tbm-edit", ignore_battle option is saved in
