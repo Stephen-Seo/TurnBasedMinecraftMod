@@ -45,21 +45,22 @@ public class BattleManager
      */
     public boolean checkAttack(final LivingAttackEvent event)
     {
+        Config config = TurnBasedMinecraftMod.proxy.getConfig();
         // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
-        if(!((event.getEntity() instanceof EntityPlayer && !((EntityPlayer)event.getEntity()).isCreative()) || TurnBasedMinecraftMod.proxy.getConfig().getEntityInfoReference(event.getEntity().getClass().getName()) != null)
-            || !((event.getSource().getTrueSource() instanceof EntityPlayer && !((EntityPlayer)event.getSource().getTrueSource()).isCreative()) || TurnBasedMinecraftMod.proxy.getConfig().getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null))
+        if(!((event.getEntity() instanceof EntityPlayer && !((EntityPlayer)event.getEntity()).isCreative()) || (config.getEntityInfoReference(event.getEntity().getClass().getName()) != null || config.getCustomEntityInfoReference(event.getEntity().getCustomNameTag()) != null))
+            || !((event.getSource().getTrueSource() instanceof EntityPlayer && !((EntityPlayer)event.getSource().getTrueSource()).isCreative()) || (config.getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null || config.getCustomEntityInfoReference(event.getSource().getTrueSource().getCustomNameTag()) != null)))
         {
             return false;
         }
         
         // check if ignore battle in config
-        EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(event.getEntity().getCustomNameTag());
+        EntityInfo entityInfo = config.getCustomEntityInfoReference(event.getEntity().getCustomNameTag());
         if(entityInfo == null)
         {
-            entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
+            entityInfo = config.getMatchingEntityInfo(event.getEntity());
         }
 
-        if(entityInfo != null && (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
+        if(entityInfo != null && (config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacked entity ignores battle
             synchronized(battleMap)
@@ -68,16 +69,22 @@ public class BattleManager
                 {
                     if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
                     {
-    //                    logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
+                        logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
                         return true;
                     }
                 }
             }
-//            logger.debug("Attack Not Canceled: attacked ignores battle");
+            logger.debug("Attack Not Canceled: attacked ignores battle");
             return false;
         }
-        entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getSource().getTrueSource());
-        if(entityInfo != null && (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
+
+        entityInfo = config.getCustomEntityInfoReference(event.getSource().getTrueSource().getCustomNameTag());
+        if(entityInfo == null)
+        {
+            entityInfo = config.getMatchingEntityInfo(event.getSource().getTrueSource());
+        }
+
+        if(entityInfo != null && (config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacker entity ignores battle
             synchronized(battleMap)
@@ -86,12 +93,12 @@ public class BattleManager
                 {
                     if(b.hasCombatant(event.getEntity().getEntityId()))
                     {
-    //                    logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
+                        logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
                         return true;
                     }
                 }
             }
-//            logger.debug("Attack Not Canceled: attacker ignores battle");
+            logger.debug("Attack Not Canceled: attacker ignores battle");
             return false;
         }
         
@@ -109,7 +116,7 @@ public class BattleManager
                     if(inBattle != null)
                     {
                         // both combatants are in battle
-    //                    logger.debug("Attack Canceled: both are in battle");
+                        logger.debug("Attack Canceled: both are in battle");
                         return true;
                     }
                     else
@@ -124,7 +131,7 @@ public class BattleManager
                     if(inBattle != null)
                     {
                         // both combatants are in battle
-    //                    logger.debug("Attack Canceled: both are in battle");
+                        logger.debug("Attack Canceled: both are in battle");
                         return true;
                     }
                     else
@@ -148,17 +155,17 @@ public class BattleManager
                 sideA.add(event.getEntity());
                 sideB.add(event.getSource().getTrueSource());
                 createBattle(sideA, sideB);
-//                logger.debug("Attack Not Canceled: new battle created");
+                logger.debug("Attack Not Canceled: new battle created");
             }
             else
             {
-//                logger.debug("Attack Not Canceled: neither are in battle or players");
+                logger.debug("Attack Not Canceled: neither are in battle or players");
             }
             return false;
         }
 
         // at this point only one entity is in battle, so add entity to other side
-        if(battle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle())
+        if(battle.getSize() >= config.getMaxInBattle())
         {
             // battle limit reached, cannot add to battle
             return true;
@@ -172,14 +179,31 @@ public class BattleManager
             battle.addCombatantToSideA(notInBattle);
         }
 
-//        logger.debug("Attack Canceled: one is in battle");
+        logger.debug("Attack Canceled: one is in battle");
         return true;
     }
     
     public void checkTargeted(LivingSetAttackTargetEvent event)
     {
-        EntityInfo attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
-        EntityInfo targetedInfo = event.getTarget() instanceof EntityPlayer ? null : TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getTarget());
+        EntityInfo attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(event.getEntity().getCustomNameTag());
+        if(attackerInfo == null)
+        {
+            attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
+        }
+
+        EntityInfo targetedInfo;
+        if(event.getTarget() instanceof EntityPlayer)
+        {
+            targetedInfo = null;
+        }
+        else
+        {
+            targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(event.getTarget().getCustomNameTag());
+            if(targetedInfo == null)
+            {
+                targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getTarget());
+            }
+        }
         if((event.getTarget() instanceof EntityPlayer && ((EntityPlayer)event.getTarget()).isCreative())
                 || attackerInfo == null
                 || attackerInfo.ignoreBattle

@@ -78,7 +78,10 @@ public class PacketEditingMessage implements IMessage
     public PacketEditingMessage(Type type, EntityInfo entityInfo)
     {
         this.type = type;
-        this.entityInfo = entityInfo;
+        if(entityInfo != null)
+        {
+            this.entityInfo = entityInfo;
+        }
     }
 
     @Override

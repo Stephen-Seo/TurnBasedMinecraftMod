@@ -95,11 +95,15 @@ public class AttackEventHandler
                     }
                     else
                     {
-                        editingInfo.entityInfo = config.getMatchingEntityInfo(event.getEntity()).clone();
+                        editingInfo.entityInfo = config.getMatchingEntityInfo(event.getEntity());
                         if(editingInfo.entityInfo == null)
                         {
                             editingInfo.entityInfo = new EntityInfo();
                             editingInfo.entityInfo.classType = event.getEntity().getClass();
+                        }
+                        else
+                        {
+                            editingInfo.entityInfo = editingInfo.entityInfo.clone();
                         }
                         TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""), (EntityPlayerMP) editingInfo.editor);
                         TurnBasedMinecraftMod.logger.info("Begin editing \"" + editingInfo.entityInfo.classType.getName() + "\"");

@@ -287,7 +287,7 @@ public class EntityInfo
         
         public void applyEffectToEntity(EntityLivingBase entity)
         {
-            applyEffectToEntity(entity, 20 * 7, 0);
+            applyEffectToEntity(entity, 20 * 12, 0);
         }
         
         public void applyEffectToEntity(EntityLivingBase entity, int duration, int amplifier)
