@@ -11,7 +11,7 @@ import net.minecraft.server.MinecraftServer;
 
 public class CommandTBMEdit extends CommandBase
 {
-    public static final String usage = "/tbm-edit (Invoke without parameters to start edit)";
+    public static final String usage = "/tbm-edit [custom] (Invoke without parameters or with arg \"custom\" to start edit)";
     private Config config;
 
     public CommandTBMEdit(Config config)
@@ -68,9 +68,16 @@ public class CommandTBMEdit extends CommandBase
             {
                 if(args[0].toLowerCase().equals("finish"))
                 {
-                    config.editEntityEntry(editingInfo.entityInfo);
-                    TurnBasedMinecraftMod.proxy.removeEditingInfo(senderEntity.getEntityId());
-                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Entity info saved in config and loaded."), (EntityPlayerMP) senderEntity);
+                    if(!config.editEntityEntry(editingInfo.entityInfo))
+                    {
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("An error occurred while attempting to save an entry to the config, check the logs"), (EntityPlayerMP) senderEntity);
+                        TurnBasedMinecraftMod.proxy.removeEditingInfo(senderEntity.getEntityId());
+                    }
+                    else
+                    {
+                        TurnBasedMinecraftMod.proxy.removeEditingInfo(senderEntity.getEntityId());
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Entity info saved in config and loaded."), (EntityPlayerMP) senderEntity);
+                    }
                 }
                 else if(args[0].toLowerCase().equals("cancel"))
                 {
@@ -88,11 +95,21 @@ public class CommandTBMEdit extends CommandBase
             }
             else if(editingInfo != null)
             {
-                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), (EntityPlayerMP) senderEntity);
+                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), (EntityPlayerMP)senderEntity);
             }
             else
             {
-                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Cannot edit entity without starting editing process (use \"/tbm-edit\")."), (EntityPlayerMP)senderEntity);
+                if(args[0].toLowerCase().equals("custom"))
+                {
+                    TurnBasedMinecraftMod.proxy.setEditingPlayer(senderEntity);
+                    TurnBasedMinecraftMod.proxy.getEditingInfo(senderEntity.getEntityId()).isEditingCustomName = true;
+                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), (EntityPlayerMP)senderEntity);
+                    TurnBasedMinecraftMod.logger.info("Begin editing custom TBM Entity for player \"" + senderEntity.getName() + "\"");
+                }
+                else
+                {
+                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Cannot edit entity without starting editing process (use \"/tbm-edit\")."), (EntityPlayerMP)senderEntity);
+                }
             }
         }
         else if(args.length == 2)

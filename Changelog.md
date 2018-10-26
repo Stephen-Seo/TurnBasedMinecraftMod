@@ -1,3 +1,15 @@
+# Version 1.7
+
+Fix bug where after using "/tbm-edit", ignore_battle option is saved in
+config with the wrong name.
+
+Add "/tbm-edit custom", which lets an OP add an entity entry for entities with
+custom names (via name-tags). The entry added into the config file will use
+"custom_name" instead of "name" to specify if it is a regular entity entry
+or an entry for a specific custom name.
+
+Minor fixes and improvements.
+
 # Version 1.6
 
 Fix bug where player can start battle with self.

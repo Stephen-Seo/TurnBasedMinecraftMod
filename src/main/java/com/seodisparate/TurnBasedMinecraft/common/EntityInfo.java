@@ -21,6 +21,7 @@ public class EntityInfo
     public int decisionAttack;
     public int decisionDefend;
     public int decisionFlee;
+    public String customName;
     
     public enum Effect
     {
@@ -379,6 +380,7 @@ public class EntityInfo
         decisionAttack = 70;
         decisionDefend = 20;
         decisionFlee = 10;
+        customName = new String();
     }
     
     public EntityInfo clone()
@@ -399,6 +401,7 @@ public class EntityInfo
         newEntityInfo.decisionAttack = decisionAttack;
         newEntityInfo.decisionDefend = decisionDefend;
         newEntityInfo.decisionFlee = decisionFlee;
+        newEntityInfo.customName = new String(customName);
         return newEntityInfo;
     }
 }

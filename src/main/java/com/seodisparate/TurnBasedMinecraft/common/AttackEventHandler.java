@@ -5,6 +5,7 @@ import java.util.Iterator;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketEditingMessage;
+import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
@@ -74,21 +75,41 @@ public class AttackEventHandler
                 {
                     editingInfo.isPendingEntitySelection = false;
                     event.setCanceled(true);
-                    editingInfo.entityInfo = config.getMatchingEntityInfo(event.getEntity());
-                    if(editingInfo.entityInfo == null)
+                    if(editingInfo.isEditingCustomName)
                     {
-                        editingInfo.entityInfo = new EntityInfo();
-                        editingInfo.entityInfo.classType = event.getEntity().getClass();
-                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP)editingInfo.editor);
-                        return;
+                        if(event.getEntity().getCustomNameTag().isEmpty())
+                        {
+                            TurnBasedMinecraftMod.logger.error("Cannot edit custom name from entity without custom name");
+                            TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Cannot edit custom name from entity without custom name"), (EntityPlayerMP) editingInfo.editor);
+                            return;
+                        }
+                        editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomNameTag());
+                        if(editingInfo.entityInfo == null)
+                        {
+                            editingInfo.entityInfo = new EntityInfo();
+                            editingInfo.entityInfo.customName = event.getEntity().getCustomNameTag();
+                        }
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomNameTag() + "\""), (EntityPlayerMP) editingInfo.editor);
+                        TurnBasedMinecraftMod.logger.info("Begin editing custom \"" + event.getEntity().getCustomNameTag() + "\"");
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP) editingInfo.editor);
                     }
-                    TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP)editingInfo.editor);
+                    else
+                    {
+                        editingInfo.entityInfo = config.getMatchingEntityInfo(event.getEntity()).clone();
+                        if(editingInfo.entityInfo == null)
+                        {
+                            editingInfo.entityInfo = new EntityInfo();
+                            editingInfo.entityInfo.classType = event.getEntity().getClass();
+                        }
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""), (EntityPlayerMP) editingInfo.editor);
+                        TurnBasedMinecraftMod.logger.info("Begin editing \"" + editingInfo.entityInfo.classType.getName() + "\"");
+                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP) editingInfo.editor);
+                    }
                     return;
                 }
             }
         }
-        if((event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()))
-                || (event.getSource().getTrueSource() != null && battleManager.isRecentlyLeftBattle(event.getSource().getTrueSource().getEntityId())))
+        if(event.getEntity() != null && event.getSource().getTrueSource() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()) || battleManager.isRecentlyLeftBattle(event.getSource().getTrueSource().getEntityId())))
         {
             event.setCanceled(true);
             return;

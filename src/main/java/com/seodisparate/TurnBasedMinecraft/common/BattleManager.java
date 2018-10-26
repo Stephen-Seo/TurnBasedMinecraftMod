@@ -53,7 +53,12 @@ public class BattleManager
         }
         
         // check if ignore battle in config
-        EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
+        EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(event.getEntity().getCustomNameTag());
+        if(entityInfo == null)
+        {
+            entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
+        }
+
         if(entityInfo != null && (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacked entity ignores battle

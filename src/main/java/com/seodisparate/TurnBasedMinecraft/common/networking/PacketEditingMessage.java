@@ -104,6 +104,7 @@ public class PacketEditingMessage implements IMessage
         entityInfo.decisionAttack = buf.readInt();
         entityInfo.decisionDefend = buf.readInt();
         entityInfo.decisionFlee = buf.readInt();
+        entityInfo.customName = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
@@ -132,6 +133,7 @@ public class PacketEditingMessage implements IMessage
         buf.writeInt(entityInfo.decisionAttack);
         buf.writeInt(entityInfo.decisionDefend);
         buf.writeInt(entityInfo.decisionFlee);
+        ByteBufUtils.writeUTF8String(buf, entityInfo.customName);
     }
 
     public static class HandlerEditingMessage implements IMessageHandler<PacketEditingMessage, IMessage>
@@ -230,7 +232,7 @@ public class PacketEditingMessage implements IMessage
                 option = new TextComponentString("E");
                 option.getStyle().setColor(TextFormatting.YELLOW).setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit evasion"))
                     .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponentString("Evasion")));
-                value = new TextComponentString("(" + message.entityInfo.evasion + ") ");
+                value = new TextComponentString("(" + message.entityInfo.evasion + "%) ");
                 value.getStyle().setColor(TextFormatting.WHITE);
                 option.appendSibling(value);
                 text.appendSibling(option);

@@ -66,7 +66,8 @@ battle_turn_time_seconds = 15
 
 
 # Each "server_config.entity" entry uses the following options:
-# name: full class name of the entity
+# name: full class name of the entity, cannot also have option "custom_name"
+# custom_name: custom name-tag name, cannot also have option "name"
 # attack_power: how much damage an entity does on successful attack
 # attack_probability: percentage of attack success. (Usually calculated with enemy's evasion to determine actual percentage)
 # attack_variance (optional): determines how much a successful attack's damage varies.

@@ -20,6 +20,7 @@ public class Config
     public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = 15000000000L;
     private long battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
     private Map<String, EntityInfo> entityInfoMap;
+    private Map<String, EntityInfo> customEntityInfoMap;
     private Set<String> ignoreBattleTypes;
     private Logger logger;
     private int playerSpeed = 50;
@@ -47,6 +48,7 @@ public class Config
     public Config(Logger logger)
     {
         entityInfoMap = new HashMap<String, EntityInfo>();
+        customEntityInfoMap = new HashMap<String, EntityInfo>();
         ignoreBattleTypes = new HashSet<String>();
         this.logger = logger;
         musicBattleTypes = new HashSet<String>();
@@ -400,18 +402,32 @@ public class Config
             {
                 TomlTable entity = entityArray.getTable(i);
                 EntityInfo eInfo = new EntityInfo();
-                try
+                String name = null;
+                if(entity.contains("name") && entity.contains("custom_name"))
                 {
-                    eInfo.classType = Class.forName(entity.getString("name"));
-                }
-                catch (ClassNotFoundException e)
-                {
-                    logger.error("Entity with class name \"" + entity.getString("name") + "\" not found, skipping...");
+                    logger.error("Entity cannot have both \"name\" and \"custom_name\" entries");
                     continue;
                 }
-                catch (NullPointerException e)
+                else if(entity.contains("name"))
                 {
-                    logger.error("Entity does not have \"name\", skipping...");
+                    try
+                    {
+                        eInfo.classType = Class.forName(entity.getString("name"));
+                        name = eInfo.classType.getName();
+                    } catch(ClassNotFoundException e)
+                    {
+                        logger.error("Entity with class name \"" + entity.getString("name") + "\" not found, skipping...");
+                        continue;
+                    }
+                }
+                else if(entity.contains("custom_name"))
+                {
+                    eInfo.customName = entity.getString("custom_name");
+                    name = eInfo.customName;
+                }
+                else
+                {
+                    logger.error("Entity must have \"name\" or \"custom_name\" entry");
                     continue;
                 }
 
@@ -421,12 +437,12 @@ public class Config
                     if(eInfo.attackPower < 0)
                     {
                         eInfo.attackPower = 0;
-                        logEntityInvalidValue("attack_power", eInfo.classType.getName(), "0");
+                        logEntityInvalidValue("attack_power", name, "0");
                     }
                 }
                 catch (NullPointerException e)
                 {
-                    logEntityMissingRequiredValue("attack_power", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("attack_power", name);
                     continue;
                 }
 
@@ -436,12 +452,12 @@ public class Config
                     if(eInfo.attackProbability < 0 || eInfo.attackProbability > 100)
                     {
                         eInfo.attackProbability = 35;
-                        logEntityInvalidValue("attack_probability", eInfo.classType.getName(), "35");
+                        logEntityInvalidValue("attack_probability", name, "35");
                     }
                 }
                 catch (NullPointerException e)
                 {
-                    logEntityMissingRequiredValue("attack_probability", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("attack_probability", name);
                     continue;
                 }
 
@@ -454,13 +470,14 @@ public class Config
                         if(eInfo.attackEffectProbability < 0 || eInfo.attackEffectProbability > 100)
                         {
                             eInfo.attackEffectProbability = 35;
-                            logEntityInvalidValue("attack_effect", eInfo.classType.getName(), "35");
+                            logEntityInvalidValue("attack_effect", name, "35");
                         }
                     }
                 }
                 catch (NullPointerException e)
                 {
                     eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                    logEntityMissingOptionalValue("attack_effect", name, "unknown");
                 }
 
                 try
@@ -469,12 +486,13 @@ public class Config
                     if(eInfo.attackVariance < 0)
                     {
                         eInfo.attackVariance = 0;
-                        logEntityInvalidValue("attack_variance", eInfo.classType.getName(), "0");
+                        logEntityInvalidValue("attack_variance", name, "0");
                     }
                 }
                 catch (NullPointerException e)
                 {
                     eInfo.attackVariance = 0;
+                    logEntityMissingOptionalValue("attack_variance", name, "0");
                 }
 
                 try
@@ -483,7 +501,7 @@ public class Config
                     if(eInfo.defenseDamage < 0)
                     {
                         eInfo.defenseDamage = 0;
-                        logEntityInvalidValue("defense_damage", eInfo.classType.getName(), "0");
+                        logEntityInvalidValue("defense_damage", name, "0");
                     }
                     else
                     {
@@ -491,13 +509,14 @@ public class Config
                         if(eInfo.defenseDamageProbability < 0 || eInfo.defenseDamageProbability > 100)
                         {
                             eInfo.defenseDamageProbability = 35;
-                            logEntityInvalidValue("defense_damage_probability", eInfo.classType.getName(), "35");
+                            logEntityInvalidValue("defense_damage_probability", name, "35");
                         }
                     }
                 }
                 catch (NullPointerException e)
                 {
                     eInfo.defenseDamage = 0;
+                    logEntityMissingOptionalValue("defense_damage", name, "0");
                 }
 
                 try
@@ -506,12 +525,12 @@ public class Config
                     if(eInfo.evasion < 0 || eInfo.evasion > 100)
                     {
                         eInfo.evasion = 20;
-                        logEntityInvalidValue("evasion", eInfo.classType.getName(), "20");
+                        logEntityInvalidValue("evasion", name, "20");
                     }
                 }
                 catch (NullPointerException e)
                 {
-                    logEntityMissingRequiredValue("evasion", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("evasion", name);
                     continue;
                 }
 
@@ -521,7 +540,8 @@ public class Config
                 }
                 catch (NullPointerException e)
                 {
-                    logEntityMissingRequiredValue("speed", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("speed", name);
+                    continue;
                 }
 
                 try
@@ -531,12 +551,13 @@ public class Config
                 catch (NullPointerException e)
                 {
                     eInfo.ignoreBattle = false;
+                    logEntityMissingOptionalValue("ignore_battle", name, "false");
                 }
 
                 eInfo.category = entity.getString("category");
                 if(eInfo.category == null)
                 {
-                    logEntityMissingRequiredValue("category", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("category", name);
                     continue;
                 }
 
@@ -546,7 +567,7 @@ public class Config
                 }
                 catch (NullPointerException e)
                 {
-                    logEntityMissingRequiredValue("decision_attack_probability", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("decision_attack_probability", name);
                     continue;
                 }
 
@@ -556,7 +577,7 @@ public class Config
                 }
                 catch (NullPointerException e)
                 {
-                    logEntityMissingRequiredValue("decision_defend_probability", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("decision_defend_probability", name);
                     continue;
                 }
 
@@ -566,11 +587,22 @@ public class Config
                 }
                 catch (NullPointerException e)
                 {
-                    logEntityMissingRequiredValue("decision_flee_probability", eInfo.classType.getName());
+                    logEntityMissingRequiredValue("decision_flee_probability", name);
                     continue;
                 }
 
-                entityInfoMap.put(eInfo.classType.getName(), eInfo);
+                if(eInfo.classType != null)
+                {
+                    entityInfoMap.put(eInfo.classType.getName(), eInfo);
+                }
+                else if(!eInfo.customName.isEmpty())
+                {
+                    customEntityInfoMap.put(eInfo.customName, eInfo);
+                }
+                else
+                {
+                    logger.error("Cannot add entity to internal config, no \"name\" or \"custom_name\"");
+                }
             }
         }
         return true;
@@ -596,22 +628,51 @@ public class Config
         logger.error("Entity \"" + name + "\" does not have option \"" + option + "\", skipping...");
     }
 
+    private void logEntityMissingOptionalValue(String option, String name, String defaultValue)
+    {
+        logger.info("Entity \"" + name + "\" does not have optional option \"" + option + "\", defaulting to \"" + defaultValue + "\"...");
+    }
+
     private String getRegexEntityName(String name)
     {
         String regex = "^\\s*name\\s*=\\s*";
         regex += "(\"" + name + "\"";
-        regex += "|'" + name + "')";
+        regex += "|'" + name + "'";
+        regex += "|\"\"\"" + name + "\"\"\"";
+        regex += "|'''" + name + "''')";
+        return regex;
+    }
+
+    private String getRegexCustomEntityName(String name)
+    {
+        String regex = "^\\s*custom_name\\s*=\\s*";
+        regex += "(\"" + name + "\"";
+        regex += "|'" + name + "'";
+        regex += "|\"\"\"" + name + "\"\"\"";
+        regex += "|'''" + name + "''')";
         return regex;
     }
 
     private boolean addEntityEntry(EntityInfo eInfo)
     {
+        if(eInfo.classType == null && eInfo.customName.isEmpty())
+        {
+            logger.error("addEntityEntry: Got invalid eInfo, no name of any type");
+            return false;
+        }
         try
         {
             File config = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
             FileWriter fw = new FileWriter(config, true);
             fw.write("[[server_config.entity]]\n");
-            fw.write("name = \"" + eInfo.classType.getName() + "\"\n");
+            if(eInfo.classType != null)
+            {
+                fw.write("name = \"" + eInfo.classType.getName() + "\"\n");
+            }
+            else
+            {
+                fw.write("custom_name = \"" + eInfo.customName + "\"\n");
+            }
             fw.write("attack_power = " + eInfo.attackPower + "\n");
             fw.write("attack_probability = " + eInfo.attackProbability + "\n");
             if(eInfo.attackVariance > 0)
@@ -632,7 +693,7 @@ public class Config
             fw.write("speed = " + eInfo.speed + "\n");
             if(eInfo.ignoreBattle)
             {
-                fw.write("ignoreBattle = true\n");
+                fw.write("ignore_battle = true\n");
             }
             fw.write("category = \"" + eInfo.category + "\"\n");
             fw.write("decision_attack_probability = " + eInfo.decisionAttack + "\n");
@@ -640,11 +701,25 @@ public class Config
             fw.write("decision_flee_probability = " + eInfo.decisionFlee + "\n");
             fw.close();
 
-            entityInfoMap.put(eInfo.classType.getName(), eInfo);
+			if(eInfo.classType != null)
+			{
+				entityInfoMap.put(eInfo.classType.getName(), eInfo);
+			}
+			else
+			{
+				customEntityInfoMap.put(eInfo.customName, eInfo);
+			}
         }
         catch (Throwable t)
         {
-            logger.error("Failed to add entity entry (name = \"" + eInfo.classType.getName() + "\")");
+			if(eInfo.classType != null)
+			{
+				logger.error("Failed to add entity entry (name = \"" + eInfo.classType.getName() + "\")");
+			}
+			else
+			{
+				logger.error("Failed to add custom entity entry (custom_name = \"" + eInfo.customName + "\")");
+			}
             return false;
         }
         return true;
@@ -670,6 +745,7 @@ public class Config
             }
 
             int nameIndex = -1;
+            if(eInfo.classType != null)
             {
                 Pattern p = Pattern.compile(getRegexEntityName(eInfo.classType.getName()), Pattern.MULTILINE);
                 Matcher m = p.matcher(cached);
@@ -677,6 +753,20 @@ public class Config
                 {
                     nameIndex = m.start();
                 }
+            }
+            else if(!eInfo.customName.isEmpty())
+            {
+                Pattern p = Pattern.compile(getRegexCustomEntityName(eInfo.customName), Pattern.MULTILINE);
+                Matcher m = p.matcher(cached);
+                if(m.find())
+                {
+                    nameIndex = m.start();
+                }
+            }
+            else
+            {
+                logger.error("EntityInfo does not have classType or customName, cannot edit/add");
+                return false;
             }
             int entryIndex = -1;
             int nextIndex = -1;
@@ -706,7 +796,14 @@ public class Config
             }
             else
             {
-                logger.warn("editEntityEntry: could not find entry for \"" + eInfo.classType.getName() + "\", skipping to adding it...");
+                if(eInfo.classType != null)
+                {
+                    logger.warn("editEntityEntry: could not find entry for \"" + eInfo.classType.getName() + "\", skipping to adding it...");
+                }
+                else if(!eInfo.customName.isEmpty())
+                {
+                    logger.warn("editEntityEntry: could not find entry for \"" + eInfo.customName + "\", skipping to adding it...");
+                }
                 return addEntityEntry(eInfo);
             }
 
@@ -781,7 +878,12 @@ public class Config
      */
     public EntityInfo getEntityInfo(String classFullName)
     {
-        return entityInfoMap.get(classFullName).clone();
+        EntityInfo eInfo = entityInfoMap.get(classFullName);
+        if(eInfo != null)
+        {
+            eInfo = eInfo.clone();
+        }
+        return eInfo;
     }
 
     protected EntityInfo getEntityInfoReference(String classFullName)
@@ -801,6 +903,26 @@ public class Config
             return matching;
         }
         return null;
+    }
+
+    /**
+     * Returns a clone of an EntityInfo (to prevent editing it).
+     * @param customName
+     * @return a clone of the stored custom EntityInfo or null if invalid String
+     */
+    public EntityInfo getCustomEntityInfo(String customName)
+    {
+        EntityInfo eInfo = customEntityInfoMap.get(customName);
+        if(eInfo != null)
+        {
+            eInfo = eInfo.clone();
+        }
+        return eInfo;
+    }
+
+    protected EntityInfo getCustomEntityInfoReference(String customName)
+    {
+        return customEntityInfoMap.get(customName);
     }
 
     private int getConfigFileVersion(InputStream io)
