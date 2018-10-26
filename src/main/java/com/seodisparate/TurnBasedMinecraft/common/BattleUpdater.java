@@ -59,7 +59,7 @@ public class BattleUpdater implements Runnable
                     updateThread.start();
                     try
                     {
-                        updateThread.join(3000);
+                        updateThread.join(10000);
                     } catch(InterruptedException e){ /* exception ignored */ }
                     if(!updateRunnable.isFinished())
                     {

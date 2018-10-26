@@ -7,6 +7,7 @@ import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -75,11 +76,19 @@ public class PacketBattleInfo implements IMessage
             TurnBasedMinecraftMod.proxy.getLocalBattle().clearCombatants();
             for(Integer id : message.sideA)
             {
-                TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideA(Minecraft.getMinecraft().world.getEntityByID(id));
+                Entity e = Minecraft.getMinecraft().world.getEntityByID(id);
+                if(e != null)
+                {
+                    TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideA(e);
+                }
             }
             for(Integer id : message.sideB)
             {
-                TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(Minecraft.getMinecraft().world.getEntityByID(id));
+                Entity e = Minecraft.getMinecraft().world.getEntityByID(id);
+                if(e != null)
+                {
+                    TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(e);
+                }
             }
             TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000L));
             TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();

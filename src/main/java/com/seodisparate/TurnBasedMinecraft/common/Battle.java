@@ -4,12 +4,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
@@ -127,9 +127,9 @@ public class Battle
         this.battleManager = battleManager;
         this.isServer = isServer;
         this.id = id;
-        this.sideA = new Hashtable<Integer, Combatant>();
-        this.sideB = new Hashtable<Integer, Combatant>();
-        players = new Hashtable<Integer, Combatant>();
+        this.sideA = new ConcurrentHashMap<Integer, Combatant>();
+        this.sideB = new ConcurrentHashMap<Integer, Combatant>();
+        players = new ConcurrentHashMap<Integer, Combatant>();
         turnOrderQueue = new PriorityQueue<Combatant>(new Combatant.CombatantComparator());
         sideAEntryQueue = new ArrayDeque<Combatant>();
         sideBEntryQueue = new ArrayDeque<Combatant>();
@@ -528,7 +528,13 @@ public class Battle
     
     public int getSize()
     {
-        return sideA.size() + sideB.size();
+        synchronized(sideAEntryQueue)
+        {
+            synchronized(sideBEntryQueue)
+            {
+                return sideA.size() + sideB.size() + sideAEntryQueue.size() + sideBEntryQueue.size();
+            }
+        }
     }
     
     protected void notifyPlayersBattleInfo()
@@ -589,7 +595,7 @@ public class Battle
                 players.remove(entry.getKey());
                 removeCombatantPostRemove(entry.getValue());
                 didRemove = true;
-                String category = new String();
+                String category = null;
                 if(entry.getValue().entityInfo != null)
                 {
                     category = entry.getValue().entityInfo.category;
@@ -610,7 +616,7 @@ public class Battle
                 players.remove(entry.getKey());
                 removeCombatantPostRemove(entry.getValue());
                 didRemove = true;
-                String category = new String();
+                String category = null;
                 if(entry.getValue().entityInfo != null)
                 {
                     category = entry.getValue().entityInfo.category;
@@ -1249,7 +1255,7 @@ public class Battle
                         break;
                     }
                 }
-                debugLog = "Actions end";
+                debugLog = "Actions almost end";
                 for(Combatant c : sideA.values())
                 {
                     c.decision = Decision.UNDECIDED;
@@ -1268,15 +1274,18 @@ public class Battle
                 {
                     combatantsChanged = true;
                 }
+                debugLog += ", adding task";
 				FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> {
 				    sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
 				});
+                debugLog = "Actions end";
                 break;
             } // case ACTION
         default:
             state = State.DECISION;
             break;
         } // switch(state)
+        debugLog = "Update almost end";
         if(combatantsChanged)
         {
             notifyPlayersBattleInfo();
@@ -1291,6 +1300,7 @@ public class Battle
                 removeCombatant(c);
             }
         }
+        debugLog = "Update end";
         return battleEnded;
     } // update(final long dt)
 }
