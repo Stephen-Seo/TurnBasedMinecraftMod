@@ -1,6 +1,6 @@
 # Upcoming changes
 
-Fix bug where more than 8 entities can be in battle.
+Fix bug where more than config-set-amount of entities can be in battle.
 
 # Version 1.7
 
