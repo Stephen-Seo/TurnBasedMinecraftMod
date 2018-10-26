@@ -44,7 +44,7 @@ Only `.wav` files are affected by volume options (master and music sliders))
 configured for them.)
   - [Alternatively, the command "/tbm-edit" can be used in-game to add/edit
   entities for the mod.](https://www.youtube.com/watch?v=MK648OVHddE)
-  - [Also, one can make entries for specific custom names](https://www.youtube.com/watch?v=DCl16jk0jCw)
+  - [Also, one can make entries for specific custom names](https://youtu.be/9lBETQFMd3A)
 
 # Building
 
