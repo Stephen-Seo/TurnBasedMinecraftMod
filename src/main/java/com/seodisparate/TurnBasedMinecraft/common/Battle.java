@@ -528,13 +528,16 @@ public class Battle
     
     public int getSize()
     {
+        int size = sideA.size() + sideB.size();
         synchronized(sideAEntryQueue)
         {
-            synchronized(sideBEntryQueue)
-            {
-                return sideA.size() + sideB.size() + sideAEntryQueue.size() + sideBEntryQueue.size();
-            }
+            size += sideAEntryQueue.size();
         }
+        synchronized(sideBEntryQueue)
+        {
+            size += sideBEntryQueue.size();
+        }
+        return size;
     }
     
     protected void notifyPlayersBattleInfo()
@@ -552,17 +555,7 @@ public class Battle
     
     protected void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount)
     {
-        if(!isServer)
-        {
-            return;
-        }
-        for(Combatant p : players.values())
-        {
-            if(p.entity.isEntityAlive())
-            {
-                TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketBattleMessage(type, from, to, amount), (EntityPlayerMP)p.entity);
-            }
-        }
+        sendMessageToAllPlayers(type, from, to, amount, new String());
     }
     
     protected void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount, String custom)

@@ -57,17 +57,24 @@ public class BattleUpdater implements Runnable
                     UpdateRunnable updateRunnable = new UpdateRunnable(entry.getValue());
                     Thread updateThread = new Thread(updateRunnable);
                     updateThread.start();
-                    try
-                    {
-                        updateThread.join(10000);
-                    } catch(InterruptedException e){ /* exception ignored */ }
+                    try { updateThread.join(2000); } catch(InterruptedException e){ /* exception ignored */ }
                     if(!updateRunnable.isFinished())
                     {
-                        // TODO this is an ugly fix to a still-not-found freeze bug in Battle.update()
-                        TurnBasedMinecraftMod.logger.error("Battle (" + entry.getValue().getId() + "; " + entry.getValue().debugLog + ") update timed out!");
-                        updateThread.stop();
+                        TurnBasedMinecraftMod.logger.warn("Battle (" + entry.getValue().getId() + "; " + entry.getValue().debugLog + ") update hanged for 2 seconds!");
+                        try { updateThread.join(2000); } catch(InterruptedException e){ /* exception ignored */ }
+                        if(!updateRunnable.isFinished())
+                        {
+                            TurnBasedMinecraftMod.logger.warn("Battle (" + entry.getValue().getId() + "; " + entry.getValue().debugLog + ") update hanged for 4 seconds!");
+                            try { updateThread.join(4000); } catch(InterruptedException e){ /* exception ignored */ }
+                            if(!updateRunnable.isFinished())
+                            {
+                                // TODO this is an ugly fix to a still-not-found freeze bug in Battle.update()
+                                TurnBasedMinecraftMod.logger.error("Battle (" + entry.getValue().getId() + "; " + entry.getValue().debugLog + ") update timed out!");
+                                updateThread.stop();
+                            }
+                        }
                     }
-                    else if(updateRunnable.isBattleFinished())
+                    if(updateRunnable.isFinished() && updateRunnable.isBattleFinished())
                     {
                         iter.remove();
                     }
