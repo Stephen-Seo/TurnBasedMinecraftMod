@@ -936,6 +936,7 @@ public class Battle
                                         next.yaw = yawDirection;
                                         next.pitch = pitchDirection;
                                     }
+                                    debugLog += " adding task...";
                                     next.entity.getServer().addScheduledTask(() -> {
                                         // have player look at attack target
                                         ((EntityPlayerMP)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, yawDirection, pitchDirection);
@@ -957,6 +958,7 @@ public class Battle
                                             }
                                         }
                                     });
+                                    debugLog += "...task added";
                                 }
                                 else
                                 {
