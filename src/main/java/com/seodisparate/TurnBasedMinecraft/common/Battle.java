@@ -1,14 +1,6 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,6 +42,8 @@ public class Battle
     private boolean battleEnded;
     
     private BattleManager battleManager;
+
+    private Random random;
     
     public String debugLog; // TODO remove after freeze bug has been found
     
@@ -135,6 +129,7 @@ public class Battle
         sideBEntryQueue = new ArrayDeque<Combatant>();
         playerCount = new AtomicInteger(0);
         undecidedCount = new AtomicInteger(0);
+        random = new Random();
         if(sideA != null)
         {
             for(Entity e : sideA)
@@ -779,7 +774,7 @@ public class Battle
                     // picking decision for sideA non-players
                     if(!(c.entity instanceof EntityPlayer) && c.decision == Decision.UNDECIDED && c.entityInfo != null)
                     {
-                        int percentage = (int)(Math.random() * 100);
+                        int percentage = random.nextInt(100);
                         if(percentage < c.entityInfo.decisionAttack)
                         {
                             c.decision = Decision.ATTACK;
@@ -798,7 +793,7 @@ public class Battle
                 {
                     if(!(c.entity instanceof EntityPlayer) && c.decision == Decision.UNDECIDED && c.entityInfo != null)
                     {
-                        int percentage = (int)(Math.random() * 100);
+                        int percentage = random.nextInt(100);
                         if(percentage < c.entityInfo.decisionAttack)
                         {
                             c.decision = Decision.ATTACK;
@@ -883,6 +878,7 @@ public class Battle
                                     final Entity targetEntity = target.entity;
                                     final float yawDirection = Utility.yawDirection(next.entity.posX, next.entity.posZ, target.entity.posX, target.entity.posZ);
                                     final float pitchDirection = Utility.pitchDirection(next.entity.posX, next.entity.posY, next.entity.posZ, target.entity.posX, target.entity.posY, target.entity.posZ);
+                                    final int randomTimeLeft = random.nextInt(heldItemStack.getItem().getMaxItemUseDuration(heldItemStack) / 3);
                                     if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
                                     {
                                         next.yaw = yawDirection;
@@ -896,7 +892,7 @@ public class Battle
                                         {
                                             TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
                                         }
-                                        itemBow.onPlayerStoppedUsing(((EntityPlayer)nextEntity).getHeldItemMainhand(), nextEntity.getEntityWorld(), (EntityLivingBase)nextEntity, (int)(Math.random() * (itemBow.getMaxItemUseDuration(heldItemStack)) / 3));
+                                        itemBow.onPlayerStoppedUsing(((EntityPlayer)nextEntity).getHeldItemMainhand(), nextEntity.getEntityWorld(), (EntityLivingBase)nextEntity, randomTimeLeft);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getEntityId(), targetEntity.getEntityId(), 0);
                                     });
                                 }
@@ -920,7 +916,7 @@ public class Battle
                             {
                                 hitChance = TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage();
                             }
-                            if((int)(Math.random() * 100) < hitChance)
+                            if(random.nextInt(100) < hitChance)
                             {
                                 if(target.remainingDefenses <= 0)
                                 {
@@ -931,6 +927,22 @@ public class Battle
                                     final EntityInfo targetEntityInfo = target.entityInfo;
                                     final float yawDirection = Utility.yawDirection(next.entity.posX, next.entity.posZ, target.entity.posX, target.entity.posZ);
                                     final float pitchDirection = Utility.pitchDirection(next.entity.posX, next.entity.posY, next.entity.posZ, target.entity.posX, target.entity.posY, target.entity.posZ);
+                                    final boolean defenseDamageTriggered;
+                                    if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0 && targetEntityInfo.defenseDamageProbability > 0)
+                                    {
+                                        if(random.nextInt(100) < targetEntityInfo.defenseDamageProbability)
+                                        {
+                                            defenseDamageTriggered = true;
+                                        }
+                                        else
+                                        {
+                                            defenseDamageTriggered = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        defenseDamageTriggered = false;
+                                    }
                                     if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
                                     {
                                         next.yaw = yawDirection;
@@ -945,17 +957,14 @@ public class Battle
                                         ((EntityPlayer)nextEntity).attackTargetEntityWithCurrentItem(targetEntity);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getEntityId(), targetEntity.getEntityId(), TurnBasedMinecraftMod.proxy.getAttackingDamage());
-                                        if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0)
+                                        if(defenseDamageTriggered)
                                         {
-                                            if((int)(Math.random() * 100) < targetEntityInfo.defenseDamageProbability)
-                                            {
-                                                // defense damage
-                                                DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)targetEntity);
-                                                TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
-                                                nextEntity.attackEntityFrom(defenseDamageSource, targetEntityInfo.defenseDamage);
-                                                TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
-                                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getEntityId(), nextEntity.getEntityId(), targetEntityInfo.defenseDamage);
-                                            }
+                                            // defense damage
+                                            DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)targetEntity);
+                                            TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
+                                            nextEntity.attackEntityFrom(defenseDamageSource, targetEntityInfo.defenseDamage);
+                                            TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
+                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getEntityId(), nextEntity.getEntityId(), targetEntityInfo.defenseDamage);
                                         }
                                     });
                                     debugLog += "...task added";
@@ -989,7 +998,7 @@ public class Battle
                                 debugLog += " to random other side";
                                 if(next.isSideA)
                                 {
-                                    int randomTargetIndex = (int)(Math.random() * sideB.size());
+                                    int randomTargetIndex = random.nextInt(sideB.size());
                                     for(Combatant c : sideB.values())
                                     {
                                         if(randomTargetIndex-- == 0)
@@ -1001,7 +1010,7 @@ public class Battle
                                 }
                                 else
                                 {
-                                    int randomTargetIndex = (int)(Math.random() * sideA.size());
+                                    int randomTargetIndex = random.nextInt(sideA.size());
                                     for(Combatant c : sideA.values())
                                     {
                                         if(randomTargetIndex-- == 0)
@@ -1029,7 +1038,7 @@ public class Battle
                             {
                                 hitChance = TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage();
                             }
-                            if((int)(Math.random() * 100) < hitChance)
+                            if(random.nextInt(100) < hitChance)
                             {
                                 if(target.remainingDefenses <= 0)
                                 {
@@ -1038,7 +1047,7 @@ public class Battle
                                     int damageAmount = next.entityInfo.attackPower;
                                     if(next.entityInfo.attackVariance > 0)
                                     {
-                                        damageAmount += (int)(Math.random() * (next.entityInfo.attackVariance * 2 + 1)) - next.entityInfo.attackVariance;
+                                        damageAmount += random.nextInt(next.entityInfo.attackVariance * 2 + 1) - next.entityInfo.attackVariance;
                                     }
                                     if(damageAmount < 0)
                                     {
@@ -1053,9 +1062,9 @@ public class Battle
                                     final boolean defenseDamageTriggered;
                                     final boolean attackEffectTriggered;
 
-                                    if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0)
+                                    if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0 && targetEntityInfo.defenseDamageProbability > 0)
                                     {
-                                        if((int)(Math.random() * 100) < targetEntityInfo.defenseDamageProbability)
+                                        if(random.nextInt(100) < targetEntityInfo.defenseDamageProbability)
                                         {
                                             defenseDamageTriggered = true;
                                         }
@@ -1071,7 +1080,7 @@ public class Battle
 
                                     if(nextEntityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && nextEntityInfo.attackEffectProbability > 0)
                                     {
-                                        if((int)(Math.random() * 100) < nextEntityInfo.attackEffectProbability)
+                                        if(random.nextInt(100) < nextEntityInfo.attackEffectProbability)
                                         {
                                             attackEffectTriggered = true;
                                         }
@@ -1196,7 +1205,7 @@ public class Battle
                                 fleeProbability = TurnBasedMinecraftMod.proxy.getConfig().getFleeGoodProbability();
                             }
                         }
-                        if((int)(Math.random() * 100) < fleeProbability)
+                        if(random.nextInt(100) < fleeProbability)
                         {
                             debugLog += " success";
                             // flee success
