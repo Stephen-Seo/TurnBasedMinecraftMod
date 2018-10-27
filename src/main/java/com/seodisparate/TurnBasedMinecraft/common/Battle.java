@@ -1050,33 +1050,61 @@ public class Battle
                                     final Entity targetEntity = target.entity;
                                     final EntityInfo targetEntityInfo = target.entityInfo;
                                     final int finalDamageAmount = damageAmount;
+                                    final boolean defenseDamageTriggered;
+                                    final boolean attackEffectTriggered;
+
+                                    if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0)
+                                    {
+                                        if((int)(Math.random() * 100) < targetEntityInfo.defenseDamageProbability)
+                                        {
+                                            defenseDamageTriggered = true;
+                                        }
+                                        else
+                                        {
+                                            defenseDamageTriggered = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        defenseDamageTriggered = false;
+                                    }
+
+                                    if(nextEntityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && nextEntityInfo.attackEffectProbability > 0)
+                                    {
+                                        if((int)(Math.random() * 100) < nextEntityInfo.attackEffectProbability)
+                                        {
+                                            attackEffectTriggered = true;
+                                        }
+                                        else
+                                        {
+                                            attackEffectTriggered = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        attackEffectTriggered = false;
+                                    }
+
                                     debugLog += " adding task...";
                                     next.entity.getServer().addScheduledTask(() -> {
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         targetEntity.attackEntityFrom(damageSource, finalDamageAmount);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getEntityId(), targetEntity.getEntityId(), finalDamageAmount);
-                                        if(!(targetEntity instanceof EntityPlayer) && targetEntityInfo.defenseDamage > 0)
+                                        if(defenseDamageTriggered)
                                         {
-                                            if((int)(Math.random() * 100) < targetEntityInfo.defenseDamageProbability)
-                                            {
-                                                // defense damage
-                                                DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)targetEntity);
-                                                TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
-                                                nextEntity.attackEntityFrom(defenseDamageSource, targetEntityInfo.defenseDamage);
-                                                TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
-                                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getEntityId(), nextEntity.getEntityId(), targetEntityInfo.defenseDamage);
-                                            }
+                                            // defense damage
+                                            DamageSource defenseDamageSource = DamageSource.causeMobDamage((EntityLivingBase)targetEntity);
+                                            TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
+                                            nextEntity.attackEntityFrom(defenseDamageSource, targetEntityInfo.defenseDamage);
+                                            TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
+                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getEntityId(), nextEntity.getEntityId(), targetEntityInfo.defenseDamage);
                                         }
                                         // attack effect
-                                        if(nextEntityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && nextEntityInfo.attackEffectProbability > 0)
+                                        if(attackEffectTriggered)
                                         {
-                                            int effectChance = (int)(Math.random() * 100);
-                                            if(effectChance < nextEntityInfo.attackEffectProbability)
-                                            {
-                                                nextEntityInfo.attackEffect.applyEffectToEntity((EntityLivingBase)targetEntity);
-                                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, nextEntity.getEntityId(), targetEntity.getEntityId(), 0, nextEntityInfo.attackEffect.getAffectedString());
-                                            }
+                                            nextEntityInfo.attackEffect.applyEffectToEntity((EntityLivingBase)targetEntity);
+                                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, nextEntity.getEntityId(), targetEntity.getEntityId(), 0, nextEntityInfo.attackEffect.getAffectedString());
                                         }
                                     });
                                     debugLog += "...task added";
