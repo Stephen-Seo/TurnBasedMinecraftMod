@@ -702,7 +702,21 @@ public class Battle
         }
         battleManager.addRecentlyLeftBattle(c);
     }
-    
+
+    private void setDecisionState()
+    {
+        for(Combatant c : sideA.values())
+        {
+            c.decision = Decision.UNDECIDED;
+        }
+        for(Combatant c : sideB.values())
+        {
+            c.decision = Decision.UNDECIDED;
+        }
+        state = State.DECISION;
+        undecidedCount.set(players.size());
+    }
+
     /**
      * @return True if battle has ended
      */
@@ -726,7 +740,29 @@ public class Battle
         long nextInstant = System.nanoTime();
         long dt = nextInstant - lastInstant;
         lastInstant = nextInstant;
-        return update(dt);
+        try
+        {
+            return update(dt);
+        } catch (Throwable t)
+        {
+            TurnBasedMinecraftMod.logger.error("Update: ", t);
+            setDecisionState();
+            boolean changed = false;
+            if(healthCheck())
+            {
+                changed = true;
+            }
+            if(isCreativeCheck())
+            {
+                changed = true;
+            }
+            sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 1);
+            if(changed)
+            {
+                notifyPlayersBattleInfo();
+            }
+            return battleEnded;
+        }
     }
     
     private boolean update(final long dt)
@@ -846,8 +882,11 @@ public class Battle
                     debugLog = next.entity.getName();
                     
                     next.remainingDefenses = 0;
+
+                    Decision decision = next.decision;
+                    next.decision = Decision.UNDECIDED;
                     
-                    switch(next.decision)
+                    switch(decision)
                     {
                     case UNDECIDED:
                         debugLog += " undecided";
@@ -998,25 +1037,31 @@ public class Battle
                                 debugLog += " to random other side";
                                 if(next.isSideA)
                                 {
-                                    int randomTargetIndex = random.nextInt(sideB.size());
-                                    for(Combatant c : sideB.values())
+                                    if(sideB.size() > 0)
                                     {
-                                        if(randomTargetIndex-- == 0)
+                                        int randomTargetIndex = random.nextInt(sideB.size());
+                                        for(Combatant c : sideB.values())
                                         {
-                                            target = c;
-                                            break;
+                                            if(randomTargetIndex-- == 0)
+                                            {
+                                                target = c;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    int randomTargetIndex = random.nextInt(sideA.size());
-                                    for(Combatant c : sideA.values())
+                                    if(sideA.size() > 0)
                                     {
-                                        if(randomTargetIndex-- == 0)
+                                        int randomTargetIndex = random.nextInt(sideA.size());
+                                        for(Combatant c : sideA.values())
                                         {
-                                            target = c;
-                                            break;
+                                            if(randomTargetIndex-- == 0)
+                                            {
+                                                target = c;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -1288,16 +1333,7 @@ public class Battle
                     }
                 }
                 debugLog = "Actions almost end";
-                for(Combatant c : sideA.values())
-                {
-                    c.decision = Decision.UNDECIDED;
-                }
-                for(Combatant c : sideB.values())
-                {
-                    c.decision = Decision.UNDECIDED;
-                }
-                state = State.DECISION;
-                undecidedCount.set(players.size());
+                setDecisionState();
                 if(healthCheck())
                 {
                     combatantsChanged = true;

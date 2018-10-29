@@ -302,7 +302,14 @@ public class PacketBattleMessage implements IMessage
             case TURN_END:
                 if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
                 {
-                    TurnBasedMinecraftMod.proxy.displayString("The turn ended!");
+                    if(message.amount == 0)
+                    {
+                        TurnBasedMinecraftMod.proxy.displayString("The turn ended!");
+                    }
+                    else
+                    {
+                        TurnBasedMinecraftMod.proxy.displayString("The turn ended (abnormally due to internal error)!");
+                    }
                 }
                 TurnBasedMinecraftMod.proxy.battleGuiTurnEnd();
                 break;
