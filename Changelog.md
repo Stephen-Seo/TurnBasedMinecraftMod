@@ -2,6 +2,8 @@
 
 # Version 1.8
 
+Update to forge version "1.12.2-14.23.5.2768".
+
 Fix bug where more than config-set-amount of entities can be in battle.
 
 Add mp3 support, can now play mp3s.
