@@ -21,7 +21,7 @@ public class TurnBasedMinecraftMod
 {
     public static final String MODID = "com.seodisparate.turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.7";
+    public static final String VERSION = "1.8";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
     public static final String CONFIG_FILE_PATH = CONFIG_DIRECTORY + CONFIG_FILENAME;

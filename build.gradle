@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = "1.7"
+version = "1.8"
 group = "com.seodisparate.TurnBasedMinecraft"
 archivesBaseName = "TurnBasedMinecraft"
 

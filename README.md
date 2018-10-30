@@ -36,8 +36,9 @@ in battle)
 - Supports custom battle music to be played when fighting enemies. (They must be
 placed in `.minecraft/config/TurnBasedMinecraft/Music/battle` or
 `.minecraft/config/TurnBasedMinecraft/Music/silly`. Client-side config determines
-which song plays in battle for the client. only `.wav` and `.mid` files supported.
-Only `.wav` files are affected by volume options (master and music sliders))
+which song plays in battle for the client. only `.wav`, `.mid`, and `.mp3` files
+supported.  Only `.mid` files are not affected by volume options (master and
+music sliders))
 - Config allows limiting number of combatants in turn-based battle.
 - Config can be modified (server-side) to add entries of mobs from other mods.
 (by default an unknown mob cannot enter turn-based battle, so the config must be

@@ -1,6 +1,12 @@
 # Upcoming changes
 
+# Version 1.8
+
 Fix bug where more than config-set-amount of entities can be in battle.
+
+Add mp3 support, can now play mp3s.
+
+Minor improvements.
 
 # Version 1.7
 
