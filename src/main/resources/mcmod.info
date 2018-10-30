@@ -8,7 +8,11 @@
   "url": "",
   "updateUrl": "",
   "authorList": ["Stephen Seo"],
-  "credits": "The Forge and FML guys, for making this possible",
+  "credits": "The Forge and FML guys, for making this possible.
+    Dependencies:
+        shadow by John Rengelman (Apache License 2.0)
+        Cava-Toml by ConenSys team (Apache License 2.0)
+        JavaMP3 by delthas, josephx86, GlaDOSik, and kevinstadler (MIT License)",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
