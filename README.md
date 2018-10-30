@@ -58,3 +58,6 @@ licenced under the [Apache License 2.0](https://github.com/johnrengelman/shadow/
 
 This mod also uses [Cava-Toml](https://github.com/ConsenSys/cava/tree/master/toml)
 which is licenced under the [Apache License 2.0](https://github.com/ConsenSys/cava/blob/master/LICENSE).
+
+This mod also uses [JavaMP3](https://github.com/kevinstadler/JavaMP3)
+which is licensed under the [MIT License](https://github.com/kevinstadler/JavaMP3/blob/master/LICENSE).

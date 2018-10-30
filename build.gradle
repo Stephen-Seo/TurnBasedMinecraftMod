@@ -38,6 +38,8 @@ dependencies {
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
+
+	// toml parser
     compile "net.consensys.cava:cava-toml:0.3.1"
       
     // real examples
@@ -83,6 +85,8 @@ shadowJar {
 	relocate 'net.consensys.cava', 'shadow.turnbasedmc.net.consensys.cava'
 	relocate 'org.antlr.v4', 'shadow.turnbasedmc.org.antlr.v4'
 	relocate 'javax.annotation', 'shadow.turnbasedmc.javax.annotation'
+
+	relocate 'fr.delthas', 'shadow.turnbasedmc.fr.delthas'
 }
 
 reobf { shadowJar { mappingType = "SEARGE" } }
