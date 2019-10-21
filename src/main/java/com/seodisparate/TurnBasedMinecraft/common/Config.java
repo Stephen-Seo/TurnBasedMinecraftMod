@@ -726,95 +726,40 @@ public class Config
         logger.warn("Config option \"" + option + "\" is an invalid value, defaulting to \"" + defaultValue + "\"");
     }
 
-    private String getRegexEntityName(String name)
-    {
-        String regex = "^\\s*name\\s*=\\s*";
-        regex += "(\"" + name + "\"";
-        regex += "|'" + name + "'";
-        regex += "|\"\"\"" + name + "\"\"\"";
-        regex += "|'''" + name + "''')";
-        return regex;
-    }
-
-    private String getRegexCustomEntityName(String name)
-    {
-        String regex = "^\\s*custom_name\\s*=\\s*";
-        regex += "(\"" + name + "\"";
-        regex += "|'" + name + "'";
-        regex += "|\"\"\"" + name + "\"\"\"";
-        regex += "|'''" + name + "''')";
-        return regex;
-    }
-
     private boolean addEntityEntry(EntityInfo eInfo)
     {
-        if(eInfo.classType == null && eInfo.customName.isEmpty())
-        {
-            logger.error("addEntityEntry: Got invalid eInfo, no name of any type");
-            return false;
-        }
-        try
-        {
-            File config = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
-            FileWriter fw = new FileWriter(config, true);
-            fw.write("[[server_config.entity]]\n");
-            if(eInfo.classType != null)
-            {
-                fw.write("name = \"" + eInfo.classType.getName() + "\"\n");
-            }
-            else
-            {
-                fw.write("custom_name = \"" + eInfo.customName + "\"\n");
-            }
-            fw.write("attack_power = " + eInfo.attackPower + "\n");
-            fw.write("attack_probability = " + eInfo.attackProbability + "\n");
-            if(eInfo.attackVariance > 0)
-            {
-                fw.write("attack_variance = " + eInfo.attackVariance + "\n");
-            }
-            if(eInfo.attackEffect != EntityInfo.Effect.UNKNOWN && eInfo.attackEffectProbability > 0)
-            {
-                fw.write("attack_effect = \"" + eInfo.attackEffect.toString() + "\"\n");
-                fw.write("attack_effect_probability = " + eInfo.attackEffectProbability + "\n");
-            }
-            if(eInfo.defenseDamage > 0 && eInfo.defenseDamageProbability > 0)
-            {
-                fw.write("defense_damage = " + eInfo.defenseDamage + "\n");
-                fw.write("defense_damage_probability = " + eInfo.defenseDamageProbability + "\n");
-            }
-            fw.write("evasion = " + eInfo.evasion + "\n");
-            fw.write("speed = " + eInfo.speed + "\n");
-            if(eInfo.ignoreBattle)
-            {
-                fw.write("ignore_battle = true\n");
-            }
-            fw.write("category = \"" + eInfo.category + "\"\n");
-            fw.write("decision_attack_probability = " + eInfo.decisionAttack + "\n");
-            fw.write("decision_defend_probability = " + eInfo.decisionDefend + "\n");
-            fw.write("decision_flee_probability = " + eInfo.decisionFlee + "\n");
-            fw.close();
+        CommentedFileConfig conf = CommentedFileConfig.builder(TurnBasedMinecraftMod.CONFIG_FILE_PATH).build();
+        conf.load();
 
-			if(eInfo.classType != null)
-			{
-				entityInfoMap.put(eInfo.classType.getName(), eInfo);
-			}
-			else
-			{
-				customEntityInfoMap.put(eInfo.customName, eInfo);
-			}
-        }
-        catch (Throwable t)
-        {
-			if(eInfo.classType != null)
-			{
-				logger.error("Failed to add entity entry (name = \"" + eInfo.classType.getName() + "\")");
-			}
-			else
-			{
-				logger.error("Failed to add custom entity entry (custom_name = \"" + eInfo.customName + "\")");
-			}
+        Collection<com.electronwill.nightconfig.core.Config> entities;
+        try {
+            entities = conf.get("server_config.entity");
+        } catch (Throwable t) {
+            t.printStackTrace();
             return false;
         }
+
+        com.electronwill.nightconfig.core.Config newConf = conf.createSubConfig();
+        newConf.set("attack_power", eInfo.attackPower);
+        newConf.set("attack_probability", eInfo.attackProbability);
+        newConf.set("attack_variance", eInfo.attackVariance);
+        newConf.set("attack_effect", eInfo.attackEffect.toString());
+        newConf.set("attack_effect_probability", eInfo.attackEffectProbability);
+        newConf.set("defense_damage", eInfo.defenseDamage);
+        newConf.set("defense_damage_probability", eInfo.defenseDamageProbability);
+        newConf.set("evasion", eInfo.evasion);
+        newConf.set("speed", eInfo.speed);
+        newConf.set("ignore_battle", eInfo.ignoreBattle);
+        newConf.set("category", eInfo.category);
+        newConf.set("decision_attack_probability", eInfo.decisionAttack);
+        newConf.set("decision_defend_probability", eInfo.decisionDefend);
+        newConf.set("decision_flee_probability", eInfo.decisionFlee);
+
+        entities.add(newConf);
+
+        conf.save();
+        conf.close();
+
         return true;
     }
 
@@ -827,31 +772,40 @@ public class Config
         try {
             entities = conf.get("server_config.entity");
         } catch (Throwable t) {
+            t.printStackTrace();
             return false;
         }
 
-        if(eInfo.classType != null || !eInfo.customName.isEmpty()) {
-            for(com.electronwill.nightconfig.core.Config entity: entities) {
-                if((eInfo.classType != null && entity.get("name").equals(eInfo.classType.getName()))
-                    || (!eInfo.customName.isEmpty() && entity.get("custom_name").equals(eInfo.customName))) {
-                    entity.set("attack_power", eInfo.attackPower);
-                    entity.set("attack_probability", eInfo.attackProbability);
-                    entity.set("attack_variance", eInfo.attackVariance);
-                    entity.set("attack_effect", eInfo.attackEffect.toString());
-                    entity.set("attack_effect_probability", eInfo.attackEffectProbability);
-                    entity.set("defense_damage", eInfo.defenseDamage);
-                    entity.set("defense_damage_probability", eInfo.defenseDamageProbability);
-                    entity.set("evasion", eInfo.evasion);
-                    entity.set("speed", eInfo.speed);
-                    entity.set("ignore_battle", eInfo.ignoreBattle);
-                    entity.set("category", eInfo.category);
-                    entity.set("decision_attack_probability", eInfo.decisionAttack);
-                    entity.set("decision_defend_probability", eInfo.decisionDefend);
-                    entity.set("decision_flee_probability", eInfo.decisionFlee);
-                    break;
+        try {
+            if (eInfo.classType != null || !eInfo.customName.isEmpty()) {
+                for (com.electronwill.nightconfig.core.Config entity : entities) {
+                    if ((eInfo.classType != null && entity.get("name").equals(eInfo.classType.getName()))
+                            || (!eInfo.customName.isEmpty() && entity.get("custom_name").equals(eInfo.customName))) {
+                        entity.set("attack_power", eInfo.attackPower);
+                        entity.set("attack_probability", eInfo.attackProbability);
+                        entity.set("attack_variance", eInfo.attackVariance);
+                        entity.set("attack_effect", eInfo.attackEffect.toString());
+                        entity.set("attack_effect_probability", eInfo.attackEffectProbability);
+                        entity.set("defense_damage", eInfo.defenseDamage);
+                        entity.set("defense_damage_probability", eInfo.defenseDamageProbability);
+                        entity.set("evasion", eInfo.evasion);
+                        entity.set("speed", eInfo.speed);
+                        entity.set("ignore_battle", eInfo.ignoreBattle);
+                        entity.set("category", eInfo.category);
+                        entity.set("decision_attack_probability", eInfo.decisionAttack);
+                        entity.set("decision_defend_probability", eInfo.decisionDefend);
+                        entity.set("decision_flee_probability", eInfo.decisionFlee);
+                        break;
+                    }
                 }
+            } else {
+                return false;
             }
-        } else {
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return false;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
             return false;
         }
 
