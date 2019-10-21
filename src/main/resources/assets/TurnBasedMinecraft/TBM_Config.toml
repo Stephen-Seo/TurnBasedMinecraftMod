@@ -1,12 +1,12 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 1
+version = 2
 
 [client_config]
 
-# determines what categories use what type of music.
-# Unknown categories sent by the server will default to "battle_music".
+# What categories play this type of music (battle_music). Unknown categories will default to this type.
 battle_music = ["monster", "animal", "boss", "player"]
+# What categories play this type of music (silly_music).
 silly_music = ["passive"]
 
 # Minimum percentage of silly entities in battle to use silly music.
@@ -41,19 +41,23 @@ freeze_battle_combatants = false
 # Entity categories that will not initiate battle.
 ignore_battle_types = ["passive", "boss"]
 
-# Stats that apply to all players
+# speed stat of all players in battle
 player_speed = 50
+# speed stat of all players under the effects of haste
 player_haste_speed = 80
+# speed stat of all players under the effects of slow
 player_slow_speed = 20
+# attack probability stat for all players
 player_attack_probability = 90
+# evasion stat for all players
 player_evasion = 10
 
 # Number of attacks that a "defend" move will block
 defense_duration = 1
 
-# If speed is greater than fastest speed of entity on opposing side, good
-# probability is used.
+# probability of fleeing from battle when speed is greater than fastest enemy's speed
 flee_good_probability = 90
+# probability of fleeing from battle when speed is less than fastest enemy's speed
 flee_bad_probability = 40
 
 # Minimum hit percentage for everyone. If option is set to less than 1,

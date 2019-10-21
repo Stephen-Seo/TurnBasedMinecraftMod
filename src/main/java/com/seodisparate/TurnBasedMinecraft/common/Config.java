@@ -3,21 +3,23 @@ package com.seodisparate.TurnBasedMinecraft.common;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.consensys.cava.toml.*;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import org.apache.logging.log4j.Logger;
+
+import com.electronwill.nightconfig.core.file.FileConfig;
 
 public class Config
 {
-    public static final long BATTLE_DECISION_DURATION_NANO_MIN = 5000000000L;
-    public static final long BATTLE_DECISION_DURATION_NANO_MAX = 60000000000L;
-    public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = 15000000000L;
+    public static final long BATTLE_DECISION_DURATION_SEC_MIN = 5L;
+    public static final long BATTLE_DECISION_DURATION_SEC_MAX = 60L;
+    public static final long BATTLE_DECISION_DURATION_SEC_DEFAULT = 15L;
+    public static final long BATTLE_DECISION_DURATION_NANO_MIN = BATTLE_DECISION_DURATION_SEC_MIN * 1000000000L;
+    public static final long BATTLE_DECISION_DURATION_NANO_MAX = BATTLE_DECISION_DURATION_SEC_MAX * 1000000000L;
+    public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = BATTLE_DECISION_DURATION_SEC_DEFAULT * 1000000000L;
     private long battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
     private Map<String, EntityInfo> entityInfoMap;
     private Map<String, EntityInfo> customEntityInfoMap;
@@ -55,79 +57,61 @@ public class Config
         musicSillyTypes = new HashSet<String>();
         battleIgnoringPlayers = new HashSet<Integer>();
 
-        int internalVersion = getConfigFileVersion(getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_INTERNAL_PATH));
+        writeDefaultConfig(getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_INTERNAL_PATH));
 
-        if(internalVersion == 0)
-        {
+        int internalVersion = getConfigFileVersion(new File(TurnBasedMinecraftMod.DEFAULT_CONFIG_FILE_PATH));
+
+        if(internalVersion == 0) {
             logger.error("Failed to check version of internal config file");
-        }
-        else
-        {
+        } else {
             configVersion = internalVersion;
         }
 
-        try
-        {
+        try {
             File testLoad = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
-            if(!testLoad.exists())
-            {
+            if(!testLoad.exists()) {
                 writeConfig();
             }
         }
-        catch (Throwable t)
-        {
+        catch (Throwable t) {
             logger.error("Failed to check/create-new config file");
         }
 
         // parse config
         File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
-        if(!configFile.exists() || !configFile.canRead())
-        {
+        if(!configFile.exists() || !configFile.canRead()) {
             logger.error("Failed to read/parse config file " + TurnBasedMinecraftMod.CONFIG_FILE_PATH);
             return;
         }
 
         int configVersion = getConfigFileVersion(configFile);
-        if(configVersion < this.configVersion)
-        {
+        if(configVersion < this.configVersion) {
             logger.warn("Config file " + TurnBasedMinecraftMod.CONFIG_FILENAME + " is older version, renaming...");
             moveOldConfig();
-            try
-            {
+            try {
                 writeConfig();
-            } catch (Throwable t)
-            {
+            } catch (Throwable t) {
                 logger.error("Failed to write config file!");
             }
         }
-        try
-        {
+        try {
             parseConfig(configFile);
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             logger.error("Failed to parse config file!");
         }
     }
 
     private void writeConfig() throws IOException
     {
-        File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
-        File dirs = configFile.getParentFile();
-        dirs.mkdirs();
-        InputStream configStream = this.getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_INTERNAL_PATH);
-        FileOutputStream configOutput = new FileOutputStream(configFile);
-        byte[] buf = new byte[4096];
-        int read = 0;
-        while(read != -1)
-        {
-            read = configStream.read(buf);
-            if(read > 0)
-            {
-                configOutput.write(buf, 0, read);
-            }
+        InputStream is = getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_INTERNAL_PATH);
+        FileOutputStream fos = new FileOutputStream(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
+        byte[] buf = new byte[1024];
+        int read;
+        while((read = is.read(buf)) > 0) {
+            fos.write(buf, 0, read);
         }
-        configStream.close();
-        configOutput.close();
+        fos.close();
+        is.close();
     }
 
     private void moveOldConfig()
@@ -144,463 +128,561 @@ public class Config
 
     private boolean parseConfig(File configFile) throws IOException
     {
-        TomlParseResult parseResult = Toml.parse(configFile.toPath(), TomlVersion.V0_5_0);
+        CommentedFileConfig conf = CommentedFileConfig
+            .builder(configFile)
+            .defaultResource(TurnBasedMinecraftMod.DEFAULT_CONFIG_FILE_PATH)
+            .build();
+        conf.load();
 
-        // client_config
-        {
-            TomlArray battleMusicCategories = parseResult.getArray("client_config.battle_music");
-            if(battleMusicCategories != null)
-            {
-                for (int i = 0; i < battleMusicCategories.size(); ++i)
-                {
-                    musicBattleTypes.add(battleMusicCategories.getString(i));
+        // client config
+        try {
+            Collection<String> battle_music_categories = conf.get("client_config.battle_music");
+            if (battle_music_categories != null) {
+                for (String category : battle_music_categories) {
+                    musicBattleTypes.add(category);
                 }
-            }
-            else
-            {
+            } else {
                 musicBattleTypes.add("monster");
                 musicBattleTypes.add("animal");
                 musicBattleTypes.add("boss");
                 musicBattleTypes.add("player");
                 logNotFound("client_config.battle_music");
             }
+        } catch (ClassCastException e) {
+            musicBattleTypes.add("monster");
+            musicBattleTypes.add("animal");
+            musicBattleTypes.add("boss");
+            musicBattleTypes.add("player");
+            logTOMLInvalidValue("client_config.battle_music");
         }
-        {
-            TomlArray sillyMusicCategories = parseResult.getArray("client_config.silly_music");
-            if(sillyMusicCategories != null)
-            {
-                for (int i = 0; i < sillyMusicCategories.size(); ++i)
-                {
-                    musicSillyTypes.add(sillyMusicCategories.getString(i));
+
+        try {
+            Collection<String> silly_music_categories = conf.get("client_config.silly_music");
+            if (silly_music_categories != null) {
+                for (String category : silly_music_categories) {
+                    musicSillyTypes.add(category);
                 }
-            }
-            else
-            {
+            } else {
                 musicSillyTypes.add("passive");
                 logNotFound("client_config.silly_music");
             }
+        } catch (ClassCastException e) {
+            musicSillyTypes.add("passive");
+            logTOMLInvalidValue("client_config.silly_music");
         }
 
-        try
-        {
-            sillyMusicThreshold = parseResult.getLong("client_config.silly_music_threshold").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            sillyMusicThreshold = 40;
-            logNotFound("client_config.silly_music_threshold", "40");
+        try {
+            OptionalInt silly_music_threshold = conf.getOptionalInt("client_config.silly_music_threshold");
+            if(silly_music_threshold.isPresent()) {
+                this.sillyMusicThreshold = silly_music_threshold.getAsInt();
+            } else {
+                this.sillyMusicThreshold = 40;
+                logNotFound("client_config.silly_music_threshold", "40");
+            }
+        } catch (ClassCastException e) {
+            this.sillyMusicThreshold = 40;
+            logTOMLInvalidValue("client_config.silly_music_threshold", "40");
         }
 
         // server_config
-        try
-        {
-            leaveBattleCooldownSeconds = parseResult.getLong("server_config.leave_battle_cooldown").intValue();
-            if (leaveBattleCooldownSeconds < 1)
-            {
-                leaveBattleCooldownSeconds = 1;
-            } else if (leaveBattleCooldownSeconds > 10)
-            {
-                leaveBattleCooldownSeconds = 10;
+        try {
+            OptionalInt leave_battle_cooldown = conf.getOptionalInt("server_config.leave_battle_cooldown");
+            if (leave_battle_cooldown.isPresent()) {
+                this.leaveBattleCooldownSeconds = leave_battle_cooldown.getAsInt();
+                if (this.leaveBattleCooldownSeconds < 1) {
+                    logClampedValue("server_config.leave_battle_cooldown", Integer.toString(this.leaveBattleCooldownSeconds), "1");
+                    this.leaveBattleCooldownSeconds = 1;
+                } else if (this.leaveBattleCooldownSeconds > 10) {
+                    logClampedValue("server_config.leave_battle_cooldown", Integer.toString(this.leaveBattleCooldownSeconds), "10");
+                    this.leaveBattleCooldownSeconds = 10;
+                }
+            } else {
+                this.leaveBattleCooldownSeconds = 5;
+                logNotFound("server_config.leave_battle_cooldown", "5");
             }
-        }
-        catch (NullPointerException e)
-        {
-            leaveBattleCooldownSeconds = 5;
-            logNotFound("server_config.leave_battle_cooldown", "5");
+        } catch (ClassCastException e) {
+            this.leaveBattleCooldownSeconds = 5;
+            logTOMLInvalidValue("server_config.leave_battle_cooldown", "5");
         }
 
-        try
-        {
-            aggroStartBattleDistance = parseResult.getLong("server_config.aggro_start_battle_max_distance").intValue();
-            if (aggroStartBattleDistance < 5)
-            {
-                aggroStartBattleDistance = 5;
-            } else if (aggroStartBattleDistance > 50)
-            {
-                aggroStartBattleDistance = 50;
+        try {
+            OptionalInt aggro_start_battle_max_distance = conf.getOptionalInt("server_config.aggro_start_battle_max_distance");
+            if (aggro_start_battle_max_distance.isPresent()) {
+                this.aggroStartBattleDistance = aggro_start_battle_max_distance.getAsInt();
+                if (this.aggroStartBattleDistance < 5) {
+                    logClampedValue("server_config.aggro_start_battle_max_distance", Integer.toString(this.aggroStartBattleDistance), "5");
+                    this.aggroStartBattleDistance = 5;
+                } else if (this.aggroStartBattleDistance > 50) {
+                    logClampedValue("server_config.aggro_start_battle_max_distance", Integer.toString(this.aggroStartBattleDistance), "50");
+                    this.aggroStartBattleDistance = 50;
+                }
+            } else {
+                this.aggroStartBattleDistance = 8;
+                logNotFound("server_config.aggro_start_battle_max_distance", "8");
             }
-        }
-        catch (NullPointerException e)
-        {
-            aggroStartBattleDistance = 8;
-            logNotFound("server_config.aggro_start_battle_max_distance", "8");
+        } catch (ClassCastException e) {
+            this.aggroStartBattleDistance = 8;
+            logTOMLInvalidValue("server_config.aggro_start_battle_max_distance", "8");
         }
 
-        try
-        {
-            oldBattleBehaviorEnabled = parseResult.getBoolean("server_config.old_battle_behavior");
-        }
-        catch (NullPointerException e)
-        {
-            oldBattleBehaviorEnabled = false;
-            logNotFound("server_config.old_battle_behavior", "false");
-        }
-
-        try
-        {
-            onlyOPsSelfDisableTB = !parseResult.getBoolean("server_config.anyone_can_disable_tbm_for_self");
-        }
-        catch (NullPointerException e)
-        {
-            onlyOPsSelfDisableTB = true;
-            logNotFound("server_config.anyone_can_disable_tbm_for_self", "false");
-        }
-
-        try
-        {
-            maxInBattle = parseResult.getLong("server_config.max_in_battle").intValue();
-            if (maxInBattle < 2)
-            {
-                maxInBattle = 2;
+        try {
+            Boolean old_battle_behavior = conf.get("server_config.old_battle_behavior");
+            if(old_battle_behavior != null) {
+                this.oldBattleBehaviorEnabled = old_battle_behavior;
+            } else {
+                this.oldBattleBehaviorEnabled = false;
+                logNotFound("server_config.old_battle_behavior", "false");
             }
+        } catch (ClassCastException e) {
+            this.oldBattleBehaviorEnabled = false;
+            logTOMLInvalidValue("server_config.old_battle_behavior", "false");
         }
-        catch (NullPointerException e)
-        {
+
+        try {
+            Boolean anyone_can_disable_tbm_for_self = conf.get("server_config.anyone_can_disable_tbm_for_self");
+            if(anyone_can_disable_tbm_for_self != null) {
+                this.onlyOPsSelfDisableTB = !anyone_can_disable_tbm_for_self;
+            } else {
+                this.onlyOPsSelfDisableTB = true;
+                logNotFound("server_config.anyone_can_disable_tbm_for_self", "false");
+            }
+        } catch (ClassCastException e) {
+            this.onlyOPsSelfDisableTB = true;
+            logTOMLInvalidValue("server_config.anyone_can_disable_tbm_for_self", "false");
+        }
+
+        try {
+            OptionalInt max_in_battle = conf.getOptionalInt("server_config.max_in_battle");
+            if(max_in_battle.isPresent()) {
+                this.maxInBattle = max_in_battle.getAsInt();
+                if(this.maxInBattle < 2) {
+                    logClampedValue("server_config.max_in_battle", Integer.toString(this.maxInBattle), "2");
+                    this.maxInBattle = 2;
+                }
+            } else {
+                maxInBattle = 8;
+                logNotFound("server_config.max_in_battle", "8");
+            }
+        } catch (ClassCastException e) {
             maxInBattle = 8;
-            logNotFound("server_config.max_in_battle", "8");
+            logTOMLInvalidValue("server_config.max_in_battle", "8");
         }
 
-        try
-        {
-            freezeCombatantsInBattle = parseResult.getBoolean("server_config.freeze_battle_combatants");
-        }
-        catch (NullPointerException e)
-        {
-            freezeCombatantsInBattle = false;
-            logNotFound("server_config.freeze_battle_combatants", "false");
-        }
-
-        try
-        {
-            TomlArray ignoreTypes = parseResult.getArray("server_config.ignore_battle_types");
-            for(int i = 0; i < ignoreTypes.size(); ++i)
-            {
-                ignoreBattleTypes.add(ignoreTypes.getString(i));
+        try {
+            Boolean freeze_battle_combatants = conf.get("server_config.freeze_battle_combatants");
+            if(freeze_battle_combatants != null) {
+                this.freezeCombatantsInBattle = freeze_battle_combatants;
+            } else {
+                freezeCombatantsInBattle = false;
+                logNotFound("server_config.freeze_battle_combatants", "false");
             }
+        } catch (ClassCastException e) {
+            freezeCombatantsInBattle = false;
+            logTOMLInvalidValue("server_config.freeze_battle_combatants", "false");
         }
-        catch (NullPointerException e)
-        {
+
+        try {
+            Collection<String> ignore_battle_types = conf.get("server_config.ignore_battle_types");
+            if(ignore_battle_types != null) {
+                this.ignoreBattleTypes.addAll(ignore_battle_types);
+            } else {
+                ignoreBattleTypes.add("passive");
+                ignoreBattleTypes.add("boss");
+                logNotFound("server_config.ignore_battle_types");
+            }
+        } catch (ClassCastException e) {
             ignoreBattleTypes.add("passive");
             ignoreBattleTypes.add("boss");
-            logNotFound("server_config.ignore_battle_types");
+            logTOMLInvalidValue("server_config.ignore_battle_types");
         }
 
-        try
-        {
-            playerSpeed = parseResult.getLong("server_config.player_speed").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            playerSpeed = 50;
-            logNotFound("server_config.player_speed", "50");
-        }
-        try
-        {
-            playerHasteSpeed = parseResult.getLong("server_config.player_haste_speed").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            playerHasteSpeed = 80;
-            logNotFound("server_config.player_haste_speed", "80");
-        }
-        try
-        {
-            playerSlowSpeed = parseResult.getLong("server_config.player_slow_speed").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            playerSlowSpeed = 20;
-            logNotFound("server_config.player_slow_speed", "20");
-        }
-        try
-        {
-            playerAttackProbability = parseResult.getLong("server_config.player_attack_probability").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            playerAttackProbability = 90;
-            logNotFound("server_config.player_attack_probability", "90");
-        }
-        try
-        {
-            playerEvasion = parseResult.getLong("server_config.player_evasion").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            playerEvasion = 10;
-            logNotFound("server_config.player_evasion", "10");
-        }
-
-        try
-        {
-            defenseDuration = parseResult.getLong("server_config.defense_duration").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            defenseDuration = 1;
-            logNotFound("server_config.defense_duration", "1");
-        }
-
-        try
-        {
-            fleeGoodProbability = parseResult.getLong("server_config.flee_good_probability").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            fleeGoodProbability = 90;
-            logNotFound("server_config.flee_good_probability", "90");
-        }
-        try
-        {
-            fleeBadProbability = parseResult.getLong("server_config.flee_bad_probability").intValue();
-        }
-        catch (NullPointerException e)
-        {
-            fleeBadProbability = 35;
-            logNotFound("server_config.flee_bad_probability", "35");
-        }
-
-        try
-        {
-            minimumHitPercentage = parseResult.getLong("server_config.minimum_hit_percentage").intValue();
-            if (minimumHitPercentage < 1)
-            {
-                minimumHitPercentage = 1;
+        try {
+            OptionalInt player_speed = conf.getOptionalInt("server_config.player_speed");
+            if(player_speed.isPresent()) {
+                this.playerSpeed = player_speed.getAsInt();
+            } else {
+                this.playerSpeed = 50;
+                logNotFound("server_config.player_speed", "50");
             }
-        }
-        catch (NullPointerException e)
-        {
-            minimumHitPercentage = 4;
-            logNotFound("server_config.minimum_hit_percentage", "4");
+        } catch (ClassCastException e) {
+            this.playerSpeed = 50;
+            logTOMLInvalidValue("server_config.player_speed", "50");
         }
 
-        try
-        {
-            battleDecisionDurationNanos = parseResult.getLong("server_config.battle_turn_time_seconds") * 1000000000L;
-            if(battleDecisionDurationNanos < BATTLE_DECISION_DURATION_NANO_MIN)
-            {
-                battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_MIN;
-                logger.warn("Config \"server_config.battle_turn_time_seconds\" too low, defaulting to minimum \"5\"");
+        try {
+            OptionalInt player_haste_speed = conf.getOptionalInt("server_config.player_haste_speed");
+            if(player_haste_speed.isPresent()) {
+                this.playerHasteSpeed = player_haste_speed.getAsInt();
+            } else {
+                this.playerHasteSpeed = 80;
+                logNotFound("server_config.player_haste_speed", "80");
             }
-            else if(battleDecisionDurationNanos > BATTLE_DECISION_DURATION_NANO_MAX)
-            {
-                battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_MAX;
-                logger.warn("Config \"server_config.battle_turn_time_seconds\" too high, defaulting to maximum \"60\"");
-            }
-        }
-        catch (NullPointerException e)
-        {
-            battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
-            logNotFound("server_config.battle_turn_time_seconds", "15");
+        } catch (ClassCastException e) {
+            this.playerHasteSpeed = 80;
+            logTOMLInvalidValue("server_config.player_haste_speed", "80");
         }
 
-        // entities
-        TomlArray entityArray = parseResult.getArray("server_config.entity");
-        if(entityArray != null)
-        {
-            for(int i = 0; i < entityArray.size(); ++i)
-            {
-                TomlTable entity = entityArray.getTable(i);
-                EntityInfo eInfo = new EntityInfo();
-                String name = null;
-                if(entity.contains("name") && entity.contains("custom_name"))
-                {
-                    logger.error("Entity cannot have both \"name\" and \"custom_name\" entries");
-                    continue;
+        try {
+            OptionalInt player_slow_speed = conf.getOptionalInt("server_config.player_slow_speed");
+            if(player_slow_speed.isPresent()) {
+                this.playerSlowSpeed = player_slow_speed.getAsInt();
+            } else {
+                this.playerSlowSpeed = 20;
+                logNotFound("server_config.player_slow_speed", "20");
+            }
+        } catch (ClassCastException e) {
+            this.playerSlowSpeed = 20;
+            logTOMLInvalidValue("server_config.player_slow_speed", "20");
+        }
+
+        try {
+            OptionalInt player_attack_probability = conf.getOptionalInt("server_config.player_attack_probability");
+            if(player_attack_probability.isPresent()) {
+                this.playerAttackProbability = player_attack_probability.getAsInt();
+            } else {
+                this.playerAttackProbability = 90;
+                logNotFound("server_config.player_attack_probability", "90");
+            }
+        } catch (ClassCastException e) {
+            this.playerAttackProbability = 90;
+            logTOMLInvalidValue("server_config.player_attack_probability", "90");
+        }
+
+        try {
+            OptionalInt player_evasion = conf.getOptionalInt("server_config.player_evasion");
+            if(player_evasion.isPresent()) {
+                this.playerEvasion = player_evasion.getAsInt();
+            } else {
+                this.playerEvasion = 10;
+                logNotFound("server_config.player_evasion", "10");
+            }
+        } catch (ClassCastException e) {
+            this.playerEvasion = 10;
+            logTOMLInvalidValue("server_config.player_evasion", "10");
+        }
+
+        try {
+            OptionalInt defense_duration = conf.getOptionalInt("server_config.defense_duration");
+            if(defense_duration.isPresent()) {
+                this.defenseDuration = defense_duration.getAsInt();
+                if(this.defenseDuration < 0) {
+                    logClampedValue("server_config.defense_duration", Integer.toString(this.defenseDuration), "0");
+                    this.defenseDuration = 0;
                 }
-                else if(entity.contains("name"))
-                {
-                    try
-                    {
-                        eInfo.classType = Class.forName(entity.getString("name"));
+            } else {
+                this.defenseDuration = 1;
+                logNotFound("server_config.defense_duration", "1");
+            }
+        } catch (ClassCastException e) {
+            this.defenseDuration = 1;
+            logTOMLInvalidValue("server_config.defense_duration", "1");
+        }
+
+        try {
+            OptionalInt flee_good_probability = conf.getOptionalInt("server_config.flee_good_probability");
+            if(flee_good_probability.isPresent()) {
+                this.fleeGoodProbability = flee_good_probability.getAsInt();
+            } else {
+                this.fleeGoodProbability = 90;
+                logNotFound("server_config.flee_good_probability", "90");
+            }
+        } catch (ClassCastException e) {
+            this.fleeGoodProbability = 90;
+            logTOMLInvalidValue("server_config.flee_good_probability", "90");
+        }
+
+        try {
+            OptionalInt flee_bad_probability = conf.getOptionalInt("server_config.flee_bad_probability");
+            if(flee_bad_probability.isPresent()) {
+                this.fleeBadProbability = flee_bad_probability.getAsInt();
+            } else {
+                this.fleeBadProbability = 35;
+                logNotFound("server_config.flee_bad_probability", "35");
+            }
+        } catch (ClassCastException e) {
+            this.fleeBadProbability = 35;
+            logTOMLInvalidValue("server_config.flee_bad_probability", "35");
+        }
+
+        try {
+            OptionalInt minimum_hit_percentage = conf.getOptionalInt("server_config.minimum_hit_percentage");
+            if(minimum_hit_percentage.isPresent()) {
+                this.minimumHitPercentage = minimum_hit_percentage.getAsInt();
+                if(this.minimumHitPercentage < 1) {
+                    logClampedValue("server_config.minimum_hit_percentage", Integer.toString(this.minimumHitPercentage), "1");
+                    this.minimumHitPercentage = 1;
+                }
+            } else {
+                this.minimumHitPercentage = 4;
+                logNotFound("server_config.minimum_hit_percentage", "4");
+            }
+        } catch (ClassCastException e) {
+            this.minimumHitPercentage = 4;
+            logTOMLInvalidValue("server_config.minimum_hit_percentage", "4");
+        }
+
+        try {
+            OptionalInt battle_turn_time_seconds = conf.getOptionalInt("server_config.battle_turn_time_seconds");
+            if(battle_turn_time_seconds.isPresent()) {
+                this.battleDecisionDurationNanos = (long)battle_turn_time_seconds.getAsInt() * 1000000000L;
+                if(this.battleDecisionDurationNanos < BATTLE_DECISION_DURATION_NANO_MIN) {
+                    this.battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_MIN;
+                    logClampedValue("server_config.battle_turn_time_seconds", Integer.toString(battle_turn_time_seconds.getAsInt()), Long.toString(BATTLE_DECISION_DURATION_SEC_MIN));
+                } else if(this.battleDecisionDurationNanos > BATTLE_DECISION_DURATION_NANO_MAX) {
+                    this.battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_MAX;
+                    logClampedValue("server_config.battle_turn_time_seconds", Integer.toString(battle_turn_time_seconds.getAsInt()), Long.toString(BATTLE_DECISION_DURATION_SEC_MAX));
+                }
+            } else {
+                this.battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
+                logNotFound("server_config.battle_turn_time_seconds", "15");
+            }
+        } catch (ClassCastException e) {
+            this.battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
+            logTOMLInvalidValue("server_config.battle_turn_time_seconds", "15");
+        }
+
+        Collection<com.electronwill.nightconfig.core.Config> entities = null;
+        try {
+            entities = conf.get("server_config.entity");
+        } catch (ClassCastException e) {
+            logTOMLInvalidValue("server_config.entity");
+        }
+        if(entities != null) {
+            for(com.electronwill.nightconfig.core.Config nestedConf : entities) {
+                EntityInfo eInfo = new EntityInfo();
+                String name;
+                if(nestedConf.contains("name") && nestedConf.contains("custom_name")) {
+                    logger.error("Entity cannot have both \"name\" (" + nestedConf.get("name")
+                            + ") and \"custom_name\" (" + nestedConf.get("custom_name") + ") entries");
+                    continue;
+                } else if(nestedConf.contains("name")) {
+                    try {
+                        eInfo.classType = Class.forName(nestedConf.get("name"));
                         name = eInfo.classType.getName();
-                    } catch(ClassNotFoundException e)
-                    {
-                        logger.error("Entity with class name \"" + entity.getString("name") + "\" not found, skipping...");
+                    } catch (ClassNotFoundException e) {
+                        logger.error("Entity with class name \"" + nestedConf.get("name") + "\" not found, skipping...");
                         continue;
                     }
-                }
-                else if(entity.contains("custom_name"))
-                {
-                    eInfo.customName = entity.getString("custom_name");
-                    name = eInfo.customName;
-                }
-                else
-                {
+                } else if(nestedConf.contains("custom_name")) {
+                    try {
+                        eInfo.customName = nestedConf.get("custom_name");
+                        name = eInfo.customName;
+                    } catch (ClassCastException e) {
+                        logger.error("Entity with invalid custom_name (must be a string), skipping...");
+                        continue;
+                    }
+                } else {
                     logger.error("Entity must have \"name\" or \"custom_name\" entry");
                     continue;
                 }
 
-                try
-                {
-                    eInfo.attackPower = entity.getLong("attack_power").intValue();
-                    if(eInfo.attackPower < 0)
-                    {
+                try {
+                    eInfo.attackPower = nestedConf.getInt("attack_power");
+                    if(eInfo.attackPower < 0) {
+                        logClampedValueEntity("attack_power", name, Integer.toString(eInfo.attackPower), "0");
                         eInfo.attackPower = 0;
-                        logEntityInvalidValue("attack_power", name, "0");
                     }
-                }
-                catch (NullPointerException e)
-                {
-                    logEntityMissingRequiredValue("attack_power", name);
-                    continue;
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("attack_power", name, "3");
+                    eInfo.attackPower = 3;
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("attack_power", name, "3");
+                    eInfo.attackPower = 3;
                 }
 
-                try
-                {
-                    eInfo.attackProbability = entity.getLong("attack_probability").intValue();
-                    if(eInfo.attackProbability < 0 || eInfo.attackProbability > 100)
-                    {
-                        eInfo.attackProbability = 35;
-                        logEntityInvalidValue("attack_probability", name, "35");
+                try {
+                    eInfo.attackProbability = nestedConf.getInt("attack_probability");
+                    if(eInfo.attackProbability < 0) {
+                        logClampedValueEntity("attack_probability", name, Integer.toString(eInfo.attackProbability), "0");
+                        eInfo.attackProbability = 0;
+                    } else if(eInfo.attackProbability > 100) {
+                        logClampedValueEntity("attack_probability", name, Integer.toString(eInfo.attackProbability), "100");
+                        eInfo.attackProbability = 100;
                     }
-                }
-                catch (NullPointerException e)
-                {
-                    logEntityMissingRequiredValue("attack_probability", name);
-                    continue;
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("attack_probability", name, "30");
+                    eInfo.attackProbability = 30;
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("attack_probability", name, "30");
+                    eInfo.attackProbability = 30;
                 }
 
-                try
-                {
-                    eInfo.attackEffect = EntityInfo.Effect.fromString(entity.getString("attack_effect"));
-                    if(eInfo.attackEffect != EntityInfo.Effect.UNKNOWN)
-                    {
-                        eInfo.attackEffectProbability = entity.getLong("attack_effect_probability").intValue();
-                        if(eInfo.attackEffectProbability < 0 || eInfo.attackEffectProbability > 100)
-                        {
-                            eInfo.attackEffectProbability = 35;
-                            logEntityInvalidValue("attack_effect", name, "35");
+                try {
+                    eInfo.attackEffect = EntityInfo.Effect.fromString(nestedConf.get("attack_effect"));
+                    if(eInfo.attackEffect != EntityInfo.Effect.UNKNOWN) {
+                        try {
+                            eInfo.attackEffectProbability = nestedConf.getInt("attack_effect_probability");
+                            if(eInfo.attackEffectProbability < 0) {
+                                logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "1");
+                                eInfo.attackEffectProbability = 1;
+                            } else if(eInfo.attackEffectProbability > 100) {
+                                logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "100");
+                                eInfo.attackEffectProbability = 100;
+                            }
+                        } catch (ClassCastException e) {
+                            eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                            logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is invalid, unsetting attack_effect");
+                        } catch (NullPointerException e) {
+                            eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                            logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is missing, unsetting attack_effect");
                         }
                     }
-                }
-                catch (NullPointerException e)
-                {
+                } catch (ClassCastException e) {
+                    eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                    logEntityInvalidValue("attack_effect", name, "unknown");
+                } catch (NullPointerException e) {
                     eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
                     logEntityMissingOptionalValue("attack_effect", name, "unknown");
                 }
 
-                try
-                {
-                    eInfo.attackVariance = entity.getLong("attack_variance").intValue();
-                    if(eInfo.attackVariance < 0)
-                    {
+                try {
+                    eInfo.attackVariance = nestedConf.getInt("attack_variance");
+                    if(eInfo.attackVariance < 0) {
+                        logClampedValueEntity("attack_variance", name, Integer.toString(eInfo.attackVariance), "0");
                         eInfo.attackVariance = 0;
-                        logEntityInvalidValue("attack_variance", name, "0");
                     }
-                }
-                catch (NullPointerException e)
-                {
+                } catch (ClassCastException e) {
+                    eInfo.attackVariance = 0;
+                    logEntityInvalidValue("attack_variance", name, "0");
+                } catch (NullPointerException e) {
                     eInfo.attackVariance = 0;
                     logEntityMissingOptionalValue("attack_variance", name, "0");
                 }
 
-                try
-                {
-                    eInfo.defenseDamage = entity.getLong("defense_damage").intValue();
-                    if(eInfo.defenseDamage < 0)
-                    {
+                try {
+                    eInfo.defenseDamage = nestedConf.getInt("defense_damage");
+                    if(eInfo.defenseDamage < 0) {
+                        logClampedValueEntity("defense_damage", name, Integer.toString(eInfo.defenseDamage), "0");
                         eInfo.defenseDamage = 0;
-                        logEntityInvalidValue("defense_damage", name, "0");
-                    }
-                    else
-                    {
-                        eInfo.defenseDamageProbability = entity.getLong("defense_damage_probability").intValue();
-                        if(eInfo.defenseDamageProbability < 0 || eInfo.defenseDamageProbability > 100)
-                        {
-                            eInfo.defenseDamageProbability = 35;
-                            logEntityInvalidValue("defense_damage_probability", name, "35");
+                    } else if(eInfo.defenseDamage != 0) {
+                        try {
+                            eInfo.defenseDamageProbability = nestedConf.getInt("defense_damage_probability");
+                            if(eInfo.defenseDamageProbability < 1) {
+                                logClampedValueEntity("defense_damage_probability", name, Integer.toString(eInfo.defenseDamageProbability), "1");
+                                eInfo.defenseDamageProbability = 1;
+                            } else if(eInfo.defenseDamageProbability > 100) {
+                                logClampedValueEntity("defense_damage_probability", name, Integer.toString(eInfo.defenseDamageProbability), "100");
+                                eInfo.defenseDamageProbability = 100;
+                            }
+                        } catch (ClassCastException e) {
+                            eInfo.defenseDamage = 0;
+                            logger.warn("Entity \"" + name + "\" has specified defense_damage but defense_damage_probability is invalid, disabling defense_damage");
+                        } catch (NullPointerException e) {
+                            eInfo.defenseDamage = 0;
+                            logger.warn("Entity \"" + name + "\" has specified defense_damage but defense_damage_probability is missing, disabling defense_damage");
                         }
                     }
-                }
-                catch (NullPointerException e)
-                {
+                } catch (ClassCastException e) {
+                    eInfo.defenseDamage = 0;
+                    logEntityInvalidValue("defense_damage", name, "0");
+                } catch (NullPointerException e) {
                     eInfo.defenseDamage = 0;
                     logEntityMissingOptionalValue("defense_damage", name, "0");
                 }
 
-                try
-                {
-                    eInfo.evasion = entity.getLong("evasion").intValue();
-                    if(eInfo.evasion < 0 || eInfo.evasion > 100)
-                    {
-                        eInfo.evasion = 20;
-                        logEntityInvalidValue("evasion", name, "20");
+                try {
+                    eInfo.evasion = nestedConf.getInt("evasion");
+                    if(eInfo.evasion < 0) {
+                        logClampedValueEntity("evasion", name, Integer.toString(eInfo.evasion), "0");
+                        eInfo.evasion = 0;
+                    } else if(eInfo.evasion > 100) {
+                        logClampedValueEntity("evasion", name, Integer.toString(eInfo.evasion), "100");
+                        eInfo.evasion = 100;
                     }
-                }
-                catch (NullPointerException e)
-                {
-                    logEntityMissingRequiredValue("evasion", name);
-                    continue;
-                }
-
-                try
-                {
-                    eInfo.speed = entity.getLong("speed").intValue();
-                }
-                catch (NullPointerException e)
-                {
-                    logEntityMissingRequiredValue("speed", name);
-                    continue;
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("evasion", name, "7");
+                    eInfo.evasion = 7;
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("evasion", name, "7");
+                    eInfo.evasion = 7;
                 }
 
-                try
-                {
-                    eInfo.ignoreBattle = entity.getBoolean("ignore_battle");
+                try {
+                    eInfo.speed = nestedConf.getInt("speed");
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("speed", name, "49");
+                    eInfo.speed = 49;
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("speed", name, "49");
+                    eInfo.speed = 49;
                 }
-                catch (NullPointerException e)
-                {
+
+                try {
+                    eInfo.ignoreBattle = nestedConf.get("ignore_battle");
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("ignore_battle", name, "false");
                     eInfo.ignoreBattle = false;
-                    logEntityMissingOptionalValue("ignore_battle", name, "false");
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("ignore_battle", name, "false");
+                    eInfo.ignoreBattle = false;
                 }
 
-                eInfo.category = entity.getString("category");
-                if(eInfo.category == null)
-                {
-                    logEntityMissingRequiredValue("category", name);
-                    continue;
+                try {
+                    eInfo.category = nestedConf.get("category");
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("category", name, "unknown");
+                    eInfo.category = "unknown";
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("category", name, "unknown");
+                    eInfo.category = "unknown";
                 }
 
-                try
-                {
-                    eInfo.decisionAttack = entity.getLong("decision_attack_probability").intValue();
-                }
-                catch (NullPointerException e)
-                {
-                    logEntityMissingRequiredValue("decision_attack_probability", name);
-                    continue;
-                }
-
-                try
-                {
-                    eInfo.decisionDefend = entity.getLong("decision_defend_probability").intValue();
-                }
-                catch (NullPointerException e)
-                {
-                    logEntityMissingRequiredValue("decision_defend_probability", name);
-                    continue;
+                try {
+                    eInfo.decisionAttack = nestedConf.getInt("decision_attack_probability");
+                    if(eInfo.decisionAttack < 0) {
+                        logClampedValueEntity("decision_attack_probability", name, Integer.toString(eInfo.decisionAttack), "0");
+                        eInfo.decisionAttack = 0;
+                    } else if(eInfo.decisionAttack > 100) {
+                        logClampedValueEntity("decision_attack_probability", name, Integer.toString(eInfo.decisionAttack), "100");
+                        eInfo.decisionAttack = 100;
+                    }
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("decision_attack_probability", name, "70");
+                    eInfo.decisionAttack = 70;
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("decision_attack_probability", name, "70");
+                    eInfo.decisionAttack = 70;
                 }
 
-                try
-                {
-                    eInfo.decisionFlee = entity.getLong("decision_flee_probability").intValue();
-                }
-                catch (NullPointerException e)
-                {
-                    logEntityMissingRequiredValue("decision_flee_probability", name);
-                    continue;
+                try {
+                    eInfo.decisionDefend = nestedConf.getInt("decision_defend_probability");
+                    if(eInfo.decisionDefend < 0) {
+                        logClampedValueEntity("decision_defend_probability", name, Integer.toString(eInfo.decisionDefend), "0");
+                        eInfo.decisionDefend = 0;
+                    } else if(eInfo.decisionDefend > 100) {
+                        logClampedValueEntity("decision_defend_probability", name, Integer.toString(eInfo.decisionDefend), "100");
+                        eInfo.decisionDefend = 100;
+                    }
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("decision_defend_probability", name, "20");
+                    eInfo.decisionDefend = 20;
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("decision_defend_probability", name, "20");
+                    eInfo.decisionDefend = 20;
                 }
 
-                if(eInfo.classType != null)
-                {
+                try {
+                    eInfo.decisionFlee = nestedConf.getInt("decision_flee_probability");
+                    if(eInfo.decisionFlee < 0) {
+                        logClampedValueEntity("decision_flee_probability", name, Integer.toString(eInfo.decisionFlee), "0");
+                        eInfo.decisionFlee = 0;
+                    } else if(eInfo.decisionFlee > 100) {
+                        logClampedValueEntity("decision_flee_probability", name, Integer.toString(eInfo.decisionFlee), "100");
+                        eInfo.decisionFlee = 100;
+                    }
+                } catch (ClassCastException e) {
+                    logEntityInvalidValue("decision_flee_probability", name, "10");
+                    eInfo.decisionFlee = 10;
+                } catch (NullPointerException e) {
+                    logEntityMissingRequiredValue("decision_flee_probability", name, "10");
+                    eInfo.decisionFlee = 10;
+                }
+
+                if(eInfo.classType != null) {
                     entityInfoMap.put(eInfo.classType.getName(), eInfo);
-                }
-                else if(!eInfo.customName.isEmpty())
-                {
+                } else if(!eInfo.customName.isEmpty()) {
                     customEntityInfoMap.put(eInfo.customName, eInfo);
-                }
-                else
-                {
+                } else {
                     logger.error("Cannot add entity to internal config, no \"name\" or \"custom_name\"");
                 }
             }
@@ -608,29 +690,40 @@ public class Config
         return true;
     }
 
-    private void logNotFound(String option)
-    {
+    private void logNotFound(String option) {
         logger.warn("Config option \"" + option + "\" not found, setting defaults");
     }
 
-    private void logNotFound(String option, String defaultValue)
-    {
+    private void logNotFound(String option, String defaultValue) {
         logger.warn("Config option \"" + option + "\" not found, defaulting to \"" + defaultValue + "\"");
     }
 
-    private void logEntityInvalidValue(String option, String name, String defaultValue)
-    {
-        logger.warn("Invalid \"" + option + "\" for \"" + name + "\", defaulting to " + defaultValue);
+    private void logEntityInvalidValue(String option, String name, String defaultValue) {
+        logger.warn("Invalid \"" + option + "\" for \"" + name + "\", defaulting to \"" + defaultValue + "\"");
     }
 
-    private void logEntityMissingRequiredValue(String option, String name)
-    {
-        logger.error("Entity \"" + name + "\" does not have option \"" + option + "\", skipping...");
+    private void logEntityMissingRequiredValue(String option, String name, String defaultValue) {
+        logger.warn("Entity \"" + name + "\" does not have option \"" + option + "\", defaulting to \"" + defaultValue + "\"");
     }
 
-    private void logEntityMissingOptionalValue(String option, String name, String defaultValue)
-    {
+    private void logEntityMissingOptionalValue(String option, String name, String defaultValue) {
         logger.info("Entity \"" + name + "\" does not have optional option \"" + option + "\", defaulting to \"" + defaultValue + "\"...");
+    }
+
+    private void logClampedValue(String option, String from, String clampedTo) {
+        logger.warn("Option \"" + option + "\" is out of bounds, clamping value from \"" + from + "\" to \"" + clampedTo + "\"");
+    }
+
+    private void logClampedValueEntity(String option, String name, String from, String clampedTo) {
+        logger.warn("Option \"" + option + "\" is out of bounds for \"" + name + "\", clamping value from \"" + from + "\" to \"" + clampedTo + "\"");
+    }
+
+    private void logTOMLInvalidValue(String option) {
+        logger.warn("Config option \"" + option + "\" is an invalid value, setting defaults");
+    }
+
+    private void logTOMLInvalidValue(String option, String defaultValue) {
+        logger.warn("Config option \"" + option + "\" is an invalid value, defaulting to \"" + defaultValue + "\"");
     }
 
     private String getRegexEntityName(String name)
@@ -727,108 +820,45 @@ public class Config
 
     protected boolean editEntityEntry(EntityInfo eInfo)
     {
-        try
-        {
-            String cached = new String();
-            char buf[] = new char[1024];
-            int read = 0;
-            File config = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
-            {
-                FileReader fr = new FileReader(config);
-                read = fr.read(buf);
-                while (read != -1)
-                {
-                    cached += String.valueOf(buf, 0, read);
-                    read = fr.read(buf);
-                }
-                fr.close();
-            }
+        CommentedFileConfig conf = CommentedFileConfig.builder(TurnBasedMinecraftMod.CONFIG_FILE_PATH).build();
+        conf.load();
 
-            int nameIndex = -1;
-            if(eInfo.classType != null)
-            {
-                Pattern p = Pattern.compile(getRegexEntityName(eInfo.classType.getName()), Pattern.MULTILINE);
-                Matcher m = p.matcher(cached);
-                if(m.find())
-                {
-                    nameIndex = m.start();
-                }
-            }
-            else if(!eInfo.customName.isEmpty())
-            {
-                Pattern p = Pattern.compile(getRegexCustomEntityName(eInfo.customName), Pattern.MULTILINE);
-                Matcher m = p.matcher(cached);
-                if(m.find())
-                {
-                    nameIndex = m.start();
-                }
-            }
-            else
-            {
-                logger.error("EntityInfo does not have classType or customName, cannot edit/add");
-                return false;
-            }
-            int entryIndex = -1;
-            int nextIndex = -1;
-            if(nameIndex != -1)
-            {
-                {
-                    Pattern p = Pattern.compile("^\\s*\\[\\[\\s*server_config\\s*\\.\\s*entity\\s*]]", Pattern.MULTILINE);
-                    Matcher m = p.matcher(cached.substring(0, nameIndex));
-                    while(m.find())
-                    {
-                        entryIndex = m.start();
-                    }
-                    if(entryIndex == -1)
-                    {
-                        logger.warn("editEntityEntry: could not find header for entry \"" + eInfo.classType.getName() + "\", skipping to adding it...");
-                        return addEntityEntry(eInfo);
-                    }
-                }
-                {
-                    Pattern p = Pattern.compile("^\\s*\\[", Pattern.MULTILINE);
-                    Matcher m = p.matcher(cached.substring(nameIndex));
-                    if(m.find())
-                    {
-                        nextIndex = m.start() + nameIndex;
-                    }
-                }
-            }
-            else
-            {
-                if(eInfo.classType != null)
-                {
-                    logger.warn("editEntityEntry: could not find entry for \"" + eInfo.classType.getName() + "\", skipping to adding it...");
-                }
-                else if(!eInfo.customName.isEmpty())
-                {
-                    logger.warn("editEntityEntry: could not find entry for \"" + eInfo.customName + "\", skipping to adding it...");
-                }
-                return addEntityEntry(eInfo);
-            }
-
-            String cut = null;
-            if(nextIndex != -1)
-            {
-                cut = cached.substring(0, entryIndex) + cached.substring(nextIndex);
-            }
-            else
-            {
-                cut = cached.substring(0, entryIndex);
-            }
-
-            {
-                FileWriter fw = new FileWriter(config);
-                fw.write(cut);
-                fw.close();
-            }
-
-            return addEntityEntry(eInfo);
-        }
-        catch (Throwable t)
-        {
+        Collection<com.electronwill.nightconfig.core.Config> entities;
+        try {
+            entities = conf.get("server_config.entity");
+        } catch (Throwable t) {
             return false;
         }
+
+        if(eInfo.classType != null || !eInfo.customName.isEmpty()) {
+            for(com.electronwill.nightconfig.core.Config entity: entities) {
+                if((eInfo.classType != null && entity.get("name").equals(eInfo.classType.getName()))
+                    || (!eInfo.customName.isEmpty() && entity.get("custom_name").equals(eInfo.customName))) {
+                    entity.set("attack_power", eInfo.attackPower);
+                    entity.set("attack_probability", eInfo.attackProbability);
+                    entity.set("attack_variance", eInfo.attackVariance);
+                    entity.set("attack_effect", eInfo.attackEffect.toString());
+                    entity.set("attack_effect_probability", eInfo.attackEffectProbability);
+                    entity.set("defense_damage", eInfo.defenseDamage);
+                    entity.set("defense_damage_probability", eInfo.defenseDamageProbability);
+                    entity.set("evasion", eInfo.evasion);
+                    entity.set("speed", eInfo.speed);
+                    entity.set("ignore_battle", eInfo.ignoreBattle);
+                    entity.set("category", eInfo.category);
+                    entity.set("decision_attack_probability", eInfo.decisionAttack);
+                    entity.set("decision_defend_probability", eInfo.decisionDefend);
+                    entity.set("decision_flee_probability", eInfo.decisionFlee);
+                    break;
+                }
+            }
+        } else {
+            return false;
+        }
+
+        conf.save();
+        conf.close();
+
+        return true;
     }
 
     public int getPlayerSpeed()
@@ -925,34 +955,32 @@ public class Config
         return customEntityInfoMap.get(customName);
     }
 
-    private int getConfigFileVersion(InputStream io)
-    {
-        int version = 0;
-        try
-        {
-            TomlParseResult result = Toml.parse(io, TomlVersion.V0_5_0);
-            version = result.getLong("version").intValue();
-        }
-        catch (Throwable t)
-        {
-            // ignored
-        }
-        return version;
-    }
-
     private int getConfigFileVersion(File configFile)
     {
         int version = 0;
-        try
-        {
-            TomlParseResult result = Toml.parse(configFile.toPath(), TomlVersion.V0_5_0);
-            version = result.getLong("version").intValue();
-        }
-        catch (Throwable t)
-        {
-            // ignored
-        }
+
+        FileConfig conf = FileConfig.of(configFile);
+        version = conf.getIntOrElse("version", 0);
+        conf.close();
+
         return version;
+    }
+
+    private void writeDefaultConfig(InputStream io) {
+        try {
+            FileOutputStream fos = new FileOutputStream(TurnBasedMinecraftMod.DEFAULT_CONFIG_FILE_PATH);
+            byte[] buffer = new byte[1024];
+            int count;
+            while((count = io.read(buffer)) > 0) {
+                fos.write(buffer, 0, count);
+            }
+            fos.close();
+            io.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isIgnoreBattleType(String type)

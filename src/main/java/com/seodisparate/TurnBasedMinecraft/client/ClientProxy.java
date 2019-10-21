@@ -3,12 +3,12 @@ package com.seodisparate.TurnBasedMinecraft.client;
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.CommonProxy;
 
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class ClientProxy extends CommonProxy
@@ -44,13 +44,11 @@ public class ClientProxy extends CommonProxy
     @Override
     public void setBattleGuiAsGui()
     {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if(Minecraft.getMinecraft().currentScreen != battleGui)
-            {
-                battleGui.turnEnd();
-                Minecraft.getMinecraft().displayGuiScreen(battleGui);
-            }
-        });
+        if(Minecraft.getInstance().currentScreen != battleGui)
+        {
+            battleGui.turnEnd();
+            Minecraft.getInstance().displayGuiScreen(battleGui);
+        }
     }
 
     @Override
@@ -75,10 +73,7 @@ public class ClientProxy extends CommonProxy
     public void battleEnded()
     {
         localBattle = null;
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            Minecraft.getMinecraft().displayGuiScreen(null);
-            Minecraft.getMinecraft().setIngameFocus();
-        });
+        Minecraft.getInstance().displayGuiScreen(null);
         stopMusic(true);
         battleMusicCount = 0;
         sillyMusicCount = 0;
@@ -93,14 +88,14 @@ public class ClientProxy extends CommonProxy
     @Override
     public void playBattleMusic()
     {
-        GameSettings gs = Minecraft.getMinecraft().gameSettings;
+        GameSettings gs = Minecraft.getInstance().gameSettings;
         battleMusic.playBattle(gs.getSoundLevel(SoundCategory.MUSIC) * gs.getSoundLevel(SoundCategory.MASTER));
     }
 
     @Override
     public void playSillyMusic()
     {
-        GameSettings gs = Minecraft.getMinecraft().gameSettings;
+        GameSettings gs = Minecraft.getInstance().gameSettings;
         battleMusic.playSilly(gs.getSoundLevel(SoundCategory.MUSIC) * gs.getSoundLevel(SoundCategory.MASTER));
     }
 
@@ -160,24 +155,24 @@ public class ClientProxy extends CommonProxy
     @Override
     public void displayString(String message)
     {
-        ITextComponent prefix = new TextComponentString("TBM: ");
+        ITextComponent prefix = new StringTextComponent("TBM: ");
         prefix.getStyle().setColor(TextFormatting.GREEN).setBold(true);
-        ITextComponent text = new TextComponentString(message);
+        ITextComponent text = new StringTextComponent(message);
         prefix.appendSibling(text);
         text.getStyle().setColor(TextFormatting.WHITE).setBold(false);
-        Minecraft.getMinecraft().player.sendMessage(prefix);
+        Minecraft.getInstance().player.sendMessage(prefix);
     }
 
     @Override
     public void displayTextComponent(ITextComponent text)
     {
-        Minecraft.getMinecraft().player.sendMessage(text);
+        Minecraft.getInstance().player.sendMessage(text);
     }
 
     @Override
     public Entity getEntityByID(int id)
     {
-        return Minecraft.getMinecraft().world.getEntityByID(id);
+        return Minecraft.getInstance().world.getEntityByID(id);
     }
     
     private void checkBattleTypes()

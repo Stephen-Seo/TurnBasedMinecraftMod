@@ -1,16 +1,16 @@
 package com.seodisparate.TurnBasedMinecraft.common.networking;
 
+import java.util.function.Supplier;
+
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.seodisparate.TurnBasedMinecraft.common.Battle.Decision;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketBattleDecision implements IMessage
+public class PacketBattleDecision
 {
     private int battleID;
     private Battle.Decision decision;
@@ -24,35 +24,28 @@ public class PacketBattleDecision implements IMessage
         this.decision = decision;
         this.targetIDOrItemID = targetIDOrItemID;
     }
-
-    @Override
-    public void fromBytes(ByteBuf buf)
-    {
-        battleID = buf.readInt();
-        decision = Decision.valueOf(buf.readInt());
-        targetIDOrItemID = buf.readInt();
+    
+    public static void encode(PacketBattleDecision pkt, PacketBuffer buf) {
+    	buf.writeInt(pkt.battleID);
+    	buf.writeInt(pkt.decision.getValue());
+    	buf.writeInt(pkt.targetIDOrItemID);
     }
-
-    @Override
-    public void toBytes(ByteBuf buf)
-    {
-        buf.writeInt(battleID);
-        buf.writeInt(decision.getValue());
-        buf.writeInt(targetIDOrItemID);
+    
+    public static PacketBattleDecision decode(PacketBuffer buf) {
+    	return new PacketBattleDecision(buf.readInt(), Decision.valueOf(buf.readInt()), buf.readInt());
     }
-
-    public static class HandleBattleDecision implements IMessageHandler<PacketBattleDecision, IMessage>
-    {
-        @Override
-        public IMessage onMessage(PacketBattleDecision message, MessageContext ctx)
-        {
-            Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(message.battleID);
-            if(b != null)
-            {
-                EntityPlayerMP player = ctx.getServerHandler().player;
-                b.setDecision(player.getEntityId(), message.decision, message.targetIDOrItemID);
-            }
-            return null;
-        }
+    
+    public static class Handler {
+    	public static void handle(final PacketBattleDecision pkt, Supplier<NetworkEvent.Context> ctx) {
+    		ctx.get().enqueueWork(() -> {
+                Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
+                if(b != null)
+                {
+                    ServerPlayerEntity player = ctx.get().getSender();
+                    b.setDecision(player.getEntityId(), pkt.decision, pkt.targetIDOrItemID);
+                }
+    		});
+    		ctx.get().setPacketHandled(true);
+    	}
     }
 }

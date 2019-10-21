@@ -6,10 +6,11 @@ import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketEditingMessage;
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.network.NetworkDirection;
 
 public class AttackEventHandler
 {
@@ -77,21 +78,31 @@ public class AttackEventHandler
                     event.setCanceled(true);
                     if(editingInfo.isEditingCustomName)
                     {
-                        if(event.getEntity().getCustomNameTag().isEmpty())
+                    	if(!event.getEntity().hasCustomName())
                         {
                             TurnBasedMinecraftMod.logger.error("Cannot edit custom name from entity without custom name");
-                            TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Cannot edit custom name from entity without custom name"), (EntityPlayerMP) editingInfo.editor);
+                            TurnBasedMinecraftMod.getHandler().sendTo(
+                            	new PacketGeneralMessage("Cannot edit custom name from entity without custom name"),
+                            	((ServerPlayerEntity)editingInfo.editor).connection.netManager,
+                            	NetworkDirection.PLAY_TO_CLIENT);
                             return;
                         }
-                        editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomNameTag());
+                        //editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomNameTag());
+                        editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getString());
                         if(editingInfo.entityInfo == null)
                         {
                             editingInfo.entityInfo = new EntityInfo();
-                            editingInfo.entityInfo.customName = event.getEntity().getCustomNameTag();
+                            editingInfo.entityInfo.customName = event.getEntity().getCustomName().getString();
                         }
-                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomNameTag() + "\""), (EntityPlayerMP) editingInfo.editor);
-                        TurnBasedMinecraftMod.logger.info("Begin editing custom \"" + event.getEntity().getCustomNameTag() + "\"");
-                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP) editingInfo.editor);
+                        TurnBasedMinecraftMod.getHandler().sendTo(
+                    		new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getString() + "\""),
+                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
+                    		NetworkDirection.PLAY_TO_CLIENT);
+                        TurnBasedMinecraftMod.logger.info("Begin editing custom \"" + event.getEntity().getCustomName().getString() + "\"");
+                        TurnBasedMinecraftMod.getHandler().sendTo(
+                    		new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo),
+                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
+                    		NetworkDirection.PLAY_TO_CLIENT);
                     }
                     else
                     {
@@ -105,9 +116,15 @@ public class AttackEventHandler
                         {
                             editingInfo.entityInfo = editingInfo.entityInfo.clone();
                         }
-                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""), (EntityPlayerMP) editingInfo.editor);
+                        TurnBasedMinecraftMod.getHandler().sendTo(
+                    		new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""),
+                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
+                    		NetworkDirection.PLAY_TO_CLIENT);
                         TurnBasedMinecraftMod.logger.info("Begin editing \"" + editingInfo.entityInfo.classType.getName() + "\"");
-                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), (EntityPlayerMP) editingInfo.editor);
+                        TurnBasedMinecraftMod.getHandler().sendTo(
+                    		new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo),
+                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
+                    		NetworkDirection.PLAY_TO_CLIENT);
                     }
                     return;
                 }

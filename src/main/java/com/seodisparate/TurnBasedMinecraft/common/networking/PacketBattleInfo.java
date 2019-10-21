@@ -2,17 +2,16 @@ package com.seodisparate.TurnBasedMinecraft.common.networking;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketBattleInfo implements IMessage
+public class PacketBattleInfo
 {
     private Collection<Integer> sideA;
     private Collection<Integer> sideB;
@@ -32,67 +31,61 @@ public class PacketBattleInfo implements IMessage
         this.decisionNanos = decisionNanos;
     }
     
-    @Override
-    public void fromBytes(ByteBuf buf)
-    {
-        int sideACount = buf.readInt();
-        int sideBCount = buf.readInt();
-        for(int i = 0; i < sideACount; ++i)
-        {
-            sideA.add(buf.readInt());
-        }
-        for(int i = 0; i < sideBCount; ++i)
-        {
-            sideB.add(buf.readInt());
-        }
-        decisionNanos = buf.readLong();
+    public static void encode(PacketBattleInfo pkt, PacketBuffer buf) {
+    	buf.writeInt(pkt.sideA.size());
+    	buf.writeInt(pkt.sideB.size());
+    	for(Integer id : pkt.sideA) {
+    		buf.writeInt(id);
+    	}
+    	for(Integer id : pkt.sideB) {
+    		buf.writeInt(id);
+    	}
+    	buf.writeLong(pkt.decisionNanos);
     }
-
-    @Override
-    public void toBytes(ByteBuf buf)
-    {
-        buf.writeInt(sideA.size());
-        buf.writeInt(sideB.size());
-        for(Integer id : sideA)
-        {
-            buf.writeInt(id);
-        }
-        for(Integer id : sideB)
-        {
-            buf.writeInt(id);
-        }
-        buf.writeLong(decisionNanos);
+    
+    public static PacketBattleInfo decode(PacketBuffer buf) {
+    	int sideACount = buf.readInt();
+    	int sideBCount = buf.readInt();
+    	Collection<Integer> sideA = new ArrayList<Integer>(sideACount);
+    	Collection<Integer> sideB = new ArrayList<Integer>(sideBCount);
+    	for(int i = 0; i < sideACount; ++i) {
+    		sideA.add(buf.readInt());
+    	}
+    	for(int i = 0; i < sideBCount; ++i) {
+    		sideB.add(buf.readInt());
+    	}
+    	long decisionNanos = buf.readLong();
+    	return new PacketBattleInfo(sideA, sideB, decisionNanos);
     }
-
-    public static class HandlerBattleInfo implements IMessageHandler<PacketBattleInfo, IMessage>
-    {
-        @Override
-        public IMessage onMessage(PacketBattleInfo message, MessageContext ctx)
-        {
-            if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null)
-            {
-                return null;
-            }
-            TurnBasedMinecraftMod.proxy.getLocalBattle().clearCombatants();
-            for(Integer id : message.sideA)
-            {
-                Entity e = Minecraft.getMinecraft().world.getEntityByID(id);
-                if(e != null)
+    
+    public static class Handler {
+    	public static void handle(final PacketBattleInfo pkt, Supplier<NetworkEvent.Context> ctx) {
+    		ctx.get().enqueueWork(() -> {
+                if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null)
                 {
-                    TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideA(e);
+                    return;
                 }
-            }
-            for(Integer id : message.sideB)
-            {
-                Entity e = Minecraft.getMinecraft().world.getEntityByID(id);
-                if(e != null)
+                TurnBasedMinecraftMod.proxy.getLocalBattle().clearCombatants();
+                for(Integer id : pkt.sideA)
                 {
-                    TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(e);
+                    Entity e = Minecraft.getInstance().world.getEntityByID(id);
+                    if(e != null)
+                    {
+                        TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideA(e);
+                    }
                 }
-            }
-            TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(message.decisionNanos / 1000000000L));
-            TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
-            return null;
-        }
+                for(Integer id : pkt.sideB)
+                {
+                    Entity e = Minecraft.getInstance().world.getEntityByID(id);
+                    if(e != null)
+                    {
+                        TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(e);
+                    }
+                }
+                TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(pkt.decisionNanos / 1000000000L));
+                TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
+    		});
+    		ctx.get().setPacketHandled(true);
+    	}
     }
 }

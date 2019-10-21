@@ -2,10 +2,11 @@ package com.seodisparate.TurnBasedMinecraft.common;
 
 import java.util.*;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -152,7 +153,7 @@ public class CommonProxy
         return editingPlayers.get(id);
     }
 
-    protected final EditingInfo setEditingPlayer(EntityPlayer player)
+    protected final EditingInfo setEditingPlayer(PlayerEntity player)
     {
         return editingPlayers.put(player.getEntityId(), new EditingInfo(player));
     }

@@ -2,9 +2,6 @@ package com.seodisparate.TurnBasedMinecraft.client;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.sound.midi.MidiSystem;
@@ -186,9 +183,7 @@ public class BattleMusic
         if(initialized && next != null)
         {
             logger.debug("play called with file " + next.getName() + " and vol " + volume);
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                Minecraft.getMinecraft().getSoundHandler().pauseSounds();
-            });
+        	Minecraft.getInstance().getSoundHandler().pause();
             String suffix = next.getName().substring(next.getName().length() - 3).toLowerCase();
             if(suffix.equals("mid"))
             {
@@ -305,7 +300,7 @@ public class BattleMusic
         }
         if(resumeMCSounds)
         {
-            Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().getSoundHandler().resumeSounds() );
+            Minecraft.getInstance().getSoundHandler().resume();
         }
         isPlaying = false;
     }

@@ -1,14 +1,15 @@
 package com.seodisparate.TurnBasedMinecraft.common.networking;
 
+import java.util.function.Supplier;
+
 import com.seodisparate.TurnBasedMinecraft.common.Battle;
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketBattleRequestInfo implements IMessage
+public class PacketBattleRequestInfo
 {
     private int battleID;
     
@@ -19,29 +20,24 @@ public class PacketBattleRequestInfo implements IMessage
         this.battleID = battleID;
     }
     
-    @Override
-    public void fromBytes(ByteBuf buf)
-    {
-        battleID = buf.readInt();
+    public static void encode(PacketBattleRequestInfo pkt, PacketBuffer buf) {
+    	buf.writeInt(pkt.battleID);
     }
-
-    @Override
-    public void toBytes(ByteBuf buf)
-    {
-        buf.writeInt(battleID);
+    
+    public static PacketBattleRequestInfo decode(PacketBuffer buf) {
+    	return new PacketBattleRequestInfo(buf.readInt());
     }
-
-    public static class HandlerBattleRequestInfo implements IMessageHandler<PacketBattleRequestInfo, PacketBattleInfo>
-    {
-        @Override
-        public PacketBattleInfo onMessage(PacketBattleRequestInfo message, MessageContext ctx)
-        {
-            Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(message.battleID);
-            if(b == null)
-            {
-                return null;
-            }
-            return new PacketBattleInfo(b.getSideAIDs(), b.getSideBIDs(), b.getTimerSeconds());
-        }
+    
+    public static class Handler {
+    	public static void handle(final PacketBattleRequestInfo pkt, Supplier<NetworkEvent.Context> ctx) {
+    		ctx.get().enqueueWork(() -> {
+                Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
+                if(b == null) {
+                	return;
+                }
+                TurnBasedMinecraftMod.getHandler().reply(new PacketBattleInfo(b.getSideAIDs(), b.getSideBIDs(), b.getTimerSeconds()), ctx.get());
+    		});
+    		ctx.get().setPacketHandled(true);
+    	}
     }
 }

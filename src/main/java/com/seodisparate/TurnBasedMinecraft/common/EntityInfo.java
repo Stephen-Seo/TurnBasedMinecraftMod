@@ -1,8 +1,8 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 
 public class EntityInfo
 {
@@ -43,120 +43,84 @@ public class EntityInfo
         WEAKNESS,
         POISON,
         WITHER,
+        HEALTH_BOOST,
         ABSORPTION,
         SATURATION,
         GLOWING,
         LEVITATION,
         LUCK,
         UNLUCK,
+        SLOW_FALLING,
+        CONDUIT_POWER,
+        DOLPHINS_GRACE,
+        BAD_OMEN,
         FIRE,
         UNKNOWN;
         
         public static Effect fromString(String c)
         {
             c = c.toLowerCase();
-            if(c.equals("speed"))
-            {
+            if(c.equals("speed")) {
                 return SPEED;
-            }
-            else if(c.equals("slow"))
-            {
+            } else if(c.equals("slow")) {
                 return SLOW;
-            }
-            else if(c.equals("haste"))
-            {
+            } else if(c.equals("haste")) {
                 return HASTE;
-            }
-            else if(c.equals("mining_fatigue") || c.equals("fatigue"))
-            {
+            } else if(c.equals("mining_fatigue") || c.equals("fatigue")) {
                 return MINING_FATIGUE;
-            }
-            else if(c.equals("strength"))
-            {
+            } else if(c.equals("strength")) {
                 return STRENGTH;
-            }
-            else if(c.equals("jump_boost"))
-            {
+            } else if(c.equals("jump_boost")) {
                 return JUMP_BOOST;
-            }
-            else if(c.equals("nausea"))
-            {
+            } else if(c.equals("nausea")) {
                 return NAUSEA;
-            }
-            else if(c.equals("regeneration"))
-            {
+            } else if(c.equals("regeneration")) {
                 return REGENERATION;
-            }
-            else if(c.equals("resistance"))
-            {
+            } else if(c.equals("resistance")) {
                 return RESISTANCE;
-            }
-            else if(c.equals("fire_resistance"))
-            {
+            } else if(c.equals("fire_resistance")) {
                 return FIRE_RESISTANCE;
-            }
-            else if(c.equals("water_breathing"))
-            {
+            } else if(c.equals("water_breathing")) {
                 return WATER_BREATHING;
-            }
-            else if(c.equals("invisibility"))
-            {
+            } else if(c.equals("invisibility")) {
                 return INVISIBILITY;
-            }
-            else if(c.equals("blindness") || c.equals("blind"))
-            {
+            } else if(c.equals("blindness") || c.equals("blind")) {
                 return BLINDNESS;
-            }
-            else if(c.equals("night_vision"))
-            {
+            } else if(c.equals("night_vision")) {
                 return NIGHT_VISION;
-            }
-            else if(c.equals("hunger"))
-            {
+            } else if(c.equals("hunger")) {
                 return HUNGER;
-            }
-            else if(c.equals("weakness"))
-            {
+            } else if(c.equals("weakness")) {
                 return WEAKNESS;
-            }
-            else if(c.equals("poison"))
-            {
+            } else if(c.equals("poison")) {
                 return POISON;
-            }
-            else if(c.equals("wither"))
-            {
+            } else if(c.equals("wither")) {
                 return WITHER;
-            }
-            else if(c.equals("absorption"))
-            {
+            } else if(c.equals("health_boost")) {
+                return HEALTH_BOOST;
+            } else if(c.equals("absorption")) {
                 return ABSORPTION;
-            }
-            else if(c.equals("saturation"))
-            {
+            } else if(c.equals("saturation")) {
                 return SATURATION;
-            }
-            else if(c.equals("glowing"))
-            {
+            } else if(c.equals("glowing")) {
                 return GLOWING;
-            }
-            else if(c.equals("levitation"))
-            {
+            } else if(c.equals("levitation")) {
                 return LEVITATION;
-            }
-            else if(c.equals("luck"))
-            {
+            } else if(c.equals("luck")) {
                 return LUCK;
-            }
-            else if(c.equals("unluck"))
-            {
+            } else if(c.equals("unluck")) {
                 return UNLUCK;
-            }
-            else if(c.equals("fire"))
-            {
+            } else if(c.equals("slow_falling")) {
+                return SLOW_FALLING;
+            } else if(c.equals("conduit_power")) {
+                return CONDUIT_POWER;
+            } else if(c.equals("dolphins_grace")) {
+                return DOLPHINS_GRACE;
+            } else if(c.equals("bad_omen")) {
+                return BAD_OMEN;
+            } else if(c.equals("fire")) {
                 return FIRE;
-            }
-            else
-            {
+            } else {
                 return UNKNOWN;
             }
         }
@@ -201,6 +165,8 @@ public class EntityInfo
                 return "poison";
             case WITHER:
                 return "wither";
+            case HEALTH_BOOST:
+                return "health_boost";
             case ABSORPTION:
                 return "absorption";
             case SATURATION:
@@ -213,6 +179,14 @@ public class EntityInfo
                 return "luck";
             case UNLUCK:
                 return "unluck";
+            case SLOW_FALLING:
+                return "slow_falling";
+            case CONDUIT_POWER:
+                return "conduit_power";
+            case DOLPHINS_GRACE:
+                return "dolphins_grace";
+            case BAD_OMEN:
+                return "bad_omen";
             case FIRE:
                 return "fire";
             default:
@@ -220,63 +194,71 @@ public class EntityInfo
             }
         }
         
-        public PotionEffect getPotionEffect()
+        public EffectInstance getPotionEffect()
         {
             return getPotionEffect(20 * 7, 0);
         }
         
-        public PotionEffect getPotionEffect(int duration, int amplifier)
-        {
-            switch(this)
-            {
+        public EffectInstance getPotionEffect(int duration, int amplifier) {
+            switch(this) {
             case SPEED:
-                return new PotionEffect(MobEffects.SPEED, duration, amplifier);
+                return new EffectInstance(Effects.SPEED, duration, amplifier);
             case SLOW:
-                return new PotionEffect(MobEffects.SLOWNESS, duration, amplifier);
+                return new EffectInstance(Effects.SLOWNESS, duration, amplifier);
             case HASTE:
-                return new PotionEffect(MobEffects.HASTE, duration, amplifier);
+                return new EffectInstance(Effects.HASTE, duration, amplifier);
             case MINING_FATIGUE:
-                return new PotionEffect(MobEffects.MINING_FATIGUE, duration, amplifier);
+                return new EffectInstance(Effects.MINING_FATIGUE, duration, amplifier);
             case STRENGTH:
-                return new PotionEffect(MobEffects.STRENGTH, duration, amplifier);
+                return new EffectInstance(Effects.STRENGTH, duration, amplifier);
             case JUMP_BOOST:
-                return new PotionEffect(MobEffects.JUMP_BOOST, duration, amplifier);
+                return new EffectInstance(Effects.JUMP_BOOST, duration, amplifier);
             case NAUSEA:
-                return new PotionEffect(MobEffects.NAUSEA, duration, amplifier);
+                return new EffectInstance(Effects.NAUSEA, duration, amplifier);
             case REGENERATION:
-                return new PotionEffect(MobEffects.REGENERATION, duration, amplifier);
+                return new EffectInstance(Effects.REGENERATION, duration, amplifier);
             case RESISTANCE:
-                return new PotionEffect(MobEffects.RESISTANCE, duration, amplifier);
+                return new EffectInstance(Effects.RESISTANCE, duration, amplifier);
             case FIRE_RESISTANCE:
-                return new PotionEffect(MobEffects.FIRE_RESISTANCE, duration, amplifier);
+                return new EffectInstance(Effects.FIRE_RESISTANCE, duration, amplifier);
             case WATER_BREATHING:
-                return new PotionEffect(MobEffects.WATER_BREATHING, duration, amplifier);
+                return new EffectInstance(Effects.WATER_BREATHING, duration, amplifier);
             case INVISIBILITY:
-                return new PotionEffect(MobEffects.INVISIBILITY, duration, amplifier);
+                return new EffectInstance(Effects.INVISIBILITY, duration, amplifier);
             case BLINDNESS:
-                return new PotionEffect(MobEffects.BLINDNESS, duration, amplifier);
+                return new EffectInstance(Effects.BLINDNESS, duration, amplifier);
             case NIGHT_VISION:
-                return new PotionEffect(MobEffects.NIGHT_VISION, duration, amplifier);
+                return new EffectInstance(Effects.NIGHT_VISION, duration, amplifier);
             case HUNGER:
-                return new PotionEffect(MobEffects.HUNGER, duration, amplifier);
+                return new EffectInstance(Effects.HUNGER, duration, amplifier);
             case WEAKNESS:
-                return new PotionEffect(MobEffects.WEAKNESS, duration, amplifier);
+                return new EffectInstance(Effects.WEAKNESS, duration, amplifier);
             case POISON:
-                return new PotionEffect(MobEffects.POISON, duration, amplifier);
+                return new EffectInstance(Effects.POISON, duration, amplifier);
             case WITHER:
-                return new PotionEffect(MobEffects.WITHER, duration, amplifier);
+                return new EffectInstance(Effects.WITHER, duration, amplifier);
+            case HEALTH_BOOST:
+                return new EffectInstance(Effects.HEALTH_BOOST, duration, amplifier);
             case ABSORPTION:
-                return new PotionEffect(MobEffects.ABSORPTION, duration, amplifier);
+                return new EffectInstance(Effects.ABSORPTION, duration, amplifier);
             case SATURATION:
-                return new PotionEffect(MobEffects.SATURATION, duration, amplifier);
+                return new EffectInstance(Effects.SATURATION, duration, amplifier);
             case GLOWING:
-                return new PotionEffect(MobEffects.GLOWING, duration, amplifier);
+                return new EffectInstance(Effects.GLOWING, duration, amplifier);
             case LEVITATION:
-                return new PotionEffect(MobEffects.LEVITATION, duration, amplifier);
+                return new EffectInstance(Effects.LEVITATION, duration, amplifier);
             case LUCK:
-                return new PotionEffect(MobEffects.LUCK, duration, amplifier);
+                return new EffectInstance(Effects.LUCK, duration, amplifier);
             case UNLUCK:
-                return new PotionEffect(MobEffects.UNLUCK, duration, amplifier);
+                return new EffectInstance(Effects.UNLUCK, duration, amplifier);
+            case SLOW_FALLING:
+                return new EffectInstance(Effects.SLOW_FALLING, duration, amplifier);
+            case CONDUIT_POWER:
+                return new EffectInstance(Effects.CONDUIT_POWER, duration, amplifier);
+            case DOLPHINS_GRACE:
+                return new EffectInstance(Effects.DOLPHINS_GRACE, duration, amplifier);
+            case BAD_OMEN:
+                return new EffectInstance(Effects.BAD_OMEN, duration, amplifier);
             case FIRE:
                 // FIRE is not a PotionEffect and must be applied directly to the Entity
                 return null;
@@ -285,12 +267,12 @@ public class EntityInfo
             }
         }
         
-        public void applyEffectToEntity(EntityLivingBase entity)
+        public void applyEffectToEntity(LivingEntity entity)
         {
             applyEffectToEntity(entity, 20 * 12, 0);
         }
         
-        public void applyEffectToEntity(EntityLivingBase entity, int duration, int amplifier)
+        public void applyEffectToEntity(LivingEntity entity, int duration, int amplifier)
         {
             if(this == FIRE)
             {
@@ -343,6 +325,8 @@ public class EntityInfo
                 return "poisoned";
             case WITHER:
                 return "withered";
+            case HEALTH_BOOST:
+                return "given more health";
             case ABSORPTION:
                 return "given absorption";
             case SATURATION:
@@ -355,6 +339,12 @@ public class EntityInfo
                 return "given luck";
             case UNLUCK:
                 return "made unlucky";
+            case SLOW_FALLING:
+                return "falls slower";
+            case CONDUIT_POWER:
+                return "made able to live underwater";
+            case BAD_OMEN:
+                return "feels a bad omen";
             case FIRE:
                 return "set on fire";
             default:

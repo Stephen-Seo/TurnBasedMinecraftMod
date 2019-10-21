@@ -1,14 +1,13 @@
 package com.seodisparate.TurnBasedMinecraft.common.networking;
 
+import java.util.function.Supplier;
+
 import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketGeneralMessage implements IMessage
+public class PacketGeneralMessage
 {
     String message;
     
@@ -21,26 +20,21 @@ public class PacketGeneralMessage implements IMessage
     {
         this.message = message;
     }
-
-    @Override
-    public void fromBytes(ByteBuf buf)
-    {
-        message = ByteBufUtils.readUTF8String(buf);
+    
+    public static void encode(PacketGeneralMessage pkt, PacketBuffer buf) {
+    	buf.writeString(pkt.message);
     }
-
-    @Override
-    public void toBytes(ByteBuf buf)
-    {
-        ByteBufUtils.writeUTF8String(buf, message);
+    
+    public static PacketGeneralMessage decode(PacketBuffer buf) {
+    	return new PacketGeneralMessage(buf.readString());
     }
-
-    public static class HandlerGeneralMessage implements IMessageHandler<PacketGeneralMessage, IMessage>
-    {
-        @Override
-        public IMessage onMessage(PacketGeneralMessage message, MessageContext ctx)
-        {
-            TurnBasedMinecraftMod.proxy.displayString(message.message);
-            return null;
-        }
+    
+    public static class Handler {
+    	public static void handle(final PacketGeneralMessage pkt, Supplier<NetworkEvent.Context> ctx) {
+    		ctx.get().enqueueWork(() -> {
+    			TurnBasedMinecraftMod.proxy.displayString(pkt.message);
+    		});
+    		ctx.get().setPacketHandled(true);
+    	}
     }
 }

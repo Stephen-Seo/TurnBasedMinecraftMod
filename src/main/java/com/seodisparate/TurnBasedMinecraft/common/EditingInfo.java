@@ -1,10 +1,10 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class EditingInfo
 {
-    public EntityPlayer editor;
+    public PlayerEntity editor;
     public EntityInfo entityInfo;
     public boolean isPendingEntitySelection;
     public boolean isEditingCustomName;
@@ -17,7 +17,7 @@ public class EditingInfo
         isEditingCustomName = false;
     }
 
-    public EditingInfo(EntityPlayer player)
+    public EditingInfo(PlayerEntity player)
     {
         editor = player;
         entityInfo = null;

@@ -1,8 +1,8 @@
 package com.seodisparate.TurnBasedMinecraft.common;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemArrow;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArrowItem;
 
 public class Utility
 {
@@ -33,11 +33,11 @@ public class Utility
         }
     }
     
-    public static boolean doesPlayerHaveArrows(EntityPlayer player)
+    public static boolean doesPlayerHaveArrows(PlayerEntity player)
     {
         for(int i = 0; i < player.inventory.getSizeInventory(); ++i)
         {
-            if(player.inventory.getStackInSlot(i).getItem() instanceof ItemArrow)
+            if(player.inventory.getStackInSlot(i).getItem() instanceof ArrowItem)
             {
                 return true;
             }
