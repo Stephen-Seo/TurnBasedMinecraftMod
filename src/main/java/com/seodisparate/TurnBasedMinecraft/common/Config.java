@@ -862,6 +862,9 @@ public class Config
      */
     public EntityInfo getEntityInfo(String classFullName)
     {
+        if(classFullName == null) {
+            return null;
+        }
         EntityInfo eInfo = entityInfoMap.get(classFullName);
         if(eInfo != null)
         {
@@ -872,18 +875,19 @@ public class Config
 
     protected EntityInfo getEntityInfoReference(String classFullName)
     {
+        if(classFullName == null) {
+            return null;
+        }
         return entityInfoMap.get(classFullName);
     }
 
     protected EntityInfo getMatchingEntityInfo(Object entity)
     {
-        if(entity == null)
-        {
+        if(entity == null) {
             return null;
         }
         EntityInfo matching = entityInfoMap.get(entity.getClass().getName());
-        if(matching != null && matching.classType.isInstance(entity))
-        {
+        if(matching != null && matching.classType.isInstance(entity)) {
             return matching;
         }
         return null;
@@ -896,6 +900,9 @@ public class Config
      */
     public EntityInfo getCustomEntityInfo(String customName)
     {
+        if(customName == null) {
+            return null;
+        }
         EntityInfo eInfo = customEntityInfoMap.get(customName);
         if(eInfo != null)
         {
@@ -906,6 +913,9 @@ public class Config
 
     protected EntityInfo getCustomEntityInfoReference(String customName)
     {
+        if(customName == null) {
+            return null;
+        }
         return customEntityInfoMap.get(customName);
     }
 

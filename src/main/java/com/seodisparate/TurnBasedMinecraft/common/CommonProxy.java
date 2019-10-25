@@ -4,6 +4,7 @@ import java.util.*;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;

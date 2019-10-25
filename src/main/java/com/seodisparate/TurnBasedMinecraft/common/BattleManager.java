@@ -6,13 +6,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
 import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 
@@ -20,19 +22,17 @@ public class BattleManager
 {
     private int IDCounter = 0;
     protected Map<Integer, Battle> battleMap;
-    private Thread updaterThread;
-    private BattleUpdater battleUpdater;
     private Logger logger;
     private Map<Integer, Combatant> recentlyLeftBattle;
+    private BattleUpdater battleUpdater;
     
     public BattleManager(Logger logger)
     {
         this.logger = logger;
         battleMap = new HashMap<Integer, Battle>();
-        battleUpdater = new BattleUpdater(this);
-        updaterThread = new Thread(battleUpdater);
-        updaterThread.start();
         recentlyLeftBattle = new HashMap<Integer, Combatant>();
+        battleUpdater = new BattleUpdater(this);
+        MinecraftForge.EVENT_BUS.register(battleUpdater);
     }
     
     /**
@@ -47,14 +47,34 @@ public class BattleManager
     {
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
         // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
-        if(!((event.getEntity() instanceof EntityPlayer && !((EntityPlayer)event.getEntity()).isCreative()) || (config.getEntityInfoReference(event.getEntity().getClass().getName()) != null || config.getCustomEntityInfoReference(event.getEntity().getCustomNameTag()) != null))
-            || !((event.getSource().getTrueSource() instanceof EntityPlayer && !((EntityPlayer)event.getSource().getTrueSource()).isCreative()) || (config.getEntityInfoReference(event.getSource().getTrueSource().getClass().getName()) != null || config.getCustomEntityInfoReference(event.getSource().getTrueSource().getCustomNameTag()) != null)))
+        String receiverClassName = event.getEntity().getClass().getName();
+        String receiverCustomName;
+        try {
+            receiverCustomName = event.getEntity().getCustomName().getUnformattedComponentText();
+        } catch (NullPointerException e) {
+            receiverCustomName = null;
+        }
+        String attackerClassName;
+        try {
+            attackerClassName = event.getSource().getTrueSource().getClass().getName();
+        } catch (NullPointerException e) {
+            attackerClassName = null;
+        }
+        String attackerCustomName;
+        try {
+            attackerCustomName = event.getSource().getTrueSource().getCustomName().getUnformattedComponentText();
+        } catch (NullPointerException e) {
+            attackerCustomName = null;
+        }
+
+        if(!((event.getEntity() instanceof PlayerEntity && !((PlayerEntity)event.getEntity()).isCreative()) || (config.getEntityInfoReference(receiverClassName) != null || config.getCustomEntityInfoReference(receiverCustomName) != null))
+            || !((event.getSource().getTrueSource() instanceof PlayerEntity && !((PlayerEntity)event.getSource().getTrueSource()).isCreative()) || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null)))
         {
             return false;
         }
         
         // check if ignore battle in config
-        EntityInfo entityInfo = config.getCustomEntityInfoReference(event.getEntity().getCustomNameTag());
+        EntityInfo entityInfo = config.getCustomEntityInfoReference(receiverCustomName);
         if(entityInfo == null)
         {
             entityInfo = config.getMatchingEntityInfo(event.getEntity());
@@ -78,7 +98,7 @@ public class BattleManager
             return false;
         }
 
-        entityInfo = config.getCustomEntityInfoReference(event.getSource().getTrueSource().getCustomNameTag());
+        entityInfo = config.getCustomEntityInfoReference(attackerCustomName);
         if(entityInfo == null)
         {
             entityInfo = config.getMatchingEntityInfo(event.getSource().getTrueSource());
@@ -147,7 +167,7 @@ public class BattleManager
         if(inBattle == null)
         {
             // neither entity is in battle
-            if(event.getEntity() instanceof EntityPlayer || event.getSource().getTrueSource() instanceof EntityPlayer)
+            if(event.getEntity() instanceof PlayerEntity || event.getSource().getTrueSource() instanceof PlayerEntity)
             {
                 // at least one of the entities is a player, create Battle
                 Collection<Entity> sideA = new ArrayList<Entity>(1);
@@ -185,26 +205,39 @@ public class BattleManager
     
     public void checkTargeted(LivingSetAttackTargetEvent event)
     {
-        EntityInfo attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(event.getEntity().getCustomNameTag());
+        String targetedCustomName;
+        try {
+            targetedCustomName = event.getTarget().getCustomName().getUnformattedComponentText();
+        } catch (NullPointerException e) {
+            targetedCustomName = null;
+        }
+        String attackerCustomName;
+        try {
+            attackerCustomName = event.getEntity().getCustomName().getUnformattedComponentText();
+        } catch (NullPointerException e) {
+            attackerCustomName = null;
+        }
+
+        EntityInfo attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(attackerCustomName);
         if(attackerInfo == null)
         {
             attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getEntity());
         }
 
         EntityInfo targetedInfo;
-        if(event.getTarget() instanceof EntityPlayer)
+        if(event.getTarget() instanceof PlayerEntity)
         {
             targetedInfo = null;
         }
         else
         {
-            targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(event.getTarget().getCustomNameTag());
+            targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(targetedCustomName);
             if(targetedInfo == null)
             {
                 targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getTarget());
             }
         }
-        if((event.getTarget() instanceof EntityPlayer && ((EntityPlayer)event.getTarget()).isCreative())
+        if((event.getTarget() instanceof PlayerEntity && ((PlayerEntity)event.getTarget()).isCreative())
                 || attackerInfo == null
                 || attackerInfo.ignoreBattle
                 || TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(attackerInfo.category)
@@ -257,7 +290,7 @@ public class BattleManager
         if(battle == null)
         {
             // neither in battle
-            if(event.getEntity() instanceof EntityPlayer || event.getTarget() instanceof EntityPlayer)
+            if(event.getEntity() instanceof PlayerEntity || event.getTarget() instanceof PlayerEntity)
             {
                 // at least one is a player, create battle
                 Collection<Entity> sideA = new ArrayList<Entity>(1);
@@ -312,25 +345,23 @@ public class BattleManager
     
     public void cleanup()
     {
-        battleUpdater.setIsRunning(false);
-        battleUpdater = null;
-        updaterThread = null;
+        battleUpdater.setRunning(false);
+        MinecraftForge.EVENT_BUS.unregister(battleUpdater);
         synchronized(battleMap)
         {
             battleMap.clear();
         }
+        battleUpdater = null;
     }
     
     protected void addRecentlyLeftBattle(Combatant c)
     {
         c.time = System.nanoTime();
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
-        if(c.entity instanceof EntityPlayerMP)
-        {
-            TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"), (EntityPlayerMP)c.entity);
+        if(c.entity instanceof ServerPlayerEntity) {
+            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity) c.entity), new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"));
         }
-        synchronized(recentlyLeftBattle)
-        {
+        synchronized(recentlyLeftBattle) {
             recentlyLeftBattle.put(c.entity.getEntityId(), c);
         }
     }
@@ -346,9 +377,9 @@ public class BattleManager
                 if(current - entry.getValue().time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
                 {
                     iter.remove();
-                    if(entry.getValue().entity instanceof EntityPlayerMP)
+                    if(entry.getValue().entity instanceof ServerPlayerEntity)
                     {
-                        TurnBasedMinecraftMod.NWINSTANCE.sendTo(new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."), (EntityPlayerMP)entry.getValue().entity);
+                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity)entry.getValue().entity), new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."));
                     }
                 }
             }
