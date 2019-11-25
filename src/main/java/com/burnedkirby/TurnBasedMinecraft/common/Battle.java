@@ -1,11 +1,11 @@
-package com.seodisparate.TurnBasedMinecraft.common;
+package com.burnedkirby.TurnBasedMinecraft.common;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleInfo;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleInfo;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

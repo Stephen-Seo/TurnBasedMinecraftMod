@@ -1,4 +1,4 @@
-package com.seodisparate.TurnBasedMinecraft.common;
+package com.burnedkirby.TurnBasedMinecraft.common;
 
 import java.util.Comparator;
 

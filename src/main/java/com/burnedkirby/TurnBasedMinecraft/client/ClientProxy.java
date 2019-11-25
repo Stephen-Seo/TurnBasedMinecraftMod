@@ -1,7 +1,7 @@
-package com.seodisparate.TurnBasedMinecraft.client;
+package com.burnedkirby.TurnBasedMinecraft.client;
 
-import com.seodisparate.TurnBasedMinecraft.common.Battle;
-import com.seodisparate.TurnBasedMinecraft.common.CommonProxy;
+import com.burnedkirby.TurnBasedMinecraft.common.Battle;
+import com.burnedkirby.TurnBasedMinecraft.common.CommonProxy;
 
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;

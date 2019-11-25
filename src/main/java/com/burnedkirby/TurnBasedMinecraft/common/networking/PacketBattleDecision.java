@@ -1,10 +1,10 @@
-package com.seodisparate.TurnBasedMinecraft.common.networking;
+package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import java.util.function.Supplier;
 
-import com.seodisparate.TurnBasedMinecraft.common.Battle;
-import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-import com.seodisparate.TurnBasedMinecraft.common.Battle.Decision;
+import com.burnedkirby.TurnBasedMinecraft.common.Battle;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import com.burnedkirby.TurnBasedMinecraft.common.Battle.Decision;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;

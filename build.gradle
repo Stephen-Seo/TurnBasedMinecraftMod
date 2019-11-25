@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 //apply plugin: 'maven-publish'
 
 version = "1.9"
-group = "com.seodisparate.TurnBasedMinecraft"
+group = "com.burnedkirby.TurnBasedMinecraft"
 archivesBaseName = "TurnBasedMinecraft"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.

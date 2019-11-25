@@ -1,7 +1,7 @@
-package com.seodisparate.TurnBasedMinecraft.common;
+package com.burnedkirby.TurnBasedMinecraft.common;
 
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketEditingMessage;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

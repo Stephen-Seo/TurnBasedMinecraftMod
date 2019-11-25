@@ -1,10 +1,10 @@
-package com.seodisparate.TurnBasedMinecraft.common.networking;
+package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

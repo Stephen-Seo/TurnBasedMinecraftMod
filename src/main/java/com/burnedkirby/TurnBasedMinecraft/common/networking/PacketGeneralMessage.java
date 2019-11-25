@@ -1,8 +1,8 @@
-package com.seodisparate.TurnBasedMinecraft.common.networking;
+package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import java.util.function.Supplier;
 
-import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;

@@ -1,15 +1,15 @@
-package com.seodisparate.TurnBasedMinecraft.client;
+package com.burnedkirby.TurnBasedMinecraft.client;
 
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.seodisparate.TurnBasedMinecraft.common.Battle;
-import com.seodisparate.TurnBasedMinecraft.common.Combatant;
-import com.seodisparate.TurnBasedMinecraft.common.Config;
-import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleDecision;
+import com.burnedkirby.TurnBasedMinecraft.common.Battle;
+import com.burnedkirby.TurnBasedMinecraft.common.Combatant;
+import com.burnedkirby.TurnBasedMinecraft.common.Config;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;

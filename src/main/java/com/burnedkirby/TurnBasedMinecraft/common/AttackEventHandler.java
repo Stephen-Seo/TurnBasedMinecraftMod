@@ -1,11 +1,11 @@
-package com.seodisparate.TurnBasedMinecraft.common;
+package com.burnedkirby.TurnBasedMinecraft.common;
 
 import java.util.Iterator;
 
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketBattleMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketEditingMessage;
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;

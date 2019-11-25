@@ -1,4 +1,4 @@
-package com.seodisparate.TurnBasedMinecraft.common;
+package com.burnedkirby.TurnBasedMinecraft.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
-import com.seodisparate.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 
 import net.minecraft.entity.Entity;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;

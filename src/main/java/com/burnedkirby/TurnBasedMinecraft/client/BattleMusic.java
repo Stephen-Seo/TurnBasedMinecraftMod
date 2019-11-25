@@ -1,4 +1,4 @@
-package com.seodisparate.TurnBasedMinecraft.client;
+package com.burnedkirby.TurnBasedMinecraft.client;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import javax.sound.sampled.*;
 import fr.delthas.javamp3.Sound;
 import org.apache.logging.log4j.Logger;
 
-import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.client.Minecraft;
 

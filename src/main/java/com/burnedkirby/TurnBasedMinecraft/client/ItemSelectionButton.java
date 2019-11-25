@@ -1,4 +1,4 @@
-package com.seodisparate.TurnBasedMinecraft.client;
+package com.burnedkirby.TurnBasedMinecraft.client;
 
 import net.minecraft.client.gui.widget.button.Button;
 

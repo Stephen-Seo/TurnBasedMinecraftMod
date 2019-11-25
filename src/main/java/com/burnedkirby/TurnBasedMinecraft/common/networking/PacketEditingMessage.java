@@ -1,7 +1,7 @@
-package com.seodisparate.TurnBasedMinecraft.common.networking;
+package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import com.seodisparate.TurnBasedMinecraft.common.EntityInfo;
-import com.seodisparate.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import com.burnedkirby.TurnBasedMinecraft.common.EntityInfo;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
