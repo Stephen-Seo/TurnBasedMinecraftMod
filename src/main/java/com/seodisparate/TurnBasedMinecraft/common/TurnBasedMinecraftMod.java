@@ -2,7 +2,11 @@ package com.seodisparate.TurnBasedMinecraft.common;
 
 import com.seodisparate.TurnBasedMinecraft.client.ClientProxy;
 import com.seodisparate.TurnBasedMinecraft.common.networking.*;
+import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.EntityArgument;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -13,6 +17,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -128,11 +133,77 @@ public class TurnBasedMinecraftMod
         proxy.getConfig().clearBattleIgnoringPlayers();
         
         // register commands
-        event.registerServerCommand(new CommandTBMDisable(proxy.getConfig()));
-        event.registerServerCommand(new CommandTBMEnable(proxy.getConfig()));
-        event.registerServerCommand(new CommandTBMSet(proxy.getConfig()));
-        event.registerServerCommand(new CommandTBMDisableAll(proxy.getConfig()));
-        event.registerServerCommand(new CommandTBMEnableAll(proxy.getConfig()));
+        // tbm-disable
+        event.getServer().getCommandManager().getDispatcher().register(
+            Commands.literal("tbm-disable")
+                .requires(c -> {
+                    return !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermissionLevel(2);
+                })
+                .executes( c -> {
+                    proxy.getConfig().addBattleIgnoringPlayer(c.getSource().asPlayer().getEntityId());
+                    c.getSource().sendFeedback(new StringTextComponent("Disabled turn-based-combat for current player"), true);
+                    return 1;
+                }));
+        // tbm-disable-all
+        event.getServer().getCommandManager().getDispatcher().register(
+            Commands.literal("tbm-disable-all")
+                .requires(c -> {
+                    return c.hasPermissionLevel(2);
+                })
+                .executes(c -> {
+                    proxy.getConfig().setBattleDisabledForAll(true);
+                    for(ServerPlayerEntity player : c.getSource().getServer().getPlayerList().getPlayers()) {
+                        proxy.getConfig().addBattleIgnoringPlayer(player.getEntityId());
+                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP disabled turn-based-combat for everyone"));
+                    }
+                    return 1;
+                }));
+        // tbm-enable
+        event.getServer().getCommandManager().getDispatcher().register(
+            Commands.literal("tbm-enable")
+                .requires(c -> !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermissionLevel(2))
+                .executes(c -> {
+                    proxy.getConfig().removeBattleIgnoringPlayer(c.getSource().asPlayer().getEntityId());
+                    c.getSource().sendFeedback(new StringTextComponent("Enabled turn-based-combat for current player"), true));
+                    return 1;
+                }));
+        // tbm-enable-all
+        event.getServer().getCommandManager().getDispatcher().register(
+            Commands.literal("tbm-enable-all")
+                .requires(c -> c.hasPermissionLevel(2))
+                .executes(c -> {
+                    proxy.getConfig().setBattleDisabledForAll(false);
+                    proxy.getConfig().clearBattleIgnoringPlayers();
+                    for(ServerPlayerEntity player: c.getSource().getServer().getPlayerList().getPlayers()) {
+                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP enabled turn-based-combat for everyone"));
+                    }
+                    return 1;
+                }));
+        // tbm-set-enable
+        event.getServer().getCommandManager().getDispatcher().register(
+            Commands.literal("tbm-set-enable")
+                .requires(c -> c.hasPermissionLevel(2))
+                .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
+                    for(ServerPlayerEntity player : EntityArgument.getPlayers(c, "targets")) {
+                        proxy.getConfig().addBattleIgnoringPlayer(player.getEntityId());
+                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP enabled turn-based-combat for you"));
+                        c.getSource().sendFeedback(new StringTextComponent("Enabled turn-based-combat for " + player.getDisplayName().getUnformattedComponentText()), true);
+                    }
+                    return 1;
+                })));
+        // tbm-set-disable
+        event.getServer().getCommandManager().getDispatcher().register(
+            Commands.literal("tbm-set-disable")
+                .requires(c -> c.hasPermissionLevel(2))
+                .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
+                    for(ServerPlayerEntity player : EntityArgument.getPlayers(c, "targets")) {
+                        proxy.getConfig().removeBattleIgnoringPlayer(player.getEntityId());
+                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP disabled turn-based-combat for you"));
+                        c.getSource().sendFeedback(new StringTextComponent("Disabled turn-based-combat for " + player.getDisplayName().getUnformattedComponentText()), true);
+                    }
+                    return 1;
+                })));
+        // tbm-edit
         event.registerServerCommand(new CommandTBMEdit(proxy.getConfig()));
     }
     
