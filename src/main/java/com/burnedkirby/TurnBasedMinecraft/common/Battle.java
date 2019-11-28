@@ -128,7 +128,12 @@ public class Battle
         {
             for(Entity e : sideA)
             {
-                EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+                EntityInfo entityInfo;
+                try {
+                    entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+                } catch(NullPointerException exception) {
+                    entityInfo = null;
+                }
                 if(entityInfo == null)
                 {
                     entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
@@ -161,7 +166,12 @@ public class Battle
         {
             for(Entity e : sideB)
             {
-                EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+                EntityInfo entityInfo;
+                try {
+                    entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+                } catch(NullPointerException exception) {
+                    entityInfo = null;
+                }
                 if(entityInfo == null)
                 {
                     entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
@@ -296,7 +306,12 @@ public class Battle
     
     public void addCombatantToSideA(Entity e)
     {
-        EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+        EntityInfo entityInfo;
+        try {
+            entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+        } catch(NullPointerException exception) {
+            entityInfo = null;
+        }
         if(entityInfo == null)
         {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
@@ -357,7 +372,12 @@ public class Battle
     
     public void addCombatantToSideB(Entity e)
     {
-        EntityInfo entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+        EntityInfo entityInfo;
+        try {
+            entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getUnformattedComponentText());
+        } catch(NullPointerException exception) {
+            entityInfo = null;
+        }
         if(entityInfo == null)
         {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);

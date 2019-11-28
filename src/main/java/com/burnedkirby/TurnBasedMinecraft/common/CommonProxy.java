@@ -4,12 +4,11 @@ import java.util.*;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class CommonProxy
 {
@@ -26,6 +25,7 @@ public class CommonProxy
         attackerViaBow = new HashSet<AttackerViaBow>();
         editingPlayers = new Hashtable<Integer, EditingInfo>();
         initializeClient();
+        logger.debug("Init proxy for com_burnedkirby_turnbasedminecraft");
     }
     
     protected void initializeClient() {}
@@ -69,6 +69,7 @@ public class CommonProxy
     {
         config = new Config(logger);
         postInitClient();
+        logger.debug("postInit proxy for com_burnedkirby_turnbasedminecraft");
     }
     
     protected void postInitClient() {}
@@ -94,7 +95,8 @@ public class CommonProxy
     
     public Entity getEntityByID(int id)
     {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getEntityByID(id);
+        // TODO validate dimension of entity
+        return ServerLifecycleHooks.getCurrentServer().getWorld(DimensionType.OVERWORLD).getEntityByID(id);
     }
     
     public final boolean isServerRunning()

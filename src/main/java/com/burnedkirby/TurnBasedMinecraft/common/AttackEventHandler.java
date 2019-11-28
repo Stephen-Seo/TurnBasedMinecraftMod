@@ -10,7 +10,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class AttackEventHandler
 {
@@ -68,10 +68,9 @@ public class AttackEventHandler
         BattleManager battleManager = proxy.getBattleManager();
         // handle edit entity, pick entity via attack
         {
-            EditingInfo editingInfo = null;
             if(event.getSource().getTrueSource() != null && event.getEntity() != null)
             {
-                editingInfo = proxy.getEditingInfo(event.getSource().getTrueSource().getEntityId());
+                final EditingInfo editingInfo = proxy.getEditingInfo(event.getSource().getTrueSource().getEntityId());
                 if(editingInfo != null && editingInfo.isPendingEntitySelection)
                 {
                     editingInfo.isPendingEntitySelection = false;
@@ -81,28 +80,18 @@ public class AttackEventHandler
                     	if(!event.getEntity().hasCustomName())
                         {
                             TurnBasedMinecraftMod.logger.error("Cannot edit custom name from entity without custom name");
-                            TurnBasedMinecraftMod.getHandler().sendTo(
-                            	new PacketGeneralMessage("Cannot edit custom name from entity without custom name"),
-                            	((ServerPlayerEntity)editingInfo.editor).connection.netManager,
-                            	NetworkDirection.PLAY_TO_CLIENT);
+                            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketGeneralMessage("Cannot edit custom name from entity without custom name"));
                             return;
                         }
-                        //editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomNameTag());
-                        editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getString());
+                        editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getUnformattedComponentText());
                         if(editingInfo.entityInfo == null)
                         {
                             editingInfo.entityInfo = new EntityInfo();
                             editingInfo.entityInfo.customName = event.getEntity().getCustomName().getString();
                         }
-                        TurnBasedMinecraftMod.getHandler().sendTo(
-                    		new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getString() + "\""),
-                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
-                    		NetworkDirection.PLAY_TO_CLIENT);
+                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getUnformattedComponentText() + "\""));
                         TurnBasedMinecraftMod.logger.info("Begin editing custom \"" + event.getEntity().getCustomName().getString() + "\"");
-                        TurnBasedMinecraftMod.getHandler().sendTo(
-                    		new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo),
-                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
-                    		NetworkDirection.PLAY_TO_CLIENT);
+                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     }
                     else
                     {
@@ -116,15 +105,9 @@ public class AttackEventHandler
                         {
                             editingInfo.entityInfo = editingInfo.entityInfo.clone();
                         }
-                        TurnBasedMinecraftMod.getHandler().sendTo(
-                    		new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""),
-                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
-                    		NetworkDirection.PLAY_TO_CLIENT);
+                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""));
                         TurnBasedMinecraftMod.logger.info("Begin editing \"" + editingInfo.entityInfo.classType.getName() + "\"");
-                        TurnBasedMinecraftMod.getHandler().sendTo(
-                    		new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo),
-                    		((ServerPlayerEntity)editingInfo.editor).connection.netManager,
-                    		NetworkDirection.PLAY_TO_CLIENT);
+                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     }
                     return;
                 }
@@ -132,6 +115,7 @@ public class AttackEventHandler
         }
         if(event.getEntity() != null && event.getSource().getTrueSource() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()) || battleManager.isRecentlyLeftBattle(event.getSource().getTrueSource().getEntityId())))
         {
+//            TurnBasedMinecraftMod.logger.debug("Canceled attack");
             event.setCanceled(true);
             return;
         }
@@ -143,13 +127,12 @@ public class AttackEventHandler
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
                 && battleManager.checkAttack(event))
         {
-//            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.commonProxy.getAttackingEntity() + " and " + event.getEntity());
+//            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.proxy.getAttackingEntity() + " and " + event.getEntity());
             event.setCanceled(true);
-        }
-        else
-        {
+        } else {
 //            TurnBasedMinecraftMod.logger.debug("Did not cancel attack");
         }
+
         if(TurnBasedMinecraftMod.proxy.getAttackingDamage() < (int) event.getAmount())
         {
             TurnBasedMinecraftMod.proxy.setAttackingDamage((int) event.getAmount());

@@ -57,6 +57,16 @@ public class Config
         musicSillyTypes = new HashSet<String>();
         battleIgnoringPlayers = new HashSet<Integer>();
 
+        {
+            File confPath = new File(TurnBasedMinecraftMod.CONFIG_DIRECTORY);
+            if(!confPath.exists()) {
+                if(!confPath.mkdirs()) {
+                    logger.error("Failed to create config dir \"" + TurnBasedMinecraftMod.CONFIG_DIRECTORY + "\"");
+                    return;
+                }
+            }
+        }
+
         writeDefaultConfig(getClass().getResourceAsStream(TurnBasedMinecraftMod.CONFIG_INTERNAL_PATH));
 
         int internalVersion = getConfigFileVersion(new File(TurnBasedMinecraftMod.DEFAULT_CONFIG_FILE_PATH));
@@ -776,6 +786,7 @@ public class Config
             return false;
         }
 
+        boolean saved = false;
         try {
             if (eInfo.classType != null || !eInfo.customName.isEmpty()) {
                 for (com.electronwill.nightconfig.core.Config entity : entities) {
@@ -795,6 +806,7 @@ public class Config
                         entity.set("decision_attack_probability", eInfo.decisionAttack);
                         entity.set("decision_defend_probability", eInfo.decisionDefend);
                         entity.set("decision_flee_probability", eInfo.decisionFlee);
+                        saved = true;
                         break;
                     }
                 }
@@ -811,6 +823,19 @@ public class Config
 
         conf.save();
         conf.close();
+
+        if(!saved) {
+            logger.warn("Failed to save \"" + eInfo.classType.getName() + "\"");
+            return false;
+        }
+
+        if(eInfo.classType != null) {
+            entityInfoMap.put(eInfo.classType.getName(), eInfo);
+        } else if(!eInfo.customName.isEmpty()){
+            customEntityInfoMap.put(eInfo.customName, eInfo);
+        } else {
+            logger.warn("Failed to update entity info in memory");
+        }
 
         return true;
     }

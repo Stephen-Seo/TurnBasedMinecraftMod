@@ -3,10 +3,10 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 import java.util.Comparator;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 
 public class Combatant
 {
@@ -50,18 +50,18 @@ public class Combatant
         @Override
         public int compare(Combatant c0, Combatant c1)
         {
-            if(c0.entity instanceof EntityPlayer && c0.recalcSpeedOnCompare)
+            if(c0.entity instanceof PlayerEntity && c0.recalcSpeedOnCompare)
             {
-                EntityLivingBase c0Entity = (EntityLivingBase)c0.entity;
+                LivingEntity c0Entity = (LivingEntity)c0.entity;
                 boolean isHaste = false;
                 boolean isSlow = false;
-                for(PotionEffect e : c0Entity.getActivePotionEffects())
+                for(EffectInstance e : c0Entity.getActivePotionEffects())
                 {
-                    if(e.getEffectName().equals(MobEffects.HASTE.getName()) || e.getEffectName().equals(MobEffects.SPEED.getName()))
+                    if(e.getEffectName().equals(Effects.HASTE.getName()) || e.getEffectName().equals(Effects.SPEED.getName()))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffectName().equals(MobEffects.SLOWNESS.getName()))
+                    else if(e.getEffectName().equals(Effects.SLOWNESS.getName()))
                     {
                         isSlow = true;
                     }
@@ -84,18 +84,18 @@ public class Combatant
                 }
             }
             
-            if(c1.entity instanceof EntityPlayer && c1.recalcSpeedOnCompare)
+            if(c1.entity instanceof PlayerEntity && c1.recalcSpeedOnCompare)
             {
-                EntityLivingBase c1Entity = (EntityLivingBase)c1.entity;
+                LivingEntity c1Entity = (LivingEntity)c1.entity;
                 boolean isHaste = false;
                 boolean isSlow = false;
-                for(PotionEffect e : c1Entity.getActivePotionEffects())
+                for(EffectInstance e : c1Entity.getActivePotionEffects())
                 {
-                    if(e.getEffectName().equals(MobEffects.HASTE.getName()))
+                    if(e.getEffectName().equals(Effects.HASTE.getName()))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffectName().equals(MobEffects.SLOWNESS.getName()))
+                    else if(e.getEffectName().equals(Effects.SLOWNESS.getName()))
                     {
                         isSlow = true;
                     }

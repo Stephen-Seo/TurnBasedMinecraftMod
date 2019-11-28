@@ -46,9 +46,9 @@ public class BattleManager
     public boolean checkAttack(final LivingAttackEvent event)
     {
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
-        // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
         String receiverClassName = event.getEntity().getClass().getName();
         String receiverCustomName;
+
         try {
             receiverCustomName = event.getEntity().getCustomName().getUnformattedComponentText();
         } catch (NullPointerException e) {
@@ -67,9 +67,13 @@ public class BattleManager
             attackerCustomName = null;
         }
 
-        if(!((event.getEntity() instanceof PlayerEntity && !((PlayerEntity)event.getEntity()).isCreative()) || (config.getEntityInfoReference(receiverClassName) != null || config.getCustomEntityInfoReference(receiverCustomName) != null))
-            || !((event.getSource().getTrueSource() instanceof PlayerEntity && !((PlayerEntity)event.getSource().getTrueSource()).isCreative()) || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null)))
+        // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
+        if(!((event.getEntity() instanceof PlayerEntity && !((PlayerEntity)event.getEntity()).isCreative())
+                || (config.getEntityInfoReference(receiverClassName) != null || config.getCustomEntityInfoReference(receiverCustomName) != null))
+            || !((event.getSource().getTrueSource() instanceof PlayerEntity && !((PlayerEntity)event.getSource().getTrueSource()).isCreative())
+                || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null)))
         {
+            logger.debug("BattleManager: Failed first check, attacker is \"" + attackerClassName + "\", defender is \"" + receiverClassName + "\"");
             return false;
         }
         
