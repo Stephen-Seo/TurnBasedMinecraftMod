@@ -270,24 +270,18 @@ public class Battle
     
     public boolean hasCombatant(int entityID)
     {
-        synchronized(sideAEntryQueue)
+        for(Combatant c : sideAEntryQueue)
         {
-            for(Combatant c : sideAEntryQueue)
+            if(c.entity.getEntityId() == entityID)
             {
-                if(c.entity.getEntityId() == entityID)
-                {
-                    return true;
-                }
+                return true;
             }
         }
-        synchronized(sideBEntryQueue)
+        for(Combatant c : sideBEntryQueue)
         {
-            for(Combatant c : sideBEntryQueue)
+            if(c.entity.getEntityId() == entityID)
             {
-                if(c.entity.getEntityId() == entityID)
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return sideA.containsKey(entityID) || sideB.containsKey(entityID);
@@ -295,14 +289,11 @@ public class Battle
     
     public boolean hasCombatantInSideA(int entityID)
     {
-        synchronized(sideAEntryQueue)
+        for(Combatant c : sideAEntryQueue)
         {
-            for(Combatant c : sideAEntryQueue)
+            if(c.entity.getEntityId() == entityID)
             {
-                if(c.entity.getEntityId() == entityID)
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return sideA.containsKey(entityID);
@@ -330,10 +321,7 @@ public class Battle
         newCombatant.battleID = getId();
         if(isServer)
         {
-            synchronized(sideAEntryQueue)
-            {
-                sideAEntryQueue.add(newCombatant);
-            }
+            sideAEntryQueue.add(newCombatant);
         }
         else
         {
@@ -396,10 +384,7 @@ public class Battle
         newCombatant.battleID = getId();
         if(isServer)
         {
-            synchronized(sideBEntryQueue)
-            {
-                sideBEntryQueue.add(newCombatant);
-            }
+            sideBEntryQueue.add(newCombatant);
         }
         else
         {
@@ -542,14 +527,8 @@ public class Battle
     public int getSize()
     {
         int size = sideA.size() + sideB.size();
-        synchronized(sideAEntryQueue)
-        {
-            size += sideAEntryQueue.size();
-        }
-        synchronized(sideBEntryQueue)
-        {
-            size += sideBEntryQueue.size();
-        }
+        size += sideAEntryQueue.size();
+        size += sideBEntryQueue.size();
         return size;
     }
     
@@ -820,21 +799,15 @@ public class Battle
             return true;
         }
         boolean combatantsChanged = false;
-        synchronized(sideAEntryQueue)
+        for(Combatant c = sideAEntryQueue.poll(); c != null; c = sideAEntryQueue.poll())
         {
-            for(Combatant c = sideAEntryQueue.poll(); c != null; c = sideAEntryQueue.poll())
-            {
-                sideA.put(c.entity.getEntityId(), c);
-                combatantsChanged = true;
-            }
+            sideA.put(c.entity.getEntityId(), c);
+            combatantsChanged = true;
         }
-        synchronized(sideBEntryQueue)
+        for(Combatant c = sideBEntryQueue.poll(); c != null; c = sideBEntryQueue.poll())
         {
-            for(Combatant c = sideBEntryQueue.poll(); c != null; c = sideBEntryQueue.poll())
-            {
-                sideB.put(c.entity.getEntityId(), c);
-                combatantsChanged = true;
-            }
+            sideB.put(c.entity.getEntityId(), c);
+            combatantsChanged = true;
         }
         if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
         {
@@ -967,10 +940,7 @@ public class Battle
                                     // have player look at attack target
                                     ((ServerPlayerEntity)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, yawDirection, pitchDirection);
                                     BowItem itemBow = (BowItem)heldItemStack.getItem();
-                                    synchronized(TurnBasedMinecraftMod.proxy.getAttackerViaBowSet())
-                                    {
-                                        TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
-                                    }
+                                    TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
                                     itemBow.onPlayerStoppedUsing(((PlayerEntity)nextEntity).getHeldItemMainhand(), nextEntity.getEntityWorld(), (LivingEntity) nextEntity, randomTimeLeft);
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getEntityId(), targetEntity.getEntityId(), 0);
                                 }

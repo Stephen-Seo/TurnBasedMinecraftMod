@@ -276,15 +276,12 @@ public class BattleManager
     private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB, DimensionType dimension)
     {
         Battle newBattle = null;
-        synchronized(battleMap)
+        while(battleMap.containsKey(IDCounter))
         {
-            while(battleMap.containsKey(IDCounter))
-            {
-                ++IDCounter;
-            }
-            newBattle = new Battle(this, IDCounter, sideA, sideB, true, dimension);
-            battleMap.put(IDCounter, newBattle);
+            ++IDCounter;
         }
+        newBattle = new Battle(this, IDCounter, sideA, sideB, true, dimension);
+        battleMap.put(IDCounter, newBattle);
         for(Entity e : sideA) {
             entityToBattleMap.put(new EntityIDDimPair(e), newBattle.getId());
         }
@@ -297,20 +294,14 @@ public class BattleManager
     
     public Battle getBattleByID(int id)
     {
-        synchronized(battleMap)
-        {
-            return battleMap.get(id);
-        }
+        return battleMap.get(id);
     }
     
     public void cleanup()
     {
         battleUpdater.setRunning(false);
         MinecraftForge.EVENT_BUS.unregister(battleUpdater);
-        synchronized(battleMap)
-        {
-            battleMap.clear();
-        }
+        battleMap.clear();
         battleUpdater = null;
     }
     
@@ -321,27 +312,22 @@ public class BattleManager
         if(c.entity instanceof ServerPlayerEntity) {
             TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity) c.entity), new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"));
         }
-        synchronized(recentlyLeftBattle) {
-            recentlyLeftBattle.put(c.entity.getEntityId(), c);
-        }
+        recentlyLeftBattle.put(c.entity.getEntityId(), c);
         entityToBattleMap.remove(new EntityIDDimPair(c.entity));
     }
     
     protected void updateRecentlyLeftBattle()
     {
         long current = System.nanoTime();
-        synchronized(recentlyLeftBattle)
+        for(Iterator<Map.Entry<Integer, Combatant>> iter = recentlyLeftBattle.entrySet().iterator(); iter.hasNext();)
         {
-            for(Iterator<Map.Entry<Integer, Combatant>> iter = recentlyLeftBattle.entrySet().iterator(); iter.hasNext();)
+            Map.Entry<Integer, Combatant> entry = iter.next();
+            if(current - entry.getValue().time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
             {
-                Map.Entry<Integer, Combatant> entry = iter.next();
-                if(current - entry.getValue().time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
+                iter.remove();
+                if(entry.getValue().entity instanceof ServerPlayerEntity)
                 {
-                    iter.remove();
-                    if(entry.getValue().entity instanceof ServerPlayerEntity)
-                    {
-                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity)entry.getValue().entity), new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."));
-                    }
+                    TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity)entry.getValue().entity), new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."));
                 }
             }
         }
@@ -349,10 +335,7 @@ public class BattleManager
     
     public boolean isRecentlyLeftBattle(int entityID)
     {
-        synchronized(recentlyLeftBattle)
-        {
-            return recentlyLeftBattle.containsKey(entityID);
-        }
+        return recentlyLeftBattle.containsKey(entityID);
     }
 
     public boolean forceLeaveBattle(EntityIDDimPair entityInfo) {
