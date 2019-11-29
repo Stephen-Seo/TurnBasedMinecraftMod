@@ -1,5 +1,16 @@
 # Upcoming changes
 
+# Version 1.9
+
+Updated mod for 1.14.4
+(Took a long while, and no new features were added due to making sure everything
+still works).
+
+Compiled against forge version "1.14.4-28.1.0"
+
+Entity names have changed in the config, so this newer version will replace the
+old version. Older existing config should be renamed rather than deleted.
+
 # Version 1.8
 
 Update to forge version "1.12.2-14.23.5.2768".
