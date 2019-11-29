@@ -52,7 +52,7 @@ configured for them.)
 # Building
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
-finished jar will be placed in build/libs/
+finished jar will be saved at "build/reobfShadowJar/output.jar"
 
 # Other notes
 
