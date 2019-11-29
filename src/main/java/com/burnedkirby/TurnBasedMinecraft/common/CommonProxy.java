@@ -93,12 +93,6 @@ public class CommonProxy
 
     public void displayTextComponent(ITextComponent textComponent) {}
     
-    public Entity getEntityByID(int id)
-    {
-        // TODO validate dimension of entity
-        return ServerLifecycleHooks.getCurrentServer().getWorld(DimensionType.OVERWORLD).getEntityByID(id);
-    }
-    
     public final boolean isServerRunning()
     {
         return battleManager != null;

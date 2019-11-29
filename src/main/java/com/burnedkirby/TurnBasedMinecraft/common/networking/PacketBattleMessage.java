@@ -6,8 +6,11 @@ import java.util.function.Supplier;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
+import com.burnedkirby.TurnBasedMinecraft.common.Utility;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class PacketBattleMessage
@@ -100,23 +103,26 @@ public class PacketBattleMessage
     int entityIDTo;
     int amount;
     String custom;
+    DimensionType dimension;
     
     public PacketBattleMessage() { custom = new String(); }
     
-    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, int amount)
+    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, DimensionType dimension, int amount)
     {
         this.messageType = messageType;
         this.entityIDFrom = entityIDFrom;
         this.entityIDTo = entityIDTo;
+        this.dimension = dimension;
         this.amount = amount;
         custom = new String();
     }
     
-    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, int amount, String custom)
+    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, DimensionType dimension, int amount, String custom)
     {
         this.messageType = messageType;
         this.entityIDFrom = entityIDFrom;
         this.entityIDTo = entityIDTo;
+        this.dimension = dimension;
         this.amount = amount;
         this.custom = custom;
     }
@@ -125,6 +131,7 @@ public class PacketBattleMessage
         buf.writeInt(pkt.messageType.getValue());
         buf.writeInt(pkt.entityIDFrom);
         buf.writeInt(pkt.entityIDTo);
+        buf.writeString(DimensionType.getKey(pkt.dimension).toString());
         buf.writeInt(pkt.amount);
         buf.writeString(pkt.custom);
     }
@@ -135,6 +142,7 @@ public class PacketBattleMessage
     			buf.readInt()),
 			buf.readInt(),
 			buf.readInt(),
+			DimensionType.byName(new ResourceLocation(buf.readString())),
 			buf.readInt(),
 			buf.readString());
     }
@@ -142,7 +150,7 @@ public class PacketBattleMessage
     public static class Handler {
     	public static void handle(final PacketBattleMessage pkt, Supplier<NetworkEvent.Context> ctx) {
     		ctx.get().enqueueWork(() -> {
-    			Entity fromEntity = TurnBasedMinecraftMod.proxy.getEntityByID(pkt.entityIDFrom);
+                Entity fromEntity = Utility.getEntity(pkt.entityIDFrom, pkt.dimension);
                 String from = "Unknown";
                 if(fromEntity != null)
                 {
@@ -156,7 +164,7 @@ public class PacketBattleMessage
                     	from = fromEntity.getDisplayName().getFormattedText();
                     }
                 }
-                Entity toEntity = TurnBasedMinecraftMod.proxy.getEntityByID(pkt.entityIDTo);
+                Entity toEntity = Utility.getEntity(pkt.entityIDTo, pkt.dimension);
                 String to = "Unknown";
                 if(toEntity != null)
                 {

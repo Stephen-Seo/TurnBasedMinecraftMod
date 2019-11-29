@@ -3,6 +3,8 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArrowItem;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class Utility
 {
@@ -48,5 +50,9 @@ public class Utility
     public static double distanceBetweenEntities(Entity a, Entity b)
     {
         return Math.sqrt(Math.pow(a.posX - b.posX, 2.0) + Math.pow(a.posY - b.posY, 2.0) + Math.pow(a.posZ - b.posZ, 2.0));
+    }
+
+    public static Entity getEntity(int id, DimensionType dimension) {
+        return ServerLifecycleHooks.getCurrentServer().getWorld(dimension).getEntityByID(id);
     }
 }

@@ -122,6 +122,7 @@ public class TurnBasedMinecraftMod
         // register event handler(s)
         MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
         MinecraftForge.EVENT_BUS.register(new PlayerJoinEventHandler());
+        MinecraftForge.EVENT_BUS.register(new DimensionChangedHandler());
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }

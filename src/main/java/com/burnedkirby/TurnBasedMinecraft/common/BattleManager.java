@@ -8,6 +8,7 @@ import java.util.Map;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +26,7 @@ public class BattleManager
     private Logger logger;
     private Map<Integer, Combatant> recentlyLeftBattle;
     private BattleUpdater battleUpdater;
+    private Map<EntityIDDimPair, Integer> entityToBattleMap;
     
     public BattleManager(Logger logger)
     {
@@ -32,6 +34,7 @@ public class BattleManager
         battleMap = new HashMap<Integer, Battle>();
         recentlyLeftBattle = new HashMap<Integer, Combatant>();
         battleUpdater = new BattleUpdater(this);
+        entityToBattleMap = new HashMap<EntityIDDimPair, Integer>();
         MinecraftForge.EVENT_BUS.register(battleUpdater);
     }
     
@@ -73,7 +76,7 @@ public class BattleManager
             || !((event.getSource().getTrueSource() instanceof PlayerEntity && !((PlayerEntity)event.getSource().getTrueSource()).isCreative())
                 || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null)))
         {
-            logger.debug("BattleManager: Failed first check, attacker is \"" + attackerClassName + "\", defender is \"" + receiverClassName + "\"");
+//            logger.debug("BattleManager: Failed first check, attacker is \"" + attackerClassName + "\", defender is \"" + receiverClassName + "\"");
             return false;
         }
         
@@ -87,19 +90,14 @@ public class BattleManager
         if(entityInfo != null && (config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacked entity ignores battle
-            synchronized(battleMap)
-            {
-                for(Battle b : battleMap.values())
-                {
-                    if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
-                    {
-                        logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
-                        return true;
-                    }
-                }
+            Battle battle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getSource().getTrueSource())));
+            if(battle != null && battle.hasCombatant(event.getSource().getTrueSource().getEntityId())) {
+                logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
+                return true;
+            } else {
+                logger.debug("Attack Not Canceled: attacked ignores battle");
+                return false;
             }
-            logger.debug("Attack Not Canceled: attacked ignores battle");
-            return false;
         }
 
         entityInfo = config.getCustomEntityInfoReference(attackerCustomName);
@@ -111,65 +109,30 @@ public class BattleManager
         if(entityInfo != null && (config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacker entity ignores battle
-            synchronized(battleMap)
-            {
-                for(Battle b : battleMap.values())
-                {
-                    if(b.hasCombatant(event.getEntity().getEntityId()))
-                    {
-                        logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
-                        return true;
-                    }
-                }
+            Battle battle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getEntity())));
+            if(battle != null && battle.hasCombatant(event.getEntity().getEntityId())) {
+                logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
+                return true;
+            } else {
+                logger.debug("Attack Not Canceled: attacker ignores battle");
+                return false;
             }
-            logger.debug("Attack Not Canceled: attacker ignores battle");
-            return false;
         }
         
         // check if one is in battle
-        Entity inBattle = null;
-        Entity notInBattle = null;
-        Battle battle = null;
-        
-        synchronized(battleMap)
-        {
-            for(Battle b : battleMap.values())
-            {
-                if(b.hasCombatant(event.getSource().getTrueSource().getEntityId()))
-                {
-                    if(inBattle != null)
-                    {
-                        // both combatants are in battle
-                        logger.debug("Attack Canceled: both are in battle");
-                        return true;
-                    }
-                    else
-                    {
-                        inBattle = event.getSource().getTrueSource();
-                        notInBattle = event.getEntity();
-                        battle = b;
-                    }
-                }
-                if(b.hasCombatant(event.getEntity().getEntityId()))
-                {
-                    if(inBattle != null)
-                    {
-                        // both combatants are in battle
-                        logger.debug("Attack Canceled: both are in battle");
-                        return true;
-                    }
-                    else
-                    {
-                        inBattle = event.getEntity();
-                        notInBattle = event.getSource().getTrueSource();
-                        battle = b;
-                    }
-                }
-            }
+        Battle attackerBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getSource().getTrueSource())));
+        if(attackerBattle != null && !attackerBattle.hasCombatant(event.getSource().getTrueSource().getEntityId())) {
+            attackerBattle = null;
         }
-        
-        if(inBattle == null)
-        {
+        Battle defenderBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getEntity())));
+        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getEntity().getEntityId())) {
+            defenderBattle = null;
+        }
+
+        if(attackerBattle != null && defenderBattle != null) {
+            // both in battle, attack canceled
+            return true;
+        } else if(attackerBattle == null && defenderBattle == null) {
             // neither entity is in battle
             if(event.getEntity() instanceof PlayerEntity || event.getSource().getTrueSource() instanceof PlayerEntity)
             {
@@ -178,7 +141,7 @@ public class BattleManager
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
                 sideB.add(event.getSource().getTrueSource());
-                createBattle(sideA, sideB);
+                createBattle(sideA, sideB, event.getEntity().dimension);
                 logger.debug("Attack Not Canceled: new battle created");
             }
             else
@@ -186,21 +149,29 @@ public class BattleManager
                 logger.debug("Attack Not Canceled: neither are in battle or players");
             }
             return false;
-        }
-
-        // at this point only one entity is in battle, so add entity to other side
-        if(battle.getSize() >= config.getMaxInBattle())
-        {
-            // battle limit reached, cannot add to battle
-            return true;
-        }
-        else if(battle.hasCombatantInSideA(inBattle.getEntityId()))
-        {
-            battle.addCombatantToSideB(notInBattle);
-        }
-        else
-        {
-            battle.addCombatantToSideA(notInBattle);
+        } else {
+            // at this point only one entity is in battle, so add entity to other side
+            if(attackerBattle != null) {
+                if (attackerBattle.getSize() >= config.getMaxInBattle()) {
+                    // battle limit reached, cannot add to battle
+                    return true;
+                } else if (attackerBattle.hasCombatantInSideA(event.getSource().getTrueSource().getEntityId())) {
+                    attackerBattle.addCombatantToSideB(event.getEntity());
+                } else {
+                    attackerBattle.addCombatantToSideA(event.getEntity());
+                }
+                entityToBattleMap.put(new EntityIDDimPair(event.getEntity()), attackerBattle.getId());
+            } else {
+                if (defenderBattle.getSize() >= config.getMaxInBattle()) {
+                    // battle limit reached, cannot add to battle
+                    return true;
+                } else if (defenderBattle.hasCombatantInSideA(event.getEntity().getEntityId())) {
+                    defenderBattle.addCombatantToSideB(event.getSource().getTrueSource());
+                } else {
+                    defenderBattle.addCombatantToSideA(event.getSource().getTrueSource());
+                }
+                entityToBattleMap.put(new EntityIDDimPair(event.getSource().getTrueSource()), defenderBattle.getId());
+            }
         }
 
         logger.debug("Attack Canceled: one is in battle");
@@ -251,48 +222,20 @@ public class BattleManager
         {
             return;
         }
-        
-        Entity inBattle = null;
-        Entity notInBattle = null;
-        Battle battle = null;
-        
-        synchronized(battleMap)
-        {
-            for(Battle b : battleMap.values())
-            {
-                if(b.hasCombatant(event.getEntity().getEntityId()))
-                {
-                    if(inBattle != null)
-                    {
-                        // both entities already in battle
-                        return;
-                    }
-                    else
-                    {
-                        inBattle = event.getEntity();
-                        notInBattle = event.getTarget();
-                        battle = b;
-                    }
-                }
-                if(b.hasCombatant(event.getTarget().getEntityId()))
-                {
-                    if(inBattle != null)
-                    {
-                        // both entities already in battle
-                        return;
-                    }
-                    else
-                    {
-                        inBattle = event.getTarget();
-                        notInBattle = event.getEntity();
-                        battle = b;
-                    }
-                }
-            }
+
+        // check if one is in battle
+        Battle attackerBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getEntity())));
+        if(attackerBattle != null && !attackerBattle.hasCombatant(event.getEntity().getEntityId())) {
+            attackerBattle = null;
         }
-        
-        if(battle == null)
-        {
+        Battle defenderBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getTarget())));
+        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getTarget().getEntityId())) {
+            defenderBattle = null;
+        }
+
+        if(attackerBattle != null && defenderBattle != null) {
+            return;
+        } else if(attackerBattle == null && defenderBattle == null) {
             // neither in battle
             if(event.getEntity() instanceof PlayerEntity || event.getTarget() instanceof PlayerEntity)
             {
@@ -301,29 +244,36 @@ public class BattleManager
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
                 sideB.add(event.getTarget());
-                createBattle(sideA, sideB);
+                createBattle(sideA, sideB, event.getEntity().dimension);
+                logger.debug("neither in battle, at least one is player, creating new battle");
             }
-        }
-        else
-        {
+        } else {
             // add entity to battle
-            if(battle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle())
-            {
-                // battle max reached, cannot add to battle
-                return;
-            }
-            else if(battle.hasCombatantInSideA(inBattle.getEntityId()))
-            {
-                battle.addCombatantToSideB(notInBattle);
-            }
-            else
-            {
-                battle.addCombatantToSideA(notInBattle);
+            if(attackerBattle != null) {
+                if (attackerBattle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()) {
+                    // battle max reached, cannot add to battle
+                    return;
+                } else if (attackerBattle.hasCombatantInSideA(event.getEntity().getEntityId())) {
+                    attackerBattle.addCombatantToSideB(event.getTarget());
+                } else {
+                    attackerBattle.addCombatantToSideA(event.getTarget());
+                }
+                entityToBattleMap.put(new EntityIDDimPair(event.getTarget()), attackerBattle.getId());
+            } else {
+                if (defenderBattle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()) {
+                    // battle max reached, cannot add to battle
+                    return;
+                } else if (defenderBattle.hasCombatantInSideA(event.getTarget().getEntityId())) {
+                    defenderBattle.addCombatantToSideB(event.getEntity());
+                } else {
+                    defenderBattle.addCombatantToSideA(event.getEntity());
+                }
+                entityToBattleMap.put(new EntityIDDimPair(event.getEntity()), defenderBattle.getId());
             }
         }
     }
     
-    private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB)
+    private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB, DimensionType dimension)
     {
         Battle newBattle = null;
         synchronized(battleMap)
@@ -332,8 +282,14 @@ public class BattleManager
             {
                 ++IDCounter;
             }
-            newBattle = new Battle(this, IDCounter, sideA, sideB, true);
+            newBattle = new Battle(this, IDCounter, sideA, sideB, true, dimension);
             battleMap.put(IDCounter, newBattle);
+        }
+        for(Entity e : sideA) {
+            entityToBattleMap.put(new EntityIDDimPair(e), newBattle.getId());
+        }
+        for(Entity e : sideB) {
+            entityToBattleMap.put(new EntityIDDimPair(e), newBattle.getId());
         }
         newBattle.notifyPlayersBattleInfo();
         return newBattle;
@@ -368,6 +324,7 @@ public class BattleManager
         synchronized(recentlyLeftBattle) {
             recentlyLeftBattle.put(c.entity.getEntityId(), c);
         }
+        entityToBattleMap.remove(new EntityIDDimPair(c.entity));
     }
     
     protected void updateRecentlyLeftBattle()
@@ -396,5 +353,19 @@ public class BattleManager
         {
             return recentlyLeftBattle.containsKey(entityID);
         }
+    }
+
+    public boolean forceLeaveBattle(EntityIDDimPair entityInfo) {
+        boolean result = false;
+        Integer battleID = entityToBattleMap.get(entityInfo);
+        if(battleID != null) {
+            Battle battle = battleMap.get(battleID);
+            if (battle != null && battle.hasCombatant(entityInfo.id)) {
+                battle.forceRemoveCombatant(entityInfo);
+                result = true;
+            }
+            entityToBattleMap.remove(entityInfo);
+        }
+        return result;
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class Battle
@@ -40,6 +41,8 @@ public class Battle
     private Random random;
     
     public String debugLog; // TODO remove after freeze bug has been found
+
+    private DimensionType dimension;
     
     public enum State
     {
@@ -110,7 +113,7 @@ public class Battle
         }
     }
 
-    public Battle(BattleManager battleManager, int id, Collection<Entity> sideA, Collection<Entity> sideB, boolean isServer)
+    public Battle(BattleManager battleManager, int id, Collection<Entity> sideA, Collection<Entity> sideB, boolean isServer, DimensionType dimension)
     {
         this.battleManager = battleManager;
         this.isServer = isServer;
@@ -124,6 +127,7 @@ public class Battle
         playerCount = new AtomicInteger(0);
         undecidedCount = new AtomicInteger(0);
         random = new Random();
+        this.dimension = dimension;
         if(sideA != null)
         {
             for(Entity e : sideA)
@@ -573,7 +577,7 @@ public class Battle
         {
             return;
         }
-        PacketBattleMessage packet = new PacketBattleMessage(type, from, to, amount, custom);
+        PacketBattleMessage packet = new PacketBattleMessage(type, from, to, dimension, amount, custom);
         for(Combatant p : players.values())
         {
             if(p.entity.isAlive())
@@ -713,9 +717,31 @@ public class Battle
     {
         if(c.entity instanceof PlayerEntity)
         {
-            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) c.entity), new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, 0));
+            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) c.entity), new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, dimension, 0));
         }
         battleManager.addRecentlyLeftBattle(c);
+    }
+
+    public void forceRemoveCombatant(EntityIDDimPair e) {
+        sideA.remove(e.id);
+        sideB.remove(e.id);
+        if(players.remove(e.id) != null) {
+            playerCount.decrementAndGet();
+        }
+        for(Iterator<Combatant> iter = sideAEntryQueue.iterator(); iter.hasNext();) {
+            Combatant c = iter.next();
+            if(c.entity.getEntityId() == e.id) {
+                iter.remove();
+                break;
+            }
+        }
+        for(Iterator<Combatant> iter = sideBEntryQueue.iterator(); iter.hasNext();) {
+            Combatant c = iter.next();
+            if(c.entity.getEntityId() == e.id) {
+                iter.remove();
+                break;
+            }
+        }
     }
 
     private void setDecisionState()
