@@ -150,7 +150,7 @@ public class PacketBattleMessage
     public static class Handler {
     	public static void handle(final PacketBattleMessage pkt, Supplier<NetworkEvent.Context> ctx) {
     		ctx.get().enqueueWork(() -> {
-                Entity fromEntity = Utility.getEntity(pkt.entityIDFrom, pkt.dimension);
+                Entity fromEntity = TurnBasedMinecraftMod.proxy.getEntity(pkt.entityIDFrom, pkt.dimension);
                 String from = "Unknown";
                 if(fromEntity != null)
                 {
@@ -164,7 +164,7 @@ public class PacketBattleMessage
                     	from = fromEntity.getDisplayName().getFormattedText();
                     }
                 }
-                Entity toEntity = Utility.getEntity(pkt.entityIDTo, pkt.dimension);
+                Entity toEntity = TurnBasedMinecraftMod.proxy.getEntity(pkt.entityIDTo, pkt.dimension);
                 String to = "Unknown";
                 if(toEntity != null)
                 {

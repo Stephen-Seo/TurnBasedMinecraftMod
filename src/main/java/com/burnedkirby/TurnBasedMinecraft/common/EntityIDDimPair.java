@@ -25,7 +25,7 @@ public class EntityIDDimPair {
     }
 
     public Entity getEntity() {
-        return Utility.getEntity(id, dim);
+        return TurnBasedMinecraftMod.proxy.getEntity(id, dim);
     }
 
     @Override

@@ -51,8 +51,4 @@ public class Utility
     {
         return Math.sqrt(Math.pow(a.posX - b.posX, 2.0) + Math.pow(a.posY - b.posY, 2.0) + Math.pow(a.posZ - b.posZ, 2.0));
     }
-
-    public static Entity getEntity(int id, DimensionType dimension) {
-        return ServerLifecycleHooks.getCurrentServer().getWorld(dimension).getEntityByID(id);
-    }
 }

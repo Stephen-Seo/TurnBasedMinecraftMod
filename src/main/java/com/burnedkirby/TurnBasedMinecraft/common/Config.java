@@ -790,8 +790,8 @@ public class Config
         try {
             if (eInfo.classType != null || !eInfo.customName.isEmpty()) {
                 for (com.electronwill.nightconfig.core.Config entity : entities) {
-                    if ((eInfo.classType != null && entity.get("name").equals(eInfo.classType.getName()))
-                            || (!eInfo.customName.isEmpty() && entity.get("custom_name").equals(eInfo.customName))) {
+                    String entityName = entity.get("name");
+                    if ((eInfo.classType != null && entityName != null && entityName.equals(eInfo.classType.getName()))) {
                         entity.set("attack_power", eInfo.attackPower);
                         entity.set("attack_probability", eInfo.attackProbability);
                         entity.set("attack_variance", eInfo.attackVariance);
@@ -808,7 +808,55 @@ public class Config
                         entity.set("decision_flee_probability", eInfo.decisionFlee);
                         saved = true;
                         break;
+                    } else {
+                        String customName = entity.get("custom_name");
+                        if(!eInfo.customName.isEmpty() && customName != null && customName.equals(eInfo.customName)) {
+                            entity.set("attack_power", eInfo.attackPower);
+                            entity.set("attack_probability", eInfo.attackProbability);
+                            entity.set("attack_variance", eInfo.attackVariance);
+                            entity.set("attack_effect", eInfo.attackEffect.toString());
+                            entity.set("attack_effect_probability", eInfo.attackEffectProbability);
+                            entity.set("defense_damage", eInfo.defenseDamage);
+                            entity.set("defense_damage_probability", eInfo.defenseDamageProbability);
+                            entity.set("evasion", eInfo.evasion);
+                            entity.set("speed", eInfo.speed);
+                            entity.set("ignore_battle", eInfo.ignoreBattle);
+                            entity.set("category", eInfo.category);
+                            entity.set("decision_attack_probability", eInfo.decisionAttack);
+                            entity.set("decision_defend_probability", eInfo.decisionDefend);
+                            entity.set("decision_flee_probability", eInfo.decisionFlee);
+                            saved = true;
+                            break;
+                        }
                     }
+                }
+                if(!saved) {
+                    com.electronwill.nightconfig.core.Config newEntry = conf.createSubConfig();
+                    if(eInfo.classType != null) {
+                        newEntry.set("name", eInfo.classType.getName());
+                    } else if(!eInfo.customName.isEmpty()) {
+                        newEntry.set("custom_name", eInfo.customName);
+                    } else {
+                        logger.error("Failed to save new entity entry into config, no name or custom_name");
+                        conf.close();
+                        return false;
+                    }
+                    newEntry.set("attack_power", eInfo.attackPower);
+                    newEntry.set("attack_probability", eInfo.attackProbability);
+                    newEntry.set("attack_variance", eInfo.attackVariance);
+                    newEntry.set("attack_effect", eInfo.attackEffect.toString());
+                    newEntry.set("attack_effect_probability", eInfo.attackEffectProbability);
+                    newEntry.set("defense_damage", eInfo.defenseDamage);
+                    newEntry.set("defense_damage_probability", eInfo.defenseDamageProbability);
+                    newEntry.set("evasion", eInfo.evasion);
+                    newEntry.set("speed", eInfo.speed);
+                    newEntry.set("ignore_battle", eInfo.ignoreBattle);
+                    newEntry.set("category", eInfo.category);
+                    newEntry.set("decision_attack_probability", eInfo.decisionAttack);
+                    newEntry.set("decision_defend_probability", eInfo.decisionDefend);
+                    newEntry.set("decision_flee_probability", eInfo.decisionFlee);
+                    entities.add(newEntry);
+                    saved = true;
                 }
             } else {
                 return false;

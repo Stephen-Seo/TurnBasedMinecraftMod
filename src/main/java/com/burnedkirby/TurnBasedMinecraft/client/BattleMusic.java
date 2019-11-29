@@ -43,19 +43,16 @@ public class BattleMusic
         try {
             sequencer = MidiSystem.getSequencer();
             sequencer.open();
-        } catch (Throwable t)
-        {
+        } catch (Throwable t) {
             logger.error("Failed to load midi sequencer");
-            return;
+            sequencer = null;
         }
         
-        try
-        {
+        try {
             clip = AudioSystem.getClip();
-        } catch(LineUnavailableException e)
-        {
+        } catch(Throwable t) {
             logger.error("Failed to load clip (for wav)");
-            return;
+            clip = null;
         }
         
         File battleMusicFolder = new File(TurnBasedMinecraftMod.MUSIC_BATTLE);
@@ -114,7 +111,7 @@ public class BattleMusic
         {
             sillyMusic.add(f);
         }
-        logger.info("Got " + sillyMusic.size() + " battle music files");
+        logger.info("Got " + sillyMusic.size() + " silly music files");
 
         initialized = true;
         
@@ -185,13 +182,13 @@ public class BattleMusic
             logger.debug("play called with file " + next.getName() + " and vol " + volume);
         	Minecraft.getInstance().getSoundHandler().pause();
             String suffix = next.getName().substring(next.getName().length() - 3).toLowerCase();
-            if(suffix.equals("mid"))
+            if(suffix.equals("mid") && sequencer != null)
             {
                 if(sequencer.isRunning())
                 {
                     sequencer.stop();
                 }
-                if(clip.isActive())
+                if(clip != null && clip.isActive())
                 {
                     clip.stop();
                     clip.close();
@@ -213,9 +210,9 @@ public class BattleMusic
                 sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
                 sequencer.start();
             }
-            else if(suffix.equals("wav"))
+            else if(suffix.equals("wav") && clip != null)
             {
-                if(sequencer.isRunning())
+                if(sequencer != null && sequencer.isRunning())
                 {
                     sequencer.stop();
                 }
@@ -248,11 +245,11 @@ public class BattleMusic
             }
             else if(suffix.equals("mp3"))
             {
-                if(sequencer.isRunning())
+                if(sequencer != null && sequencer.isRunning())
                 {
                     sequencer.stop();
                 }
-                if(clip.isActive())
+                if(clip != null && clip.isActive())
                 {
                     clip.stop();
                     clip.close();
@@ -290,9 +287,13 @@ public class BattleMusic
     
     public void stopMusic(boolean resumeMCSounds)
     {
-        sequencer.stop();
-        clip.stop();
-        clip.close();
+        if(sequencer != null) {
+            sequencer.stop();
+        }
+        if(clip != null) {
+            clip.stop();
+            clip.close();
+        }
         if(mp3StreamThread != null && mp3StreamThread.isAlive())
         {
             mp3StreamRunnable.setKeepPlaying(false);
@@ -312,7 +313,7 @@ public class BattleMusic
     
     public boolean isPlaying()
     {
-        return isPlaying || sequencer.isRunning() || clip.isActive();
+        return isPlaying || (sequencer != null && sequencer.isRunning()) || (clip != null && clip.isActive());
     }
     
     public boolean hasBattleMusic()

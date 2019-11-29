@@ -10,6 +10,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.dimension.DimensionType;
 
 public class ClientProxy extends CommonProxy
 {
@@ -27,6 +28,7 @@ public class ClientProxy extends CommonProxy
         battleMusicCount = 0;
         sillyMusicCount = 0;
         localBattle = null;
+        logger.debug("Init client");
     }
 
     @Override
@@ -227,5 +229,10 @@ public class ClientProxy extends CommonProxy
     public void createLocalBattle(int id)
     {
         localBattle = new Battle(null, id, null, null, false, Minecraft.getInstance().world.dimension.getType());
+    }
+
+    @Override
+    public Entity getEntity(int id, DimensionType dim) {
+        return Minecraft.getInstance().world.getEntityByID(id);
     }
 }

@@ -17,7 +17,7 @@ public class CommonProxy
     private Entity attackingEntity = null;
     private int attackingDamage = 0;
     private Config config = null;
-    private Logger logger = null;
+    protected Logger logger = null;
     private Map<Integer, EditingInfo> editingPlayers;
     
     public final void initialize()
@@ -158,5 +158,9 @@ public class CommonProxy
     protected final EditingInfo removeEditingInfo(int id)
     {
         return editingPlayers.remove(id);
+    }
+
+    public Entity getEntity(int id, DimensionType dim) {
+        return ServerLifecycleHooks.getCurrentServer().getWorld(dim).getEntityByID(id);
     }
 }

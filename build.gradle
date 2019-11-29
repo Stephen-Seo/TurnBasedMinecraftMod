@@ -6,11 +6,13 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 //apply plugin: 'maven-publish'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 version = "1.9"
 group = "com.burnedkirby.TurnBasedMinecraft"
@@ -108,7 +110,20 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    compile files('src/main/resources/META-INF/libraries/javamp3-1.0.3.jar')
+    compile files('libs/javamp3-1.0.3.jar')
+
+    shadow files('libs/javamp3-1.0.3.jar')
+}
+
+shadowJar {
+    project.configurations.shadow.setTransitive(true);
+    configurations = [project.configurations.shadow]
+    relocate 'fr.delthas', 'com.burnedkirby.tbm_repack.fr.delthas'
+    classifier '' // replace the default jar
+}
+
+reobf {
+    shadowJar {} // reobfuscate the shadowed jar
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -122,7 +137,7 @@ jar {
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"TurnBasedMinecraftMod_BK",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "ContainedDeps": "javamp3-1.0.3.jar"
+//            "ContainedDeps": "javamp3-1.0.3.jar"
         ])
     }
 }
@@ -131,11 +146,11 @@ jar {
 // we define a custom artifact that is sourced from the reobfJar output task
 // and then declare that to be published
 // Note you'll need to add a repository here
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
-}
+//def reobfFile = file("$buildDir/reobfJar/output.jar")
+//def reobfArtifact = artifacts.add('default', reobfFile) {
+//    type 'jar'
+//    builtBy 'reobfJar'
+//}
 //publishing {
 //    publications {
 //        mavenJava(MavenPublication) {
