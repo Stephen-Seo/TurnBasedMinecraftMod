@@ -3,8 +3,10 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 import java.util.*;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
 
@@ -160,7 +162,7 @@ public class CommonProxy
         return editingPlayers.remove(id);
     }
 
-    public Entity getEntity(int id, DimensionType dim) {
+    public Entity getEntity(int id, RegistryKey<World> dim) {
         return ServerLifecycleHooks.getCurrentServer().getWorld(dim).getEntityByID(id);
     }
 }

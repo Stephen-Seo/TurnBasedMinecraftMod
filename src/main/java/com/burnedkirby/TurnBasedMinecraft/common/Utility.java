@@ -3,8 +3,10 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArrowItem;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 public class Utility
 {
@@ -49,6 +51,15 @@ public class Utility
     
     public static double distanceBetweenEntities(Entity a, Entity b)
     {
-        return Math.sqrt(Math.pow(a.posX - b.posX, 2.0) + Math.pow(a.posY - b.posY, 2.0) + Math.pow(a.posZ - b.posZ, 2.0));
+        return Math.sqrt(Math.pow(a.getPosX() - b.getPosX(), 2.0) + Math.pow(a.getPosY()- b.getPosY(), 2.0) + Math.pow(a.getPosZ()- b.getPosZ(), 2.0));
+    }
+
+    public static String serializeDimension(RegistryKey<World> dimObject) {
+        return dimObject.func_240901_a_().toString();
+    }
+
+    public static RegistryKey<World> deserializeDimension(String dimString) {
+        ResourceLocation dimRes = new ResourceLocation(dimString);
+        return RegistryKey.func_240903_a_(Registry.field_239699_ae_, dimRes);
     }
 }

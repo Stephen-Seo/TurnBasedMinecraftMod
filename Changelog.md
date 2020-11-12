@@ -1,5 +1,13 @@
 # Upcoming changes
 
+# Version 1.10
+
+Updated for 1.16.3
+
+Compiled against forge version "1.16.3-34.1.0"
+
+However, MP3 playing seems to not work sometimes.
+
 # Version 1.9
 
 Updated mod for 1.14.4

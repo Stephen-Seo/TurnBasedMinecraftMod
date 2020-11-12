@@ -14,7 +14,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.DamageSource;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class Battle
@@ -42,7 +44,7 @@ public class Battle
     
     public String debugLog; // TODO remove after freeze bug has been found
 
-    private DimensionType dimension;
+    private RegistryKey<World> dimension;
     
     public enum State
     {
@@ -113,7 +115,7 @@ public class Battle
         }
     }
 
-    public Battle(BattleManager battleManager, int id, Collection<Entity> sideA, Collection<Entity> sideB, boolean isServer, DimensionType dimension)
+    public Battle(BattleManager battleManager, int id, Collection<Entity> sideA, Collection<Entity> sideB, boolean isServer, RegistryKey<World> dimension)
     {
         this.battleManager = battleManager;
         this.isServer = isServer;
@@ -159,8 +161,8 @@ public class Battle
                 }
                 if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
                 {
-                    newCombatant.x = e.posX;
-                    newCombatant.z = e.posZ;
+                    newCombatant.x = e.getPosX();
+                    newCombatant.z = e.getPosZ();
                     newCombatant.yaw = e.rotationYaw;
                     newCombatant.pitch = e.rotationPitch;
                 }
@@ -197,8 +199,8 @@ public class Battle
                 }
                 if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
                 {
-                    newCombatant.x = e.posX;
-                    newCombatant.z = e.posZ;
+                    newCombatant.x = e.getPosX();
+                    newCombatant.z = e.getPosZ();
                     newCombatant.yaw = e.rotationYaw;
                     newCombatant.pitch = e.rotationPitch;
                 }
@@ -339,8 +341,8 @@ public class Battle
         }
         if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
         {
-            newCombatant.x = e.posX;
-            newCombatant.z = e.posZ;
+            newCombatant.x = e.getPosX();
+            newCombatant.z = e.getPosZ();
             newCombatant.yaw = e.rotationYaw;
             newCombatant.pitch = e.rotationPitch;
         }
@@ -402,8 +404,8 @@ public class Battle
         }
         if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
         {
-            newCombatant.x = e.posX;
-            newCombatant.z = e.posZ;
+            newCombatant.x = e.getPosX();
+            newCombatant.z = e.getPosZ();
             newCombatant.yaw = e.rotationYaw;
             newCombatant.pitch = e.rotationPitch;
         }
@@ -673,11 +675,11 @@ public class Battle
     {
         for(Combatant c : sideA.values())
         {
-            c.entity.setPositionAndRotation(c.x, c.entity.posY, c.z, c.yaw, c.pitch);
+            c.entity.setPositionAndRotation(c.x, c.entity.getPosY(), c.z, c.yaw, c.pitch);
         }
         for(Combatant c : sideB.values())
         {
-            c.entity.setPositionAndRotation(c.x, c.entity.posY, c.z, c.yaw, c.pitch);
+            c.entity.setPositionAndRotation(c.x, c.entity.getPosY(), c.z, c.yaw, c.pitch);
         }
     }
     
@@ -929,8 +931,8 @@ public class Battle
                                 {
                                     final Entity nextEntity = next.entity;
                                     final Entity targetEntity = target.entity;
-                                    final float yawDirection = Utility.yawDirection(next.entity.posX, next.entity.posZ, target.entity.posX, target.entity.posZ);
-                                    final float pitchDirection = Utility.pitchDirection(next.entity.posX, next.entity.posY, next.entity.posZ, target.entity.posX, target.entity.posY, target.entity.posZ);
+                                    final float yawDirection = Utility.yawDirection(next.entity.getPosX(), next.entity.getPosZ(), target.entity.getPosX(), target.entity.getPosZ());
+                                    final float pitchDirection = Utility.pitchDirection(next.entity.getPosX(), next.entity.getPosY(), next.entity.getPosZ(), target.entity.getPosX(), target.entity.getPosY(), target.entity.getPosZ());
                                     final int randomTimeLeft = random.nextInt(heldItemStack.getItem().getUseDuration(heldItemStack) / 3);
                                     if(TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled())
                                     {
@@ -938,7 +940,7 @@ public class Battle
                                         next.pitch = pitchDirection;
                                     }
                                     // have player look at attack target
-                                    ((ServerPlayerEntity)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, yawDirection, pitchDirection);
+                                    ((ServerPlayerEntity)nextEntity).connection.setPlayerLocation(nextEntity.getPosX(), nextEntity.getPosY(), nextEntity.getPosZ(), yawDirection, pitchDirection);
                                     BowItem itemBow = (BowItem)heldItemStack.getItem();
                                     TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
                                     itemBow.onPlayerStoppedUsing(((PlayerEntity)nextEntity).getHeldItemMainhand(), nextEntity.getEntityWorld(), (LivingEntity) nextEntity, randomTimeLeft);
@@ -973,8 +975,8 @@ public class Battle
                                     final Entity nextEntity = next.entity;
                                     final Entity targetEntity = target.entity;
                                     final EntityInfo targetEntityInfo = target.entityInfo;
-                                    final float yawDirection = Utility.yawDirection(next.entity.posX, next.entity.posZ, target.entity.posX, target.entity.posZ);
-                                    final float pitchDirection = Utility.pitchDirection(next.entity.posX, next.entity.posY, next.entity.posZ, target.entity.posX, target.entity.posY, target.entity.posZ);
+                                    final float yawDirection = Utility.yawDirection(next.entity.getPosX(), next.entity.getPosZ(), target.entity.getPosX(), target.entity.getPosZ());
+                                    final float pitchDirection = Utility.pitchDirection(next.entity.getPosX(), next.entity.getPosY(), next.entity.getPosZ(), target.entity.getPosX(), target.entity.getPosY(), target.entity.getPosZ());
                                     final boolean defenseDamageTriggered;
                                     if(!(targetEntity instanceof PlayerEntity) && targetEntityInfo.defenseDamage > 0 && targetEntityInfo.defenseDamageProbability > 0)
                                     {
@@ -997,7 +999,7 @@ public class Battle
                                         next.pitch = pitchDirection;
                                     }
                                     // have player look at attack target
-                                    ((ServerPlayerEntity)nextEntity).connection.setPlayerLocation(nextEntity.posX, nextEntity.posY, nextEntity.posZ, yawDirection, pitchDirection);
+                                    ((ServerPlayerEntity)nextEntity).connection.setPlayerLocation(nextEntity.getPosX(), nextEntity.getPosY(), nextEntity.getPosZ(), yawDirection, pitchDirection);
                                     TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                     TurnBasedMinecraftMod.proxy.setAttackingDamage(0);
                                     ((PlayerEntity)nextEntity).attackTargetEntityWithCurrentItem(targetEntity);
@@ -1294,7 +1296,7 @@ public class Battle
                         if(targetItem.getGroup() == ItemGroup.FOOD)
                         {
                             debugLog += " food";
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getFormattedText());
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                             final Entity nextEntity = next.entity;
                             final int nextItemToUse = next.itemToUse;
                             ((PlayerEntity)nextEntity).inventory.setInventorySlotContents(nextItemToUse, targetItem.onItemUseFinish(targetItemStack, nextEntity.world, (LivingEntity)nextEntity));
@@ -1302,7 +1304,7 @@ public class Battle
                         else if(targetItem instanceof PotionItem)
                         {
                             debugLog += " potion";
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName().getFormattedText());
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName().getString());
                             final Entity nextEntity = next.entity;
                             final int nextItemToUse = next.itemToUse;
                             ((PlayerEntity)nextEntity).inventory.setInventorySlotContents(nextItemToUse, targetItem.onItemUseFinish(targetItemStack, nextEntity.world, (LivingEntity)nextEntity));
@@ -1310,7 +1312,7 @@ public class Battle
                         else
                         {
                             debugLog += " non-consumable";
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getFormattedText());
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getString());
                         }
                         break;
                     case SWITCH_ITEM:

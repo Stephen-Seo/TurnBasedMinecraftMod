@@ -125,7 +125,7 @@ public class AttackEventHandler
                 && event.getEntity() != event.getSource().getTrueSource()
                 && !config.getBattleIgnoringPlayers().contains(event.getSource().getTrueSource().getEntityId())
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
-                && event.getEntity().dimension == event.getSource().getTrueSource().dimension
+                && event.getEntity().getEntityWorld().func_234923_W_().equals(event.getSource().getTrueSource().getEntityWorld().func_234923_W_())
                 && battleManager.checkAttack(event))
         {
 //            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.proxy.getAttackingEntity() + " and " + event.getEntity());
@@ -157,7 +157,7 @@ public class AttackEventHandler
                 && event.getTarget() != null
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
                 && !config.getBattleIgnoringPlayers().contains(event.getTarget().getEntityId())
-                && event.getEntity().dimension == event.getTarget().dimension)
+                && event.getEntity().getEntityWorld().func_234923_W_().equals(event.getTarget().getEntityWorld().func_234923_W_()))
         {
             TurnBasedMinecraftMod.proxy.getBattleManager().checkTargeted(event);
         }

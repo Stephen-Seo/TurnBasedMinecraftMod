@@ -24,6 +24,7 @@ public class BattleMusic
     private File nextBattle;
     private File nextSilly;
     private Sequencer sequencer;
+    private AudioInputStream wavInputStream;
     private Clip clip;
     private boolean playingIsSilly;
     private boolean isPlaying;
@@ -45,15 +46,17 @@ public class BattleMusic
             sequencer.open();
         } catch (Throwable t) {
             logger.error("Failed to load midi sequencer");
+            t.printStackTrace();
             sequencer = null;
         }
         
-        try {
-            clip = AudioSystem.getClip();
-        } catch(Throwable t) {
-            logger.error("Failed to load clip (for wav)");
-            clip = null;
-        }
+//        try {
+//            clip = AudioSystem.getClip();
+//        } catch(Throwable t) {
+//            logger.error("Failed to load clip (for wav)");
+//            t.printStackTrace();
+//            clip = null;
+//        }
         
         File battleMusicFolder = new File(TurnBasedMinecraftMod.MUSIC_BATTLE);
         File sillyMusicFolder = new File(TurnBasedMinecraftMod.MUSIC_SILLY);
@@ -204,19 +207,22 @@ public class BattleMusic
                 } catch (Throwable t)
                 {
                     logger.error("Failed to play battle music (midi)");
+                    t.printStackTrace();
                     return;
                 }
 
                 sequencer.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);
                 sequencer.start();
+
+                logger.info("Played music (midi) " + next.getName());
             }
-            else if(suffix.equals("wav") && clip != null)
+            else if(suffix.equals("wav"))
             {
                 if(sequencer != null && sequencer.isRunning())
                 {
                     sequencer.stop();
                 }
-                if(clip.isActive())
+                if(clip != null && clip.isActive())
                 {
                     clip.stop();
                     clip.close();
@@ -229,10 +235,18 @@ public class BattleMusic
 
                 try
                 {
-                    clip.open(AudioSystem.getAudioInputStream(next));
+                    if(wavInputStream != null) {
+                        wavInputStream.close();
+                    }
+                    wavInputStream = AudioSystem.getAudioInputStream(next);
+                    AudioFormat format = wavInputStream.getFormat();
+                    DataLine.Info info = new DataLine.Info(Clip.class, format);
+                    clip = (Clip) AudioSystem.getLine(info);
+                    clip.open(wavInputStream);
                 } catch(Throwable t)
                 {
                     logger.error("Failed to play battle music (wav)");
+                    t.printStackTrace();
                     return;
                 }
                 
@@ -242,6 +256,8 @@ public class BattleMusic
 
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
+
+                logger.info("Playing music (wav) " + next.getName());
             }
             else if(suffix.equals("mp3"))
             {
@@ -279,6 +295,7 @@ public class BattleMusic
                 catch (Throwable t)
                 {
                     logger.error("Failed to play battle music (mp3)");
+                    t.printStackTrace();
                     return;
                 }
             }

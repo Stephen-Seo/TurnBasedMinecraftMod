@@ -1,78 +1,99 @@
 package com.burnedkirby.TurnBasedMinecraft.client;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.text.StringTextComponent;
 
-public class EntitySelectionButton extends Button
-{
+public class EntitySelectionButton extends Button {
     private int entityID;
     private boolean isSideA;
-    
+
     public EntitySelectionButton(int x, int y, int widthIn, int heightIn, String buttonText, int entityID, boolean isSideA, Button.IPressable onPress) {
-        super(x, y, widthIn, heightIn, buttonText, onPress);
+        super(x, y, widthIn, heightIn, new StringTextComponent(buttonText), onPress);
         this.entityID = entityID;
         this.isSideA = isSideA;
     }
-    
+
     public int getID() {
-    	return entityID;
+        return entityID;
     }
-    
+
     public boolean getIsSideA() {
-    	return isSideA;
+        return isSideA;
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        super.render(mouseX, mouseY, partialTicks);
+    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
         Entity e = Minecraft.getInstance().world.getEntityByID(entityID);
-        if(e != null && e instanceof LivingEntity && ((LivingEntity)e).isAlive()) {
-            int health = (int)(((LivingEntity)e).getHealth() + 0.5f);
-            int xpos = x;
+        if (e != null && e instanceof LivingEntity && ((LivingEntity) e).isAlive()) {
+            int health = (int) (((LivingEntity) e).getHealth() + 0.5f);
+            int xpos = getX();
             int xoffset;
-            if(isSideA) {
-                xpos += width + 4;
+            if (isSideA) {
+                xpos += getWidth() + 4;
                 xoffset = 4;
             } else {
                 xpos -= 6;
                 xoffset = -4;
             }
-            if(health > 200) {
-                fill(xpos, y + height * 4 / 5, xpos + 2, y + height        , 0xFFFF0000);
-                fill(xpos, y + height * 3 / 5, xpos + 2, y + height * 4 / 5, 0xFFFFFF00);
-                fill(xpos, y + height * 2 / 5, xpos + 2, y + height * 3 / 5, 0xFF00FF00);
-                fill(xpos, y + height     / 5, xpos + 2, y + height * 2 / 5, 0xFF00FFFF);
-                fill(xpos, y                 , xpos + 2, y + height     / 5, 0xFF0000FF);
-                int healthHeight = ((health - 200) * height / 100);
-                fill(xpos + xoffset, y + height - healthHeight, xpos + xoffset + 2, y + height, 0xFFFFFFFF);
-            } else if(health > 100) {
-                fill(xpos, y + height * 4 / 5, xpos + 2, y + height        , 0xFFFF0000);
-                fill(xpos, y + height * 3 / 5, xpos + 2, y + height * 4 / 5, 0xFFFFFF00);
-                fill(xpos, y + height * 2 / 5, xpos + 2, y + height * 3 / 5, 0xFF00FF00);
-                fill(xpos, y + height     / 5, xpos + 2, y + height * 2 / 5, 0xFF00FFFF);
-                int healthHeight = ((health - 100) * height / 100);
-                fill(xpos + xoffset, y + height - healthHeight, xpos + xoffset + 2, y + height, 0xFF0000FF);
-            } else if(health > 50) {
-                fill(xpos, y + height * 4 / 5, xpos + 2, y + height        , 0xFFFF0000);
-                fill(xpos, y + height * 3 / 5, xpos + 2, y + height * 4 / 5, 0xFFFFFF00);
-                fill(xpos, y + height * 2 / 5, xpos + 2, y + height * 3 / 5, 0xFF00FF00);
-                int healthHeight = ((health - 50) * height / 50);
-                fill(xpos + xoffset, y + height - healthHeight, xpos + xoffset + 2, y + height, 0xFF00FFFF);
-            } else if(health > 20) {
-                fill(xpos, y + height * 4 / 5, xpos + 2, y + height        , 0xFFFF0000);
-                fill(xpos, y + height * 3 / 5, xpos + 2, y + height * 4 / 5, 0xFFFFFF00);
-                int healthHeight = ((health - 20) * height / 30);
-                fill(xpos + xoffset, y + height - healthHeight, xpos + xoffset + 2, y + height, 0xFF00FF00);
-            } else if(health > 10) {
-                fill(xpos, y + height * 4 / 5, xpos + 2, y + height, 0xFFFF0000);
-                int healthHeight = ((health - 10) * height / 10);
-                fill(xpos + xoffset, y + height - healthHeight, xpos + xoffset + 2, y + height, 0xFFFFFF00);
+            if (health > 200) {
+                fill(matrixStack, xpos, getY() + getHeight() * 4 / 5, xpos + 2, getY() + getHeight(), 0xFFFF0000);
+                fill(matrixStack, xpos, getY() + getHeight() * 3 / 5, xpos + 2, getY() + getHeight() * 4 / 5, 0xFFFFFF00);
+                fill(matrixStack, xpos, getY() + getHeight() * 2 / 5, xpos + 2, getY() + getHeight() * 3 / 5, 0xFF00FF00);
+                fill(matrixStack, xpos, getY() + getHeight() / 5, xpos + 2, getY() + getHeight() * 2 / 5, 0xFF00FFFF);
+                fill(matrixStack, xpos, getY(), xpos + 2, getY() + getHeight() / 5, 0xFF0000FF);
+                int healthHeight = ((health - 200) * getHeight() / 100);
+                fill(matrixStack, xpos + xoffset, getY() + getHeight() - healthHeight, xpos + xoffset + 2, getY() + getHeight(), 0xFFFFFFFF);
+            } else if (health > 100) {
+                fill(matrixStack, xpos, getY() + getHeight() * 4 / 5, xpos + 2, getY() + getHeight(), 0xFFFF0000);
+                fill(matrixStack, xpos, getY() + getHeight() * 3 / 5, xpos + 2, getY() + getHeight() * 4 / 5, 0xFFFFFF00);
+                fill(matrixStack, xpos, getY() + getHeight() * 2 / 5, xpos + 2, getY() + getHeight() * 3 / 5, 0xFF00FF00);
+                fill(matrixStack, xpos, getY() + getHeight() / 5, xpos + 2, getY() + getHeight() * 2 / 5, 0xFF00FFFF);
+                int healthHeight = ((health - 100) * getHeight() / 100);
+                fill(matrixStack, xpos + xoffset, getY() + getHeight() - healthHeight, xpos + xoffset + 2, getY() + getHeight(), 0xFF0000FF);
+            } else if (health > 50) {
+                fill(matrixStack, xpos, getY() + getHeight() * 4 / 5, xpos + 2, getY() + getHeight(), 0xFFFF0000);
+                fill(matrixStack, xpos, getY() + getHeight() * 3 / 5, xpos + 2, getY() + getHeight() * 4 / 5, 0xFFFFFF00);
+                fill(matrixStack, xpos, getY() + getHeight() * 2 / 5, xpos + 2, getY() + getHeight() * 3 / 5, 0xFF00FF00);
+                int healthHeight = ((health - 50) * getHeight() / 50);
+                fill(matrixStack, xpos + xoffset, getY() + getHeight() - healthHeight, xpos + xoffset + 2, getY() + getHeight(), 0xFF00FFFF);
+            } else if (health > 20) {
+                fill(matrixStack, xpos, getY() + getHeight() * 4 / 5, xpos + 2, getY() + getHeight(), 0xFFFF0000);
+                fill(matrixStack, xpos, getY() + getHeight() * 3 / 5, xpos + 2, getY() + getHeight() * 4 / 5, 0xFFFFFF00);
+                int healthHeight = ((health - 20) * getHeight() / 30);
+                fill(matrixStack, xpos + xoffset, getY() + getHeight() - healthHeight, xpos + xoffset + 2, getY() + getHeight(), 0xFF00FF00);
+            } else if (health > 10) {
+                fill(matrixStack, xpos, getY() + getHeight() * 4 / 5, xpos + 2, getY() + getHeight(), 0xFFFF0000);
+                int healthHeight = ((health - 10) * getHeight() / 10);
+                fill(matrixStack, xpos + xoffset, getY() + getHeight() - healthHeight, xpos + xoffset + 2, getY() + getHeight(), 0xFFFFFF00);
             } else {
-                int healthHeight = (health * height / 10);
-                fill(xpos + xoffset, y + height - healthHeight, xpos + xoffset + 2, y + height, 0xFFFF0000);
+                int healthHeight = (health * getHeight() / 10);
+                fill(matrixStack, xpos + xoffset, getY() + getHeight() - healthHeight, xpos + xoffset + 2, getY() + getHeight(), 0xFFFF0000);
             }
         }
+    }
+
+    private int getX() {
+        return field_230690_l_;
+    }
+
+    private int getY() {
+        return field_230691_m_;
+    }
+
+    private int getWidth() {
+        return field_230688_j_;
+    }
+
+    private int getHeight() {
+        return field_230689_k_;
+    }
+
+    private void fill(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
+        func_238467_a_(matrixStack, x, y, width, height, color);
     }
 }

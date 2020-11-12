@@ -8,7 +8,8 @@ import java.util.Map;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
@@ -141,7 +142,7 @@ public class BattleManager
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
                 sideB.add(event.getSource().getTrueSource());
-                createBattle(sideA, sideB, event.getEntity().dimension);
+                createBattle(sideA, sideB, event.getEntity().getEntityWorld().func_234923_W_());
                 logger.debug("Attack Not Canceled: new battle created");
             }
             else
@@ -244,7 +245,7 @@ public class BattleManager
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
                 sideB.add(event.getTarget());
-                createBattle(sideA, sideB, event.getEntity().dimension);
+                createBattle(sideA, sideB, event.getEntity().getEntityWorld().func_234923_W_());
                 logger.debug("neither in battle, at least one is player, creating new battle");
             }
         } else {
@@ -273,7 +274,7 @@ public class BattleManager
         }
     }
     
-    private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB, DimensionType dimension)
+    private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB, RegistryKey<World> dimension)
     {
         Battle newBattle = null;
         while(battleMap.containsKey(IDCounter))

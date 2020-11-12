@@ -2,26 +2,26 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.World;
 
 public class EntityIDDimPair {
     public int id;
-    public DimensionType dim;
+    public RegistryKey<World> dim;
 
     EntityIDDimPair() {
         id = 0;
-        dim = Minecraft.getInstance().world.dimension.getType();
+        dim = Minecraft.getInstance().world.func_234923_W_();
     }
 
-    EntityIDDimPair(int id, DimensionType dim) {
+    EntityIDDimPair(int id, RegistryKey<World> dim) {
         this.id = id;
         this.dim = dim;
     }
 
     EntityIDDimPair(Entity entity) {
         id = entity.getEntityId();
-        dim = entity.dimension;
+        dim = entity.getEntityWorld().func_234923_W_();
     }
 
     public Entity getEntity() {

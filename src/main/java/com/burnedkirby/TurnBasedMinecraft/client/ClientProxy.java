@@ -6,11 +6,14 @@ import com.burnedkirby.TurnBasedMinecraft.common.CommonProxy;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.Color;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
+
+import java.util.UUID;
 
 public class ClientProxy extends CommonProxy
 {
@@ -158,17 +161,21 @@ public class ClientProxy extends CommonProxy
     public void displayString(String message)
     {
         ITextComponent prefix = new StringTextComponent("TBM: ");
-        prefix.getStyle().setColor(TextFormatting.GREEN).setBold(true);
+        // func_240718_a_ is set color
+        // func_240713_a_ is set bold
+        prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true);
         ITextComponent text = new StringTextComponent(message);
-        prefix.appendSibling(text);
-        text.getStyle().setColor(TextFormatting.WHITE).setBold(false);
-        Minecraft.getInstance().player.sendMessage(prefix);
+        prefix.getSiblings().add(text);
+        text.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFFFFFF)).func_240713_a_(false);
+        // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
+        Minecraft.getInstance().player.sendMessage(prefix, UUID.randomUUID());
     }
 
     @Override
     public void displayTextComponent(ITextComponent text)
     {
-        Minecraft.getInstance().player.sendMessage(text);
+        // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
+        Minecraft.getInstance().player.sendMessage(text, UUID.randomUUID());
     }
 
     private void checkBattleTypes()
@@ -228,11 +235,11 @@ public class ClientProxy extends CommonProxy
     @Override
     public void createLocalBattle(int id)
     {
-        localBattle = new Battle(null, id, null, null, false, Minecraft.getInstance().world.dimension.getType());
+        localBattle = new Battle(null, id, null, null, false, Minecraft.getInstance().world.func_234923_W_());
     }
 
     @Override
-    public Entity getEntity(int id, DimensionType dim) {
+    public Entity getEntity(int id, RegistryKey<World> dim) {
         return Minecraft.getInstance().world.getEntityByID(id);
     }
 }
