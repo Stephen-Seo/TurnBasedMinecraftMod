@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.12
+
+Fix potential crash if mod is loaded on dedicated server.
+
 # Version 1.11
 
 Fixed text display in BattleGUI.
