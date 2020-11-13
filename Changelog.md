@@ -1,5 +1,13 @@
 # Upcoming changes
 
+# Version 1.11
+
+Fixed text display in BattleGUI.
+
+Updated TBM\_Config.toml with new vanilla mobs.
+
+Fixed version parsing of TBM\_Config.toml.
+
 # Version 1.10
 
 Updated for 1.16.3
