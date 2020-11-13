@@ -4,10 +4,9 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.toml.TomlFormat;
 import org.apache.logging.log4j.Logger;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
@@ -73,6 +72,7 @@ public class Config
 
         if(internalVersion == 0) {
             logger.error("Failed to check version of internal config file");
+            logger.error("Tried path \"" + TurnBasedMinecraftMod.DEFAULT_CONFIG_FILE_PATH + "\"");
         } else {
             configVersion = internalVersion;
         }
@@ -996,7 +996,8 @@ public class Config
     {
         int version = 0;
 
-        FileConfig conf = FileConfig.of(configFile);
+        FileConfig conf = FileConfig.of(configFile, TomlFormat.instance());
+        conf.load();
         version = conf.getIntOrElse("version", 0);
         conf.close();
 

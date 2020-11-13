@@ -1,6 +1,6 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 2
+version = 3
 
 [client_config]
 
@@ -221,6 +221,18 @@ decision_defend_probability = 20
 decision_flee_probability = 0
 
 [[server_config.entity]]
+name = "net.minecraft.entity.monster.HoglinEntity"
+attack_power = 6
+attack_variance = 2
+attack_probability = 60
+evasion = 20
+category = "monster"
+speed = 40
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+
+[[server_config.entity]]
 name = "net.minecraft.entity.monster.HuskEntity"
 attack_power = 3
 attack_probability = 70
@@ -246,7 +258,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.IronGolemEntity"
+name = "net.minecraft.entity.passive.IronGolemEntity"
 attack_power = 14
 attack_probability = 85
 attack_variance = 7
@@ -264,6 +276,30 @@ attack_probability = 35
 evasion = 12
 category = "monster"
 speed = 35
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+
+[[server_config.entity]]
+name = "net.minecraft.entity.monster.piglin.PiglinEntity"
+attack_power = 5
+attack_variance = 2
+attack_probability = 70
+evasion = 20
+category = "monster"
+speed = 25
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+
+[[server_config.entity]]
+name = "net.minecraft.entity.monster.piglin.PiglinBruteEntity"
+attack_power = 10
+attack_variance = 2
+attack_probability = 75
+evasion = 20
+category = "monster"
+speed = 28
 decision_attack_probability = 100
 decision_defend_probability = 0
 decision_flee_probability = 0
@@ -422,6 +458,18 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
+name = "net.minecraft.entity.monster.ZoglinEntity"
+attack_power = 6
+attack_variance = 2
+attack_probability = 60
+evasion = 20
+category = "monster"
+speed = 40
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+
+[[server_config.entity]]
 name = "net.minecraft.entity.monster.ZombieEntity"
 attack_power = 3
 attack_probability = 70
@@ -433,7 +481,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.ZombiePigmanEntity"
+name = "net.minecraft.entity.monster.ZombifiedPiglinEntity"
 attack_power = 8
 attack_probability = 70
 evasion = 10
@@ -464,6 +512,19 @@ speed = 75
 decision_attack_probability = 0
 decision_defend_probability = 0
 decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.entity.passive.BeeEntity"
+attack_power = 2
+attack_probability = 65
+evasion = 30
+category = "animal"
+speed = 20
+decision_attack_probability = 90
+decision_defend_probability = 0
+decision_flee_probability = 0
+attack_effect = "poison"
+attack_effect_probability = 50
 
 [[server_config.entity]]
 name = "net.minecraft.entity.passive.ChickenEntity"
@@ -498,6 +559,17 @@ speed = 75
 decision_attack_probability = 70
 decision_defend_probability = 0
 decision_flee_probability = 30
+
+[[server_config.entity]]
+name = "net.minecraft.entity.passive.FoxEntity"
+attack_power = 2
+attack_probability = 70
+evasion = 65
+category = "animal"
+speed = 65
+decision_attack_probability = 70
+decision_defend_probability = 0
+decision_flee_probability = 25
 
 [[server_config.entity]]
 name = "net.minecraft.entity.passive.horse.DonkeyEntity"
@@ -745,6 +817,17 @@ decision_defend_probability = 0
 decision_flee_probability = 75
 
 [[server_config.entity]]
+name = "net.minecraft.entity.passive.StriderEntity"
+attack_power = 0
+attack_probability = 50
+evasion = 35
+category = "passive"
+speed = 45
+decision_attack_probability = 0
+decision_defend_probability = 10
+decision_flee_probability = 90
+
+[[server_config.entity]]
 name = "net.minecraft.entity.passive.fish.TropicalFishEntity"
 attack_power = 0
 attack_probability = 50
@@ -754,6 +837,28 @@ speed = 75
 decision_attack_probability = 25
 decision_defend_probability = 0
 decision_flee_probability = 75
+
+[[server_config.entity]]
+name = "net.minecraft.entity.passive.TurtleEntity"
+attack_power = 0
+attack_probability = 20
+evasion = 35
+category = "passive"
+speed = 50
+decision_attack_probability = 0
+decision_defend_probability = 40
+decision_flee_probability = 60
+
+[[server_config.entity]]
+name = "net.minecraft.entity.merchant.villager.WanderingTraderEntity"
+attack_power = 0
+attack_probability = 70
+evasion = 5
+category = "passive"
+speed = 35
+decision_attack_probability = 0
+decision_defend_probability = 10
+decision_flee_probability = 80
 
 [[server_config.entity]]
 name = "net.minecraft.entity.boss.dragon.EnderDragonEntity"

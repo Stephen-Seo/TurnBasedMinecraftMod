@@ -235,7 +235,7 @@ public class BattleGui extends Screen {
 	public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
 			// drawHoveringText("Waiting...", field_230708_k_ / 2 - 50, field_230709_l_ / 2);
-			drawString("Waiting...", field_230708_k_ / 2 - 50, field_230709_l_ / 2, 0xFFFFFFFF);
+			drawString(matrixStack, "Waiting...", field_230708_k_ / 2 - 50, field_230709_l_ / 2, 0xFFFFFFFF);
 			return;
 		}
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle().getState() == Battle.State.DECISION
@@ -266,10 +266,10 @@ public class BattleGui extends Screen {
 		int stringWidth = field_230712_o_.getStringWidth(timeRemainingString);
 		// func_238467_a_ is probably fill
 		func_238467_a_(matrixStack, field_230708_k_ / 2 - stringWidth / 2, 5, field_230708_k_ / 2 + stringWidth / 2, 15, 0x70000000);
-		drawString(timeRemainingString, field_230708_k_ / 2 - stringWidth / 2, 5, 0xFFFFFFFF);
+		drawString(matrixStack, timeRemainingString, field_230708_k_ / 2 - stringWidth / 2, 5, 0xFFFFFFFF);
 		stringWidth = field_230712_o_.getStringWidth(info);
 		func_238467_a_(matrixStack, field_230708_k_ / 2 - stringWidth / 2, 20, field_230708_k_ / 2 + stringWidth / 2, 30, 0x70000000);
-		drawString(info, field_230708_k_ / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
+		drawString(matrixStack, info, field_230708_k_ / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
 	}
 
 	protected void buttonActionEvent(Button button, ButtonAction action) {
@@ -358,9 +358,7 @@ public class BattleGui extends Screen {
 		timeRemaining.set(remaining);
 	}
 
-	private void drawString(String string, int x, int y, int color) {
-		IRenderTypeBuffer.Impl irendertypebuffer$impl = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-		field_230712_o_.renderString(string, x, y, color, true, identity, irendertypebuffer$impl, true, 0x7F000000, 15728880);
-		irendertypebuffer$impl.finish();
+	private void drawString(MatrixStack matrixStack, String string, int x, int y, int color) {
+		field_230712_o_.func_238405_a_(matrixStack, string, x, y, color);
 	}
 }
