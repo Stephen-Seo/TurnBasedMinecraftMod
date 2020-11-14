@@ -1,5 +1,12 @@
 # Upcoming changes
 
+# Version 1.13
+
+Disabled midi playback due to currently being unable to change its volume.
+
+Note mp3 playback breaks sometimes. Using an mp3 file without album art seems to
+work though...
+
 # Version 1.12
 
 Fix potential crash if mod is loaded on dedicated server.
