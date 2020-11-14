@@ -4,7 +4,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 import javax.sound.sampled.*;
 
@@ -41,22 +43,15 @@ public class BattleMusic
         mp3StreamThread = null;
         mp3StreamRunnable = null;
 
-        try {
-            sequencer = MidiSystem.getSequencer();
-            sequencer.open();
-        } catch (Throwable t) {
-            logger.error("Failed to load midi sequencer");
-            t.printStackTrace();
-            sequencer = null;
-        }
-        
 //        try {
-//            clip = AudioSystem.getClip();
-//        } catch(Throwable t) {
-//            logger.error("Failed to load clip (for wav)");
+//            sequencer = MidiSystem.getSequencer();
+//            sequencer.open();
+//        } catch (Throwable t) {
+//            logger.error("Failed to load midi sequencer");
 //            t.printStackTrace();
-//            clip = null;
+//            sequencer = null;
 //        }
+        sequencer = null; // midi disabled
         
         File battleMusicFolder = new File(TurnBasedMinecraftMod.MUSIC_BATTLE);
         File sillyMusicFolder = new File(TurnBasedMinecraftMod.MUSIC_SILLY);
@@ -88,7 +83,8 @@ public class BattleMusic
                     return false;
                 }
                 String ext = name.substring(extIndex + 1).toLowerCase();
-                return ext.equals("mid") || ext.equals("wav") || ext.equals("mp3");
+//                return ext.equals("mid") || ext.equals("wav") || ext.equals("mp3");
+                return ext.equals("wav") || ext.equals("mp3"); // midi disabled
             }
         });
         for(File f : battleFiles)
@@ -107,7 +103,8 @@ public class BattleMusic
                     return false;
                 }
                 String ext = name.substring(extIndex + 1).toLowerCase();
-                return ext.equals("mid") || ext.equals("wav") || ext.equals("mp3");
+//                return ext.equals("mid") || ext.equals("wav") || ext.equals("mp3");
+                return ext.equals("wav") || ext.equals("mp3"); // midi disabled
             }
         });
         for(File f : sillyFiles)
@@ -208,6 +205,16 @@ public class BattleMusic
                 {
                     logger.error("Failed to play battle music (midi)");
                     t.printStackTrace();
+                    return;
+                }
+
+                try {
+                    for (MidiChannel channel : MidiSystem.getSynthesizer().getChannels()) {
+                        channel.controlChange(7, (int)(volume * 127));
+                    }
+                } catch (MidiUnavailableException e) {
+                    logger.error("Failed to set Midi volume");
+                    e.printStackTrace();
                     return;
                 }
 
