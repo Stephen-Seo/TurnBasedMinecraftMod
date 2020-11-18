@@ -23,8 +23,11 @@ Minecraft directory. They will typically be located at
 The config file `.minecraft/config/TurnBasedMinecraft/TBM_Config.toml` is commented
 with info on what each option does. ~~It will also be moved if a newer version
 of this mod has a newer version of the config file (usually renamed with a
-timestamp).~~ I will try my best to not move the previous version config, but rather
-edit the previous version config to have new options.
+timestamp).~~ ~~I will try my best to not move the previous version config, but rather
+edit the previous version config to have new options.~~ When a new config version is made,
+usually because a new entry has been added, the existing config is renamed to a file with
+a timestamp in the filename of when it was replaced. One can set a config option in the
+config to prevent it being overwritten if necessary.
 
 Some options in the config file only affect the Server, and some only affect the Client.
 When playing multiplayer, some configuration of the config on the server may be needed.
@@ -38,9 +41,11 @@ in battle)
 - Supports custom battle music to be played when fighting enemies. (They must be
 placed in `.minecraft/config/TurnBasedMinecraft/Music/battle` or
 `.minecraft/config/TurnBasedMinecraft/Music/silly`. Client-side config determines
-which song plays in battle for the client. only `.wav`, `.mid`, and `.mp3` files
-supported.  Only `.mid` files are not affected by volume options (master and
-music sliders))
+which song plays in battle for the client. only `.wav`, ~~`.mid`~~, and `.mp3` files
+supported.  ~~Only `.mid` files are not affected by volume options (master and
+music sliders))~~ Midi file playback has been disabled for now due to lack of volume
+control issues. MP3 file playback sometimes fails, but seems to work better when the
+file is as "barebones" as possible (no album art metadata in the file).
 - Config allows limiting number of combatants in turn-based battle.
 - Config can be modified (server-side) to add entries of mobs from other mods.
 (by default an unknown mob cannot enter turn-based battle, so the config must be
