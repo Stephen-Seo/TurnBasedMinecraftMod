@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.RegistryKey;
@@ -323,6 +324,9 @@ public class BattleManager
         for(Iterator<Map.Entry<Integer, Combatant>> iter = recentlyLeftBattle.entrySet().iterator(); iter.hasNext();)
         {
             Map.Entry<Integer, Combatant> entry = iter.next();
+            if(entry.getValue().entity instanceof CreeperEntity && TurnBasedMinecraftMod.proxy.getConfig().getCreeperStopExplodeOnLeaveBattle()) {
+                ((CreeperEntity)entry.getValue().entity).setCreeperState(-10);
+            }
             if(current - entry.getValue().time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
             {
                 iter.remove();

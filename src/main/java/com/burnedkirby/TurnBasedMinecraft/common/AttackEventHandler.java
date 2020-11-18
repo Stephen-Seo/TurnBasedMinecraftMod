@@ -6,6 +6,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
@@ -115,8 +116,12 @@ public class AttackEventHandler
         }
         if(event.getEntity() != null && event.getSource().getTrueSource() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()) || battleManager.isRecentlyLeftBattle(event.getSource().getTrueSource().getEntityId())))
         {
+            if(event.getSource().getTrueSource().getEntity() instanceof CreeperEntity && TurnBasedMinecraftMod.proxy.getConfig().getCreeperAlwaysAllowDamage()) {
+                event.setCanceled(false);
+            } else {
 //            TurnBasedMinecraftMod.logger.debug("Canceled attack");
-            event.setCanceled(true);
+                event.setCanceled(true);
+            }
             return;
         }
         else if(!isAttackerValid(event)

@@ -1,5 +1,15 @@
 # Upcoming changes
 
+# Version 1.16
+
+Add config options regarding creeper behavior.
+
+By default, creepers will not explode if they leave battle (maybe due to a
+player fleeing), until the cooldown time ends.
+
+By default, creepers that explode will damage anyone, even if they weren't in
+turn-based battle.
+
 # Version 1.15
 
 Add server-side config option that determines on what turn a Creeper will

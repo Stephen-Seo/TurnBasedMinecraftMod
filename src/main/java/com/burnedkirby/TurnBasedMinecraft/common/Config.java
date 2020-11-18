@@ -46,6 +46,8 @@ public class Config
     private int leaveBattleCooldownSeconds = 5;
     private int aggroStartBattleDistance = 8;
     private int creeperExplodeTurn = 5;
+    private boolean creeperStopExplodeOnLeaveBattle = true;
+    private boolean creeperAlwaysAllowDamage = true;
 
     public Config(Logger logger)
     {
@@ -252,6 +254,32 @@ public class Config
         } catch(ClassCastException e) {
             this.creeperExplodeTurn = 5;
             logTOMLInvalidValue("server_config.creeper_explode_turn", "5");
+        }
+
+        try {
+            Boolean creeper_stop_explode_on_leave_battle = conf.get("server_config.creeper_stop_explode_on_leave_battle");
+            if(creeper_stop_explode_on_leave_battle != null) {
+                this.creeperStopExplodeOnLeaveBattle = creeper_stop_explode_on_leave_battle;
+            } else {
+                this.creeperStopExplodeOnLeaveBattle = true;
+                logNotFound("server_config.creeper_stop_explode_on_leave_battle", "true");
+            }
+        } catch (ClassCastException e) {
+            this.creeperStopExplodeOnLeaveBattle = true;
+            logTOMLInvalidValue("server_config.creeper_stop_explode_on_leave_battle", "true");
+        }
+
+        try {
+            Boolean creeper_always_allow_damage = conf.get("server_config.creeper_always_allow_damage");
+            if(creeper_always_allow_damage != null) {
+                this.creeperAlwaysAllowDamage = creeper_always_allow_damage;
+            } else {
+                this.creeperAlwaysAllowDamage = true;
+                logNotFound("server_config.creeper_always_allow_damage", "true");
+            }
+        } catch (ClassCastException e) {
+            this.creeperAlwaysAllowDamage = true;
+            logTOMLInvalidValue("server_config.creeper_always_allow_damage", "true");
         }
 
         try {
@@ -1157,4 +1185,8 @@ public class Config
     }
 
     public int getCreeperExplodeTurn() { return creeperExplodeTurn; }
+
+    public boolean getCreeperStopExplodeOnLeaveBattle() { return creeperStopExplodeOnLeaveBattle; }
+
+    public boolean getCreeperAlwaysAllowDamage() { return creeperAlwaysAllowDamage; }
 }

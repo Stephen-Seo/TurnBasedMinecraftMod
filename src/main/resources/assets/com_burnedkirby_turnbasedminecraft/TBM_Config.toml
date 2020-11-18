@@ -1,6 +1,6 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 5
+version = 6
 do_not_overwrite = false
 
 [client_config]
@@ -71,6 +71,12 @@ battle_turn_time_seconds = 15
 
 # On what turn a Creeper will explode in battle
 creeper_explode_turn = 5
+
+# Keep creepers from exploding when they leave a battle (for leave_battle_cooldown duration)
+creeper_stop_explode_on_leave_battle = true
+
+# If false, creepers may not damage others outside of turn-based battle
+creeper_always_allow_damage = true
 
 
 # Each "server_config.entity" entry uses the following options:
