@@ -45,6 +45,7 @@ public class Config
     private boolean oldBattleBehaviorEnabled = false;
     private int leaveBattleCooldownSeconds = 5;
     private int aggroStartBattleDistance = 8;
+    private int creeperExplodeTurn = 5;
 
     public Config(Logger logger)
     {
@@ -234,6 +235,23 @@ public class Config
         } catch (ClassCastException e) {
             this.aggroStartBattleDistance = 8;
             logTOMLInvalidValue("server_config.aggro_start_battle_max_distance", "8");
+        }
+
+        try {
+            OptionalInt creeper_explode_turn = conf.getOptionalInt("server_config.creeper_explode_turn");
+            if(creeper_explode_turn.isPresent()) {
+                this.creeperExplodeTurn = creeper_explode_turn.getAsInt();
+                if(this.creeperExplodeTurn < 1) {
+                    logClampedValue("server_config.creeper_explode_turn", Integer.toString(this.creeperExplodeTurn), "1");
+                    this.creeperExplodeTurn = 1;
+                }
+            } else {
+                this.creeperExplodeTurn = 5;
+                logNotFound("server_config.creeper_explode_turn", "5");
+            }
+        } catch(ClassCastException e) {
+            this.creeperExplodeTurn = 5;
+            logTOMLInvalidValue("server_config.creeper_explode_turn", "5");
         }
 
         try {
@@ -1137,4 +1155,6 @@ public class Config
     {
         return aggroStartBattleDistance;
     }
+
+    public int getCreeperExplodeTurn() { return creeperExplodeTurn; }
 }

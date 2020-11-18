@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version 1.15
+
+Add server-side config option that determines on what turn a Creeper will
+explode in battle.
+
 # Version 1.14
 
 Implemented support for Creepers in battle.

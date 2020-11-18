@@ -830,7 +830,7 @@ public class Battle
                     if(!(c.entity instanceof PlayerEntity) && c.decision == Decision.UNDECIDED && c.entityInfo != null)
                     {
                         if(c.entity instanceof CreeperEntity) {
-                            if(c.creeperTurns++ < 2) {
+                            if(c.creeperTurns++ < TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
                                 c.decision = Decision.CREEPER_WAIT;
                             } else {
                                 c.decision = Decision.CREEPER_EXPLODE;
@@ -857,7 +857,7 @@ public class Battle
                     if(!(c.entity instanceof PlayerEntity) && c.decision == Decision.UNDECIDED && c.entityInfo != null)
                     {
                         if(c.entity instanceof CreeperEntity) {
-                            if(c.creeperTurns++ < 2) {
+                            if(c.creeperTurns++ < TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
                                 c.decision = Decision.CREEPER_WAIT;
                             } else {
                                 c.decision = Decision.CREEPER_EXPLODE;
@@ -1348,7 +1348,7 @@ public class Battle
                         break;
                     case CREEPER_WAIT:
                         debugLog += " creeper wait";
-                        if(next.creeperTurns < 2) {
+                        if(next.creeperTurns < TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_WAIT, next.entity.getEntityId(), 0, 0);
                         } else {
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_WAIT_FINAL, next.entity.getEntityId(), 0, 0);
@@ -1493,7 +1493,7 @@ public class Battle
     private void defuseCreepers() {
         for(Combatant c : sideA.values()) {
             if(c.entity instanceof CreeperEntity) {
-                if(c.creeperTurns <= 2) {
+                if(c.creeperTurns <= TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
                     ((CreeperEntity)c.entity).setCreeperState(-10);
                 } else {
                     ((CreeperEntity)c.entity).setCreeperState(1000000);
@@ -1502,7 +1502,7 @@ public class Battle
         }
         for(Combatant c : sideB.values()) {
             if(c.entity instanceof CreeperEntity) {
-                if(c.creeperTurns <= 2) {
+                if(c.creeperTurns <= TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
                     ((CreeperEntity)c.entity).setCreeperState(-10);
                 } else {
                     ((CreeperEntity) c.entity).setCreeperState(1000000);

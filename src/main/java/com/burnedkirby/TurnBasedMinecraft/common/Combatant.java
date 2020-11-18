@@ -32,7 +32,7 @@ public class Combatant
         decision = Battle.Decision.UNDECIDED;
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
-        creeperTurns = 0;
+        creeperTurns = 1;
     }
     
     public Combatant(Entity e, EntityInfo entityInfo)
@@ -42,7 +42,7 @@ public class Combatant
         this.entityInfo = entityInfo;
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
-        creeperTurns = 0;
+        creeperTurns = 1;
     }
     
     /**

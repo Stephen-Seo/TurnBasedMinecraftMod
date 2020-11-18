@@ -1,6 +1,6 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 4
+version = 5
 do_not_overwrite = false
 
 [client_config]
@@ -68,6 +68,9 @@ minimum_hit_percentage = 4
 # Number of seconds to wait in battle for all players to make a decision.
 # Minimum 5, maximum 60.
 battle_turn_time_seconds = 15
+
+# On what turn a Creeper will explode in battle
+creeper_explode_turn = 5
 
 
 # Each "server_config.entity" entry uses the following options:
