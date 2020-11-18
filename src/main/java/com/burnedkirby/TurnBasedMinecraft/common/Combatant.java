@@ -25,12 +25,14 @@ public class Combatant
     public float yaw;
     public float pitch;
     public long time;
+    public int creeperTurns;
     
     public Combatant()
     {
         decision = Battle.Decision.UNDECIDED;
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
+        creeperTurns = 0;
     }
     
     public Combatant(Entity e, EntityInfo entityInfo)
@@ -40,6 +42,7 @@ public class Combatant
         this.entityInfo = entityInfo;
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
+        creeperTurns = 0;
     }
     
     /**

@@ -160,13 +160,13 @@ public class ClientProxy extends CommonProxy
     @Override
     public void displayString(String message)
     {
-        ITextComponent prefix = new StringTextComponent("TBM: ");
+        StringTextComponent prefix = new StringTextComponent("TBM: ");
         // func_240718_a_ is set color
         // func_240713_a_ is set bold
-        prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true);
-        ITextComponent text = new StringTextComponent(message);
+        prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+        StringTextComponent text = new StringTextComponent(message);
         prefix.getSiblings().add(text);
-        text.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFFFFFF)).func_240713_a_(false);
+        text.func_230530_a_(text.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFFFFFF)).func_240713_a_(false));
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
         Minecraft.getInstance().player.sendMessage(prefix, UUID.randomUUID());
     }

@@ -1,5 +1,14 @@
 # Upcoming changes
 
+# Version 1.14
+
+Implemented support for Creepers in battle.
+
+Added an option to the config to prevent config from being overwritten on
+update.
+
+Fixed some display text during battle.
+
 # Version 1.13
 
 Disabled midi playback due to currently being unable to change its volume.

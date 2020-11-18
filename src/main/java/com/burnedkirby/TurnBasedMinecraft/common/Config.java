@@ -95,7 +95,8 @@ public class Config
         }
 
         int configVersion = getConfigFileVersion(configFile);
-        if(configVersion < this.configVersion) {
+        boolean canOverwrite = getCanOverwrite(configFile);
+        if(configVersion < this.configVersion && canOverwrite) {
             logger.warn("Config file " + TurnBasedMinecraftMod.CONFIG_FILENAME + " is older version, renaming...");
             moveOldConfig();
             try {
@@ -1019,6 +1020,17 @@ public class Config
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean getCanOverwrite(File configFile) {
+        boolean canOverwrite;
+
+        FileConfig conf = FileConfig.of(configFile, TomlFormat.instance());
+        conf.load();
+        canOverwrite = !(Boolean)conf.getOrElse("do_not_overwrite", false);
+        conf.close();
+
+        return canOverwrite;
     }
 
     public boolean isIgnoreBattleType(String type)

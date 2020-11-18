@@ -35,7 +35,7 @@ public class TurnBasedMinecraftMod
 {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.13";
+    public static final String VERSION = "1.14";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -76,7 +76,7 @@ public class TurnBasedMinecraftMod
 
     private void firstInit(final FMLCommonSetupEvent event)
     {
-    	proxy = DistExecutor.runForDist(()->()->new ClientProxy(), ()->()->new CommonProxy());
+    	proxy = DistExecutor.safeRunForDist(()->()->new ClientProxy(), ()->()->new CommonProxy());
         proxy.setLogger(logger);
         proxy.initialize();
 

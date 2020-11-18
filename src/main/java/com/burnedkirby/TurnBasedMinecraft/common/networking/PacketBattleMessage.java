@@ -10,8 +10,8 @@ import com.burnedkirby.TurnBasedMinecraft.common.Utility;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.text.Color;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -37,7 +37,10 @@ public class PacketBattleMessage
         BECAME_CREATIVE(15),
         FIRED_ARROW(16),
         ARROW_HIT(17),
-        BOW_NO_AMMO(18);
+        BOW_NO_AMMO(18),
+        CREEPER_WAIT(19),
+        CREEPER_WAIT_FINAL(20),
+        CREEPER_EXPLODE(21);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -295,6 +298,33 @@ public class PacketBattleMessage
                     break;
                 case BOW_NO_AMMO:
                     TurnBasedMinecraftMod.proxy.displayString(from + " tried to use their bow but ran out of ammo!");
+                    break;
+                case CREEPER_WAIT: {
+                    StringTextComponent prefix = new StringTextComponent("TBM: ");
+                    prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+                    StringTextComponent message = new StringTextComponent(from + " is charging up!");
+                    message.func_230530_a_(message.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFFFF00)));
+                    prefix.getSiblings().add(message);
+                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                }
+                    break;
+                case CREEPER_WAIT_FINAL: {
+                    StringTextComponent prefix = new StringTextComponent("TBM: ");
+                    prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+                    StringTextComponent message = new StringTextComponent(from + " is about to explode!");
+                    message.func_230530_a_(message.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFF5050)));
+                    prefix.getSiblings().add(message);
+                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                }
+                    break;
+                case CREEPER_EXPLODE: {
+                    StringTextComponent prefix = new StringTextComponent("TBM: ");
+                    prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+                    StringTextComponent message = new StringTextComponent(from + " exploded!");
+                    message.func_230530_a_(message.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFF0000)));
+                    prefix.getSiblings().add(message);
+                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                }
                     break;
                 }
     		});

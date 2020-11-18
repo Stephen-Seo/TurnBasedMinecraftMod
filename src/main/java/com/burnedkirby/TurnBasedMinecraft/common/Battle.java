@@ -10,12 +10,12 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -86,7 +86,9 @@ public class Battle
         DEFEND(2),
         FLEE(3),
         USE_ITEM(4),
-        SWITCH_ITEM(5);
+        SWITCH_ITEM(5),
+        CREEPER_WAIT(6),
+        CREEPER_EXPLODE(7);
         
         private int value;
         private static Map<Integer, Decision> map = new HashMap<Integer, Decision>();
@@ -815,6 +817,7 @@ public class Battle
         {
             enforceFreezePositions();
         }
+        defuseCreepers();
         switch(state)
         {
         case DECISION:
@@ -826,6 +829,14 @@ public class Battle
                     // picking decision for sideA non-players
                     if(!(c.entity instanceof PlayerEntity) && c.decision == Decision.UNDECIDED && c.entityInfo != null)
                     {
+                        if(c.entity instanceof CreeperEntity) {
+                            if(c.creeperTurns++ < 2) {
+                                c.decision = Decision.CREEPER_WAIT;
+                            } else {
+                                c.decision = Decision.CREEPER_EXPLODE;
+                            }
+                            continue;
+                        }
                         int percentage = random.nextInt(100);
                         if(percentage < c.entityInfo.decisionAttack)
                         {
@@ -845,6 +856,14 @@ public class Battle
                 {
                     if(!(c.entity instanceof PlayerEntity) && c.decision == Decision.UNDECIDED && c.entityInfo != null)
                     {
+                        if(c.entity instanceof CreeperEntity) {
+                            if(c.creeperTurns++ < 2) {
+                                c.decision = Decision.CREEPER_WAIT;
+                            } else {
+                                c.decision = Decision.CREEPER_EXPLODE;
+                            }
+                            continue;
+                        }
                         int percentage = random.nextInt(100);
                         if(percentage < c.entityInfo.decisionAttack)
                         {
@@ -1315,17 +1334,121 @@ public class Battle
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getEntityId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getString());
                         }
                         break;
-                    case SWITCH_ITEM:
+                    case SWITCH_ITEM: {
                         debugLog += " switch item";
-                        if(next.itemToUse < 0 || next.itemToUse > 8)
-                        {
+                        if (next.itemToUse < 0 || next.itemToUse > 8) {
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 0);
                             break;
                         }
                         final Entity nextEntity = next.entity;
                         final int nextItemToUse = next.itemToUse;
-                        ((PlayerEntity)nextEntity).inventory.currentItem = nextItemToUse;
+                        ((PlayerEntity) nextEntity).inventory.currentItem = nextItemToUse;
                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getEntityId(), 0, 1);
+                    }
+                        break;
+                    case CREEPER_WAIT:
+                        debugLog += " creeper wait";
+                        if(next.creeperTurns < 2) {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_WAIT, next.entity.getEntityId(), 0, 0);
+                        } else {
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_WAIT_FINAL, next.entity.getEntityId(), 0, 0);
+                        }
+                        break;
+                    case CREEPER_EXPLODE: {
+                        debugLog += " creeper explode";
+                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_EXPLODE, next.entity.getEntityId(), 0, 0);
+                        final Entity nextEntity = next.entity;
+                        final EntityInfo nextEntityInfo = next.entityInfo;
+                        for (Combatant c : sideA.values()) {
+                            if (c.entity.getEntityId() != next.entity.getEntityId()) {
+                                int hitChance = next.entityInfo.attackProbability;
+                                if (c.entity instanceof PlayerEntity) {
+                                    hitChance = hitChance * (100 - TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion()) / 100;
+                                } else {
+                                    hitChance = hitChance * (100 - c.entityInfo.evasion) / 100;
+                                }
+                                if (hitChance < TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage()) {
+                                    hitChance = TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage();
+                                }
+                                if (random.nextInt(100) < hitChance) {
+                                    final Entity targetEntity = c.entity;
+                                    final EntityInfo targetEntityInfo = c.entityInfo;
+                                    int damageAmount = nextEntityInfo.attackPower;
+                                    if (nextEntityInfo.attackVariance > 0) {
+                                        damageAmount += random.nextInt(nextEntityInfo.attackVariance * 2 + 1) - nextEntityInfo.attackVariance;
+                                    }
+                                    if (damageAmount < 0) {
+                                        damageAmount = 0;
+                                    }
+                                    final int finalDamageAmount = damageAmount;
+                                    final boolean attackEffectTriggered;
+                                    if (nextEntityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && nextEntityInfo.attackEffectProbability > 0) {
+                                        if (random.nextInt(100) < nextEntityInfo.attackEffectProbability) {
+                                            attackEffectTriggered = true;
+                                        } else {
+                                            attackEffectTriggered = false;
+                                        }
+                                    } else {
+                                        attackEffectTriggered = false;
+                                    }
+
+                                    TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
+                                    targetEntity.attackEntityFrom(DamageSource.causeMobDamage((LivingEntity) nextEntity), finalDamageAmount);
+                                    TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
+                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getEntityId(), targetEntity.getEntityId(), finalDamageAmount);
+                                    if(attackEffectTriggered) {
+                                        nextEntityInfo.attackEffect.applyEffectToEntity((LivingEntity)targetEntity);
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, nextEntity.getEntityId(), targetEntity.getEntityId(), 0, nextEntityInfo.attackEffect.getAffectedString());
+                                    }
+                                }
+                            }
+                        }
+                        for(Combatant c : sideB.values()) {
+                            if (c.entity.getEntityId() != next.entity.getEntityId()) {
+                                int hitChance = next.entityInfo.attackProbability;
+                                if (c.entity instanceof PlayerEntity) {
+                                    hitChance = hitChance * (100 - TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion()) / 100;
+                                } else {
+                                    hitChance = hitChance * (100 - c.entityInfo.evasion) / 100;
+                                }
+                                if (hitChance < TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage()) {
+                                    hitChance = TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage();
+                                }
+                                if (random.nextInt(100) < hitChance) {
+                                    final Entity targetEntity = c.entity;
+                                    final EntityInfo targetEntityInfo = c.entityInfo;
+                                    int damageAmount = nextEntityInfo.attackPower;
+                                    if (nextEntityInfo.attackVariance > 0) {
+                                        damageAmount += random.nextInt(nextEntityInfo.attackVariance * 2 + 1) - nextEntityInfo.attackVariance;
+                                    }
+                                    if (damageAmount < 0) {
+                                        damageAmount = 0;
+                                    }
+                                    final int finalDamageAmount = damageAmount;
+                                    final boolean attackEffectTriggered;
+                                    if (nextEntityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && nextEntityInfo.attackEffectProbability > 0) {
+                                        if (random.nextInt(100) < nextEntityInfo.attackEffectProbability) {
+                                            attackEffectTriggered = true;
+                                        } else {
+                                            attackEffectTriggered = false;
+                                        }
+                                    } else {
+                                        attackEffectTriggered = false;
+                                    }
+
+                                    TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
+                                    targetEntity.attackEntityFrom(DamageSource.causeMobDamage((LivingEntity) nextEntity), finalDamageAmount);
+                                    TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
+                                    sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getEntityId(), targetEntity.getEntityId(), finalDamageAmount);
+                                    if(attackEffectTriggered) {
+                                        nextEntityInfo.attackEffect.applyEffectToEntity((LivingEntity)targetEntity);
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, nextEntity.getEntityId(), targetEntity.getEntityId(), 0, nextEntityInfo.attackEffect.getAffectedString());
+                                    }
+                                }
+                            }
+                        }
+                        ((CreeperEntity)nextEntity).setCreeperState(1000000);
+                    }
                         break;
                     }
                 }
@@ -1366,4 +1489,25 @@ public class Battle
         debugLog = "Update end";
         return battleEnded;
     } // update(final long dt)
+
+    private void defuseCreepers() {
+        for(Combatant c : sideA.values()) {
+            if(c.entity instanceof CreeperEntity) {
+                if(c.creeperTurns <= 2) {
+                    ((CreeperEntity)c.entity).setCreeperState(-10);
+                } else {
+                    ((CreeperEntity)c.entity).setCreeperState(1000000);
+                }
+            }
+        }
+        for(Combatant c : sideB.values()) {
+            if(c.entity instanceof CreeperEntity) {
+                if(c.creeperTurns <= 2) {
+                    ((CreeperEntity)c.entity).setCreeperState(-10);
+                } else {
+                    ((CreeperEntity) c.entity).setCreeperState(1000000);
+                }
+            }
+        }
+    }
 }

@@ -1,6 +1,7 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 3
+version = 4
+do_not_overwrite = false
 
 [client_config]
 
@@ -115,9 +116,9 @@ decision_flee_probability = 0
 
 [[server_config.entity]]
 name = "net.minecraft.entity.monster.CreeperEntity"
-ignore_battle = true
-attack_power = 15
-attack_probability = 17
+ignore_battle = false
+attack_power = 13
+attack_probability = 95
 attack_variance = 7
 evasion = 5
 category = "monster"
