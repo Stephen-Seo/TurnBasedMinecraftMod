@@ -17,11 +17,11 @@ public class AttackEventHandler
 {
     private boolean isAttackerValid(LivingAttackEvent event)
     {
-        if(event.getSource().getTrueSource() == null)
+        if(event.getSource().getEntity() == null)
         {
             return false;
         }
-        else if(event.getSource().getTrueSource().equals(TurnBasedMinecraftMod.proxy.getAttackingEntity()))
+        else if(event.getSource().getEntity().equals(TurnBasedMinecraftMod.proxy.getAttackingEntity()))
         {
             return true;
         }
@@ -38,7 +38,7 @@ public class AttackEventHandler
                     {
                         iter.remove();
                     }
-                    else if(event.getSource().getTrueSource().equals(attacker.entity) && event.getSource().isProjectile())
+                    else if(event.getSource().getEntity().equals(attacker.entity) && event.getSource().isProjectile())
                     {
                         iter.remove();
                         if(!isValid)
@@ -46,7 +46,7 @@ public class AttackEventHandler
                             Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(attacker.battleID);
                             if(b != null)
                             {
-                                b.sendMessageToAllPlayers(PacketBattleMessage.MessageType.ARROW_HIT, attacker.entity.getEntityId(), event.getEntity().getEntityId(), 0);
+                                b.sendMessageToAllPlayers(PacketBattleMessage.MessageType.ARROW_HIT, attacker.entity.getId(), event.getEntity().getId(), 0);
                             }
                             isValid = true;
                         }
@@ -60,7 +60,7 @@ public class AttackEventHandler
     @SubscribeEvent
     public void entityAttacked(LivingAttackEvent event)
     {
-        if(event.getEntity().world.isRemote)
+        if(event.getEntity().level.isClientSide)
         {
             return;
         }
@@ -69,9 +69,9 @@ public class AttackEventHandler
         BattleManager battleManager = proxy.getBattleManager();
         // handle edit entity, pick entity via attack
         {
-            if(event.getSource().getTrueSource() != null && event.getEntity() != null)
+            if(event.getSource().getEntity() != null && event.getEntity() != null)
             {
-                final EditingInfo editingInfo = proxy.getEditingInfo(event.getSource().getTrueSource().getEntityId());
+                final EditingInfo editingInfo = proxy.getEditingInfo(event.getSource().getEntity().getId());
                 if(editingInfo != null && editingInfo.isPendingEntitySelection)
                 {
                     editingInfo.isPendingEntitySelection = false;
@@ -84,13 +84,13 @@ public class AttackEventHandler
                             TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketGeneralMessage("Cannot edit custom name from entity without custom name"));
                             return;
                         }
-                        editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getUnformattedComponentText());
+                        editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getString());
                         if(editingInfo.entityInfo == null)
                         {
                             editingInfo.entityInfo = new EntityInfo();
                             editingInfo.entityInfo.customName = event.getEntity().getCustomName().getString();
                         }
-                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getUnformattedComponentText() + "\""));
+                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getString() + "\""));
                         TurnBasedMinecraftMod.logger.info("Begin editing custom \"" + event.getEntity().getCustomName().getString() + "\"");
                         TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)editingInfo.editor), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     }
@@ -114,9 +114,9 @@ public class AttackEventHandler
                 }
             }
         }
-        if(event.getEntity() != null && event.getSource().getTrueSource() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()) || battleManager.isRecentlyLeftBattle(event.getSource().getTrueSource().getEntityId())))
+        if(event.getEntity() != null && event.getSource().getEntity() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getId()) || battleManager.isRecentlyLeftBattle(event.getSource().getEntity().getId())))
         {
-            if(event.getSource().getTrueSource().getEntity() instanceof CreeperEntity && TurnBasedMinecraftMod.proxy.getConfig().getCreeperAlwaysAllowDamage()) {
+            if(event.getSource().getEntity().getEntity() instanceof CreeperEntity && TurnBasedMinecraftMod.proxy.getConfig().getCreeperAlwaysAllowDamage()) {
                 event.setCanceled(false);
             } else {
 //            TurnBasedMinecraftMod.logger.debug("Canceled attack");
@@ -126,11 +126,11 @@ public class AttackEventHandler
         }
         else if(!isAttackerValid(event)
                 && event.getEntity() != null
-                && event.getSource().getTrueSource() != null
-                && event.getEntity() != event.getSource().getTrueSource()
-                && !config.getBattleIgnoringPlayers().contains(event.getSource().getTrueSource().getEntityId())
-                && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
-                && event.getEntity().getEntityWorld().func_234923_W_().equals(event.getSource().getTrueSource().getEntityWorld().func_234923_W_())
+                && event.getSource().getEntity() != null
+                && event.getEntity() != event.getSource().getEntity()
+                && !config.getBattleIgnoringPlayers().contains(event.getSource().getEntity().getId())
+                && !config.getBattleIgnoringPlayers().contains(event.getEntity().getId())
+                && event.getEntity().level.dimension().equals(event.getSource().getEntity().level.dimension())
                 && battleManager.checkAttack(event))
         {
 //            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.proxy.getAttackingEntity() + " and " + event.getEntity());
@@ -150,19 +150,19 @@ public class AttackEventHandler
     {
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
         BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();
-        if(event.getEntity().world.isRemote
+        if(event.getEntity().level.isClientSide
                 || config.isOldBattleBehaviorEnabled()
-                || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getEntityId()))
-                || (event.getTarget() != null && battleManager.isRecentlyLeftBattle(event.getTarget().getEntityId()))
+                || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getId()))
+                || (event.getTarget() != null && battleManager.isRecentlyLeftBattle(event.getTarget().getId()))
                 || (event.getEntity() != null && event.getTarget() != null && Utility.distanceBetweenEntities(event.getEntity(), event.getTarget()) > (double)config.getAggroStartBattleDistance()))
         {
             return;
         }
         else if(event.getEntity() != null
                 && event.getTarget() != null
-                && !config.getBattleIgnoringPlayers().contains(event.getEntity().getEntityId())
-                && !config.getBattleIgnoringPlayers().contains(event.getTarget().getEntityId())
-                && event.getEntity().getEntityWorld().func_234923_W_().equals(event.getTarget().getEntityWorld().func_234923_W_()))
+                && !config.getBattleIgnoringPlayers().contains(event.getEntity().getId())
+                && !config.getBattleIgnoringPlayers().contains(event.getTarget().getId())
+                && event.getEntity().level.dimension().equals(event.getTarget().level.dimension()))
         {
             TurnBasedMinecraftMod.proxy.getBattleManager().checkTargeted(event);
         }

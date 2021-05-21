@@ -136,9 +136,9 @@ public class PacketBattleMessage
         buf.writeInt(pkt.messageType.getValue());
         buf.writeInt(pkt.entityIDFrom);
         buf.writeInt(pkt.entityIDTo);
-        buf.writeString(Utility.serializeDimension(pkt.dimension));
+        buf.writeUtf(Utility.serializeDimension(pkt.dimension));
         buf.writeInt(pkt.amount);
-        buf.writeString(pkt.custom);
+        buf.writeUtf(pkt.custom);
     }
     
     public static PacketBattleMessage decode(PacketBuffer buf) {
@@ -147,9 +147,9 @@ public class PacketBattleMessage
     			buf.readInt()),
 			buf.readInt(),
 			buf.readInt(),
-			Utility.deserializeDimension(buf.readString()),
+			Utility.deserializeDimension(buf.readUtf()),
 			buf.readInt(),
-			buf.readString());
+			buf.readUtf());
     }
     
     public static class Handler {
@@ -301,27 +301,27 @@ public class PacketBattleMessage
                     break;
                 case CREEPER_WAIT: {
                     StringTextComponent prefix = new StringTextComponent("TBM: ");
-                    prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+                    prefix.setStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
                     StringTextComponent message = new StringTextComponent(from + " is charging up!");
-                    message.func_230530_a_(message.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFFFF00)));
+                    message.setStyle(message.getStyle().withColor(Color.fromRgb(0xFFFFFF00)));
                     prefix.getSiblings().add(message);
                     TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
                 }
                     break;
                 case CREEPER_WAIT_FINAL: {
                     StringTextComponent prefix = new StringTextComponent("TBM: ");
-                    prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+                    prefix.setStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
                     StringTextComponent message = new StringTextComponent(from + " is about to explode!");
-                    message.func_230530_a_(message.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFF5050)));
+                    message.setStyle(message.getStyle().withColor(Color.fromRgb(0xFFFF5050)));
                     prefix.getSiblings().add(message);
                     TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
                 }
                     break;
                 case CREEPER_EXPLODE: {
                     StringTextComponent prefix = new StringTextComponent("TBM: ");
-                    prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+                    prefix.setStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
                     StringTextComponent message = new StringTextComponent(from + " exploded!");
-                    message.func_230530_a_(message.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFF0000)));
+                    message.setStyle(message.getStyle().withColor(Color.fromRgb(0xFFFF0000)));
                     prefix.getSiblings().add(message);
                     TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
                 }

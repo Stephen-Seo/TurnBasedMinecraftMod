@@ -22,11 +22,11 @@ public class PacketGeneralMessage
     }
     
     public static void encode(PacketGeneralMessage pkt, PacketBuffer buf) {
-    	buf.writeString(pkt.message);
+    	buf.writeUtf(pkt.message);
     }
     
     public static PacketGeneralMessage decode(PacketBuffer buf) {
-    	return new PacketGeneralMessage(buf.readString());
+    	return new PacketGeneralMessage(buf.readUtf());
     }
     
     public static class Handler {

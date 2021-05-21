@@ -68,7 +68,7 @@ public class PacketBattleInfo
                 TurnBasedMinecraftMod.proxy.getLocalBattle().clearCombatants();
                 for(Integer id : pkt.sideA)
                 {
-                    Entity e = Minecraft.getInstance().world.getEntityByID(id);
+                    Entity e = Minecraft.getInstance().level.getEntity(id);
                     if(e != null)
                     {
                         TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideA(e);
@@ -76,7 +76,7 @@ public class PacketBattleInfo
                 }
                 for(Integer id : pkt.sideB)
                 {
-                    Entity e = Minecraft.getInstance().world.getEntityByID(id);
+                    Entity e = Minecraft.getInstance().level.getEntity(id);
                     if(e != null)
                     {
                         TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(e);

@@ -17,9 +17,8 @@ public class ItemSelectionButton extends Button {
     }
 
     @Override
-    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        // field_230694_p_ is probably isVisible
-        if (field_230694_p_) {
+    public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        if (visible) {
             boolean hovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + getWidth() && mouseY < getY() + getHeight();
             if (hovered) {
                 fill(matrixStack, getX(), getY(), getX() + getWidth(), getY() + getHeight(), 0x80FFFFFF);
@@ -30,23 +29,10 @@ public class ItemSelectionButton extends Button {
     }
 
     private int getX() {
-        return field_230690_l_;
+        return x;
     }
 
     private int getY() {
-        return field_230691_m_;
-    }
-
-    private int getWidth() {
-        return field_230688_j_;
-    }
-
-    private int getHeight() {
-        return field_230689_k_;
-
-    }
-
-    private void fill(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
-        func_238467_a_(matrixStack, x, y, width, height, color);
+        return y;
     }
 }

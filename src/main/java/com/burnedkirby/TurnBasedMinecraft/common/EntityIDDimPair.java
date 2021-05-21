@@ -11,7 +11,8 @@ public class EntityIDDimPair {
 
     EntityIDDimPair() {
         id = 0;
-        dim = Minecraft.getInstance().world.func_234923_W_();
+//        dim = Minecraft.getInstance().world.dimension();
+        dim = null;
     }
 
     EntityIDDimPair(int id, RegistryKey<World> dim) {
@@ -20,8 +21,8 @@ public class EntityIDDimPair {
     }
 
     EntityIDDimPair(Entity entity) {
-        id = entity.getEntityId();
-        dim = entity.getEntityWorld().func_234923_W_();
+        id = entity.getId();
+        dim = entity.level.dimension();
     }
 
     public Entity getEntity() {

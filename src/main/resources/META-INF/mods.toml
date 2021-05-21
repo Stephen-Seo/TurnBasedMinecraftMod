@@ -15,7 +15,7 @@ license="MIT"
 # The modid of the mod
 modId="com_burnedkirby_turnbasedminecraft" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="1.16" #mandatory
+version="1.17" #mandatory
  # A display name for the mod
 displayName="TurnBasedMinecraftMod" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
@@ -39,7 +39,7 @@ Implements turn-based-battle in Minecraft.
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[34,)" #mandatory
+    versionRange="[36,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -48,6 +48,6 @@ Implements turn-based-battle in Minecraft.
 [[dependencies.com_burnedkirby_turnbasedminecraft]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.3,)"
+    versionRange="[1.16.5,1.17)"
     ordering="NONE"
     side="BOTH"

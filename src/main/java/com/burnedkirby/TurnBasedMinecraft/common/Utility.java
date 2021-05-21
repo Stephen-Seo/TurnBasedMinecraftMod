@@ -39,9 +39,9 @@ public class Utility
     
     public static boolean doesPlayerHaveArrows(PlayerEntity player)
     {
-        for(int i = 0; i < player.inventory.getSizeInventory(); ++i)
+        for(int i = 0; i < player.inventory.getContainerSize(); ++i)
         {
-            if(player.inventory.getStackInSlot(i).getItem() instanceof ArrowItem)
+            if(player.inventory.getItem(i).getItem() instanceof ArrowItem)
             {
                 return true;
             }
@@ -51,15 +51,15 @@ public class Utility
     
     public static double distanceBetweenEntities(Entity a, Entity b)
     {
-        return Math.sqrt(Math.pow(a.getPosX() - b.getPosX(), 2.0) + Math.pow(a.getPosY()- b.getPosY(), 2.0) + Math.pow(a.getPosZ()- b.getPosZ(), 2.0));
+        return Math.sqrt(Math.pow(a.getX() - b.getX(), 2.0) + Math.pow(a.getY()- b.getY(), 2.0) + Math.pow(a.getZ()- b.getZ(), 2.0));
     }
 
     public static String serializeDimension(RegistryKey<World> dimObject) {
-        return dimObject.func_240901_a_().toString();
+        return dimObject.getRegistryName().toString();
     }
 
     public static RegistryKey<World> deserializeDimension(String dimString) {
         ResourceLocation dimRes = new ResourceLocation(dimString);
-        return RegistryKey.func_240903_a_(Registry.field_239699_ae_, dimRes);
+        return RegistryKey.create(Registry.DIMENSION_REGISTRY, dimRes);
     }
 }

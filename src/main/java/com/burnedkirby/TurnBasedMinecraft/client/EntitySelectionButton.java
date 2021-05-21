@@ -26,9 +26,9 @@ public class EntitySelectionButton extends Button {
     }
 
     @Override
-    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
-        Entity e = Minecraft.getInstance().world.getEntityByID(entityID);
+    public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
+        Entity e = Minecraft.getInstance().level.getEntity(entityID);
         if (e != null && e instanceof LivingEntity && ((LivingEntity) e).isAlive()) {
             int health = (int) (((LivingEntity) e).getHealth() + 0.5f);
             int xpos = getX();
@@ -78,22 +78,10 @@ public class EntitySelectionButton extends Button {
     }
 
     private int getX() {
-        return field_230690_l_;
+        return x;
     }
 
     private int getY() {
-        return field_230691_m_;
-    }
-
-    private int getWidth() {
-        return field_230688_j_;
-    }
-
-    private int getHeight() {
-        return field_230689_k_;
-    }
-
-    private void fill(MatrixStack matrixStack, int x, int y, int width, int height, int color) {
-        func_238467_a_(matrixStack, x, y, width, height, color);
+        return y;
     }
 }

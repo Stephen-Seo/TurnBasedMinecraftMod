@@ -55,19 +55,19 @@ public class BattleManager
         String receiverCustomName;
 
         try {
-            receiverCustomName = event.getEntity().getCustomName().getUnformattedComponentText();
+            receiverCustomName = event.getEntity().getCustomName().getString();
         } catch (NullPointerException e) {
             receiverCustomName = null;
         }
         String attackerClassName;
         try {
-            attackerClassName = event.getSource().getTrueSource().getClass().getName();
+            attackerClassName = event.getSource().getEntity().getClass().getName();
         } catch (NullPointerException e) {
             attackerClassName = null;
         }
         String attackerCustomName;
         try {
-            attackerCustomName = event.getSource().getTrueSource().getCustomName().getUnformattedComponentText();
+            attackerCustomName = event.getSource().getEntity().getCustomName().getString();
         } catch (NullPointerException e) {
             attackerCustomName = null;
         }
@@ -75,7 +75,7 @@ public class BattleManager
         // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
         if(!((event.getEntity() instanceof PlayerEntity && !((PlayerEntity)event.getEntity()).isCreative())
                 || (config.getEntityInfoReference(receiverClassName) != null || config.getCustomEntityInfoReference(receiverCustomName) != null))
-            || !((event.getSource().getTrueSource() instanceof PlayerEntity && !((PlayerEntity)event.getSource().getTrueSource()).isCreative())
+            || !((event.getSource().getEntity() instanceof PlayerEntity && !((PlayerEntity)event.getSource().getEntity()).isCreative())
                 || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null)))
         {
 //            logger.debug("BattleManager: Failed first check, attacker is \"" + attackerClassName + "\", defender is \"" + receiverClassName + "\"");
@@ -92,8 +92,8 @@ public class BattleManager
         if(entityInfo != null && (config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacked entity ignores battle
-            Battle battle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getSource().getTrueSource())));
-            if(battle != null && battle.hasCombatant(event.getSource().getTrueSource().getEntityId())) {
+            Battle battle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getSource().getEntity())));
+            if(battle != null && battle.hasCombatant(event.getSource().getEntity().getId())) {
                 logger.debug("Attack Canceled: attacked ignores battle but attacker in battle");
                 return true;
             } else {
@@ -105,14 +105,14 @@ public class BattleManager
         entityInfo = config.getCustomEntityInfoReference(attackerCustomName);
         if(entityInfo == null)
         {
-            entityInfo = config.getMatchingEntityInfo(event.getSource().getTrueSource());
+            entityInfo = config.getMatchingEntityInfo(event.getSource().getEntity());
         }
 
         if(entityInfo != null && (config.isIgnoreBattleType(entityInfo.category) || entityInfo.ignoreBattle))
         {
             // attacker entity ignores battle
             Battle battle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getEntity())));
-            if(battle != null && battle.hasCombatant(event.getEntity().getEntityId())) {
+            if(battle != null && battle.hasCombatant(event.getEntity().getId())) {
                 logger.debug("Attack Canceled: attacker ignores battle but attacked in battle");
                 return true;
             } else {
@@ -122,12 +122,12 @@ public class BattleManager
         }
         
         // check if one is in battle
-        Battle attackerBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getSource().getTrueSource())));
-        if(attackerBattle != null && !attackerBattle.hasCombatant(event.getSource().getTrueSource().getEntityId())) {
+        Battle attackerBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getSource().getEntity())));
+        if(attackerBattle != null && !attackerBattle.hasCombatant(event.getSource().getEntity().getId())) {
             attackerBattle = null;
         }
         Battle defenderBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getEntity())));
-        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getEntity().getEntityId())) {
+        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getEntity().getId())) {
             defenderBattle = null;
         }
 
@@ -136,14 +136,14 @@ public class BattleManager
             return true;
         } else if(attackerBattle == null && defenderBattle == null) {
             // neither entity is in battle
-            if(event.getEntity() instanceof PlayerEntity || event.getSource().getTrueSource() instanceof PlayerEntity)
+            if(event.getEntity() instanceof PlayerEntity || event.getSource().getEntity() instanceof PlayerEntity)
             {
                 // at least one of the entities is a player, create Battle
                 Collection<Entity> sideA = new ArrayList<Entity>(1);
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
-                sideB.add(event.getSource().getTrueSource());
-                createBattle(sideA, sideB, event.getEntity().getEntityWorld().func_234923_W_());
+                sideB.add(event.getSource().getEntity());
+                createBattle(sideA, sideB, event.getEntity().level.dimension());
                 logger.debug("Attack Not Canceled: new battle created");
             }
             else
@@ -157,7 +157,7 @@ public class BattleManager
                 if (attackerBattle.getSize() >= config.getMaxInBattle()) {
                     // battle limit reached, cannot add to battle
                     return true;
-                } else if (attackerBattle.hasCombatantInSideA(event.getSource().getTrueSource().getEntityId())) {
+                } else if (attackerBattle.hasCombatantInSideA(event.getSource().getEntity().getId())) {
                     attackerBattle.addCombatantToSideB(event.getEntity());
                 } else {
                     attackerBattle.addCombatantToSideA(event.getEntity());
@@ -167,12 +167,12 @@ public class BattleManager
                 if (defenderBattle.getSize() >= config.getMaxInBattle()) {
                     // battle limit reached, cannot add to battle
                     return true;
-                } else if (defenderBattle.hasCombatantInSideA(event.getEntity().getEntityId())) {
-                    defenderBattle.addCombatantToSideB(event.getSource().getTrueSource());
+                } else if (defenderBattle.hasCombatantInSideA(event.getEntity().getId())) {
+                    defenderBattle.addCombatantToSideB(event.getSource().getEntity());
                 } else {
-                    defenderBattle.addCombatantToSideA(event.getSource().getTrueSource());
+                    defenderBattle.addCombatantToSideA(event.getSource().getEntity());
                 }
-                entityToBattleMap.put(new EntityIDDimPair(event.getSource().getTrueSource()), defenderBattle.getId());
+                entityToBattleMap.put(new EntityIDDimPair(event.getSource().getEntity()), defenderBattle.getId());
             }
         }
 
@@ -184,13 +184,13 @@ public class BattleManager
     {
         String targetedCustomName;
         try {
-            targetedCustomName = event.getTarget().getCustomName().getUnformattedComponentText();
+            targetedCustomName = event.getTarget().getCustomName().getString();
         } catch (NullPointerException e) {
             targetedCustomName = null;
         }
         String attackerCustomName;
         try {
-            attackerCustomName = event.getEntity().getCustomName().getUnformattedComponentText();
+            attackerCustomName = event.getEntity().getCustomName().getString();
         } catch (NullPointerException e) {
             attackerCustomName = null;
         }
@@ -227,11 +227,11 @@ public class BattleManager
 
         // check if one is in battle
         Battle attackerBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getEntity())));
-        if(attackerBattle != null && !attackerBattle.hasCombatant(event.getEntity().getEntityId())) {
+        if(attackerBattle != null && !attackerBattle.hasCombatant(event.getEntity().getId())) {
             attackerBattle = null;
         }
         Battle defenderBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getTarget())));
-        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getTarget().getEntityId())) {
+        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getTarget().getId())) {
             defenderBattle = null;
         }
 
@@ -246,7 +246,7 @@ public class BattleManager
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
                 sideB.add(event.getTarget());
-                createBattle(sideA, sideB, event.getEntity().getEntityWorld().func_234923_W_());
+                createBattle(sideA, sideB, event.getEntity().level.dimension());
                 logger.debug("neither in battle, at least one is player, creating new battle");
             }
         } else {
@@ -255,7 +255,7 @@ public class BattleManager
                 if (attackerBattle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()) {
                     // battle max reached, cannot add to battle
                     return;
-                } else if (attackerBattle.hasCombatantInSideA(event.getEntity().getEntityId())) {
+                } else if (attackerBattle.hasCombatantInSideA(event.getEntity().getId())) {
                     attackerBattle.addCombatantToSideB(event.getTarget());
                 } else {
                     attackerBattle.addCombatantToSideA(event.getTarget());
@@ -265,7 +265,7 @@ public class BattleManager
                 if (defenderBattle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()) {
                     // battle max reached, cannot add to battle
                     return;
-                } else if (defenderBattle.hasCombatantInSideA(event.getTarget().getEntityId())) {
+                } else if (defenderBattle.hasCombatantInSideA(event.getTarget().getId())) {
                     defenderBattle.addCombatantToSideB(event.getEntity());
                 } else {
                     defenderBattle.addCombatantToSideA(event.getEntity());
@@ -314,7 +314,7 @@ public class BattleManager
         if(c.entity instanceof ServerPlayerEntity) {
             TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity) c.entity), new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"));
         }
-        recentlyLeftBattle.put(c.entity.getEntityId(), c);
+        recentlyLeftBattle.put(c.entity.getId(), c);
         entityToBattleMap.remove(new EntityIDDimPair(c.entity));
     }
     
@@ -325,7 +325,7 @@ public class BattleManager
         {
             Map.Entry<Integer, Combatant> entry = iter.next();
             if(entry.getValue().entity instanceof CreeperEntity && TurnBasedMinecraftMod.proxy.getConfig().getCreeperStopExplodeOnLeaveBattle()) {
-                ((CreeperEntity)entry.getValue().entity).setCreeperState(-10);
+                ((CreeperEntity)entry.getValue().entity).setSwellDir(-10);
             }
             if(current - entry.getValue().time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
             {

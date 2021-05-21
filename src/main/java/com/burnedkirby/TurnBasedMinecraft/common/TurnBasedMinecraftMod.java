@@ -35,7 +35,7 @@ public class TurnBasedMinecraftMod
 {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.16";
+    public static final String VERSION = "1.17";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -76,7 +76,7 @@ public class TurnBasedMinecraftMod
 
     private void firstInit(final FMLCommonSetupEvent event)
     {
-    	proxy = DistExecutor.safeRunForDist(()->()->new ClientProxy(), ()->()->new CommonProxy());
+    	proxy = DistExecutor.safeRunForDist(()-> ClientProxy::new, ()-> CommonProxy::new);
         proxy.setLogger(logger);
         proxy.initialize();
 
@@ -150,43 +150,43 @@ public class TurnBasedMinecraftMod
         
         // register commands
         // tbm-disable
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
             Commands.literal("tbm-disable")
                 .requires(c -> {
-                    return !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermissionLevel(2);
+                    return !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermission(2);
                 })
                 .executes( c -> {
-                    proxy.getConfig().addBattleIgnoringPlayer(c.getSource().asPlayer().getEntityId());
-                    c.getSource().sendFeedback(new StringTextComponent("Disabled turn-based-combat for current player"), true);
+                    proxy.getConfig().addBattleIgnoringPlayer(c.getSource().getPlayerOrException().getId());
+                    c.getSource().sendSuccess(new StringTextComponent("Disabled turn-based-combat for current player"), true);
                     return 1;
                 }));
         // tbm-disable-all
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
             Commands.literal("tbm-disable-all")
                 .requires(c -> {
-                    return c.hasPermissionLevel(2);
+                    return c.hasPermission(2);
                 })
                 .executes(c -> {
                     proxy.getConfig().setBattleDisabledForAll(true);
                     for(ServerPlayerEntity player : c.getSource().getServer().getPlayerList().getPlayers()) {
-                        proxy.getConfig().addBattleIgnoringPlayer(player.getEntityId());
+                        proxy.getConfig().addBattleIgnoringPlayer(player.getId());
                         getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP disabled turn-based-combat for everyone"));
                     }
                     return 1;
                 }));
         // tbm-enable
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
             Commands.literal("tbm-enable")
-                .requires(c -> !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermissionLevel(2))
+                .requires(c -> !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermission(2))
                 .executes(c -> {
-                    proxy.getConfig().removeBattleIgnoringPlayer(c.getSource().asPlayer().getEntityId());
-                    c.getSource().sendFeedback(new StringTextComponent("Enabled turn-based-combat for current player"), true);
+                    proxy.getConfig().removeBattleIgnoringPlayer(c.getSource().getPlayerOrException().getId());
+                    c.getSource().sendSuccess(new StringTextComponent("Enabled turn-based-combat for current player"), true);
                     return 1;
                 }));
         // tbm-enable-all
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
             Commands.literal("tbm-enable-all")
-                .requires(c -> c.hasPermissionLevel(2))
+                .requires(c -> c.hasPermission(2))
                 .executes(c -> {
                     proxy.getConfig().setBattleDisabledForAll(false);
                     proxy.getConfig().clearBattleIgnoringPlayers();
@@ -196,36 +196,36 @@ public class TurnBasedMinecraftMod
                     return 1;
                 }));
         // tbm-set-enable
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
             Commands.literal("tbm-set-enable")
-                .requires(c -> c.hasPermissionLevel(2))
+                .requires(c -> c.hasPermission(2))
                 .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
                     for(ServerPlayerEntity player : EntityArgument.getPlayers(c, "targets")) {
-                        proxy.getConfig().addBattleIgnoringPlayer(player.getEntityId());
+                        proxy.getConfig().addBattleIgnoringPlayer(player.getId());
                         getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP enabled turn-based-combat for you"));
-                        c.getSource().sendFeedback(new StringTextComponent("Enabled turn-based-combat for " + player.getDisplayName().getUnformattedComponentText()), true);
+                        c.getSource().sendSuccess(new StringTextComponent("Enabled turn-based-combat for " + player.getDisplayName().getString()), true);
                     }
                     return 1;
                 })));
         // tbm-set-disable
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
             Commands.literal("tbm-set-disable")
-                .requires(c -> c.hasPermissionLevel(2))
+                .requires(c -> c.hasPermission(2))
                 .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
                     for(ServerPlayerEntity player : EntityArgument.getPlayers(c, "targets")) {
-                        proxy.getConfig().removeBattleIgnoringPlayer(player.getEntityId());
+                        proxy.getConfig().removeBattleIgnoringPlayer(player.getId());
                         getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP disabled turn-based-combat for you"));
-                        c.getSource().sendFeedback(new StringTextComponent("Disabled turn-based-combat for " + player.getDisplayName().getUnformattedComponentText()), true);
+                        c.getSource().sendSuccess(new StringTextComponent("Disabled turn-based-combat for " + player.getDisplayName().getString()), true);
                     }
                     return 1;
                 })));
         // tbm-edit
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
             Commands.literal("tbm-edit")
-                .requires(c -> c.hasPermissionLevel(2))
+                .requires(c -> c.hasPermission(2))
                 .executes(c -> {
-                    ServerPlayerEntity player = c.getSource().asPlayer();
-                    EditingInfo editingInfo = proxy.getEditingInfo(player.getEntityId());
+                    ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                    EditingInfo editingInfo = proxy.getEditingInfo(player.getId());
                     if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                         getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     } else if(editingInfo != null) {
@@ -233,20 +233,20 @@ public class TurnBasedMinecraftMod
                     } else {
                         proxy.setEditingPlayer(player);
                         getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
-                        logger.info("Begin editing TBM Entity for player \"" + player.getDisplayName().getUnformattedComponentText() + "\" (\"" + c.getSource().getName() + "\")");
+                        logger.info("Begin editing TBM Entity for player \"" + player.getDisplayName().getString() + "\" (\"" + c.getSource().getDisplayName() + "\")");
                     }
                     return 1;
                 })
                 .then(Commands.literal("finish")
                     .executes(c -> {
-                        ServerPlayerEntity player = c.getSource().asPlayer();
-                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                        ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                         if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                             if(!proxy.getConfig().editEntityEntry(editingInfo.entityInfo)) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("An error occurred while attempting to save an entry to the config"));
-                                proxy.removeEditingInfo(player.getEntityId());
+                                proxy.removeEditingInfo(player.getId());
                             } else {
-                                proxy.removeEditingInfo(player.getEntityId());
+                                proxy.removeEditingInfo(player.getId());
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("Entity info saved in config and loaded."));
                             }
                         } else if(editingInfo != null) {
@@ -259,18 +259,18 @@ public class TurnBasedMinecraftMod
                     }))
                 .then(Commands.literal("cancel")
                     .executes(c -> {
-                        ServerPlayerEntity player = c.getSource().asPlayer();
-                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                        ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                         if(editingInfo != null) {
-                            proxy.removeEditingInfo(player.getEntityId());
+                            proxy.removeEditingInfo(player.getId());
                             getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("Cancelled editing entry."));
                         }
                         return 1;
                     }))
                 .then(Commands.literal("custom")
                     .executes(c -> {
-                        ServerPlayerEntity player = c.getSource().asPlayer();
-                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                        ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                         if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                             Message exceptionMessage = new LiteralMessage("Invalid action for tbm-edit");
                             throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -278,16 +278,16 @@ public class TurnBasedMinecraftMod
                             getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
                         } else {
                             proxy.setEditingPlayer(player);
-                            proxy.getEditingInfo(player.getEntityId()).isEditingCustomName = true;
+                            proxy.getEditingInfo(player.getId()).isEditingCustomName = true;
                             getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
-                            logger.info("Begin editing custom TBM Entity for player \"" + player.getDisplayName().getUnformattedComponentText() + "\" (\"" + c.getSource().getName() + "\")");
+                            logger.info("Begin editing custom TBM Entity for player \"" + player.getDisplayName().getString() + "\" (\"" + c.getSource().getDisplayName() + "\")");
                         }
                         return 1;
                     }))
                 .then(Commands.literal("edit")
                     .executes(c -> {
-                        ServerPlayerEntity player = c.getSource().asPlayer();
-                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                        ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                        EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                         if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                             getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                         } else if(editingInfo != null){
@@ -300,8 +300,8 @@ public class TurnBasedMinecraftMod
                     })
                     .then(Commands.literal("ignoreBattle")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_IGNORE_BATTLE));
                             } else if(editingInfo != null) {
@@ -314,8 +314,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("ignoreBattle", BoolArgumentType.bool())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 boolean ignoreBattle = BoolArgumentType.getBool(c, "ignoreBattle");
                                 if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.ignoreBattle = ignoreBattle;
@@ -331,8 +331,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("attackPower")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_POWER));
                             } else if(editingInfo != null) {
@@ -345,8 +345,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("attackPower", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int attackPower = IntegerArgumentType.getInteger(c, "attackPower");
                                 if(attackPower < 0) {
                                     attackPower = 0;
@@ -365,8 +365,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("attackProbability")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_PROBABILITY));
                             } else if(editingInfo != null) {
@@ -379,8 +379,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("attackProbability", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int attackProbability = IntegerArgumentType.getInteger(c, "attackProbability");
                                 if(attackProbability < 0) {
                                     attackProbability = 0;
@@ -401,8 +401,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("attackVariance")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_VARIANCE));
                             } else if(editingInfo != null) {
@@ -415,8 +415,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("attackVariance", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int attackVariance = IntegerArgumentType.getInteger(c, "attackVariance");
                                 if(attackVariance < 0) {
                                     attackVariance = 0;
@@ -435,8 +435,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("attackEffect")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_EFFECT));
                             } else if(editingInfo != null) {
@@ -449,8 +449,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("attackEffect", StringArgumentType.word())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 EntityInfo.Effect effect = EntityInfo.Effect.fromString(StringArgumentType.getString(c, "attackEffect"));
                                 if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.attackEffect = effect;
@@ -466,8 +466,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("attackEffectProbability")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_EFFECT_PROBABILITY));
                             } else if(editingInfo != null) {
@@ -480,8 +480,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("attackEffectProbability", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int attackEffectProbability = IntegerArgumentType.getInteger(c, "attackEffectProbability");
                                 if(attackEffectProbability < 0) {
                                     attackEffectProbability = 0;
@@ -502,8 +502,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("defenseDamage")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DEFENSE_DAMAGE));
                             } else if(editingInfo != null) {
@@ -516,8 +516,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("defenseDamage", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int defenseDamage = IntegerArgumentType.getInteger(c, "defenseDamage");
                                 if(defenseDamage < 0) {
                                     defenseDamage = 0;
@@ -536,8 +536,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("defenseDamageProbability")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DEFENSE_DAMAGE_PROBABILITY));
                             } else if(editingInfo != null) {
@@ -550,8 +550,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("defenseDamageProbability", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int defenseDamageProbability = IntegerArgumentType.getInteger(c, "defenseDamageProbability");
                                 if(defenseDamageProbability < 0) {
                                     defenseDamageProbability = 0;
@@ -572,8 +572,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("evasion")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_EVASION));
                             } else if(editingInfo != null) {
@@ -586,8 +586,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("evasion", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int evasion = IntegerArgumentType.getInteger(c, "evasion");
                                 if(evasion < 0) {
                                     evasion = 0;
@@ -608,8 +608,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("speed")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_SPEED));
                             } else if(editingInfo != null) {
@@ -622,8 +622,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("speed", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int speed = IntegerArgumentType.getInteger(c, "speed");
                                 if(speed < 0) {
                                     speed = 0;
@@ -642,8 +642,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("category")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_CATEGORY));
                             } else if(editingInfo != null) {
@@ -656,8 +656,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("category", StringArgumentType.word())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 String category = StringArgumentType.getString(c, "category");
                                 if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.category = category;
@@ -673,8 +673,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("decisionAttack")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_ATTACK));
                             } else if(editingInfo != null) {
@@ -687,8 +687,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("decisionAttack", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int decisionAttack = IntegerArgumentType.getInteger(c, "decisionAttack");
                                 if(decisionAttack < 0) {
                                     decisionAttack = 0;
@@ -709,8 +709,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("decisionDefend")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_DEFEND));
                             } else if(editingInfo != null) {
@@ -723,8 +723,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("decisionDefend", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int decisionDefend = IntegerArgumentType.getInteger(c, "decisionDefend");
                                 if(decisionDefend < 0) {
                                     decisionDefend = 0;
@@ -745,8 +745,8 @@ public class TurnBasedMinecraftMod
                     )
                     .then(Commands.literal("decisionFlee")
                         .executes(c -> {
-                            ServerPlayerEntity player = c.getSource().asPlayer();
-                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                            ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                            EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                 getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_FLEE));
                             } else if(editingInfo != null) {
@@ -759,8 +759,8 @@ public class TurnBasedMinecraftMod
                         })
                         .then(Commands.argument("decisionFlee", IntegerArgumentType.integer())
                             .executes(c -> {
-                                ServerPlayerEntity player = c.getSource().asPlayer();
-                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getEntityId());
+                                ServerPlayerEntity player = c.getSource().getPlayerOrException();
+                                EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                                 int decisionFlee = IntegerArgumentType.getInteger(c, "decisionFlee");
                                 if(editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.decisionFlee = decisionFlee;

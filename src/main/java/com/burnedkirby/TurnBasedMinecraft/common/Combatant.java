@@ -58,13 +58,13 @@ public class Combatant
                 LivingEntity c0Entity = (LivingEntity)c0.entity;
                 boolean isHaste = false;
                 boolean isSlow = false;
-                for(EffectInstance e : c0Entity.getActivePotionEffects())
+                for(EffectInstance e : c0Entity.getActiveEffects())
                 {
-                    if(e.getEffectName().equals(Effects.HASTE.getName()) || e.getEffectName().equals(Effects.SPEED.getName()))
+                    if(e.getEffect().equals(Effects.MOVEMENT_SPEED) || e.getEffect().equals(Effects.DIG_SPEED))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffectName().equals(Effects.SLOWNESS.getName()))
+                    else if(e.getEffect().equals(Effects.MOVEMENT_SLOWDOWN) || e.getEffect().equals(Effects.DIG_SLOWDOWN))
                     {
                         isSlow = true;
                     }
@@ -92,13 +92,13 @@ public class Combatant
                 LivingEntity c1Entity = (LivingEntity)c1.entity;
                 boolean isHaste = false;
                 boolean isSlow = false;
-                for(EffectInstance e : c1Entity.getActivePotionEffects())
+                for(EffectInstance e : c1Entity.getActiveEffects())
                 {
-                    if(e.getEffectName().equals(Effects.HASTE.getName()))
+                    if(e.getEffect().equals(Effects.MOVEMENT_SPEED))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffectName().equals(Effects.SLOWNESS.getName()))
+                    else if(e.getEffect().equals(Effects.MOVEMENT_SLOWDOWN))
                     {
                         isSlow = true;
                     }

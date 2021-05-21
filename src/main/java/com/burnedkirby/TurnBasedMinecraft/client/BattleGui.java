@@ -126,26 +126,21 @@ public class BattleGui extends Screen {
 		}
 
 		stateChanged = false;
-		// field_230705_e_ is probably a list of buttons
-		field_230705_e_.clear();
-		// field_230710_m_ is probably a list of gui elements
-		field_230710_m_.clear();
+		buttons.clear();
+		children.clear();
 		switch (state) {
 		case MAIN_MENU:
 			info = "What will you do?";
-			// func_230480_a_ is probably addButton
-            // field_230708_k_ is probably width
-			// field_230709_l_ is probably height
-			func_230480_a_(new Button(field_230708_k_ * 3 / 7 - 25, 40, 50, 20, new StringTextComponent("Attack"), (button) -> {
+			addButton(new Button(width * 3 / 7 - 25, 40, 50, 20, new StringTextComponent("Attack"), (button) -> {
 				buttonActionEvent(button, ButtonAction.ATTACK);
 			}));
-			func_230480_a_(new Button(field_230708_k_ * 4 / 7 - 25, 40, 50, 20, new StringTextComponent("Defend"), (button) -> {
+			addButton(new Button(width * 4 / 7 - 25, 40, 50, 20, new StringTextComponent("Defend"), (button) -> {
 				buttonActionEvent(button, ButtonAction.DEFEND);
 			}));
-			func_230480_a_(new Button(field_230708_k_ * 3 / 7 - 25, 60, 50, 20, new StringTextComponent("Item"), (button) -> {
+			addButton(new Button(width * 3 / 7 - 25, 60, 50, 20, new StringTextComponent("Item"), (button) -> {
 				buttonActionEvent(button, ButtonAction.ITEM);
 			}));
-			func_230480_a_(new Button(field_230708_k_ * 4 / 7 - 25, 60, 50, 20, new StringTextComponent("Flee"), (button) -> {
+			addButton(new Button(width * 4 / 7 - 25, 60, 50, 20, new StringTextComponent("Flee"), (button) -> {
 				buttonActionEvent(button, ButtonAction.FLEE);
 			}));
 			break;
@@ -156,11 +151,11 @@ public class BattleGui extends Screen {
 				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle()
 						.getSideAEntrySet()) {
 					if (e.getValue().entity != null) {
-						func_230480_a_(new EntitySelectionButton(field_230708_k_ / 4 - 60, y, 120, 20, e.getValue().entity.getName().getString(), e.getKey(), true, (button) -> {
+						addButton(new EntitySelectionButton(width / 4 - 60, y, 120, 20, e.getValue().entity.getName().getString(), e.getKey(), true, (button) -> {
 							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					} else {
-						func_230480_a_(new EntitySelectionButton(field_230708_k_ / 4 - 60, y, 120, 20, "Unknown", e.getKey(), true, (button) -> {
+						addButton(new EntitySelectionButton(width / 4 - 60, y, 120, 20, "Unknown", e.getKey(), true, (button) -> {
 							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					}
@@ -174,11 +169,11 @@ public class BattleGui extends Screen {
 				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle()
 						.getSideBEntrySet()) {
 					if (e.getValue().entity != null) {
-						func_230480_a_(new EntitySelectionButton(field_230708_k_ * 3 / 4 - 60, y, 120, 20, e.getValue().entity.getName().getString(), e.getKey(), false, (button) -> {
+						addButton(new EntitySelectionButton(width * 3 / 4 - 60, y, 120, 20, e.getValue().entity.getName().getString(), e.getKey(), false, (button) -> {
 							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					} else {
-						func_230480_a_(new EntitySelectionButton(field_230708_k_ * 3 / 4 - 60, y, 120, 20, "Unknown", e.getKey(), false, (button) -> {
+						addButton(new EntitySelectionButton(width * 3 / 4 - 60, y, 120, 20, "Unknown", e.getKey(), false, (button) -> {
 							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					}
@@ -187,19 +182,19 @@ public class BattleGui extends Screen {
 			} catch (ConcurrentModificationException e) {
 				// ignored
 			}
-			func_230480_a_(new Button(field_230708_k_ / 2 - 30, field_230709_l_ - 120, 60, 20, new StringTextComponent("Cancel"), (button) -> {
+			addButton(new Button(width / 2 - 30, height - 120, 60, 20, new StringTextComponent("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;
 		case ITEM_ACTION:
 			info = "What will you do with an item?";
-			func_230480_a_(new Button(field_230708_k_ * 1 / 4 - 40, field_230709_l_ - 120, 80, 20, new StringTextComponent("Switch Held"), (button) -> {
+			addButton(new Button(width * 1 / 4 - 40, height - 120, 80, 20, new StringTextComponent("Switch Held"), (button) -> {
 				buttonActionEvent(button, ButtonAction.SWITCH_HELD_ITEM);
 			}));
-			func_230480_a_(new Button(field_230708_k_ * 2 / 4 - 40, field_230709_l_ - 120, 80, 20, new StringTextComponent("Use"), (button) -> {
+			addButton(new Button(width * 2 / 4 - 40, height - 120, 80, 20, new StringTextComponent("Use"), (button) -> {
 				buttonActionEvent(button, ButtonAction.DECIDE_USE_ITEM);
 			}));
-			func_230480_a_(new Button(field_230708_k_ * 3 / 4 - 40, field_230709_l_ - 120, 80, 20, new StringTextComponent("Cancel"), (button) -> {
+			addButton(new Button(width * 3 / 4 - 40, height - 120, 80, 20, new StringTextComponent("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;
@@ -209,22 +204,22 @@ public class BattleGui extends Screen {
 		case SWITCH_ITEM:
 			info = "To which item will you switch to?";
 			for (int i = 0; i < 9; ++i) {
-				func_230480_a_(new ItemSelectionButton(field_230708_k_ / 2 - 88 + i * 20, field_230709_l_ - 19, 16, 16, "", i, (button) -> {
+				addButton(new ItemSelectionButton(width / 2 - 88 + i * 20, height - 19, 16, 16, "", i, (button) -> {
 					buttonActionEvent(button, ButtonAction.DO_ITEM_SWITCH);
 				}));
 			}
-			func_230480_a_(new Button(field_230708_k_ / 2 - 40, field_230709_l_ - 120, 80, 20, new StringTextComponent("Cancel"), (button) -> {
+			addButton(new Button(width / 2 - 40, height - 120, 80, 20, new StringTextComponent("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;
 		case USE_ITEM:
 			info = "Which item will you use?";
 			for (int i = 0; i < 9; ++i) {
-				func_230480_a_(new ItemSelectionButton(field_230708_k_ / 2 - 88 + i * 20, field_230709_l_ - 19, 16, 16, "", i, (button) -> {
+				addButton(new ItemSelectionButton(width / 2 - 88 + i * 20, height - 19, 16, 16, "", i, (button) -> {
 					buttonActionEvent(button, ButtonAction.DO_USE_ITEM);
 				}));
 			}
-			func_230480_a_(new Button(field_230708_k_ / 2 - 40, field_230709_l_ - 120, 80, 20, new StringTextComponent("Cancel"), (button) -> {
+			addButton(new Button(width / 2 - 40, height - 120, 80, 20, new StringTextComponent("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;
@@ -232,10 +227,10 @@ public class BattleGui extends Screen {
 	}
 
 	@Override
-	public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
-			// drawHoveringText("Waiting...", field_230708_k_ / 2 - 50, field_230709_l_ / 2);
-			drawString(matrixStack, "Waiting...", field_230708_k_ / 2 - 50, field_230709_l_ / 2, 0xFFFFFFFF);
+			// drawHoveringText("Waiting...", width / 2 - 50, height / 2);
+			drawString(matrixStack, "Waiting...", width / 2 - 50, height / 2, 0xFFFFFFFF);
 			return;
 		}
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle().getState() == Battle.State.DECISION
@@ -251,7 +246,7 @@ public class BattleGui extends Screen {
 
 		updateState();
 
-		super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 
 		String timeRemainingString = "Time remaining: ";
 		int timeRemainingInt = timeRemaining.get();
@@ -263,13 +258,12 @@ public class BattleGui extends Screen {
 			timeRemainingString += "\u00A7c";
 		}
 		timeRemainingString += Integer.toString(timeRemainingInt);
-		int stringWidth = field_230712_o_.getStringWidth(timeRemainingString);
-		// func_238467_a_ is probably fill
-		func_238467_a_(matrixStack, field_230708_k_ / 2 - stringWidth / 2, 5, field_230708_k_ / 2 + stringWidth / 2, 15, 0x70000000);
-		drawString(matrixStack, timeRemainingString, field_230708_k_ / 2 - stringWidth / 2, 5, 0xFFFFFFFF);
-		stringWidth = field_230712_o_.getStringWidth(info);
-		func_238467_a_(matrixStack, field_230708_k_ / 2 - stringWidth / 2, 20, field_230708_k_ / 2 + stringWidth / 2, 30, 0x70000000);
-		drawString(matrixStack, info, field_230708_k_ / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
+		int stringWidth = font.width(timeRemainingString);
+		fill(matrixStack, width / 2 - stringWidth / 2, 5, width / 2 + stringWidth / 2, 15, 0x70000000);
+		drawString(matrixStack, timeRemainingString, width / 2 - stringWidth / 2, 5, 0xFFFFFFFF);
+		stringWidth = font.width(info);
+		fill(matrixStack, width / 2 - stringWidth / 2, 20, width / 2 + stringWidth / 2, 30, 0x70000000);
+		drawString(matrixStack, info, width / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
 	}
 
 	protected void buttonActionEvent(Button button, ButtonAction action) {
@@ -315,7 +309,7 @@ public class BattleGui extends Screen {
 						.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(),
 								Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton) button).getID()));
 				if (((ItemSelectionButton) button).getID() >= 0 && ((ItemSelectionButton) button).getID() < 9) {
-					Minecraft.getInstance().player.inventory.currentItem = ((ItemSelectionButton) button).getID();
+					Minecraft.getInstance().player.inventory.selected = ((ItemSelectionButton) button).getID();
 				}
 				setState(MenuState.WAITING);
 			} else {
@@ -335,21 +329,23 @@ public class BattleGui extends Screen {
 		}
 	}
 
-//	@Override
-//	protected void init() {
-//	}
-
-    // func_231177_au__ is probably isPauseScreen
 	@Override
-	public boolean func_231177_au__() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 
-	// func_231046_a_ is probably keyPressed
 	@Override
-	public boolean func_231046_a_(int a, int b, int c) {
+	public boolean keyPressed(int a, int b, int c) {
 		if (getMinecraft().player.isCreative()) {
-			return super.func_231046_a_(a, b, c);
+			return super.keyPressed(a, b, c);
+		}
+		return false; // TODO verify return value
+	}
+
+	@Override
+	public boolean keyReleased(int a, int b, int c) {
+		if (getMinecraft().player.isCreative()) {
+			return super.keyReleased(a, b, c);
 		}
 		return false; // TODO verify return value
 	}
@@ -359,6 +355,6 @@ public class BattleGui extends Screen {
 	}
 
 	private void drawString(MatrixStack matrixStack, String string, int x, int y, int color) {
-		field_230712_o_.func_238405_a_(matrixStack, string, x, y, color);
+		font.draw(matrixStack, string, x, y, color);
 	}
 }

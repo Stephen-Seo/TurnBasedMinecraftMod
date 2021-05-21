@@ -9,7 +9,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 public class DimensionChangedHandler {
     @SubscribeEvent
     public void dimensionChanged(EntityTravelToDimensionEvent event) {
-        if(event.getEntity().world.isRemote) {
+        if(event.getEntity().level.isClientSide) {
             return;
         }
         if(TurnBasedMinecraftMod.proxy.getBattleManager().forceLeaveBattle(new EntityIDDimPair(event.getEntity()))

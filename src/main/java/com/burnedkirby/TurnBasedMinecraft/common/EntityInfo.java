@@ -202,23 +202,23 @@ public class EntityInfo
         public EffectInstance getPotionEffect(int duration, int amplifier) {
             switch(this) {
             case SPEED:
-                return new EffectInstance(Effects.SPEED, duration, amplifier);
+                return new EffectInstance(Effects.MOVEMENT_SPEED, duration, amplifier);
             case SLOW:
-                return new EffectInstance(Effects.SLOWNESS, duration, amplifier);
+                return new EffectInstance(Effects.MOVEMENT_SLOWDOWN, duration, amplifier);
             case HASTE:
-                return new EffectInstance(Effects.HASTE, duration, amplifier);
+                return new EffectInstance(Effects.DIG_SPEED, duration, amplifier);
             case MINING_FATIGUE:
-                return new EffectInstance(Effects.MINING_FATIGUE, duration, amplifier);
+                return new EffectInstance(Effects.DIG_SLOWDOWN, duration, amplifier);
             case STRENGTH:
-                return new EffectInstance(Effects.STRENGTH, duration, amplifier);
+                return new EffectInstance(Effects.DAMAGE_BOOST, duration, amplifier);
             case JUMP_BOOST:
-                return new EffectInstance(Effects.JUMP_BOOST, duration, amplifier);
+                return new EffectInstance(Effects.JUMP, duration, amplifier);
             case NAUSEA:
-                return new EffectInstance(Effects.NAUSEA, duration, amplifier);
+                return new EffectInstance(Effects.CONFUSION, duration, amplifier);
             case REGENERATION:
                 return new EffectInstance(Effects.REGENERATION, duration, amplifier);
             case RESISTANCE:
-                return new EffectInstance(Effects.RESISTANCE, duration, amplifier);
+                return new EffectInstance(Effects.DAMAGE_RESISTANCE, duration, amplifier);
             case FIRE_RESISTANCE:
                 return new EffectInstance(Effects.FIRE_RESISTANCE, duration, amplifier);
             case WATER_BREATHING:
@@ -276,12 +276,12 @@ public class EntityInfo
         {
             if(this == FIRE)
             {
-                entity.setFire(duration / 20);
+                entity.setSecondsOnFire(duration / 20);
                 return;
             }
             else if(this != UNKNOWN)
             {
-                entity.addPotionEffect(getPotionEffect(duration, amplifier));
+                entity.addEffect(getPotionEffect(duration, amplifier));
             }
         }
         

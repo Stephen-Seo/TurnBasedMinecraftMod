@@ -42,7 +42,7 @@ public class PacketBattleDecision
                 if(b != null)
                 {
                     ServerPlayerEntity player = ctx.get().getSender();
-                    b.setDecision(player.getEntityId(), pkt.decision, pkt.targetIDOrItemID);
+                    b.setDecision(player.getId(), pkt.decision, pkt.targetIDOrItemID);
                 }
     		});
     		ctx.get().setPacketHandled(true);

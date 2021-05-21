@@ -49,10 +49,10 @@ public class ClientProxy extends CommonProxy
     @Override
     public void setBattleGuiAsGui()
     {
-        if(Minecraft.getInstance().currentScreen != battleGui)
+        if(Minecraft.getInstance().screen != battleGui)
         {
             battleGui.turnEnd();
-            Minecraft.getInstance().displayGuiScreen(battleGui);
+            Minecraft.getInstance().setScreen(battleGui);
         }
     }
 
@@ -78,7 +78,7 @@ public class ClientProxy extends CommonProxy
     public void battleEnded()
     {
         localBattle = null;
-        Minecraft.getInstance().displayGuiScreen(null);
+        Minecraft.getInstance().setScreen(null);
         stopMusic(true);
         battleMusicCount = 0;
         sillyMusicCount = 0;
@@ -93,15 +93,15 @@ public class ClientProxy extends CommonProxy
     @Override
     public void playBattleMusic()
     {
-        GameSettings gs = Minecraft.getInstance().gameSettings;
-        battleMusic.playBattle(gs.getSoundLevel(SoundCategory.MUSIC) * gs.getSoundLevel(SoundCategory.MASTER));
+        GameSettings gs = Minecraft.getInstance().options;
+        battleMusic.playBattle(gs.getSoundSourceVolume(SoundCategory.MUSIC) * gs.getSoundSourceVolume(SoundCategory.MASTER));
     }
 
     @Override
     public void playSillyMusic()
     {
-        GameSettings gs = Minecraft.getInstance().gameSettings;
-        battleMusic.playSilly(gs.getSoundLevel(SoundCategory.MUSIC) * gs.getSoundLevel(SoundCategory.MASTER));
+        GameSettings gs = Minecraft.getInstance().options;
+        battleMusic.playSilly(gs.getSoundSourceVolume(SoundCategory.MUSIC) * gs.getSoundSourceVolume(SoundCategory.MASTER));
     }
 
     @Override
@@ -163,10 +163,10 @@ public class ClientProxy extends CommonProxy
         StringTextComponent prefix = new StringTextComponent("TBM: ");
         // func_240718_a_ is set color
         // func_240713_a_ is set bold
-        prefix.func_230530_a_(prefix.getStyle().func_240718_a_(Color.func_240743_a_(0xFF00FF00)).func_240713_a_(true));
+        prefix.withStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
         StringTextComponent text = new StringTextComponent(message);
         prefix.getSiblings().add(text);
-        text.func_230530_a_(text.getStyle().func_240718_a_(Color.func_240743_a_(0xFFFFFFFF)).func_240713_a_(false));
+        text.withStyle(text.getStyle().withColor(Color.fromRgb(0xFFFFFFFF)).withBold(false));
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
         Minecraft.getInstance().player.sendMessage(prefix, UUID.randomUUID());
     }
@@ -235,11 +235,11 @@ public class ClientProxy extends CommonProxy
     @Override
     public void createLocalBattle(int id)
     {
-        localBattle = new Battle(null, id, null, null, false, Minecraft.getInstance().world.func_234923_W_());
+        localBattle = new Battle(null, id, null, null, false, Minecraft.getInstance().level.dimension());
     }
 
     @Override
     public Entity getEntity(int id, RegistryKey<World> dim) {
-        return Minecraft.getInstance().world.getEntityByID(id);
+        return Minecraft.getInstance().level.getEntity(id);
     }
 }

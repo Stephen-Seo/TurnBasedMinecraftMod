@@ -154,7 +154,7 @@ public class CommonProxy
 
     protected final EditingInfo setEditingPlayer(PlayerEntity player)
     {
-        return editingPlayers.put(player.getEntityId(), new EditingInfo(player));
+        return editingPlayers.put(player.getId(), new EditingInfo(player));
     }
 
     protected final EditingInfo removeEditingInfo(int id)
@@ -163,6 +163,6 @@ public class CommonProxy
     }
 
     public Entity getEntity(int id, RegistryKey<World> dim) {
-        return ServerLifecycleHooks.getCurrentServer().getWorld(dim).getEntityByID(id);
+        return ServerLifecycleHooks.getCurrentServer().getLevel(dim).getEntity(id);
     }
 }
