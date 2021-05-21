@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.17
+
+Update mod for Forge 1.16.5-36.1.0 .
+
 # Version 1.16
 
 Add config options regarding creeper behavior.
