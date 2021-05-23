@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.17.2
+
+(try to) Fix potential freeze bug when an entity leaves battle.
+
 # Version 1.17.1
 
 Add experimental support for Pam's Harvestcraft foods.

@@ -1290,8 +1290,8 @@ public class Battle
                             {
                                 fleeingCategory = "player";
                             }
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getId(), 0, 1, fleeingCategory);
                             removeCombatant(next);
+                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getId(), 0, 1, fleeingCategory);
                         }
                         else
                         {

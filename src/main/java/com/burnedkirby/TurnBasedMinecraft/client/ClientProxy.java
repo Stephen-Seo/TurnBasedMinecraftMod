@@ -116,53 +116,40 @@ public class ClientProxy extends CommonProxy
     @Override
     public void typeEnteredBattle(String type)
     {
-        if(localBattle == null)
-        {
+        if(localBattle == null) {
             return;
-        }
-        if(type == null || type.isEmpty() || getConfig().isBattleMusicType(type))
-        {
+        } if(type == null || type.isEmpty() || getConfig().isBattleMusicType(type)) {
             ++battleMusicCount;
-        }
-        else if(getConfig().isSillyMusicType(type))
-        {
+        } else if(getConfig().isSillyMusicType(type)) {
             ++sillyMusicCount;
-        }
-        else
-        {
+        } else {
             ++battleMusicCount;
         }
-        checkBattleTypes();
+        checkBattleTypes(false);
     }
 
     @Override
     public void typeLeftBattle(String type)
     {
-        if(localBattle == null)
+        if(localBattle == null || localBattle.getSideA().isEmpty() || localBattle.getSideB().isEmpty())
         {
+            battleMusicCount = 0;
+            sillyMusicCount = 0;
             return;
-        }
-        if(type == null || type.isEmpty() || getConfig().isBattleMusicType(type))
-        {
+        } else if(type == null || type.isEmpty() || getConfig().isBattleMusicType(type)) {
             --battleMusicCount;
-        }
-        else if(getConfig().isSillyMusicType(type))
-        {
+        } else if(getConfig().isSillyMusicType(type)) {
             --sillyMusicCount;
-        }
-        else
-        {
+        } else {
             --battleMusicCount;
         }
-        checkBattleTypes();
+        checkBattleTypes(true);
     }
 
     @Override
     public void displayString(String message)
     {
         StringTextComponent prefix = new StringTextComponent("TBM: ");
-        // func_240718_a_ is set color
-        // func_240713_a_ is set bold
         prefix.withStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
         StringTextComponent text = new StringTextComponent(message);
         prefix.getSiblings().add(text);
@@ -178,9 +165,14 @@ public class ClientProxy extends CommonProxy
         Minecraft.getInstance().player.sendMessage(text, UUID.randomUUID());
     }
 
-    private void checkBattleTypes()
+    private void checkBattleTypes(boolean entityLeft)
     {
-        float percentage = 0.0f;
+        // check that battle is still valid
+        if(localBattle == null && entityLeft && (localBattle.getSideA().isEmpty() || localBattle.getSideB().isEmpty())) {
+            return;
+        }
+
+    float percentage = 0.0f;
         if(sillyMusicCount == 0 && battleMusicCount == 0)
         {
             percentage = 0.0f;
