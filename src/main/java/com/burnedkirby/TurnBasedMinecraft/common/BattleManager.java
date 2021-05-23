@@ -9,6 +9,7 @@ import java.util.Map;
 import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,6 +30,7 @@ public class BattleManager
     private Map<Integer, Combatant> recentlyLeftBattle;
     private BattleUpdater battleUpdater;
     private Map<EntityIDDimPair, Integer> entityToBattleMap;
+    private static Collection<ItemGroup> otherFoodItemGroups = new ArrayList<>();
     
     public BattleManager(Logger logger)
     {
@@ -355,5 +357,13 @@ public class BattleManager
             entityToBattleMap.remove(entityInfo);
         }
         return result;
+    }
+
+    public static void addOtherModItemGroup(ItemGroup itemGroup) {
+        otherFoodItemGroups.add(itemGroup);
+    }
+
+    public static Collection<ItemGroup> getOtherFoodItemGroups() {
+        return otherFoodItemGroups;
     }
 }

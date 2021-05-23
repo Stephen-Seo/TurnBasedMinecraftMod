@@ -1316,26 +1316,39 @@ public class Battle
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_NOTHING.getValue());
                             break;
                         }
-                        if(targetItem.getItemCategory() == ItemGroup.TAB_FOOD)
-                        {
+                        // check if use item is a food
+                        boolean isFood = false;
+                        // first check other mod foods
+                        for(ItemGroup itemGroup : BattleManager.getOtherFoodItemGroups()) {
+                            if(targetItem.getItemCategory() == itemGroup && targetItem.isEdible()) {
+                                isFood = true;
+                                break;
+                            }
+                        }
+                        if(isFood) {
                             debugLog += " food";
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                             final Entity nextEntity = next.entity;
                             final int nextItemToUse = next.itemToUse;
                             ((PlayerEntity)nextEntity).inventory.setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level, (LivingEntity)nextEntity));
-                        }
-                        else if(targetItem instanceof PotionItem)
-                        {
-                            debugLog += " potion";
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName().getString());
-                            final Entity nextEntity = next.entity;
-                            final int nextItemToUse = next.itemToUse;
-                            ((PlayerEntity)nextEntity).inventory.setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level, (LivingEntity)nextEntity));
-                        }
-                        else
-                        {
-                            debugLog += " non-consumable";
-                            sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getString());
+                        } else {
+                            // then check vanilla foods
+                            if (targetItem.getItemCategory() == ItemGroup.TAB_FOOD && targetItem.isEdible()) {
+                                debugLog += " food";
+                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
+                                final Entity nextEntity = next.entity;
+                                final int nextItemToUse = next.itemToUse;
+                                ((PlayerEntity) nextEntity).inventory.setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level, (LivingEntity) nextEntity));
+                            } else if (targetItem instanceof PotionItem) {
+                                debugLog += " potion";
+                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName().getString());
+                                final Entity nextEntity = next.entity;
+                                final int nextItemToUse = next.itemToUse;
+                                ((PlayerEntity) nextEntity).inventory.setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level, (LivingEntity) nextEntity));
+                            } else {
+                                debugLog += " non-consumable";
+                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getString());
+                            }
                         }
                         break;
                     case SWITCH_ITEM: {
