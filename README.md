@@ -69,4 +69,4 @@ which is licensed under the [MIT License](https://github.com/kevinstadler/JavaMP
 
 # Related Videos
 
-[See related videos here](https://burnedkirby.com/tbmm_vids/)
+[See related videos here](https://burnedkirby.com/posts/tbmm/)
