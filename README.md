@@ -7,7 +7,7 @@ This mod puts turn-based-combat of RPGs into Minecraft!
 Precompiled jars are available here:  
 https://seodisparate.com/static/tbm_releases/  
 https://burnedkirby.com/tbmm_downloads/  
-https://minecraft.curseforge.com/projects/turnbasedminecraft/files
+https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files
 
 # What changed in what version
 
