@@ -7,13 +7,12 @@ import java.util.function.Supplier;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import com.burnedkirby.TurnBasedMinecraft.common.Utility;
-import net.minecraft.entity.Entity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.text.Color;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent;
 
 public class PacketBattleMessage
 {
@@ -102,17 +101,40 @@ public class PacketBattleMessage
             return map.get(value);
         }
     }
-    
+
     MessageType messageType;
     int entityIDFrom;
     int entityIDTo;
     int amount;
     String custom;
-    RegistryKey<World> dimension;
-    
+    ResourceKey<Level> dimension;
+
+    public MessageType getMessageType() {
+        return messageType;
+    }
+
+    public int getEntityIDFrom() {
+        return entityIDFrom;
+    }
+
+    public int getEntityIDTo() {
+        return entityIDTo;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public String getCustom() {
+        return custom;
+    }
+
+    public ResourceKey<Level> getDimension() {
+        return dimension;
+    }
     public PacketBattleMessage() { custom = new String(); }
     
-    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, RegistryKey<World> dimension, int amount)
+    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, ResourceKey<Level> dimension, int amount)
     {
         this.messageType = messageType;
         this.entityIDFrom = entityIDFrom;
@@ -122,7 +144,7 @@ public class PacketBattleMessage
         custom = new String();
     }
     
-    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, RegistryKey<World> dimension, int amount, String custom)
+    public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, ResourceKey<Level> dimension, int amount, String custom)
     {
         this.messageType = messageType;
         this.entityIDFrom = entityIDFrom;
@@ -132,7 +154,7 @@ public class PacketBattleMessage
         this.custom = custom;
     }
     
-    public static void encode(PacketBattleMessage pkt, PacketBuffer buf) {
+    public static void encode(PacketBattleMessage pkt, FriendlyByteBuf buf) {
         buf.writeInt(pkt.messageType.getValue());
         buf.writeInt(pkt.entityIDFrom);
         buf.writeInt(pkt.entityIDTo);
@@ -141,7 +163,7 @@ public class PacketBattleMessage
         buf.writeUtf(pkt.custom);
     }
     
-    public static PacketBattleMessage decode(PacketBuffer buf) {
+    public static PacketBattleMessage decode(FriendlyByteBuf buf) {
     	return new PacketBattleMessage(
     		MessageType.valueOf(
     			buf.readInt()),
@@ -152,183 +174,10 @@ public class PacketBattleMessage
 			buf.readUtf());
     }
     
-    public static class Handler {
-    	public static void handle(final PacketBattleMessage pkt, Supplier<NetworkEvent.Context> ctx) {
-    		ctx.get().enqueueWork(() -> {
-                Entity fromEntity = TurnBasedMinecraftMod.proxy.getEntity(pkt.entityIDFrom, pkt.dimension);
-                String from = "Unknown";
-                if(fromEntity != null)
-                {
-                	from = fromEntity.getDisplayName().getString();
-                }
-                else if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
-                {
-                    fromEntity = TurnBasedMinecraftMod.proxy.getLocalBattle().getCombatantEntity(pkt.entityIDFrom);
-                    if(fromEntity != null)
-                    {
-                    	from = fromEntity.getDisplayName().getString();
-                    }
-                }
-                Entity toEntity = TurnBasedMinecraftMod.proxy.getEntity(pkt.entityIDTo, pkt.dimension);
-                String to = "Unknown";
-                if(toEntity != null)
-                {
-                	to = toEntity.getDisplayName().getString();
-                }
-                else if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
-                {
-                    toEntity = TurnBasedMinecraftMod.proxy.getLocalBattle().getCombatantEntity(pkt.entityIDTo);
-                    if(toEntity != null)
-                    {
-                        to = toEntity.getDisplayName().getString();
-                    }
-                }
-                
-                switch(pkt.messageType)
-                {
-                case ENTERED:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " entered battle!");
-                    if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null || TurnBasedMinecraftMod.proxy.getLocalBattle().getId() != pkt.amount)
-                    {
-                        TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.amount);
-                    }
-                    TurnBasedMinecraftMod.proxy.battleStarted();
-                    TurnBasedMinecraftMod.proxy.typeEnteredBattle(pkt.custom);
-                    break;
-                case FLEE:
-                    if(pkt.amount != 0)
-                    {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " fled battle!");
-                        TurnBasedMinecraftMod.proxy.typeLeftBattle(pkt.custom);
-                    }
-                    else
-                    {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " tried to flee battle but failed!");
-                    }
-                    break;
-                case DIED:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " died in battle!");
-                    TurnBasedMinecraftMod.proxy.typeLeftBattle(pkt.custom);
-                    break;
-                case ENDED:
-                    TurnBasedMinecraftMod.proxy.displayString("Battle has ended!");
-                    TurnBasedMinecraftMod.proxy.battleEnded();
-                    break;
-                case ATTACK:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " attacked " + to + " and dealt " + pkt.amount + " damage!");
-                    break;
-                case DEFEND:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " blocked " + to + "'s attack!");
-                    break;
-                case DEFENSE_DAMAGE:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " retaliated from " + to + "'s attack and dealt " + pkt.amount + " damage!");
-                    break;
-                case MISS:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " attacked " + to + " but missed!");
-                    break;
-                case DEFENDING:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " is defending!");
-                    break;
-                case DID_NOTHING:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " did nothing!");
-                    break;
-                case USED_ITEM:
-                    switch(UsedItemAction.valueOf(pkt.amount))
-                    {
-                    case USED_NOTHING:
-                        TurnBasedMinecraftMod.proxy.displayString(from + " tried to use nothing!");
-                        break;
-                    case USED_INVALID:
-                        if(pkt.custom.length() > 0)
-                        {
-                            TurnBasedMinecraftMod.proxy.displayString(from + " tried to consume " + pkt.custom + " and failed!");
-                        }
-                        else
-                        {
-                            TurnBasedMinecraftMod.proxy.displayString(from + " tried to consume an invalid item and failed!");
-                        }
-                        break;
-                    case USED_FOOD:
-                        TurnBasedMinecraftMod.proxy.displayString(from + " ate a " + pkt.custom + "!");
-                        break;
-                    case USED_POTION:
-                        TurnBasedMinecraftMod.proxy.displayString(from + " drank a " + pkt.custom + "!");
-                        break;
-                    }
-                    break;
-                case TURN_BEGIN:
-                    TurnBasedMinecraftMod.proxy.displayString("The turn begins!");
-                    TurnBasedMinecraftMod.proxy.battleGuiTurnBegin();
-                    break;
-                case TURN_END:
-                    if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
-                    {
-                        if(pkt.amount == 0)
-                        {
-                            TurnBasedMinecraftMod.proxy.displayString("The turn ended!");
-                        }
-                        else
-                        {
-                            TurnBasedMinecraftMod.proxy.displayString("The turn ended (abnormally due to internal error)!");
-                        }
-                    }
-                    TurnBasedMinecraftMod.proxy.battleGuiTurnEnd();
-                    break;
-                case SWITCHED_ITEM:
-                    if(pkt.amount != 0)
-                    {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " switched to a different item!");
-                    }
-                    else
-                    {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " switched to a different item but failed because it was invalid!");
-                    }
-                    break;
-                case WAS_AFFECTED:
-                    TurnBasedMinecraftMod.proxy.displayString(to + " was " + pkt.custom + " by " + from + "!");
-                    break;
-                case BECAME_CREATIVE:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " entered creative mode and left battle!");
-                    break;
-                case FIRED_ARROW:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " let loose an arrow towards " + to + "!");
-                    break;
-                case ARROW_HIT:
-                    TurnBasedMinecraftMod.proxy.displayString(to + " was hit by " + from + "'s arrow!");
-                    break;
-                case BOW_NO_AMMO:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " tried to use their bow but ran out of ammo!");
-                    break;
-                case CREEPER_WAIT: {
-                    StringTextComponent prefix = new StringTextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
-                    StringTextComponent message = new StringTextComponent(from + " is charging up!");
-                    message.setStyle(message.getStyle().withColor(Color.fromRgb(0xFFFFFF00)));
-                    prefix.getSiblings().add(message);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
-                }
-                    break;
-                case CREEPER_WAIT_FINAL: {
-                    StringTextComponent prefix = new StringTextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
-                    StringTextComponent message = new StringTextComponent(from + " is about to explode!");
-                    message.setStyle(message.getStyle().withColor(Color.fromRgb(0xFFFF5050)));
-                    prefix.getSiblings().add(message);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
-                }
-                    break;
-                case CREEPER_EXPLODE: {
-                    StringTextComponent prefix = new StringTextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(Color.fromRgb(0xFF00FF00)).withBold(true));
-                    StringTextComponent message = new StringTextComponent(from + " exploded!");
-                    message.setStyle(message.getStyle().withColor(Color.fromRgb(0xFFFF0000)));
-                    prefix.getSiblings().add(message);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
-                }
-                    break;
-                }
-    		});
-    		ctx.get().setPacketHandled(true);
-    	}
+    public static void handle(final PacketBattleMessage pkt, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
+        });
+        ctx.get().setPacketHandled(true);
     }
 }

@@ -1,12 +1,12 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ArrowItem;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArrowItem;
+import net.minecraft.world.level.Level;
 
 public class Utility
 {
@@ -37,11 +37,11 @@ public class Utility
         }
     }
     
-    public static boolean doesPlayerHaveArrows(PlayerEntity player)
+    public static boolean doesPlayerHaveArrows(Player player)
     {
-        for(int i = 0; i < player.inventory.getContainerSize(); ++i)
+        for(int i = 0; i < player.getInventory().getContainerSize(); ++i)
         {
-            if(player.inventory.getItem(i).getItem() instanceof ArrowItem)
+            if(player.getInventory().getItem(i).getItem() instanceof ArrowItem)
             {
                 return true;
             }
@@ -54,12 +54,12 @@ public class Utility
         return Math.sqrt(Math.pow(a.getX() - b.getX(), 2.0) + Math.pow(a.getY()- b.getY(), 2.0) + Math.pow(a.getZ()- b.getZ(), 2.0));
     }
 
-    public static String serializeDimension(RegistryKey<World> dimObject) {
+    public static String serializeDimension(ResourceKey<Level> dimObject) {
         return dimObject.getRegistryName().toString();
     }
 
-    public static RegistryKey<World> deserializeDimension(String dimString) {
+    public static ResourceKey<Level> deserializeDimension(String dimString) {
         ResourceLocation dimRes = new ResourceLocation(dimString);
-        return RegistryKey.create(Registry.DIMENSION_REGISTRY, dimRes);
+        return ResourceKey.create(Registry.DIMENSION_REGISTRY, dimRes);
     }
 }

@@ -1,21 +1,18 @@
 package com.burnedkirby.TurnBasedMinecraft.client;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import fr.delthas.javamp3.Sound;
+import net.minecraft.client.Minecraft;
+import org.apache.logging.log4j.Logger;
 
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 import javax.sound.sampled.*;
-
-import fr.delthas.javamp3.Sound;
-import org.apache.logging.log4j.Logger;
-
-import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
-import net.minecraft.client.Minecraft;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BattleMusic
 {

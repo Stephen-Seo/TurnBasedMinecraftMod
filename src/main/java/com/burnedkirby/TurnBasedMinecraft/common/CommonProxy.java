@@ -1,20 +1,19 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import java.lang.reflect.Field;
-import java.util.*;
-
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.entity.Entity;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class CommonProxy
 {
@@ -75,96 +74,11 @@ public class CommonProxy
     {
         config = new Config(logger);
         postInitClient();
-        pamsFoodIntegrationLoading();
         logger.debug("postInit proxy for com_burnedkirby_turnbasedminecraft");
     }
     
     protected void postInitClient() {}
 
-    private final void pamsFoodIntegrationLoading() {
-        // TODO: generalize other mod's food loading via config with a list of mod ids
-
-        // pamhc2foodcore
-        {
-            ModList modList = ModList.get();
-            Optional<? extends ModContainer> pamsFoodCoreContainer = modList.getModContainerById("pamhc2foodcore");
-            if (pamsFoodCoreContainer.isPresent()) {
-                Object pamsFoodCore = pamsFoodCoreContainer.get().getMod();
-                try {
-                    Field itemGroupField = pamsFoodCore.getClass().getField("ITEM_GROUP");
-                    ItemGroup foodItemGroup = (ItemGroup) itemGroupField.get(null);
-                    if(foodItemGroup != null) {
-                        BattleManager.addOtherModItemGroup(foodItemGroup);
-                    } else {
-                        throw new NullPointerException();
-                    }
-                } catch (Exception e) {
-                    TurnBasedMinecraftMod.logger.info("Failed to get pamhc2foodcore ITEM_GROUP");
-                }
-            }
-        }
-
-        // pamhc2crops
-        {
-            ModList modList = ModList.get();
-            Optional<? extends ModContainer> pamsFoodCoreContainer = modList.getModContainerById("pamhc2crops");
-            if (pamsFoodCoreContainer.isPresent()) {
-                Object pamsFoodCore = pamsFoodCoreContainer.get().getMod();
-                try {
-                    Field itemGroupField = pamsFoodCore.getClass().getField("ITEM_GROUP");
-                    ItemGroup foodItemGroup = (ItemGroup) itemGroupField.get(null);
-                    if(foodItemGroup != null) {
-                        BattleManager.addOtherModItemGroup(foodItemGroup);
-                    } else {
-                        throw new NullPointerException();
-                    }
-                } catch (Exception e) {
-                    TurnBasedMinecraftMod.logger.info("Failed to get pamhc2crops ITEM_GROUP");
-                }
-            }
-        }
-
-        // pamhc2trees
-        {
-            ModList modList = ModList.get();
-            Optional<? extends ModContainer> pamsFoodCoreContainer = modList.getModContainerById("pamhc2trees");
-            if (pamsFoodCoreContainer.isPresent()) {
-                Object pamsFoodCore = pamsFoodCoreContainer.get().getMod();
-                try {
-                    Field itemGroupField = pamsFoodCore.getClass().getField("ITEM_GROUP");
-                    ItemGroup foodItemGroup = (ItemGroup) itemGroupField.get(null);
-                    if(foodItemGroup != null) {
-                        BattleManager.addOtherModItemGroup(foodItemGroup);
-                    } else {
-                        throw new NullPointerException();
-                    }
-                } catch (Exception e) {
-                    TurnBasedMinecraftMod.logger.info("Failed to get pamhc2trees ITEM_GROUP");
-                }
-            }
-        }
-
-        // pamhc2foodextended
-        {
-            ModList modList = ModList.get();
-            Optional<? extends ModContainer> pamsFoodCoreContainer = modList.getModContainerById("pamhc2foodextended");
-            if (pamsFoodCoreContainer.isPresent()) {
-                Object pamsFoodCore = pamsFoodCoreContainer.get().getMod();
-                try {
-                    Field itemGroupField = pamsFoodCore.getClass().getField("ITEM_GROUP");
-                    ItemGroup foodItemGroup = (ItemGroup) itemGroupField.get(null);
-                    if(foodItemGroup != null) {
-                        BattleManager.addOtherModItemGroup(foodItemGroup);
-                    } else {
-                        throw new NullPointerException();
-                    }
-                } catch (Exception e) {
-                    TurnBasedMinecraftMod.logger.info("Failed to get pamhc2foodextended ITEM_GROUP");
-                }
-            }
-        }
-    }
-    
     public final void setLogger(Logger logger)
     {
         this.logger = logger;
@@ -182,7 +96,7 @@ public class CommonProxy
     
     public void displayString(String message) {}
 
-    public void displayTextComponent(ITextComponent textComponent) {}
+    public void displayTextComponent(TextComponent textComponent) {}
     
     public final boolean isServerRunning()
     {
@@ -241,7 +155,7 @@ public class CommonProxy
         return editingPlayers.get(id);
     }
 
-    protected final EditingInfo setEditingPlayer(PlayerEntity player)
+    protected final EditingInfo setEditingPlayer(Player player)
     {
         return editingPlayers.put(player.getId(), new EditingInfo(player));
     }
@@ -251,7 +165,9 @@ public class CommonProxy
         return editingPlayers.remove(id);
     }
 
-    public Entity getEntity(int id, RegistryKey<World> dim) {
+    public Entity getEntity(int id, ResourceKey<Level> dim) {
         return ServerLifecycleHooks.getCurrentServer().getLevel(dim).getEntity(id);
     }
+
+    public <MSG> void handlePacket(MSG msg, Supplier<NetworkEvent.Context> ctx) {}
 }

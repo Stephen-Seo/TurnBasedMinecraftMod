@@ -2,11 +2,11 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 
 import java.util.Comparator;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 
 public class Combatant
 {
@@ -53,18 +53,18 @@ public class Combatant
         @Override
         public int compare(Combatant c0, Combatant c1)
         {
-            if(c0.entity instanceof PlayerEntity && c0.recalcSpeedOnCompare)
+            if(c0.entity instanceof Player && c0.recalcSpeedOnCompare)
             {
                 LivingEntity c0Entity = (LivingEntity)c0.entity;
                 boolean isHaste = false;
                 boolean isSlow = false;
-                for(EffectInstance e : c0Entity.getActiveEffects())
+                for(MobEffectInstance e : c0Entity.getActiveEffects())
                 {
-                    if(e.getEffect().equals(Effects.MOVEMENT_SPEED) || e.getEffect().equals(Effects.DIG_SPEED))
+                    if(e.getEffect().equals(MobEffects.MOVEMENT_SPEED) || e.getEffect().equals(MobEffects.DIG_SPEED))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffect().equals(Effects.MOVEMENT_SLOWDOWN) || e.getEffect().equals(Effects.DIG_SLOWDOWN))
+                    else if(e.getEffect().equals(MobEffects.MOVEMENT_SLOWDOWN) || e.getEffect().equals(MobEffects.DIG_SLOWDOWN))
                     {
                         isSlow = true;
                     }
@@ -87,18 +87,18 @@ public class Combatant
                 }
             }
             
-            if(c1.entity instanceof PlayerEntity && c1.recalcSpeedOnCompare)
+            if(c1.entity instanceof Player && c1.recalcSpeedOnCompare)
             {
                 LivingEntity c1Entity = (LivingEntity)c1.entity;
                 boolean isHaste = false;
                 boolean isSlow = false;
-                for(EffectInstance e : c1Entity.getActiveEffects())
+                for(MobEffectInstance e : c1Entity.getActiveEffects())
                 {
-                    if(e.getEffect().equals(Effects.MOVEMENT_SPEED))
+                    if(e.getEffect().equals(MobEffects.MOVEMENT_SPEED))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffect().equals(Effects.MOVEMENT_SLOWDOWN))
+                    else if(e.getEffect().equals(MobEffects.MOVEMENT_SLOWDOWN))
                     {
                         isSlow = true;
                     }

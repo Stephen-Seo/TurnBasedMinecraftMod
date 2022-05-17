@@ -6,8 +6,8 @@ import com.burnedkirby.TurnBasedMinecraft.common.Battle;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class PacketBattleRequestInfo
 {
@@ -20,24 +20,22 @@ public class PacketBattleRequestInfo
         this.battleID = battleID;
     }
     
-    public static void encode(PacketBattleRequestInfo pkt, PacketBuffer buf) {
+    public static void encode(PacketBattleRequestInfo pkt, FriendlyByteBuf buf) {
     	buf.writeInt(pkt.battleID);
     }
     
-    public static PacketBattleRequestInfo decode(PacketBuffer buf) {
+    public static PacketBattleRequestInfo decode(FriendlyByteBuf buf) {
     	return new PacketBattleRequestInfo(buf.readInt());
     }
     
-    public static class Handler {
-    	public static void handle(final PacketBattleRequestInfo pkt, Supplier<NetworkEvent.Context> ctx) {
-    		ctx.get().enqueueWork(() -> {
-                Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
-                if(b == null) {
-                	return;
-                }
-                TurnBasedMinecraftMod.getHandler().reply(new PacketBattleInfo(b.getSideAIDs(), b.getSideBIDs(), b.getTimerSeconds()), ctx.get());
-    		});
-    		ctx.get().setPacketHandled(true);
-    	}
+    public static void handle(final PacketBattleRequestInfo pkt, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
+            if(b == null) {
+                return;
+            }
+            TurnBasedMinecraftMod.getHandler().reply(new PacketBattleInfo(b.getSideAIDs(), b.getSideBIDs(), b.getTimerSeconds()), ctx.get());
+        });
+        ctx.get().setPacketHandled(true);
     }
 }

@@ -1,26 +1,19 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.network.PacketDistributor;
-import org.apache.logging.log4j.Logger;
-
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
-
-import net.minecraft.entity.Entity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.network.PacketDistributor;
+import org.apache.logging.log4j.Logger;
+
+import java.util.*;
 
 public class BattleManager
 {
@@ -30,8 +23,7 @@ public class BattleManager
     private Map<Integer, Combatant> recentlyLeftBattle;
     private BattleUpdater battleUpdater;
     private Map<EntityIDDimPair, Integer> entityToBattleMap;
-    private static Collection<ItemGroup> otherFoodItemGroups = new ArrayList<>();
-    
+
     public BattleManager(Logger logger)
     {
         this.logger = logger;
@@ -75,9 +67,9 @@ public class BattleManager
         }
 
         // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
-        if(!((event.getEntity() instanceof PlayerEntity && !((PlayerEntity)event.getEntity()).isCreative())
+        if(!((event.getEntity() instanceof Player && !((Player)event.getEntity()).isCreative())
                 || (config.getEntityInfoReference(receiverClassName) != null || config.getCustomEntityInfoReference(receiverCustomName) != null))
-            || !((event.getSource().getEntity() instanceof PlayerEntity && !((PlayerEntity)event.getSource().getEntity()).isCreative())
+            || !((event.getSource().getEntity() instanceof Player && !((Player)event.getSource().getEntity()).isCreative())
                 || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null)))
         {
 //            logger.debug("BattleManager: Failed first check, attacker is \"" + attackerClassName + "\", defender is \"" + receiverClassName + "\"");
@@ -138,7 +130,7 @@ public class BattleManager
             return true;
         } else if(attackerBattle == null && defenderBattle == null) {
             // neither entity is in battle
-            if(event.getEntity() instanceof PlayerEntity || event.getSource().getEntity() instanceof PlayerEntity)
+            if(event.getEntity() instanceof Player || event.getSource().getEntity() instanceof Player)
             {
                 // at least one of the entities is a player, create Battle
                 Collection<Entity> sideA = new ArrayList<Entity>(1);
@@ -204,7 +196,7 @@ public class BattleManager
         }
 
         EntityInfo targetedInfo;
-        if(event.getTarget() instanceof PlayerEntity)
+        if(event.getTarget() instanceof Player)
         {
             targetedInfo = null;
         }
@@ -216,7 +208,7 @@ public class BattleManager
                 targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getTarget());
             }
         }
-        if((event.getTarget() instanceof PlayerEntity && ((PlayerEntity)event.getTarget()).isCreative())
+        if((event.getTarget() instanceof Player && ((Player)event.getTarget()).isCreative())
                 || attackerInfo == null
                 || attackerInfo.ignoreBattle
                 || TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(attackerInfo.category)
@@ -241,7 +233,7 @@ public class BattleManager
             return;
         } else if(attackerBattle == null && defenderBattle == null) {
             // neither in battle
-            if(event.getEntity() instanceof PlayerEntity || event.getTarget() instanceof PlayerEntity)
+            if(event.getEntity() instanceof Player || event.getTarget() instanceof Player)
             {
                 // at least one is a player, create battle
                 Collection<Entity> sideA = new ArrayList<Entity>(1);
@@ -277,7 +269,7 @@ public class BattleManager
         }
     }
     
-    private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB, RegistryKey<World> dimension)
+    private Battle createBattle(Collection<Entity> sideA, Collection<Entity> sideB, ResourceKey<Level> dimension)
     {
         Battle newBattle = null;
         while(battleMap.containsKey(IDCounter))
@@ -313,8 +305,8 @@ public class BattleManager
     {
         c.time = System.nanoTime();
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
-        if(c.entity instanceof ServerPlayerEntity) {
-            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity) c.entity), new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"));
+        if(c.entity instanceof ServerPlayer) {
+            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayer) c.entity), new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"));
         }
         recentlyLeftBattle.put(c.entity.getId(), c);
         entityToBattleMap.remove(new EntityIDDimPair(c.entity));
@@ -326,15 +318,15 @@ public class BattleManager
         for(Iterator<Map.Entry<Integer, Combatant>> iter = recentlyLeftBattle.entrySet().iterator(); iter.hasNext();)
         {
             Map.Entry<Integer, Combatant> entry = iter.next();
-            if(entry.getValue().entity instanceof CreeperEntity && TurnBasedMinecraftMod.proxy.getConfig().getCreeperStopExplodeOnLeaveBattle()) {
-                ((CreeperEntity)entry.getValue().entity).setSwellDir(-10);
+            if(entry.getValue().entity instanceof Creeper && TurnBasedMinecraftMod.proxy.getConfig().getCreeperStopExplodeOnLeaveBattle()) {
+                ((Creeper)entry.getValue().entity).setSwellDir(-10);
             }
             if(current - entry.getValue().time > TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownNanos())
             {
                 iter.remove();
-                if(entry.getValue().entity instanceof ServerPlayerEntity)
+                if(entry.getValue().entity instanceof ServerPlayer)
                 {
-                    TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayerEntity)entry.getValue().entity), new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."));
+                    TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayer)entry.getValue().entity), new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."));
                 }
             }
         }
@@ -357,13 +349,5 @@ public class BattleManager
             entityToBattleMap.remove(entityInfo);
         }
         return result;
-    }
-
-    public static void addOtherModItemGroup(ItemGroup itemGroup) {
-        otherFoodItemGroups.add(itemGroup);
-    }
-
-    public static Collection<ItemGroup> getOtherFoodItemGroups() {
-        return otherFoodItemGroups;
     }
 }

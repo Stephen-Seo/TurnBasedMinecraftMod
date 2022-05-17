@@ -1,6 +1,6 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 6
+version = 7
 do_not_overwrite = false
 
 [client_config]
@@ -98,7 +98,7 @@ creeper_always_allow_damage = true
 # decision_flee_probability: Percentage of entity choosing to flee on turn.
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.BlazeEntity"
+name = "net.minecraft.world.entity.monster.Blaze"
 attack_power = 5
 attack_probability = 50
 attack_effect = "fire"
@@ -111,7 +111,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.CaveSpiderEntity"
+name = "net.minecraft.world.entity.monster.CaveSpider"
 attack_power = 2
 attack_probability = 75
 attack_effect = "poison"
@@ -124,7 +124,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.CreeperEntity"
+name = "net.minecraft.world.entity.monster.Creeper"
 ignore_battle = false
 attack_power = 13
 attack_probability = 95
@@ -137,7 +137,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.DrownedEntity"
+name = "net.minecraft.world.entity.monster.Drowned"
 attack_power = 3
 attack_probability = 70
 attack_variance = 2
@@ -149,7 +149,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.ElderGuardianEntity"
+name = "net.minecraft.world.entity.monster.ElderGuardian"
 attack_power = 8
 attack_probability = 65
 defense_damage = 2
@@ -162,7 +162,7 @@ decision_defend_probability = 20
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.EndermanEntity"
+name = "net.minecraft.world.entity.monster.EnderMan"
 attack_power = 7
 attack_probability = 80
 evasion = 40
@@ -173,7 +173,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.EndermiteEntity"
+name = "net.minecraft.world.entity.monster.Endermite"
 attack_power = 2
 attack_probability = 80
 evasion = 40
@@ -184,7 +184,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.EvokerEntity"
+name = "net.minecraft.world.entity.monster.Evoker"
 attack_power = 6
 attack_probability = 60
 evasion = 35
@@ -195,7 +195,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.GhastEntity"
+name = "net.minecraft.world.entity.monster.Ghast"
 ignore_battle = true
 attack_power = 13
 attack_probability = 20
@@ -207,7 +207,7 @@ decision_defend_probability = 0
 decision_flee_probability = 25
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.GiantEntity"
+name = "net.minecraft.world.entity.monster.Giant"
 attack_power = 11
 attack_probability = 35
 evasion = 2
@@ -218,7 +218,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.GuardianEntity"
+name = "net.minecraft.world.entity.monster.Guardian"
 attack_power = 6
 attack_probability = 55
 defense_damage = 2
@@ -231,7 +231,7 @@ decision_defend_probability = 20
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.HoglinEntity"
+name = "net.minecraft.world.entity.monster.hoglin.Hoglin"
 attack_power = 6
 attack_variance = 2
 attack_probability = 60
@@ -243,7 +243,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.HuskEntity"
+name = "net.minecraft.world.entity.monster.Husk"
 attack_power = 3
 attack_probability = 70
 attack_effect = "hunger"
@@ -256,7 +256,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.IllusionerEntity"
+name = "net.minecraft.world.entity.monster.Illusioner"
 attack_power = 2
 attack_probability = 70
 attack_variance = 2
@@ -268,7 +268,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.IronGolemEntity"
+name = "net.minecraft.world.entity.animal.IronGolem"
 attack_power = 14
 attack_probability = 85
 attack_variance = 7
@@ -280,7 +280,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.MagmaCubeEntity"
+name = "net.minecraft.world.entity.monster.MagmaCube"
 attack_power = 3
 attack_probability = 35
 evasion = 12
@@ -291,7 +291,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.piglin.PiglinEntity"
+name = "net.minecraft.world.entity.monster.piglin.Piglin"
 attack_power = 5
 attack_variance = 2
 attack_probability = 70
@@ -303,7 +303,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.piglin.PiglinBruteEntity"
+name = "net.minecraft.world.entity.monster.piglin.PiglinBrute"
 attack_power = 10
 attack_variance = 2
 attack_probability = 75
@@ -315,7 +315,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.PhantomEntity"
+name = "net.minecraft.world.entity.monster.Phantom"
 attack_power = 2
 attack_probability = 90
 attack_variance = 1
@@ -327,7 +327,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.PillagerEntity"
+name = "net.minecraft.world.entity.monster.Pillager"
 attack_power = 3
 attack_probability = 60
 attack_variance = 1
@@ -339,7 +339,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.RavagerEntity"
+name = "net.minecraft.world.entity.monster.Ravager"
 attack_power = 12
 attack_probability = 70
 attack_variance = 4
@@ -351,7 +351,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.ShulkerEntity"
+name = "net.minecraft.world.entity.monster.Shulker"
 attack_power = 4
 attack_probability = 80
 evasion = 15
@@ -362,7 +362,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.SilverfishEntity"
+name = "net.minecraft.world.entity.monster.Silverfish"
 attack_power = 1
 attack_probability = 85
 evasion = 37
@@ -373,7 +373,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.SkeletonEntity"
+name = "net.minecraft.world.entity.monster.Skeleton"
 attack_power = 3
 attack_probability = 75
 attack_variance = 1
@@ -385,7 +385,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.SlimeEntity"
+name = "net.minecraft.world.entity.monster.Slime"
 attack_power = 2
 attack_probability = 35
 evasion = 10
@@ -396,7 +396,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.SpiderEntity"
+name = "net.minecraft.world.entity.monster.Spider"
 attack_power = 2
 attack_probability = 70
 evasion = 25
@@ -407,7 +407,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.StrayEntity"
+name = "net.minecraft.world.entity.monster.Stray"
 attack_power = 3
 attack_probability = 75
 attack_variance = 1
@@ -421,7 +421,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.VexEntity"
+name = "net.minecraft.world.entity.monster.Vex"
 attack_power = 9
 attack_probability = 65
 evasion = 30
@@ -432,7 +432,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.VindicatorEntity"
+name = "net.minecraft.world.entity.monster.Vindicator"
 attack_power = 13
 attack_probability = 70
 evasion = 10
@@ -443,7 +443,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.WitchEntity"
+name = "net.minecraft.world.entity.monster.Witch"
 attack_power = 5
 attack_probability = 75
 attack_variance = 1
@@ -455,7 +455,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.WitherSkeletonEntity"
+name = "net.minecraft.world.entity.monster.WitherSkeleton"
 attack_power = 8
 attack_probability = 70
 attack_effect = "wither"
@@ -468,7 +468,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.ZoglinEntity"
+name = "net.minecraft.world.entity.monster.Zoglin"
 attack_power = 6
 attack_variance = 2
 attack_probability = 60
@@ -480,7 +480,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.ZombieEntity"
+name = "net.minecraft.world.entity.monster.Zombie"
 attack_power = 3
 attack_probability = 70
 evasion = 5
@@ -491,7 +491,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.ZombifiedPiglinEntity"
+name = "net.minecraft.world.entity.monster.ZombifiedPiglin"
 attack_power = 8
 attack_probability = 70
 evasion = 10
@@ -502,7 +502,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.monster.ZombieVillagerEntity"
+name = "net.minecraft.world.entity.monster.ZombieVillager"
 attack_power = 3
 attack_probability = 70
 evasion = 5
@@ -513,7 +513,18 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.BatEntity"
+name = "net.minecraft.world.entity.animal.axolotl.Axolotl"
+attack_power = 2
+attack_probability = 70
+evasion = 25
+category = "passive"
+speed = 65
+decision_attack_probability = 70
+decision_defend_probability = 20
+decision_flee_probability = 10
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.ambient.Bat"
 attack_power = 0
 attack_probability = 70
 evasion = 35
@@ -524,7 +535,7 @@ decision_defend_probability = 0
 decision_flee_probability = 90
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.BeeEntity"
+name = "net.minecraft.world.entity.animal.Bee"
 attack_power = 2
 attack_probability = 65
 evasion = 30
@@ -537,107 +548,7 @@ attack_effect = "poison"
 attack_effect_probability = 50
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.ChickenEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 10
-category = "passive"
-speed = 35
-decision_attack_probability = 0
-decision_defend_probability = 0
-decision_flee_probability = 90
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.CowEntity"
-attack_power = 0
-attack_probability = 50
-evasion = 1
-category = "passive"
-speed = 20
-decision_attack_probability = 0
-decision_defend_probability = 10
-decision_flee_probability = 80
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.DolphinEntity"
-attack_power = 3
-attack_probability = 80
-attack_variance = 1
-evasion = 45
-category = "passive"
-speed = 75
-decision_attack_probability = 70
-decision_defend_probability = 0
-decision_flee_probability = 30
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.FoxEntity"
-attack_power = 2
-attack_probability = 70
-evasion = 65
-category = "animal"
-speed = 65
-decision_attack_probability = 70
-decision_defend_probability = 0
-decision_flee_probability = 25
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.horse.DonkeyEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 10
-category = "passive"
-speed = 65
-decision_attack_probability = 0
-decision_defend_probability = 0
-decision_flee_probability = 90
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.horse.HorseEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 10
-category = "passive"
-speed = 65
-decision_attack_probability = 0
-decision_defend_probability = 0
-decision_flee_probability = 90
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.horse.LlamaEntity"
-attack_power = 1
-attack_probability = 70
-evasion = 10
-category = "passive"
-speed = 50
-decision_attack_probability = 65
-decision_defend_probability = 0
-decision_flee_probability = 25
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.MooshroomEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 1
-category = "passive"
-speed = 20
-decision_attack_probability = 0
-decision_defend_probability = 10
-decision_flee_probability = 80
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.horse.MuleEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 10
-category = "passive"
-speed = 50
-decision_attack_probability = 0
-decision_defend_probability = 0
-decision_flee_probability = 90
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.OcelotEntity"
+name = "net.minecraft.world.entity.animal.Cat"
 attack_power = 1
 attack_probability = 70
 attack_variance = 1
@@ -649,76 +560,55 @@ decision_defend_probability = 0
 decision_flee_probability = 90
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.PandaEntity"
-attack_power = 6
-attack_probability = 60
+name = "net.minecraft.world.entity.animal.Chicken"
+attack_power = 0
+attack_probability = 70
 evasion = 10
 category = "passive"
-speed = 30
-decision_attack_probability = 45
-decision_defend_probability = 25
+speed = 35
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Cow"
+attack_power = 0
+attack_probability = 50
+evasion = 1
+category = "passive"
+speed = 20
+decision_attack_probability = 0
+decision_defend_probability = 10
+decision_flee_probability = 80
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Dolphin"
+attack_power = 3
+attack_probability = 80
+attack_variance = 1
+evasion = 45
+category = "passive"
+speed = 75
+decision_attack_probability = 70
+decision_defend_probability = 0
 decision_flee_probability = 30
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.ParrotEntity"
-attack_power = 0
+name = "net.minecraft.world.entity.animal.Fox"
+attack_power = 2
 attack_probability = 70
-evasion = 35
-category = "passive"
-speed = 70
-decision_attack_probability = 0
+evasion = 65
+category = "animal"
+speed = 65
+decision_attack_probability = 70
 decision_defend_probability = 0
-decision_flee_probability = 90
+decision_flee_probability = 25
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.PigEntity"
+name = "net.minecraft.world.entity.animal.horse.Donkey"
 attack_power = 0
 attack_probability = 70
 evasion = 10
-category = "passive"
-speed = 30
-decision_attack_probability = 0
-decision_defend_probability = 5
-decision_flee_probability = 85
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.PolarBearEntity"
-attack_power = 6
-attack_probability = 67
-evasion = 5
-category = "animal"
-speed = 35
-decision_attack_probability = 100
-decision_defend_probability = 0
-decision_flee_probability = 0
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.RabbitEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 40
-category = "passive"
-speed = 75
-decision_attack_probability = 0
-decision_defend_probability = 0
-decision_flee_probability = 100
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.SheepEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 5
-category = "passive"
-speed = 30
-decision_attack_probability = 0
-decision_defend_probability = 0
-decision_flee_probability = 90
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.horse.SkeletonHorseEntity"
-attack_power = 0
-attack_probability = 70
-evasion = 5
 category = "passive"
 speed = 65
 decision_attack_probability = 0
@@ -726,29 +616,29 @@ decision_defend_probability = 0
 decision_flee_probability = 90
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.SnowGolemEntity"
-attack_power = 0
-attack_probability = 80
-evasion = 5
-category = "passive"
-speed = 60
-decision_attack_probability = 100
-decision_defend_probability = 0
-decision_flee_probability = 0
-
-[[server_config.entity]]
-name = "net.minecraft.entity.passive.SquidEntity"
+name = "net.minecraft.world.entity.animal.horse.Horse"
 attack_power = 0
 attack_probability = 70
-evasion = 15
+evasion = 10
 category = "passive"
-speed = 40
+speed = 65
 decision_attack_probability = 0
 decision_defend_probability = 0
 decision_flee_probability = 90
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.horse.TraderLlamaEntity"
+name = "net.minecraft.world.entity.animal.goat.Goat"
+attack_power = 2
+attack_probability = 70
+evasion = 30
+category = "passive"
+speed = 60
+decision_attack_probability = 75
+decision_defend_probability = 20
+decision_flee_probability = 5
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.horse.Llama"
 attack_power = 1
 attack_probability = 70
 evasion = 10
@@ -759,7 +649,151 @@ decision_defend_probability = 0
 decision_flee_probability = 25
 
 [[server_config.entity]]
-name = "net.minecraft.entity.merchant.villager.VillagerEntity"
+name = "net.minecraft.world.entity.animal.MushroomCow"
+attack_power = 0
+attack_probability = 70
+evasion = 1
+category = "passive"
+speed = 20
+decision_attack_probability = 0
+decision_defend_probability = 10
+decision_flee_probability = 80
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.horse.Mule"
+attack_power = 0
+attack_probability = 70
+evasion = 10
+category = "passive"
+speed = 50
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Ocelot"
+attack_power = 1
+attack_probability = 70
+attack_variance = 1
+evasion = 30
+category = "passive"
+speed = 75
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Panda"
+attack_power = 6
+attack_probability = 60
+evasion = 10
+category = "passive"
+speed = 30
+decision_attack_probability = 45
+decision_defend_probability = 25
+decision_flee_probability = 30
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Parrot"
+attack_power = 0
+attack_probability = 70
+evasion = 35
+category = "passive"
+speed = 70
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Pig"
+attack_power = 0
+attack_probability = 70
+evasion = 10
+category = "passive"
+speed = 30
+decision_attack_probability = 0
+decision_defend_probability = 5
+decision_flee_probability = 85
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.PolarBear"
+attack_power = 6
+attack_probability = 67
+evasion = 5
+category = "animal"
+speed = 35
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Rabbit"
+attack_power = 0
+attack_probability = 70
+evasion = 40
+category = "passive"
+speed = 75
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 100
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Sheep"
+attack_power = 0
+attack_probability = 70
+evasion = 5
+category = "passive"
+speed = 30
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.horse.SkeletonHorse"
+attack_power = 0
+attack_probability = 70
+evasion = 5
+category = "passive"
+speed = 65
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.SnowGolem"
+attack_power = 0
+attack_probability = 80
+evasion = 5
+category = "passive"
+speed = 60
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.Squid"
+attack_power = 0
+attack_probability = 70
+evasion = 15
+category = "passive"
+speed = 40
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.horse.TraderLlama"
+attack_power = 1
+attack_probability = 70
+evasion = 10
+category = "passive"
+speed = 50
+decision_attack_probability = 65
+decision_defend_probability = 0
+decision_flee_probability = 25
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.npc.Villager"
 attack_power = 0
 attack_probability = 70
 evasion = 5
@@ -770,7 +804,7 @@ decision_defend_probability = 10
 decision_flee_probability = 80
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.WolfEntity"
+name = "net.minecraft.world.entity.animal.Wolf"
 attack_power = 4
 attack_probability = 70
 evasion = 20
@@ -781,7 +815,7 @@ decision_defend_probability = 15
 decision_flee_probability = 5
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.horse.ZombieHorseEntity"
+name = "net.minecraft.world.entity.animal.horse.ZombieHorse"
 attack_power = 0
 attack_probability = 70
 evasion = 8
@@ -792,7 +826,7 @@ decision_defend_probability = 0
 decision_flee_probability = 90
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.fish.CodEntity"
+name = "net.minecraft.world.entity.animal.Cod"
 attack_power = 0
 attack_probability = 50
 evasion = 50
@@ -803,7 +837,7 @@ decision_defend_probability = 0
 decision_flee_probability = 75
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.fish.PufferfishEntity"
+name = "net.minecraft.world.entity.animal.Pufferfish"
 attack_power = 0
 attack_probability = 50
 defense_damage = 3
@@ -816,7 +850,7 @@ decision_defend_probability = 0
 decision_flee_probability = 65
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.fish.SalmonEntity"
+name = "net.minecraft.world.entity.animal.Salmon"
 attack_power = 0
 attack_probability = 50
 evasion = 50
@@ -827,7 +861,7 @@ decision_defend_probability = 0
 decision_flee_probability = 75
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.StriderEntity"
+name = "net.minecraft.world.entity.monster.Strider"
 attack_power = 0
 attack_probability = 50
 evasion = 35
@@ -838,7 +872,7 @@ decision_defend_probability = 10
 decision_flee_probability = 90
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.fish.TropicalFishEntity"
+name = "net.minecraft.world.entity.animal.TropicalFish"
 attack_power = 0
 attack_probability = 50
 evasion = 50
@@ -849,7 +883,7 @@ decision_defend_probability = 0
 decision_flee_probability = 75
 
 [[server_config.entity]]
-name = "net.minecraft.entity.passive.TurtleEntity"
+name = "net.minecraft.world.entity.animal.Turtle"
 attack_power = 0
 attack_probability = 20
 evasion = 35
@@ -860,7 +894,7 @@ decision_defend_probability = 40
 decision_flee_probability = 60
 
 [[server_config.entity]]
-name = "net.minecraft.entity.merchant.villager.WanderingTraderEntity"
+name = "net.minecraft.world.entity.npc.WanderingTrader"
 attack_power = 0
 attack_probability = 70
 evasion = 5
@@ -871,7 +905,7 @@ decision_defend_probability = 10
 decision_flee_probability = 80
 
 [[server_config.entity]]
-name = "net.minecraft.entity.boss.dragon.EnderDragonEntity"
+name = "net.minecraft.world.entity.boss.enderdragon.EnderDragon"
 attack_power = 10
 attack_probability = 70
 attack_variance = 2
@@ -883,7 +917,7 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
-name = "net.minecraft.entity.boss.WitherEntity"
+name = "net.minecraft.world.entity.boss.wither.WitherBoss"
 attack_power = 8
 attack_probability = 70
 attack_effect = "wither"

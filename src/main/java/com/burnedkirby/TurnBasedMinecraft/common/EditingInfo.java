@@ -1,10 +1,10 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class EditingInfo
 {
-    public PlayerEntity editor;
+    public Player editor;
     public EntityInfo entityInfo;
     public boolean isPendingEntitySelection;
     public boolean isEditingCustomName;
@@ -17,7 +17,7 @@ public class EditingInfo
         isEditingCustomName = false;
     }
 
-    public EditingInfo(PlayerEntity player)
+    public EditingInfo(Player player)
     {
         editor = player;
         entityInfo = null;

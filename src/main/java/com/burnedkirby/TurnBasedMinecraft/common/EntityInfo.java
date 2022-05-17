@@ -1,8 +1,8 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 
 public class EntityInfo
 {
@@ -194,71 +194,71 @@ public class EntityInfo
             }
         }
         
-        public EffectInstance getPotionEffect()
+        public MobEffectInstance getPotionEffect()
         {
             return getPotionEffect(20 * 7, 0);
         }
         
-        public EffectInstance getPotionEffect(int duration, int amplifier) {
+        public MobEffectInstance getPotionEffect(int duration, int amplifier) {
             switch(this) {
             case SPEED:
-                return new EffectInstance(Effects.MOVEMENT_SPEED, duration, amplifier);
+                return new MobEffectInstance(MobEffects.MOVEMENT_SPEED, duration, amplifier);
             case SLOW:
-                return new EffectInstance(Effects.MOVEMENT_SLOWDOWN, duration, amplifier);
+                return new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, duration, amplifier);
             case HASTE:
-                return new EffectInstance(Effects.DIG_SPEED, duration, amplifier);
+                return new MobEffectInstance(MobEffects.DIG_SPEED, duration, amplifier);
             case MINING_FATIGUE:
-                return new EffectInstance(Effects.DIG_SLOWDOWN, duration, amplifier);
+                return new MobEffectInstance(MobEffects.DIG_SLOWDOWN, duration, amplifier);
             case STRENGTH:
-                return new EffectInstance(Effects.DAMAGE_BOOST, duration, amplifier);
+                return new MobEffectInstance(MobEffects.DAMAGE_BOOST, duration, amplifier);
             case JUMP_BOOST:
-                return new EffectInstance(Effects.JUMP, duration, amplifier);
+                return new MobEffectInstance(MobEffects.JUMP, duration, amplifier);
             case NAUSEA:
-                return new EffectInstance(Effects.CONFUSION, duration, amplifier);
+                return new MobEffectInstance(MobEffects.CONFUSION, duration, amplifier);
             case REGENERATION:
-                return new EffectInstance(Effects.REGENERATION, duration, amplifier);
+                return new MobEffectInstance(MobEffects.REGENERATION, duration, amplifier);
             case RESISTANCE:
-                return new EffectInstance(Effects.DAMAGE_RESISTANCE, duration, amplifier);
+                return new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, duration, amplifier);
             case FIRE_RESISTANCE:
-                return new EffectInstance(Effects.FIRE_RESISTANCE, duration, amplifier);
+                return new MobEffectInstance(MobEffects.FIRE_RESISTANCE, duration, amplifier);
             case WATER_BREATHING:
-                return new EffectInstance(Effects.WATER_BREATHING, duration, amplifier);
+                return new MobEffectInstance(MobEffects.WATER_BREATHING, duration, amplifier);
             case INVISIBILITY:
-                return new EffectInstance(Effects.INVISIBILITY, duration, amplifier);
+                return new MobEffectInstance(MobEffects.INVISIBILITY, duration, amplifier);
             case BLINDNESS:
-                return new EffectInstance(Effects.BLINDNESS, duration, amplifier);
+                return new MobEffectInstance(MobEffects.BLINDNESS, duration, amplifier);
             case NIGHT_VISION:
-                return new EffectInstance(Effects.NIGHT_VISION, duration, amplifier);
+                return new MobEffectInstance(MobEffects.NIGHT_VISION, duration, amplifier);
             case HUNGER:
-                return new EffectInstance(Effects.HUNGER, duration, amplifier);
+                return new MobEffectInstance(MobEffects.HUNGER, duration, amplifier);
             case WEAKNESS:
-                return new EffectInstance(Effects.WEAKNESS, duration, amplifier);
+                return new MobEffectInstance(MobEffects.WEAKNESS, duration, amplifier);
             case POISON:
-                return new EffectInstance(Effects.POISON, duration, amplifier);
+                return new MobEffectInstance(MobEffects.POISON, duration, amplifier);
             case WITHER:
-                return new EffectInstance(Effects.WITHER, duration, amplifier);
+                return new MobEffectInstance(MobEffects.WITHER, duration, amplifier);
             case HEALTH_BOOST:
-                return new EffectInstance(Effects.HEALTH_BOOST, duration, amplifier);
+                return new MobEffectInstance(MobEffects.HEALTH_BOOST, duration, amplifier);
             case ABSORPTION:
-                return new EffectInstance(Effects.ABSORPTION, duration, amplifier);
+                return new MobEffectInstance(MobEffects.ABSORPTION, duration, amplifier);
             case SATURATION:
-                return new EffectInstance(Effects.SATURATION, duration, amplifier);
+                return new MobEffectInstance(MobEffects.SATURATION, duration, amplifier);
             case GLOWING:
-                return new EffectInstance(Effects.GLOWING, duration, amplifier);
+                return new MobEffectInstance(MobEffects.GLOWING, duration, amplifier);
             case LEVITATION:
-                return new EffectInstance(Effects.LEVITATION, duration, amplifier);
+                return new MobEffectInstance(MobEffects.LEVITATION, duration, amplifier);
             case LUCK:
-                return new EffectInstance(Effects.LUCK, duration, amplifier);
+                return new MobEffectInstance(MobEffects.LUCK, duration, amplifier);
             case UNLUCK:
-                return new EffectInstance(Effects.UNLUCK, duration, amplifier);
+                return new MobEffectInstance(MobEffects.UNLUCK, duration, amplifier);
             case SLOW_FALLING:
-                return new EffectInstance(Effects.SLOW_FALLING, duration, amplifier);
+                return new MobEffectInstance(MobEffects.SLOW_FALLING, duration, amplifier);
             case CONDUIT_POWER:
-                return new EffectInstance(Effects.CONDUIT_POWER, duration, amplifier);
+                return new MobEffectInstance(MobEffects.CONDUIT_POWER, duration, amplifier);
             case DOLPHINS_GRACE:
-                return new EffectInstance(Effects.DOLPHINS_GRACE, duration, amplifier);
+                return new MobEffectInstance(MobEffects.DOLPHINS_GRACE, duration, amplifier);
             case BAD_OMEN:
-                return new EffectInstance(Effects.BAD_OMEN, duration, amplifier);
+                return new MobEffectInstance(MobEffects.BAD_OMEN, duration, amplifier);
             case FIRE:
                 // FIRE is not a PotionEffect and must be applied directly to the Entity
                 return null;

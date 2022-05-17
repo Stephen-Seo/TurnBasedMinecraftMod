@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version 1.18.0
+
+Mod now works with Forge-1.18.2-40.1.0 .  
+Note that the mod's version is confusingly similar (1.18.0).
+
 # Version 1.17.2
 
 (try to) Fix potential freeze bug when an entity leaves battle.

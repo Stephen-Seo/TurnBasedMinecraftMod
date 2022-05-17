@@ -1,13 +1,12 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 
 public class EntityIDDimPair {
     public int id;
-    public RegistryKey<World> dim;
+    public ResourceKey<Level> dim;
 
     EntityIDDimPair() {
         id = 0;
@@ -15,7 +14,7 @@ public class EntityIDDimPair {
         dim = null;
     }
 
-    EntityIDDimPair(int id, RegistryKey<World> dim) {
+    EntityIDDimPair(int id, ResourceKey<Level> dim) {
         this.id = id;
         this.dim = dim;
     }

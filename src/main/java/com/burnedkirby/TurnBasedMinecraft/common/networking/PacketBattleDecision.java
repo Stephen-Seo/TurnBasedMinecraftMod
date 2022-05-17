@@ -6,9 +6,9 @@ import com.burnedkirby.TurnBasedMinecraft.common.Battle;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.burnedkirby.TurnBasedMinecraft.common.Battle.Decision;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 public class PacketBattleDecision
 {
@@ -25,27 +25,25 @@ public class PacketBattleDecision
         this.targetIDOrItemID = targetIDOrItemID;
     }
     
-    public static void encode(PacketBattleDecision pkt, PacketBuffer buf) {
+    public static void encode(PacketBattleDecision pkt, FriendlyByteBuf buf) {
     	buf.writeInt(pkt.battleID);
     	buf.writeInt(pkt.decision.getValue());
     	buf.writeInt(pkt.targetIDOrItemID);
     }
     
-    public static PacketBattleDecision decode(PacketBuffer buf) {
+    public static PacketBattleDecision decode(FriendlyByteBuf buf) {
     	return new PacketBattleDecision(buf.readInt(), Decision.valueOf(buf.readInt()), buf.readInt());
     }
     
-    public static class Handler {
-    	public static void handle(final PacketBattleDecision pkt, Supplier<NetworkEvent.Context> ctx) {
-    		ctx.get().enqueueWork(() -> {
-                Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
-                if(b != null)
-                {
-                    ServerPlayerEntity player = ctx.get().getSender();
-                    b.setDecision(player.getId(), pkt.decision, pkt.targetIDOrItemID);
-                }
-    		});
-    		ctx.get().setPacketHandled(true);
-    	}
+    public static void handle(final PacketBattleDecision pkt, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
+            if(b != null)
+            {
+                ServerPlayer player = ctx.get().getSender();
+                b.setDecision(player.getId(), pkt.decision, pkt.targetIDOrItemID);
+            }
+        });
+        ctx.get().setPacketHandled(true);
     }
 }

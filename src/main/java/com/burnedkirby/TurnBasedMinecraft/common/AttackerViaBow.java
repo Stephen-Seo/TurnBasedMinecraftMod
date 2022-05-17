@@ -1,6 +1,6 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public class AttackerViaBow
 {
