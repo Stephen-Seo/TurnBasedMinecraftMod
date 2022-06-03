@@ -1,6 +1,6 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -96,7 +96,7 @@ public class CommonProxy
     
     public void displayString(String message) {}
 
-    public void displayTextComponent(TextComponent textComponent) {}
+    public void displayComponent(Component textComponent) {}
     
     public final boolean isServerRunning()
     {

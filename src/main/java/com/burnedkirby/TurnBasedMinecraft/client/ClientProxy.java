@@ -9,10 +9,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -156,20 +153,31 @@ public class ClientProxy extends CommonProxy
     @Override
     public void displayString(String message)
     {
+        Component parentComponent = new TextComponent("");
+
         TextComponent prefix = new TextComponent("TBM: ");
         prefix.withStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
         TextComponent text = new TextComponent(message);
-        prefix.getSiblings().add(text);
         text.withStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
+
+        parentComponent.getSiblings().add(prefix);
+        parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendMessage(prefix, UUID.randomUUID());
+        Minecraft.getInstance().player.sendMessage(parentComponent, new UUID(0, 0));
     }
 
     @Override
-    public void displayTextComponent(TextComponent text)
+    public void displayComponent(Component text)
     {
+        Component parentComponent = new TextComponent("");
+
+        TextComponent prefix = new TextComponent("TBM: ");
+        prefix.withStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
+
+        parentComponent.getSiblings().add(prefix);
+        parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendMessage(text, UUID.randomUUID());
+        Minecraft.getInstance().player.sendMessage(parentComponent, new UUID(0,0));
     }
 
     private void checkBattleTypes(boolean entityLeft)
@@ -247,38 +255,41 @@ public class ClientProxy extends CommonProxy
         if (msg.getClass() == PacketBattleMessage.class) {
             PacketBattleMessage pkt = (PacketBattleMessage)msg;
             Entity fromEntity = getEntity(pkt.getEntityIDFrom(), pkt.getDimension());
-            String from = "Unknown";
+            Component from = new TextComponent("Unknown");
             if(fromEntity != null)
             {
-                from = fromEntity.getDisplayName().getString();
+                from = fromEntity.getDisplayName();
             }
             else if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
             {
                 fromEntity = TurnBasedMinecraftMod.proxy.getLocalBattle().getCombatantEntity(pkt.getEntityIDFrom());
                 if(fromEntity != null)
                 {
-                    from = fromEntity.getDisplayName().getString();
+                    from = fromEntity.getDisplayName();
                 }
             }
             Entity toEntity = TurnBasedMinecraftMod.proxy.getEntity(pkt.getEntityIDTo(), pkt.getDimension());
-            String to = "Unknown";
+            Component to = new TextComponent("Unknown");
             if(toEntity != null)
             {
-                to = toEntity.getDisplayName().getString();
+                to = toEntity.getDisplayName();
             }
             else if(TurnBasedMinecraftMod.proxy.getLocalBattle() != null)
             {
                 toEntity = TurnBasedMinecraftMod.proxy.getLocalBattle().getCombatantEntity(pkt.getEntityIDTo());
                 if(toEntity != null)
                 {
-                    to = toEntity.getDisplayName().getString();
+                    to = toEntity.getDisplayName();
                 }
             }
 
+            Component parentComponent = new TextComponent("");
             switch(pkt.getMessageType())
             {
                 case ENTERED:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " entered battle!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" entered battle!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null || TurnBasedMinecraftMod.proxy.getLocalBattle().getId() != pkt.getAmount())
                     {
                         TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.getAmount());
@@ -289,16 +300,22 @@ public class ClientProxy extends CommonProxy
                 case FLEE:
                     if(pkt.getAmount() != 0)
                     {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " fled battle!");
+                        parentComponent.getSiblings().add(from);
+                        parentComponent.getSiblings().add(new TextComponent(" fled battle!"));
+                        TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                         TurnBasedMinecraftMod.proxy.typeLeftBattle(pkt.getCustom());
                     }
                     else
                     {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " tried to flee battle but failed!");
+                        parentComponent.getSiblings().add(from);
+                        parentComponent.getSiblings().add(new TextComponent(" tried to flee battle but failed!"));
+                        TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     }
                     break;
                 case DIED:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " died in battle!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" died in battle!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     TurnBasedMinecraftMod.proxy.typeLeftBattle(pkt.getCustom());
                     break;
                 case ENDED:
@@ -306,43 +323,79 @@ public class ClientProxy extends CommonProxy
                     TurnBasedMinecraftMod.proxy.battleEnded();
                     break;
                 case ATTACK:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " attacked " + to + " and dealt " + pkt.getAmount() + " damage!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" attacked "));
+                    parentComponent.getSiblings().add(to);
+                    parentComponent.getSiblings().add(new TextComponent(" and dealt "));
+                    parentComponent.getSiblings().add(new TextComponent(Integer.valueOf(pkt.getAmount()).toString()));
+                    parentComponent.getSiblings().add(new TextComponent(" damage!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DEFEND:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " blocked " + to + "'s attack!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" blocked "));
+                    parentComponent.getSiblings().add(to);
+                    parentComponent.getSiblings().add(new TextComponent("'s attack!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DEFENSE_DAMAGE:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " retaliated from " + to + "'s attack and dealt " + pkt.getAmount() + " damage!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" retaliated from "));
+                    parentComponent.getSiblings().add(to);
+                    parentComponent.getSiblings().add(new TextComponent("'s attack and dealt "));
+                    parentComponent.getSiblings().add(new TextComponent(Integer.valueOf(pkt.getAmount()).toString()));
+                    parentComponent.getSiblings().add(new TextComponent(" damage!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case MISS:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " attacked " + to + " but missed!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" attacked "));
+                    parentComponent.getSiblings().add(to);
+                    parentComponent.getSiblings().add(new TextComponent(" but missed!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DEFENDING:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " is defending!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" is defending!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DID_NOTHING:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " did nothing!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" did nothing!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case USED_ITEM:
+                    parentComponent.getSiblings().add(from);
                     switch(PacketBattleMessage.UsedItemAction.valueOf(pkt.getAmount()))
                     {
                         case USED_NOTHING:
-                            TurnBasedMinecraftMod.proxy.displayString(from + " tried to use nothing!");
+                            parentComponent.getSiblings().add(new TextComponent(" tried to use nothing!"));
+                            TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             break;
                         case USED_INVALID:
                             if(pkt.getCustom().length() > 0)
                             {
-                                TurnBasedMinecraftMod.proxy.displayString(from + " tried to consume " + pkt.getCustom() + " and failed!");
+                                parentComponent.getSiblings().add(new TextComponent(" tried to consume "));
+                                parentComponent.getSiblings().add(new TextComponent(pkt.getCustom()));
+                                parentComponent.getSiblings().add(new TextComponent(" and failed!"));
+                                TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             }
                             else
                             {
-                                TurnBasedMinecraftMod.proxy.displayString(from + " tried to consume an invalid item and failed!");
+                                parentComponent.getSiblings().add(new TextComponent(" tried to consume an invalid item and failed!"));
+                                TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             }
                             break;
                         case USED_FOOD:
-                            TurnBasedMinecraftMod.proxy.displayString(from + " ate a " + pkt.getCustom() + "!");
+                            parentComponent.getSiblings().add(new TextComponent(" ate a "));
+                            parentComponent.getSiblings().add(new TextComponent(pkt.getCustom()));
+                            parentComponent.getSiblings().add(new TextComponent("!"));
+                            TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             break;
                         case USED_POTION:
+                            parentComponent.getSiblings().add(new TextComponent(" drank a "));
+                            parentComponent.getSiblings().add(new TextComponent(pkt.getCustom()));
+                            parentComponent.getSiblings().add(new TextComponent("!"));
                             TurnBasedMinecraftMod.proxy.displayString(from + " drank a " + pkt.getCustom() + "!");
                             break;
                     }
@@ -368,53 +421,70 @@ public class ClientProxy extends CommonProxy
                 case SWITCHED_ITEM:
                     if(pkt.getAmount() != 0)
                     {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " switched to a different item!");
+                        parentComponent.getSiblings().add(from);
+                        parentComponent.getSiblings().add(new TextComponent(" switched to a different item!"));
+                        TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     }
                     else
                     {
-                        TurnBasedMinecraftMod.proxy.displayString(from + " switched to a different item but failed because it was invalid!");
+                        parentComponent.getSiblings().add(from);
+                        parentComponent.getSiblings().add(new TextComponent(" switched to a different item but failed because it was invalid!"));
+                        TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     }
                     break;
                 case WAS_AFFECTED:
-                    TurnBasedMinecraftMod.proxy.displayString(to + " was " + pkt.getCustom() + " by " + from + "!");
+                    parentComponent.getSiblings().add(to);
+                    parentComponent.getSiblings().add(new TextComponent(" was " + pkt.getCustom() + " by "));
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent("!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case BECAME_CREATIVE:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " entered creative mode and left battle!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" entered creative mode and left battle!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case FIRED_ARROW:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " let loose an arrow towards " + to + "!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" let loose an arrow towards "));
+                    parentComponent.getSiblings().add(to);
+                    parentComponent.getSiblings().add(new TextComponent("!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case ARROW_HIT:
-                    TurnBasedMinecraftMod.proxy.displayString(to + " was hit by " + from + "'s arrow!");
+                    parentComponent.getSiblings().add(to);
+                    parentComponent.getSiblings().add(new TextComponent(" was hit by "));
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent("'s arrow!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case BOW_NO_AMMO:
-                    TurnBasedMinecraftMod.proxy.displayString(from + " tried to use their bow but ran out of ammo!");
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(new TextComponent(" tried to use their bow but ran out of ammo!"));
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case CREEPER_WAIT: {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
-                    TextComponent message = new TextComponent(from + " is charging up!");
+                    parentComponent.getSiblings().add(from);
+                    TextComponent message = new TextComponent(" is charging up!");
                     message.setStyle(message.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)));
-                    prefix.getSiblings().add(message);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(message);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                 }
                 break;
                 case CREEPER_WAIT_FINAL: {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
-                    TextComponent message = new TextComponent(from + " is about to explode!");
+                    parentComponent.getSiblings().add(from);
+                    TextComponent message = new TextComponent(" is about to explode!");
                     message.setStyle(message.getStyle().withColor(TextColor.fromRgb(0xFFFF5050)));
-                    prefix.getSiblings().add(message);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(message);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                 }
                 break;
                 case CREEPER_EXPLODE: {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
-                    TextComponent message = new TextComponent(from + " exploded!");
+                    parentComponent.getSiblings().add(from);
+                    TextComponent message = new TextComponent(" exploded!");
                     message.setStyle(message.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
-                    prefix.getSiblings().add(message);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(message);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                 }
                 break;
             }
@@ -423,27 +493,24 @@ public class ClientProxy extends CommonProxy
             displayString(pkt.getMessage());
         } else if (msg.getClass() == PacketEditingMessage.class) {
             PacketEditingMessage pkt = (PacketEditingMessage)msg;
+            Component parentComponent = new TextComponent("");
             switch(pkt.getType())
             {
                 case ATTACK_ENTITY:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("Attack the entity you want to edit for TurnBasedMinecraftMod. ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     TextComponent cancel = new TextComponent("Cancel");
                     cancel.setStyle(cancel.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit cancel")));
-                    text.getSiblings().add(cancel);
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    parentComponent.getSiblings().add(cancel);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case PICK_EDIT:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("Edit what value? ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -569,14 +636,12 @@ public class ClientProxy extends CommonProxy
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit cancel")));
                     text.getSiblings().add(option);
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_IGNORE_BATTLE:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("ignoreBattle: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -590,14 +655,12 @@ public class ClientProxy extends CommonProxy
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle false")));
                     text.getSiblings().add(option);
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_POWER:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("attackPower: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -614,14 +677,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackPower <integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_PROBABILITY:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("attackProbability: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -638,14 +699,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackProbability <percentage-integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_VARIANCE:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("attackVariance: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -662,14 +721,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackVariance <integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_EFFECT:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("attackEffect: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -685,14 +742,12 @@ public class ClientProxy extends CommonProxy
                         }
                     }
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_EFFECT_PROBABILITY:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("attackEffectProbability: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -709,14 +764,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackEffectProbability <percentage-integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DEFENSE_DAMAGE:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("defenseDamage: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -733,14 +786,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit defenseDamage <integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DEFENSE_DAMAGE_PROBABILITY:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("defenseDamageProbability: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -757,14 +808,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit defenseDamageProbability <percentage-integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_EVASION:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("evasion: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -781,14 +830,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit evasion <percentage-integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_SPEED:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("speed: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -805,14 +852,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit speed <integer>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_CATEGORY:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("category: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -942,14 +987,12 @@ public class ClientProxy extends CommonProxy
 
                     text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit category <string>\")"));
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DECISION_ATTACK:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("decisionAttack: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -964,14 +1007,12 @@ public class ClientProxy extends CommonProxy
                         }
                     }
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DECISION_DEFEND:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("decisionDefend: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -986,14 +1027,12 @@ public class ClientProxy extends CommonProxy
                         }
                     }
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DECISION_FLEE:
                 {
-                    TextComponent prefix = new TextComponent("TBM: ");
-                    prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
                     TextComponent text = new TextComponent("decisionFlee: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
@@ -1008,8 +1047,8 @@ public class ClientProxy extends CommonProxy
                         }
                     }
 
-                    prefix.getSiblings().add(text);
-                    TurnBasedMinecraftMod.proxy.displayTextComponent(prefix);
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 default:

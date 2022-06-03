@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version 1.18.1
+
+Fix battle text output such that players in teams will have their name displayed
+with the team's color (and some refactoring of related battle text output).
+
 # Version 1.18.0
 
 Mod now works with Forge-1.18.2-40.1.0 .  
