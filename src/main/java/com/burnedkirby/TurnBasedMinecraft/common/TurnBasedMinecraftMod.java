@@ -11,6 +11,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -984,6 +986,176 @@ public class TurnBasedMinecraftMod {
                             }
                             return 1;
                         })))
+                .then(Commands.literal("ignore_battle_types").executes(c -> {
+                        TextComponent response = new TextComponent("Use ");
+                        TextComponent subResponse = new TextComponent("/tbm-server-edit ignore_battle_types add/remove <category> ");
+                        subResponse.setStyle(subResponse.getStyle().withColor(0xFFFFFF00));
+                        response.append(subResponse);
+
+                        subResponse = new TextComponent("ignore_battle_types is currently: [");
+                        response.append(subResponse);
+
+                        boolean isFirst = true;
+                        for (String category : TurnBasedMinecraftMod.proxy.getConfig().getIgnoreBattleTypes()) {
+                            if (!isFirst) {
+                                response.append(new TextComponent(", "));
+                            }
+                            subResponse = new TextComponent(category);
+                            subResponse.setStyle(subResponse.getStyle()
+                                .withColor(0xFF00FF00)
+                                .withClickEvent(new ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit ignore_battle_types remove " + category))
+                                .withHoverEvent(new HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    new TextComponent("Click to remove category"))));
+                            response.append(subResponse);
+                            isFirst = false;
+                        }
+                        response.append(new TextComponent("] "));
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.literal("add").executes(c -> {
+                            c.getSource().sendFailure(new TextComponent("/tbm-server-edit ignore_battle_types add <category>"));
+                            return 1;
+                        })
+                        .then(Commands.argument("category", StringArgumentType.greedyString()).executes(c -> {
+                            String category = StringArgumentType.getString(c, "category");
+                            if (TurnBasedMinecraftMod.proxy.getConfig().addIgnoreBattleType(category)
+                                && TurnBasedMinecraftMod.proxy.getConfig().updateConfigAppendToStringArray("server_config.ignore_battle_types", category)) {
+                                TextComponent response = new TextComponent("Successfully appended category \"");
+
+                                TextComponent sub = new TextComponent(category);
+                                sub.setStyle(sub.getStyle().withColor(0xFF00FF00));
+                                response.append(sub);
+
+                                sub = new TextComponent("\" to ignore_battle_types");
+                                response.append(sub);
+
+                                c.getSource().sendSuccess(response, true);
+                                return 1;
+                            }
+
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to append category \"" + category + "\" to ignore_battle_types"));
+                            return 1;
+                        })))
+                    .then(Commands.literal("remove").executes(c -> {
+                            c.getSource().sendFailure(new TextComponent("/tbm-server-edit ignore_battle_types remove <category>"));
+                            return 1;
+                        })
+                        .then(Commands.argument("category", StringArgumentType.greedyString()).executes(c -> {
+                            String category = StringArgumentType.getString(c, "category");
+                            if (TurnBasedMinecraftMod.proxy.getConfig().removeIgnoreBattleType(category)
+                                && TurnBasedMinecraftMod.proxy.getConfig().updateConfigRemoveFromStringArray("server_config.ignore_battle_types", category)) {
+                                TextComponent response = new TextComponent("Successfully removed category \"");
+
+                                TextComponent sub = new TextComponent(category);
+                                sub.setStyle(sub.getStyle().withColor(0xFF00FF00));
+                                response.append(sub);
+
+                                sub = new TextComponent("\" from ignore_battle_types");
+                                response.append(sub);
+
+                                c.getSource().sendSuccess(response, true);
+                                return 1;
+                            }
+
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to remove category \"" + category + "\" to ignore_battle_types"));
+                            return 1;
+                        }))))
+                .then(Commands.literal("player_speed").executes(c -> {
+                        TextComponent parent = new TextComponent("Use ");
+                        TextComponent sub = new TextComponent("/tbm-server-edit player_speed <0-100>");
+                        sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                        parent.append(sub);
+
+                        c.getSource().sendSuccess(parent, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("speed", IntegerArgumentType.integer()).executes(c -> {
+                        int speed = IntegerArgumentType.getInteger(c, "speed");
+                        // setPlayerSpeed() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setPlayerSpeed(speed);
+                        speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_speed", speed)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.player_speed\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set player_speed to \""
+                                    + speed
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set player_speed to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(speed));
+                            subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("player_haste_speed").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit player_haste_speed <0-100>");
+                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("haste_speed", IntegerArgumentType.integer()).executes(c -> {
+                        int haste_speed = IntegerArgumentType.getInteger(c, "haste_speed");
+                        // setPlayerHasteSpeed() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setPlayerHasteSpeed(haste_speed);
+                        haste_speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_haste_speed", haste_speed)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.player_haste_speed\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set player_haste_speed to \""
+                                    + haste_speed
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set player_haste_speed to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(haste_speed));
+                            subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("player_slow_speed").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit player_slow_speed <0-100>");
+                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("slow_speed", IntegerArgumentType.integer()).executes(c -> {
+                        int slow_speed = IntegerArgumentType.getInteger(c, "slow_speed");
+                        // setPlayerSlowSpeed() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setPlayerSlowSpeed(slow_speed);
+                        slow_speed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_slow_speed", slow_speed)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.player_slow_speed\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set player_slow_speed to \""
+                                    + slow_speed
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set player_slow_speed to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(slow_speed));
+                            subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
         );
     }
 

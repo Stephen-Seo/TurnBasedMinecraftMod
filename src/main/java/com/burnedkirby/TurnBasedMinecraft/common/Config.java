@@ -936,14 +936,44 @@ public class Config
         return playerSpeed;
     }
 
+    public void setPlayerSpeed(int speed) {
+        if (speed < 0) {
+            speed = 0;
+        } else if (speed > 100) {
+            speed = 100;
+        }
+
+        playerSpeed = speed;
+    }
+
     public int getPlayerHasteSpeed()
     {
         return playerHasteSpeed;
     }
 
+    public void setPlayerHasteSpeed(int speed) {
+        if (speed < 0) {
+            speed = 0;
+        } else if (speed > 100) {
+            speed = 100;
+        }
+
+        playerHasteSpeed = speed;
+    }
+
     public int getPlayerSlowSpeed()
     {
         return playerSlowSpeed;
+    }
+
+    public void setPlayerSlowSpeed(int speed) {
+        if (speed < 0) {
+            speed = 0;
+        } else if (speed > 100) {
+            speed = 100;
+        }
+
+        playerSlowSpeed = speed;
     }
 
     public int getPlayerAttackProbability()
@@ -1096,9 +1126,83 @@ public class Config
         return true;
     }
 
+    public boolean updateConfigAppendToStringArray(String path, String string_value) {
+        File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
+        CommentedFileConfig conf = getConfigObj(configFile);
+
+        Collection<String> strings;
+        try {
+            strings = conf.get(path);
+        } catch (Exception e) {
+            TurnBasedMinecraftMod.logger.warn("Exception during fetching Collection<String> from config (append)");
+            TurnBasedMinecraftMod.logger.warn(e);
+            return false;
+        }
+
+        if (strings.contains(string_value)) {
+            return false;
+        }
+        strings.add(string_value);
+
+        try {
+            conf.set(path, strings);
+        } catch (Exception e) {
+            TurnBasedMinecraftMod.logger.warn("Exception during setting Collection<String> in config (append)");
+            TurnBasedMinecraftMod.logger.warn(e);
+            return false;
+        }
+        conf.save();
+        conf.close();
+
+        return true;
+    }
+
+    public boolean updateConfigRemoveFromStringArray(String path, String string_value) {
+        File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
+        CommentedFileConfig conf = getConfigObj(configFile);
+
+        Collection<String> strings;
+        try {
+            strings = conf.get(path);
+        } catch (Exception e) {
+            TurnBasedMinecraftMod.logger.warn("Exception during fetching Collection<String> from config (removal)");
+            TurnBasedMinecraftMod.logger.warn(e);
+            return false;
+        }
+
+        if (!strings.contains(string_value)) {
+            return false;
+        }
+        strings.remove(string_value);
+
+        try {
+            conf.set(path, strings);
+        } catch (Exception e) {
+            TurnBasedMinecraftMod.logger.warn("Exception during setting Collection<String> in config (removal)");
+            TurnBasedMinecraftMod.logger.warn(e);
+            return false;
+        }
+        conf.save();
+        conf.close();
+
+        return true;
+    }
+
     public boolean isIgnoreBattleType(String type)
     {
         return ignoreBattleTypes.contains(type);
+    }
+
+    public Collection<String> getIgnoreBattleTypes() {
+        return ignoreBattleTypes;
+    }
+
+    public boolean removeIgnoreBattleType(String category) {
+        return ignoreBattleTypes.remove(category);
+    }
+
+    public boolean addIgnoreBattleType(String category) {
+        return ignoreBattleTypes.add(category);
     }
 
     public int getMinimumHitPercentage()

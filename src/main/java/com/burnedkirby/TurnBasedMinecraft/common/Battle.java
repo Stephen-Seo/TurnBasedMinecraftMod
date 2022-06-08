@@ -5,6 +5,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -1218,7 +1219,13 @@ public class Battle
                             {
                                 if(c.entity instanceof Player)
                                 {
-                                    if(TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed() > fastestEnemySpeed)
+                                    int playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
+                                    if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                        playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
+                                    } else if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                        playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                                    }
+                                    if(playerSpeed > fastestEnemySpeed)
                                     {
                                         fastestEnemySpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                                     }
@@ -1238,7 +1245,13 @@ public class Battle
                             {
                                 if(c.entity instanceof Player)
                                 {
-                                    if(TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed() > fastestEnemySpeed)
+                                    int playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
+                                    if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                        playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
+                                    } else if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                        playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                                    }
+                                    if(playerSpeed > fastestEnemySpeed)
                                     {
                                         fastestEnemySpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                                     }
@@ -1255,7 +1268,13 @@ public class Battle
                         int fleeProbability = 0;
                         if(next.entity instanceof Player)
                         {
-                            if(fastestEnemySpeed >= TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed())
+                            int playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
+                            if (((Player) next.entity).hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
+                            } else if (((Player) next.entity).hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                            }
+                            if(fastestEnemySpeed >= playerSpeed)
                             {
                                 fleeProbability = TurnBasedMinecraftMod.proxy.getConfig().getFleeBadProbability();
                             }
