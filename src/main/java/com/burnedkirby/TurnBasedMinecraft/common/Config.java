@@ -142,11 +142,7 @@ public class Config
 
     private boolean parseConfig(File configFile) throws IOException
     {
-        CommentedFileConfig conf = CommentedFileConfig
-            .builder(configFile)
-            .defaultResource(TurnBasedMinecraftMod.DEFAULT_CONFIG_FILE_PATH)
-            .build();
-        conf.load();
+        CommentedFileConfig conf = getConfigObj(configFile);
 
         // client config
         try {
@@ -1079,6 +1075,27 @@ public class Config
         return canOverwrite;
     }
 
+    private CommentedFileConfig getConfigObj(File configFile) {
+        CommentedFileConfig conf = CommentedFileConfig
+            .builder(configFile)
+            .defaultResource(TurnBasedMinecraftMod.DEFAULT_CONFIG_FILE_PATH)
+            .build();
+        conf.load();
+
+        return conf;
+    }
+
+    public boolean updateConfig(String path, Object value) {
+        File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
+        CommentedFileConfig conf = getConfigObj(configFile);
+
+        conf.set(path, value);
+        conf.save();
+        conf.close();
+
+        return true;
+    }
+
     public boolean isIgnoreBattleType(String type)
     {
         return ignoreBattleTypes.contains(type);
@@ -1094,6 +1111,15 @@ public class Config
         return maxInBattle;
     }
 
+    public void setMaxInBattle(int maxInBattle) {
+        if (maxInBattle < 2) {
+            maxInBattle = 2;
+        } else if (maxInBattle > 30) {
+            maxInBattle = 30;
+        }
+        this.maxInBattle = maxInBattle;
+    }
+
     public boolean isBattleMusicType(String type)
     {
         return musicBattleTypes.contains(type.toLowerCase());
@@ -1107,6 +1133,10 @@ public class Config
     public boolean isFreezeCombatantsEnabled()
     {
         return freezeCombatantsInBattle;
+    }
+
+    public void setFreezeCombatantsInBattle(boolean enabled) {
+        freezeCombatantsInBattle = enabled;
     }
 
     public int getSillyMusicThreshold()
@@ -1154,6 +1184,10 @@ public class Config
         return onlyOPsSelfDisableTB;
     }
 
+    public void setIfOnlyOPsCanDisableTurnBasedForSelf(boolean enabled_for_only_ops) {
+        onlyOPsSelfDisableTB = enabled_for_only_ops;
+    }
+
     protected void setBattleDisabledForAll(boolean isDisabled)
     {
         battleDisabledForAll = isDisabled;
@@ -1169,9 +1203,22 @@ public class Config
         return oldBattleBehaviorEnabled;
     }
 
+    public void setOldBattleBehavior(boolean enabled) {
+        oldBattleBehaviorEnabled = enabled;
+    }
+
     public int getLeaveBattleCooldownSeconds()
     {
         return leaveBattleCooldownSeconds;
+    }
+
+    public void setLeaveBattleCooldownSeconds(int seconds) {
+        if (seconds < 1) {
+            seconds = 1;
+        } else if (seconds > 10) {
+            seconds = 10;
+        }
+        leaveBattleCooldownSeconds = seconds;
     }
 
     public long getLeaveBattleCooldownNanos()
@@ -1182,6 +1229,15 @@ public class Config
     public int getAggroStartBattleDistance()
     {
         return aggroStartBattleDistance;
+    }
+
+    public void setAggroStartBattleDistance(int distance) {
+        if (distance < 5) {
+            distance = 5;
+        } else if (distance > 50) {
+            distance = 50;
+        }
+        aggroStartBattleDistance = distance;
     }
 
     public int getCreeperExplodeTurn() { return creeperExplodeTurn; }

@@ -35,7 +35,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.18.2";
+    public static final String VERSION = "1.18.3";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -773,10 +773,222 @@ public class TurnBasedMinecraftMod {
                     )
                 )
         );
+        // tbm-server-edit
+        event.getDispatcher().register(
+            Commands.literal("tbm-server-edit")
+                .requires(c -> c.hasPermission(2))
+                .executes(c -> {
+                    ServerPlayer player = c.getSource().getPlayerOrException();
+                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.SERVER_EDIT));
+                    return 1;
+                })
+                .then(Commands.literal("leave_battle_cooldown").executes(c -> {
+                        TextComponent response = new TextComponent("leave_battle_cooldown requires an integer argument. ");
+                        TextComponent subResponse = new TextComponent("leave_battle_cooldown is currently: ");
+                        response.append(subResponse);
+                        subResponse = new TextComponent(String.valueOf(TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownSeconds()));
+                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        response.append(subResponse);
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("cooldown_seconds", IntegerArgumentType.integer())
+                        .executes(c -> {
+                            int cooldown = IntegerArgumentType.getInteger(c, "cooldown_seconds");
+                            // setting cooldown validates the value. Set it, then fetch it again.
+                            TurnBasedMinecraftMod.proxy.getConfig().setLeaveBattleCooldownSeconds(cooldown);
+                            cooldown = TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownSeconds();
+                            if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig(
+                                "server_config.leave_battle_cooldown",
+                                cooldown)) {
+                                TurnBasedMinecraftMod.logger.warn(
+                                    "Failed to set \"server_config.leave_battle_cooldown\" in config file!");
+                                c.getSource().sendFailure(new TextComponent("" +
+                                    "Failed to set leave_battle_cooldown to \""
+                                    + cooldown
+                                    + "\" in config file!"));
+                            } else {
+                                TextComponent response = new TextComponent("Successfully set leave_battle_cooldown to: ");
+                                TextComponent subResponse = new TextComponent(String.valueOf(cooldown));
+                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                response.append(subResponse);
+                                c.getSource().sendSuccess(response, true);
+                            }
+                            return 1;
+                        })))
+                .then(Commands.literal("aggro_start_battle_max_distance").executes(c -> {
+                        TextComponent response = new TextComponent("aggro_start_battle_max_distance requires an integer argument. ");
+                        TextComponent subResponse = new TextComponent("aggro_start_battle_max_distance is currently: ");
+                        response.append(subResponse);
+                        subResponse = new TextComponent(String.valueOf(
+                            TurnBasedMinecraftMod.proxy.getConfig().getAggroStartBattleDistance()));
+                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        response.append(subResponse);
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("aggro_distance", IntegerArgumentType.integer())
+                        .executes(c -> {
+                            int distance = IntegerArgumentType.getInteger(c, "aggro_distance");
+                            // setDistance in Config validates the value. Set it, then fetch it again.
+                            TurnBasedMinecraftMod.proxy.getConfig().setAggroStartBattleDistance(distance);
+                            distance = TurnBasedMinecraftMod.proxy.getConfig().getAggroStartBattleDistance();
+                            if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig(
+                                "server_config.aggro_start_battle_max_distance",
+                                distance)) {
+                                TurnBasedMinecraftMod.logger.warn(
+                                    "Failed to set \"server_config.aggro_start_battle_max_distance\" in config file!");
+                                c.getSource().sendFailure(new TextComponent(
+                                    "Failed to set aggro_start_battle_max_distance to \""
+                                        + distance
+                                        + "\" in config file!"));
+                            } else {
+                                TextComponent response = new TextComponent("Successfully set aggro_start_battle_max_distance to: ");
+                                TextComponent subResponse = new TextComponent(String.valueOf(distance));
+                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                response.append(subResponse);
+                                c.getSource().sendSuccess(response, true);
+                            }
+                            return 1;
+                        })))
+                .then(Commands.literal("old_battle_behavior").executes(c -> {
+                        TextComponent response = new TextComponent("old_battle_behavior requires a boolean argument. ");
+                        TextComponent subResponse = new TextComponent("old_battle_behavior is currently: ");
+                        response.append(subResponse);
+                        subResponse = new TextComponent(String.valueOf(
+                            TurnBasedMinecraftMod.proxy.getConfig().isOldBattleBehaviorEnabled()));
+                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        response.append(subResponse);
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("old_battle_behavior_enabled", BoolArgumentType.bool())
+                        .executes(c -> {
+                            boolean enabled = BoolArgumentType.getBool(c, "old_battle_behavior_enabled");
+                            TurnBasedMinecraftMod.proxy.getConfig().setOldBattleBehavior(enabled);
+                            if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig(
+                                "server_config.old_battle_behavior",
+                                enabled)) {
+                                TurnBasedMinecraftMod.logger.warn(
+                                    "Failed to set \"server_config.old_battle_behavior\" in config file!");
+                                c.getSource().sendFailure(new TextComponent(
+                                    "Failed to set old_battle_behavior to \""
+                                        + enabled
+                                        + "\" in config file!"));
+                            } else {
+                                TextComponent response = new TextComponent("Successfully set old_battle_behavior to: ");
+                                TextComponent subResponse = new TextComponent(String.valueOf(enabled));
+                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                response.append(subResponse);
+                                c.getSource().sendSuccess(response, true);
+                            }
+                            return 1;
+                        })))
+                .then(Commands.literal("anyone_can_disable_tbm_for_self").executes(c -> {
+                        TextComponent response = new TextComponent("anyone_can_disable_tbm_for_self requires a boolean argument. ");
+                        TextComponent subResponse = new TextComponent("anyone_can_disable_tbm_for_self is currently: ");
+                        response.append(subResponse);
+                        subResponse = new TextComponent(String.valueOf(
+                            !TurnBasedMinecraftMod.proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf()));
+                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        response.append(subResponse);
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("enabled_for_all", BoolArgumentType.bool())
+                        .executes(c -> {
+                            boolean enabled_for_all = BoolArgumentType.getBool(c, "enabled_for_all");
+                            TurnBasedMinecraftMod.proxy.getConfig().setIfOnlyOPsCanDisableTurnBasedForSelf(!enabled_for_all);
+                            if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig(
+                                "server_config.anyone_can_disable_tbm_for_self",
+                                enabled_for_all
+                            )) {
+                                TurnBasedMinecraftMod.logger.warn(
+                                    "Failed to set \"server_config.anyone_can_disable_tbm_for_self\" in config file!");
+                                c.getSource().sendFailure(new TextComponent(
+                                    "Failed to set anyone_can_disable_tbm_for_self to \""
+                                        + enabled_for_all
+                                        + "\" in config file!"));
+                            } else {
+                                TextComponent response = new TextComponent("Successfully set anyone_can_disable_tbm_for_self to: ");
+                                TextComponent subResponse = new TextComponent(String.valueOf(enabled_for_all));
+                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                response.append(subResponse);
+                                c.getSource().sendSuccess(response, true);
+                            }
+                            return 1;
+                        })))
+                .then(Commands.literal("max_in_battle").executes(c -> {
+                        TextComponent response = new TextComponent("max_in_battle requires an integer argument. ");
+                        TextComponent subResponse = new TextComponent("max_in_battle is currently: ");
+                        response.append(subResponse);
+                        subResponse = new TextComponent(String.valueOf(
+                            TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()));
+                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        response.append(subResponse);
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("max_amount", IntegerArgumentType.integer())
+                        .executes(c -> {
+                            int max_amount = IntegerArgumentType.getInteger(c, "max_amount");
+                            // setMaxInBattle in Config validates the value. Set it, then fetch it again.
+                            TurnBasedMinecraftMod.proxy.getConfig().setMaxInBattle(max_amount);
+                            max_amount = TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle();
+                            if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig(
+                                "server_config.max_in_battle",
+                                max_amount)) {
+                                TurnBasedMinecraftMod.logger.warn(
+                                    "Failed to set \"server_config.max_in_battle\" in config file!");
+                                c.getSource().sendFailure(new TextComponent(
+                                    "Failed to set max_in_battle to \""
+                                        + max_amount
+                                        + "\" in config file!"));
+                            } else {
+                                TextComponent response = new TextComponent("Successfully set max_in_battle to: ");
+                                TextComponent subResponse = new TextComponent(String.valueOf(max_amount));
+                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                response.append(subResponse);
+                                c.getSource().sendSuccess(response, true);
+                            }
+                            return 1;
+                        })))
+                .then(Commands.literal("freeze_battle_combatants").executes(c -> {
+                        TextComponent response = new TextComponent("freeze_battle_combatants requires a boolean argument. ");
+                        TextComponent subResponse = new TextComponent("freeze_battle_combatants is currently: ");
+                        response.append(subResponse);
+                        subResponse = new TextComponent(String.valueOf(
+                            !TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled()));
+                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        response.append(subResponse);
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("freeze_enabled", BoolArgumentType.bool())
+                        .executes(c -> {
+                            boolean enabled = BoolArgumentType.getBool(c, "freeze_enabled");
+                            TurnBasedMinecraftMod.proxy.getConfig().setFreezeCombatantsInBattle(enabled);
+                            if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.freeze_battle_combatants", enabled)) {
+                                TurnBasedMinecraftMod.logger.warn(
+                                    "Failed to set \"server_config.freeze_battle_combatants\" in config file!");
+                                c.getSource().sendFailure(new TextComponent(
+                                    "Failed to set freeze_battle_combatants to \""
+                                        + enabled
+                                        + "\" in config file!"));
+                            } else {
+                                TextComponent response = new TextComponent("Successfully set freeze_battle_combatants to: ");
+                                TextComponent subResponse = new TextComponent(String.valueOf(enabled));
+                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                response.append(subResponse);
+                                c.getSource().sendSuccess(response, true);
+                            }
+                            return 1;
+                        })))
+        );
     }
 
     @SubscribeEvent
-    public void serverStopping(ServerStoppingEvent event) {
+    public void serverStopping(ServerStoppingEvent ignoredEvent) {
         logger.debug("About to cleanup BattleManager");
         if (proxy.cleanupBattleManager()) {
             logger.debug("Cleaned up BattleManager");

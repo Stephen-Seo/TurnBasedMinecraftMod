@@ -1,5 +1,8 @@
 # Upcoming changes
 
+The ability to change server-side config from within the game using
+"/tbm-server-edit".
+
 # Version 1.18.2
 
 The list of targets in the Battle GUI when selecting a target did not display

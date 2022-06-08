@@ -30,7 +30,8 @@ public class PacketEditingMessage
         EDIT_CATEGORY(12),
         EDIT_DECISION_ATTACK(13),
         EDIT_DECISION_DEFEND(14),
-        EDIT_DECISION_FLEE(15);
+        EDIT_DECISION_FLEE(15),
+        SERVER_EDIT(16);
 
         Type(int value)
         {

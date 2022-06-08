@@ -640,6 +640,159 @@ public class ClientProxy extends CommonProxy
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
+                case SERVER_EDIT:
+                {
+                    TextComponent parent = new TextComponent("Edit what server value? ");
+                    parent.setStyle(parent.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
+
+                    TextComponent sub = new TextComponent("leave_battle_cooldown ");
+                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+
+                    for (int i = 1; i <= 10; ++i) {
+                        TextComponent value = new TextComponent(String.valueOf(i) + ' ');
+                        value.setStyle(
+                            value.getStyle()
+                                .withColor(0xFF00FF00)
+                                .withClickEvent(new ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit leave_battle_cooldown " + i)));
+                        sub.append(value);
+                    }
+
+                    parent.append(sub);
+
+                    sub = new TextComponent("aggro_start_battle_max_distance ");
+                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                    parent.append(sub);
+
+                    sub = new TextComponent("5 ");
+                    sub.setStyle(
+                        sub.getStyle()
+                            .withColor(0xFF00FF00)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit aggro_start_battle_max_distance 5")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("8 ");
+                    sub.setStyle(
+                        sub.getStyle()
+                            .withColor(0xFF00FF00)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit aggro_start_battle_max_distance 8")));
+                    parent.append(sub);
+
+                    for (int i = 10; i <= 50; i += 5) {
+                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub.setStyle(
+                            sub.getStyle()
+                                .withColor(0xFF00FF00)
+                                .withClickEvent(new ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit aggro_start_battle_max_distance " + String.valueOf(i))));
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("old_battle_behavior ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(0xFFFFFF00)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("If enabled, battles only start on a hit, not including mobs targeting players"))));
+                    parent.append(sub);
+
+                    sub = new TextComponent("true ");
+                    sub.setStyle(
+                        sub.getStyle()
+                            .withColor(0xFF00FF00)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit old_battle_behavior true")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("false ");
+                    sub.setStyle(
+                        sub.getStyle()
+                            .withColor(0xFF00FF00)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit old_battle_behavior false")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("anyone_can_disable_tbm_for_self ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(0xFFFFFF00)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Allows use for /tbm-disable and /tbm-enable for all"))));
+                    parent.append(sub);
+
+                    sub = new TextComponent("true ");
+                    sub.setStyle(
+                        sub.getStyle()
+                            .withColor(0xFF00FF00)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit anyone_can_disable_tbm_for_self true")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("false ");
+                    sub.setStyle(
+                        sub.getStyle()
+                            .withColor(0xFF00FF00)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit anyone_can_disable_tbm_for_self false")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("max_in_battle ");
+                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                    parent.append(sub);
+
+                    sub = new TextComponent("2 ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(0xFF00FF00)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit max_in_battle 2")));
+                    parent.append(sub);
+
+                    for (int i = 5; i < 30; i += 5) {
+                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub.setStyle(sub.getStyle()
+                            .withColor(0xFF00FF00)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit max_in_battle " + String.valueOf(i))));
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("freeze_battle_combatants ");
+                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                    parent.append(sub);
+
+                    sub = new TextComponent("true ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(0xFF00FF00)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit freeze_battle_combatants true"
+                        )));
+                    parent.append(sub);
+
+                    sub = new TextComponent("false ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(0xFF00FF00)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit freeze_battle_combatants false"
+                        )));
+                    parent.append(sub);
+
+                    TurnBasedMinecraftMod.proxy.displayComponent(parent);
+                    break;
+                }
                 case EDIT_IGNORE_BATTLE:
                 {
                     TextComponent text = new TextComponent("ignoreBattle: ");
