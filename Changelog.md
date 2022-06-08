@@ -1,5 +1,11 @@
 # Upcoming changes
 
+# Version 1.18.2
+
+The list of targets in the Battle GUI when selecting a target did not display
+Players' names in their team color. This version now shows Player names with
+their team color in the target buttons/list.
+
 # Version 1.18.1
 
 Fix battle text output such that players in teams will have their name displayed
