@@ -3,6 +3,7 @@ package com.burnedkirby.TurnBasedMinecraft.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.network.chat.TextComponent;
@@ -13,6 +14,12 @@ public class EntitySelectionButton extends Button {
 
     public EntitySelectionButton(int x, int y, int widthIn, int heightIn, String buttonText, int entityID, boolean isSideA, Button.OnPress onPress) {
         super(x, y, widthIn, heightIn, new TextComponent(buttonText), onPress);
+        this.entityID = entityID;
+        this.isSideA = isSideA;
+    }
+
+    public EntitySelectionButton(int x, int y, int widthIn, int heightIn, Component buttonTextComponent, int entityID, boolean isSideA, Button.OnPress onPress) {
+        super(x, y, widthIn, heightIn, buttonTextComponent, onPress);
         this.entityID = entityID;
         this.isSideA = isSideA;
     }
