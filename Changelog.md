@@ -3,6 +3,9 @@
 The ability to change server-side config from within the game using
 "/tbm-server-edit".
 
+Fix Battle not checking Player "speed/slow" status to apply the
+"player\_haste\_speed" and "player\_slow\_speed" settings.
+
 # Version 1.18.2
 
 The list of targets in the Battle GUI when selecting a target did not display
