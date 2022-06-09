@@ -7,6 +7,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.network.chat.*;
@@ -581,29 +582,28 @@ public class ClientProxy extends CommonProxy {
                     parent.setStyle(parent.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     TextComponent sub = new TextComponent("leave_battle_cooldown ");
-                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00).withBold(true));
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
+                    parent.append(sub);
 
                     for (int i = 1; i <= 10; ++i) {
-                        TextComponent value = new TextComponent(String.valueOf(i) + ' ');
-                        value.setStyle(
-                            value.getStyle()
-                                .withColor(0xFF00FF00)
+                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub.setStyle(
+                            sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(
                                     ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit leave_battle_cooldown " + i)));
-                        sub.append(value);
+                        parent.append(sub);
                     }
 
-                    parent.append(sub);
-
                     sub = new TextComponent("aggro_start_battle_max_distance ");
-                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00).withBold(true));
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
                     parent.append(sub);
 
                     sub = new TextComponent("5 ");
                     sub.setStyle(
                         sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit aggro_start_battle_max_distance 5")));
@@ -612,7 +612,7 @@ public class ClientProxy extends CommonProxy {
                     sub = new TextComponent("8 ");
                     sub.setStyle(
                         sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit aggro_start_battle_max_distance 8")));
@@ -622,7 +622,7 @@ public class ClientProxy extends CommonProxy {
                         sub = new TextComponent(String.valueOf(i) + ' ');
                         sub.setStyle(
                             sub.getStyle()
-                                .withColor(0xFF00FF00)
+                                .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(
                                     ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit aggro_start_battle_max_distance " + String.valueOf(i))));
@@ -631,7 +631,7 @@ public class ClientProxy extends CommonProxy {
 
                     sub = new TextComponent("old_battle_behavior ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFFFFFF00)
+                        .withColor(ChatFormatting.YELLOW)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
                             new TextComponent("If enabled, battles only start on a hit, not including mobs targeting players")))
@@ -641,7 +641,7 @@ public class ClientProxy extends CommonProxy {
                     sub = new TextComponent("true ");
                     sub.setStyle(
                         sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit old_battle_behavior true")));
@@ -650,7 +650,7 @@ public class ClientProxy extends CommonProxy {
                     sub = new TextComponent("false ");
                     sub.setStyle(
                         sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit old_battle_behavior false")));
@@ -658,7 +658,7 @@ public class ClientProxy extends CommonProxy {
 
                     sub = new TextComponent("anyone_can_disable_tbm_for_self ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFFFFFF00)
+                        .withColor(ChatFormatting.YELLOW)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
                             new TextComponent("Allows use for /tbm-disable and /tbm-enable for all")))
@@ -668,7 +668,7 @@ public class ClientProxy extends CommonProxy {
                     sub = new TextComponent("true ");
                     sub.setStyle(
                         sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit anyone_can_disable_tbm_for_self true")));
@@ -677,19 +677,19 @@ public class ClientProxy extends CommonProxy {
                     sub = new TextComponent("false ");
                     sub.setStyle(
                         sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit anyone_can_disable_tbm_for_self false")));
                     parent.append(sub);
 
                     sub = new TextComponent("max_in_battle ");
-                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00).withBold(true));
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
                     parent.append(sub);
 
                     sub = new TextComponent("2 ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFF00FF00)
+                        .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit max_in_battle 2")));
@@ -698,7 +698,7 @@ public class ClientProxy extends CommonProxy {
                     for (int i = 5; i < 30; i += 5) {
                         sub = new TextComponent(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit max_in_battle " + String.valueOf(i))));
@@ -706,12 +706,12 @@ public class ClientProxy extends CommonProxy {
                     }
 
                     sub = new TextComponent("freeze_battle_combatants ");
-                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00).withBold(true));
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
                     parent.append(sub);
 
                     sub = new TextComponent("true ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFF00FF00)
+                        .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit freeze_battle_combatants true"
@@ -720,7 +720,7 @@ public class ClientProxy extends CommonProxy {
 
                     sub = new TextComponent("false ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFF00FF00)
+                        .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit freeze_battle_combatants false"
@@ -729,7 +729,7 @@ public class ClientProxy extends CommonProxy {
 
                     sub = new TextComponent("ignore_battle_types ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFF00FF00)
+                        .withColor(ChatFormatting.DARK_GREEN)
                         .withClickEvent(new ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit ignore_battle_types"))
@@ -742,7 +742,7 @@ public class ClientProxy extends CommonProxy {
 
                     sub = new TextComponent("player_speed ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFFFFFF00)
+                        .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
@@ -752,7 +752,7 @@ public class ClientProxy extends CommonProxy {
                     for (int i = 0; i <= 100; i += 5) {
                         sub = new TextComponent(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit player_speed " + i)));
                         parent.append(sub);
@@ -760,7 +760,7 @@ public class ClientProxy extends CommonProxy {
 
                     sub = new TextComponent("player_haste_speed ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFFFFFF00)
+                        .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
@@ -771,7 +771,7 @@ public class ClientProxy extends CommonProxy {
                     for (int i = 0; i <= 100; i += 5) {
                         sub = new TextComponent(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit player_haste_speed " + i)));
                         parent.append(sub);
@@ -779,7 +779,7 @@ public class ClientProxy extends CommonProxy {
 
                     sub = new TextComponent("player_slow_speed ");
                     sub.setStyle(sub.getStyle()
-                        .withColor(0xFFFFFF00)
+                        .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
@@ -790,9 +790,174 @@ public class ClientProxy extends CommonProxy {
                     for (int i = 0; i <= 100; i += 5) {
                         sub = new TextComponent(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
-                            .withColor(0xFF00FF00)
+                            .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit player_slow_speed " + i)));
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("player_attack_probability ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Base Player attack probability in percentage")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 0; i <= 100; i += 5) {
+                        if (i == 0) {
+                            sub = new TextComponent("1 ");
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit player_attack_probability 1")));
+                        } else {
+                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit player_attack_probability " + i)));
+                        }
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("player_evasion ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Base Player evasion rate in percentage")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 0; i <= 100; i += 5) {
+                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub.setStyle(sub.getStyle()
+                            .withColor(ChatFormatting.GREEN)
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit player_evasion " + i)));
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("defense_duration ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Number of attacks that a \"Defend\" move blocks (lasts until next action)")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 0; i <= 5; ++i) {
+                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub.setStyle(sub.getStyle()
+                            .withColor(ChatFormatting.GREEN)
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit defense_duration " + i)));
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("flee_good_probability ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Probability of flee success when Player's speed is higher than the fastest opposing Entity")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 0; i <= 100; i += 5) {
+                        if (i == 0) {
+                            sub = new TextComponent("1 ");
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit flee_good_probability 1")));
+                        } else {
+                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit flee_good_probability " + i)));
+                        }
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("flee_bad_probability ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Probability of flee success when Player's speed is lower than the fastest opposing Entity")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 0; i <= 100; i += 5) {
+                        if (i == 0) {
+                            sub = new TextComponent("1 ");
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit flee_bad_probability 1")));
+                        } else {
+                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit flee_bad_probability " + i)));
+                        }
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("minimum_hit_percentage ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("The minimum percentage possible when calculating hit percentage for any attacker")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 0; i <= 100; i += 5) {
+                        if (i == 0) {
+                            sub = new TextComponent("1 ");
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit minimum_hit_percentage 1")));
+                        } else {
+                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub.setStyle(sub.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit minimum_hit_percentage " + i)));
+                        }
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("battle_turn_time_seconds ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("The time in seconds to wait for all Players to choose their move")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 5; i <= 60; i += 5) {
+                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub.setStyle(sub.getStyle()
+                            .withColor(ChatFormatting.GREEN)
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit battle_turn_time_seconds " + i)));
                         parent.append(sub);
                     }
 

@@ -981,9 +981,27 @@ public class Config
         return playerAttackProbability;
     }
 
+    public void setPlayerAttackProbability(int probability) {
+        if (probability < 1) {
+            probability = 1;
+        } else if (probability > 100) {
+            probability = 100;
+        }
+        playerAttackProbability = probability;
+    }
+
     public int getPlayerEvasion()
     {
         return playerEvasion;
+    }
+
+    public void setPlayerEvasion(int evasion) {
+        if (evasion < 0) {
+            evasion = 0;
+        } else if (evasion > 100) {
+            evasion = 100;
+        }
+        playerEvasion = evasion;
     }
 
     public int getDefenseDuration()
@@ -991,14 +1009,42 @@ public class Config
         return defenseDuration;
     }
 
+    public void setDefenseDuration(int turns) {
+        if (turns < 0) {
+            turns = 0;
+        } else if (turns > 5) {
+            turns = 5;
+        }
+
+        defenseDuration = turns;
+    }
+
     public int getFleeGoodProbability()
     {
         return fleeGoodProbability;
     }
 
+    public void setFleeGoodProbability(int probability) {
+        if (probability < 1) {
+            probability = 1;
+        } else if (probability > 100) {
+            probability = 100;
+        }
+        fleeGoodProbability = probability;
+    }
+
     public int getFleeBadProbability()
     {
         return fleeBadProbability;
+    }
+
+    public void setFleeBadProbability(int probability) {
+        if (probability < 1) {
+            probability = 1;
+        } else if (probability > 100) {
+            probability = 100;
+        }
+        fleeBadProbability = probability;
     }
 
     /**
@@ -1210,6 +1256,15 @@ public class Config
         return minimumHitPercentage;
     }
 
+    public void setMinimumHitPercentage(int percentage) {
+        if (percentage < 1) {
+            percentage = 1;
+        } else if (percentage > 100) {
+            percentage = 100;
+        }
+        minimumHitPercentage = percentage;
+    }
+
     public int getMaxInBattle()
     {
         return maxInBattle;
@@ -1261,6 +1316,15 @@ public class Config
     public int getDecisionDurationSeconds()
     {
         return (int)(battleDecisionDurationNanos / 1000000000L);
+    }
+
+    public void setDecisionDurationSeconds(long seconds) {
+        if (seconds < 5) {
+            seconds = 5;
+        } else if (seconds > 60) {
+            seconds = 60;
+        }
+        battleDecisionDurationNanos = seconds * 1000000000L;
     }
 
     protected void addBattleIgnoringPlayer(int id)

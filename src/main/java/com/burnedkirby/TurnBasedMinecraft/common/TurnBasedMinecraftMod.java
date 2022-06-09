@@ -9,6 +9,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.ClickEvent;
@@ -789,7 +790,7 @@ public class TurnBasedMinecraftMod {
                         TextComponent subResponse = new TextComponent("leave_battle_cooldown is currently: ");
                         response.append(subResponse);
                         subResponse = new TextComponent(String.valueOf(TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownSeconds()));
-                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                         response.append(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
@@ -812,7 +813,7 @@ public class TurnBasedMinecraftMod {
                             } else {
                                 TextComponent response = new TextComponent("Successfully set leave_battle_cooldown to: ");
                                 TextComponent subResponse = new TextComponent(String.valueOf(cooldown));
-                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
@@ -824,7 +825,7 @@ public class TurnBasedMinecraftMod {
                         response.append(subResponse);
                         subResponse = new TextComponent(String.valueOf(
                             TurnBasedMinecraftMod.proxy.getConfig().getAggroStartBattleDistance()));
-                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                         response.append(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
@@ -847,7 +848,7 @@ public class TurnBasedMinecraftMod {
                             } else {
                                 TextComponent response = new TextComponent("Successfully set aggro_start_battle_max_distance to: ");
                                 TextComponent subResponse = new TextComponent(String.valueOf(distance));
-                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
@@ -859,7 +860,7 @@ public class TurnBasedMinecraftMod {
                         response.append(subResponse);
                         subResponse = new TextComponent(String.valueOf(
                             TurnBasedMinecraftMod.proxy.getConfig().isOldBattleBehaviorEnabled()));
-                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                         response.append(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
@@ -880,7 +881,7 @@ public class TurnBasedMinecraftMod {
                             } else {
                                 TextComponent response = new TextComponent("Successfully set old_battle_behavior to: ");
                                 TextComponent subResponse = new TextComponent(String.valueOf(enabled));
-                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
@@ -892,7 +893,7 @@ public class TurnBasedMinecraftMod {
                         response.append(subResponse);
                         subResponse = new TextComponent(String.valueOf(
                             !TurnBasedMinecraftMod.proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf()));
-                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                         response.append(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
@@ -914,7 +915,7 @@ public class TurnBasedMinecraftMod {
                             } else {
                                 TextComponent response = new TextComponent("Successfully set anyone_can_disable_tbm_for_self to: ");
                                 TextComponent subResponse = new TextComponent(String.valueOf(enabled_for_all));
-                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
@@ -926,7 +927,7 @@ public class TurnBasedMinecraftMod {
                         response.append(subResponse);
                         subResponse = new TextComponent(String.valueOf(
                             TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()));
-                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                         response.append(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
@@ -949,7 +950,7 @@ public class TurnBasedMinecraftMod {
                             } else {
                                 TextComponent response = new TextComponent("Successfully set max_in_battle to: ");
                                 TextComponent subResponse = new TextComponent(String.valueOf(max_amount));
-                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
@@ -961,7 +962,7 @@ public class TurnBasedMinecraftMod {
                         response.append(subResponse);
                         subResponse = new TextComponent(String.valueOf(
                             !TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled()));
-                        subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                         response.append(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
@@ -980,7 +981,7 @@ public class TurnBasedMinecraftMod {
                             } else {
                                 TextComponent response = new TextComponent("Successfully set freeze_battle_combatants to: ");
                                 TextComponent subResponse = new TextComponent(String.valueOf(enabled));
-                                subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                                subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
@@ -989,7 +990,7 @@ public class TurnBasedMinecraftMod {
                 .then(Commands.literal("ignore_battle_types").executes(c -> {
                         TextComponent response = new TextComponent("Use ");
                         TextComponent subResponse = new TextComponent("/tbm-server-edit ignore_battle_types add/remove <category> ");
-                        subResponse.setStyle(subResponse.getStyle().withColor(0xFFFFFF00));
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.YELLOW));
                         response.append(subResponse);
 
                         subResponse = new TextComponent("ignore_battle_types is currently: [");
@@ -1002,7 +1003,7 @@ public class TurnBasedMinecraftMod {
                             }
                             subResponse = new TextComponent(category);
                             subResponse.setStyle(subResponse.getStyle()
-                                .withColor(0xFF00FF00)
+                                .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(
                                     ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit ignore_battle_types remove " + category))
@@ -1027,7 +1028,7 @@ public class TurnBasedMinecraftMod {
                                 TextComponent response = new TextComponent("Successfully appended category \"");
 
                                 TextComponent sub = new TextComponent(category);
-                                sub.setStyle(sub.getStyle().withColor(0xFF00FF00));
+                                sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(sub);
 
                                 sub = new TextComponent("\" to ignore_battle_types");
@@ -1052,7 +1053,7 @@ public class TurnBasedMinecraftMod {
                                 TextComponent response = new TextComponent("Successfully removed category \"");
 
                                 TextComponent sub = new TextComponent(category);
-                                sub.setStyle(sub.getStyle().withColor(0xFF00FF00));
+                                sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN));
                                 response.append(sub);
 
                                 sub = new TextComponent("\" from ignore_battle_types");
@@ -1069,7 +1070,7 @@ public class TurnBasedMinecraftMod {
                 .then(Commands.literal("player_speed").executes(c -> {
                         TextComponent parent = new TextComponent("Use ");
                         TextComponent sub = new TextComponent("/tbm-server-edit player_speed <0-100>");
-                        sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                        sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
                         parent.append(sub);
 
                         c.getSource().sendSuccess(parent, false);
@@ -1090,7 +1091,7 @@ public class TurnBasedMinecraftMod {
                         } else {
                             TextComponent response = new TextComponent("Successfully set player_speed to: ");
                             TextComponent subResponse = new TextComponent(String.valueOf(speed));
-                            subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                             response.append(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
@@ -1099,7 +1100,7 @@ public class TurnBasedMinecraftMod {
                 .then(Commands.literal("player_haste_speed").executes(c -> {
                     TextComponent parent = new TextComponent("Use ");
                     TextComponent sub = new TextComponent("/tbm-server-edit player_haste_speed <0-100>");
-                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
                     parent.append(sub);
 
                     c.getSource().sendSuccess(parent, false);
@@ -1120,7 +1121,7 @@ public class TurnBasedMinecraftMod {
                         } else {
                             TextComponent response = new TextComponent("Successfully set player_haste_speed to: ");
                             TextComponent subResponse = new TextComponent(String.valueOf(haste_speed));
-                            subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                             response.append(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
@@ -1129,7 +1130,7 @@ public class TurnBasedMinecraftMod {
                 .then(Commands.literal("player_slow_speed").executes(c -> {
                     TextComponent parent = new TextComponent("Use ");
                     TextComponent sub = new TextComponent("/tbm-server-edit player_slow_speed <0-100>");
-                    sub.setStyle(sub.getStyle().withColor(0xFFFFFF00));
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
                     parent.append(sub);
 
                     c.getSource().sendSuccess(parent, false);
@@ -1150,7 +1151,217 @@ public class TurnBasedMinecraftMod {
                         } else {
                             TextComponent response = new TextComponent("Successfully set player_slow_speed to: ");
                             TextComponent subResponse = new TextComponent(String.valueOf(slow_speed));
-                            subResponse.setStyle(subResponse.getStyle().withColor(0xFF00FF00));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("player_attack_probability").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit player_attack_probability <1-100>");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("probability", IntegerArgumentType.integer()).executes(c -> {
+                        int probability = IntegerArgumentType.getInteger(c, "probability");
+                        // setPlayerAttackProbability() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setPlayerAttackProbability(probability);
+                        probability = TurnBasedMinecraftMod.proxy.getConfig().getPlayerAttackProbability();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_attack_probability", probability)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.player_attack_probability\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set player_attack_probability to \""
+                                    + probability
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set player_attack_probability to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(probability));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("player_evasion").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit player_evasion <0-100>");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("evasion", IntegerArgumentType.integer()).executes(c -> {
+                        int evasion = IntegerArgumentType.getInteger(c, "evasion");
+                        // setPlayerEvasion() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setPlayerEvasion(evasion);
+                        evasion = TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_evasion", evasion)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.player_evasion\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set player_evasion to \""
+                                    + evasion
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set player_evasion to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(evasion));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("defense_duration").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit defense_duration <0-5>");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("defends", IntegerArgumentType.integer()).executes(c -> {
+                        int defends = IntegerArgumentType.getInteger(c, "defends");
+                        // setDefenseDuration() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setDefenseDuration(defends);
+                        defends = TurnBasedMinecraftMod.proxy.getConfig().getDefenseDuration();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.defense_duration", defends)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.defense_duration\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set defense_druation to \""
+                                    + defends
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set defense_duration to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(defends));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("flee_good_probability").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit flee_good_probability <1-100>");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("probability", IntegerArgumentType.integer()).executes(c -> {
+                        int probability = IntegerArgumentType.getInteger(c, "probability");
+                        // setFleeGoodProbability() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setFleeGoodProbability(probability);
+                        probability = TurnBasedMinecraftMod.proxy.getConfig().getFleeGoodProbability();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.flee_good_probability", probability)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.flee_good_probability\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set flee_good_probability to \""
+                                    + probability
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set flee_good_probability to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(probability));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("flee_bad_probability").executes(c -> {
+                        TextComponent parent = new TextComponent("Use ");
+                        TextComponent sub = new TextComponent("/tbm-server-edit flee_bad_probability <1-100>");
+                        sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                        parent.append(sub);
+
+                        c.getSource().sendSuccess(parent, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("probability", IntegerArgumentType.integer()).executes(c -> {
+                        int probability = IntegerArgumentType.getInteger(c, "probability");
+                        // setFleeBadProbability() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setFleeBadProbability(probability);
+                        probability = TurnBasedMinecraftMod.proxy.getConfig().getFleeBadProbability();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.flee_bad_probability", probability)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.flee_bad_probability\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set flee_bad_probability to \""
+                                    + probability
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set flee_bad_probability to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(probability));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("minimum_hit_percentage").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit minimum_hit_percentage <1-100>");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("percentage", IntegerArgumentType.integer()).executes(c -> {
+                        int percentage = IntegerArgumentType.getInteger(c, "percentage");
+                        // setMinimumHitPercentage() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setMinimumHitPercentage(percentage);
+                        percentage = TurnBasedMinecraftMod.proxy.getConfig().getMinimumHitPercentage();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.minimum_hit_percentage", percentage)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.minimum_hit_percentage\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set minimum_hit_percentage to \""
+                                    + percentage
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set minimum_hit_percentage to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(percentage));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("battle_turn_time_seconds").executes(c -> {
+                    TextComponent parent = new TextComponent("Use ");
+                    TextComponent sub = new TextComponent("/tbm-server-edit battle_turn_time_seconds <5-60>");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                    parent.append(sub);
+
+                    c.getSource().sendSuccess(parent, false);
+                    return 1;
+                })
+                    .then(Commands.argument("seconds", IntegerArgumentType.integer()).executes(c -> {
+                        int seconds = IntegerArgumentType.getInteger(c, "seconds");
+                        // setDecisionDurationSeconds() in Config validates the value. Set it, then fetch it again.
+                        TurnBasedMinecraftMod.proxy.getConfig().setDecisionDurationSeconds(seconds);
+                        seconds = TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationSeconds();
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.battle_turn_time_seconds", seconds)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.battle_turn_time_seconds\" in config file!");
+                            c.getSource().sendFailure(new TextComponent(
+                                "Failed to set battle_turn_time_seconds to \""
+                                    + seconds
+                                    + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set battle_turn_time_seconds to: ");
+                            TextComponent subResponse = new TextComponent(String.valueOf(seconds));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                             response.append(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
