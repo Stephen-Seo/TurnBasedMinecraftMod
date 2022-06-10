@@ -2,8 +2,8 @@
 
 # Version 1.18.3
 
-The ability to change server-side config from within the game using
-"/tbm-server-edit".
+[The ability to change server-side config from within the game using
+"/tbm-server-edit".](https://youtu.be/9xkbHNWkcIY)
 
 Fix Battle not checking Player "speed/slow" status to apply the
 "player\_haste\_speed" and "player\_slow\_speed" settings.
