@@ -1410,7 +1410,24 @@ public class Config
 
     public int getCreeperExplodeTurn() { return creeperExplodeTurn; }
 
+    public void setCreeperExplodeTurn(int turns) {
+        if (turns < 1) {
+            turns = 1;
+        } else if (turns > 10) {
+            turns = 10;
+        }
+        creeperExplodeTurn = turns;
+    }
+
     public boolean getCreeperStopExplodeOnLeaveBattle() { return creeperStopExplodeOnLeaveBattle; }
 
+    public void setCreeperStopExplodeOnLeaveBattle(boolean stop_explode_on_leave_battle) {
+        creeperStopExplodeOnLeaveBattle = stop_explode_on_leave_battle;
+    }
+
     public boolean getCreeperAlwaysAllowDamage() { return creeperAlwaysAllowDamage; }
+
+    public void setCreeperAlwaysAllowDamage(boolean allow_damage) {
+        creeperAlwaysAllowDamage = allow_damage;
+    }
 }

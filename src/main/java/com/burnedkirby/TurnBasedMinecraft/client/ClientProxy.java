@@ -961,6 +961,73 @@ public class ClientProxy extends CommonProxy {
                         parent.append(sub);
                     }
 
+                    sub = new TextComponent("creeper_explode_turn ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("The number of turns it takes for a creeper to explode")
+                        )));
+                    parent.append(sub);
+
+                    for (int i = 1; i <= 10; ++i) {
+                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub.setStyle(sub.getStyle()
+                            .withColor(ChatFormatting.GREEN)
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit creeper_explode_turn " + i)));
+                        parent.append(sub);
+                    }
+
+                    sub = new TextComponent("creeper_stop_explode_on_leave_battle ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Stops creepers from exploding when they leave battle (during leave battle cooldown)")
+                        )));
+                    parent.append(sub);
+
+                    sub = new TextComponent("true ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit creeper_stop_explode_on_leave_battle true")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("false ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit creeper_stop_explode_on_leave_battle false")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("creeper_always_allow_damage ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Allows creepers to damage anyone who just left battle (in cooldown)")
+                        )));
+                    parent.append(sub);
+
+                    sub = new TextComponent("true ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit creeper_always_allow_damage true")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("false ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit creeper_always_allow_damage false")));
+                    parent.append(sub);
+
                     TurnBasedMinecraftMod.proxy.displayComponent(parent);
                     break;
                 }
