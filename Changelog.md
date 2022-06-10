@@ -1,5 +1,11 @@
 # Upcoming changes
 
+# Version 1.18.4
+
+Fix attacks not hitting due to "invulnerability frames".
+
+Change attacks to be applied approx 150ms apart.
+
 # Version 1.18.3
 
 [The ability to change server-side config from within the game using

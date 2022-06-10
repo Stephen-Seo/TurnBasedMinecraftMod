@@ -11,7 +11,7 @@ public class BattleUpdater
     private BattleManager manager;
     private AtomicBoolean isRunning;
     private int tick;
-    private final int tickLimit = 10;
+    private final int tickLimit = 3;
 
     public BattleUpdater(BattleManager manager)
     {
