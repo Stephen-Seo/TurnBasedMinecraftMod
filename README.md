@@ -53,7 +53,7 @@ configured for them.)
   - [Alternatively, the command "/tbm-edit" can be used in-game to add/edit
   entities for the mod.](https://www.youtube.com/watch?v=MK648OVHddE)
   - [Also, one can make entries for specific custom names](https://youtu.be/9lBETQFMd3A)
-  - Server-side config can be edited in-game with the "/tbm-server-edit" command
+  - [Server-side config can be edited in-game with the "/tbm-server-edit" command](https://youtu.be/9xkbHNWkcIY)
 
 # Building
 
