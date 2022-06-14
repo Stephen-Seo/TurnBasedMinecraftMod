@@ -343,7 +343,7 @@ public class ClientProxy extends CommonProxy {
                             parentComponent.getSiblings().add(new TextComponent(" drank a "));
                             parentComponent.getSiblings().add(new TextComponent(pkt.getCustom()));
                             parentComponent.getSiblings().add(new TextComponent("!"));
-                            TurnBasedMinecraftMod.proxy.displayString(from + " drank a " + pkt.getCustom() + "!");
+                            TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             break;
                     }
                     break;
