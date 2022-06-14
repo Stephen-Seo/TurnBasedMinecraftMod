@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.18.5
+
+Fix invalid Battle text output when a Player drinks a potion.
+
 # Version 1.18.4
 
 Fix attacks not hitting due to "invulnerability frames".
