@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version 1.18.7
+
+Incremented network channel's protocol version to 2, because a packet's format
+was changed in the previous version.
+
 # Version 1.18.6
 
 Add server config option to disable the turn timer (recommended to not disable

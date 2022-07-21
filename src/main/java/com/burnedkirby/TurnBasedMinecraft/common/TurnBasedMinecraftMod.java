@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.18.6";
+    public static final String VERSION = "1.18.7";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -49,7 +49,7 @@ public class TurnBasedMinecraftMod {
     public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
 
-    private static final String PROTOCOL_VERSION = Integer.toString(1);
+    private static final String PROTOCOL_VERSION = Integer.toString(2);
     private static final ResourceLocation HANDLER_ID = new ResourceLocation(MODID, "main_channel");
     private static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
         .named(HANDLER_ID)
