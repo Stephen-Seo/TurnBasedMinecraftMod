@@ -16,19 +16,22 @@ public class PacketBattleInfo
     private Collection<Integer> sideA;
     private Collection<Integer> sideB;
     private long decisionNanos;
+    private boolean turnTimerEnabled;
     
     public PacketBattleInfo()
     {
         sideA = new ArrayList<Integer>();
         sideB = new ArrayList<Integer>();
         decisionNanos = TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos();
+        turnTimerEnabled = false;
     }
 
-    public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos)
+    public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, boolean turnTimerEnabled)
     {
         this.sideA = sideA;
         this.sideB = sideB;
         this.decisionNanos = decisionNanos;
+        this.turnTimerEnabled = turnTimerEnabled;
     }
 
     public static void encode(PacketBattleInfo msg, FriendlyByteBuf buf) {
@@ -41,6 +44,7 @@ public class PacketBattleInfo
     		buf.writeInt(id);
     	}
     	buf.writeLong(msg.decisionNanos);
+        buf.writeBoolean(msg.turnTimerEnabled);
     }
 
     public static PacketBattleInfo decode(FriendlyByteBuf buf) {
@@ -55,7 +59,8 @@ public class PacketBattleInfo
     		sideB.add(buf.readInt());
     	}
     	long decisionNanos = buf.readLong();
-    	return new PacketBattleInfo(sideA, sideB, decisionNanos);
+        boolean turnTimerEnabled = buf.readBoolean();
+    	return new PacketBattleInfo(sideA, sideB, decisionNanos, turnTimerEnabled);
     }
     
     public static void handle(final PacketBattleInfo pkt, Supplier<NetworkEvent.Context> ctx) {
@@ -83,6 +88,7 @@ public class PacketBattleInfo
             }
             TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(pkt.decisionNanos / 1000000000L));
             TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
+            TurnBasedMinecraftMod.proxy.setBattleGuiTurnTimerEnabled(pkt.turnTimerEnabled);
         });
         ctx.get().setPacketHandled(true);
     }

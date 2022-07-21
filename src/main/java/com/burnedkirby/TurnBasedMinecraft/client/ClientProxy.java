@@ -56,6 +56,11 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void setBattleGuiTurnTimerEnabled(boolean enabled) {
+        battleGui.setTurnTimerEnabled(enabled);
+    }
+
+    @Override
     public void battleGuiTurnBegin() {
         battleGui.turnBegin();
     }
@@ -941,6 +946,26 @@ public class ClientProxy extends CommonProxy {
                         }
                         parent.append(sub);
                     }
+
+                    sub = new TextComponent("battle_turn_wait_forever ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            new TextComponent("Disables the turn timer (recommended to leave this to false)"))
+                        ));
+                    parent.append(sub);
+
+                    sub = new TextComponent("true ");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                        "/tbm-server-edit battle_turn_wait_forever true")));
+                    parent.append(sub);
+
+                    sub = new TextComponent("false ");
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                        "/tbm-server-edit battle_turn_wait_forever false")));
+                    parent.append(sub);
 
                     sub = new TextComponent("battle_turn_time_seconds ");
                     sub.setStyle(sub.getStyle()

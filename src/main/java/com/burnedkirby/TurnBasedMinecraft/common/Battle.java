@@ -34,6 +34,8 @@ public class Battle {
     private long lastInstant;
     private long timer;
 
+    private boolean timerForever;
+
     private boolean isServer;
     private boolean battleEnded;
 
@@ -208,6 +210,7 @@ public class Battle {
         state = State.DECISION;
         undecidedCount.set(playerCount.get());
         timer = TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos();
+        timerForever = TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever();
         battleEnded = false;
 
         notifyPlayersBattleInfo();
@@ -424,7 +427,11 @@ public class Battle {
     }
 
     public long getTimerSeconds() {
-        return timer / 1000000000;
+        return timer / 1000000000L;
+    }
+
+    public long getTimerNanos() {
+        return timer;
     }
 
     public int getSize() {
@@ -438,7 +445,7 @@ public class Battle {
         if (!isServer) {
             return;
         }
-        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer);
+        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer, !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
         for (Combatant p : players.values()) {
             TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p.entity), infoPacket);
         }
@@ -667,7 +674,7 @@ public class Battle {
         switch (state) {
             case DECISION:
                 timer -= dt;
-                if (timer <= 0 || undecidedCount.get() <= 0) {
+                if ((!timerForever && timer <= 0) || undecidedCount.get() <= 0) {
                     for (Combatant c : sideA.values()) {
                         // picking decision for sideA non-players
                         if (!(c.entity instanceof Player) && c.decision == Decision.UNDECIDED && c.entityInfo != null) {
@@ -711,6 +718,7 @@ public class Battle {
                     }
                     state = State.ACTION;
                     timer = TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos();
+                    timerForever = TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever();
                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_BEGIN, 0, 0, 0);
                     turnOrderQueue.clear();
                     for (Combatant c : sideA.values()) {

@@ -61,6 +61,8 @@ public class CommonProxy
     public void setBattleGuiBattleChanged() {}
     
     public void setBattleGuiAsGui() {}
+
+    public void setBattleGuiTurnTimerEnabled(boolean enabled) {}
     
     public void battleGuiTurnBegin() {}
     

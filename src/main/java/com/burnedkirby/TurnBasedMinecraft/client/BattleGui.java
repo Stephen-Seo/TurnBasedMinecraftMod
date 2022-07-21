@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BattleGui extends Screen {
 	private AtomicInteger timeRemaining;
+	private boolean turnTimerEnabled;
 	private long lastInstant;
 	private long elapsedTime;
 	private MenuState state;
@@ -242,14 +243,19 @@ public class BattleGui extends Screen {
 
 		String timeRemainingString = "Time remaining: ";
 		int timeRemainingInt = timeRemaining.get();
-		if (timeRemainingInt > 8) {
+		if (timeRemainingInt > 8 || !turnTimerEnabled) {
 			timeRemainingString += "\u00A7a";
 		} else if (timeRemainingInt > 4) {
 			timeRemainingString += "\u00A7e";
 		} else {
 			timeRemainingString += "\u00A7c";
 		}
-		timeRemainingString += Integer.toString(timeRemainingInt);
+
+		if (!turnTimerEnabled) {
+			timeRemainingString += "Infinity";
+		} else {
+			timeRemainingString += Integer.toString(timeRemainingInt);
+		}
 		int stringWidth = font.width(timeRemainingString);
 		fill(poseStack, width / 2 - stringWidth / 2, 5, width / 2 + stringWidth / 2, 15, 0x70000000);
 		drawString(poseStack, timeRemainingString, width / 2 - stringWidth / 2, 5, 0xFFFFFFFF);
@@ -348,5 +354,9 @@ public class BattleGui extends Screen {
 
 	private void drawString(PoseStack poseStack, String string, int x, int y, int color) {
 		font.draw(poseStack, string, x, y, color);
+	}
+
+	public void setTurnTimerEnabled(boolean enabled) {
+		turnTimerEnabled = enabled;
 	}
 }

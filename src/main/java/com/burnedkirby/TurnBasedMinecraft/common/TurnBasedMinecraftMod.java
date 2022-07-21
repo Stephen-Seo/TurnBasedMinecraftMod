@@ -38,7 +38,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.18.5";
+    public static final String VERSION = "1.18.6";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -1331,6 +1331,32 @@ public class TurnBasedMinecraftMod {
                         } else {
                             TextComponent response = new TextComponent("Successfully set minimum_hit_percentage to: ");
                             TextComponent subResponse = new TextComponent(String.valueOf(percentage));
+                            subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
+                            response.append(subResponse);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
+                .then(Commands.literal("battle_turn_wait_forever").executes(c -> {
+                        TextComponent parent = new TextComponent("Use ");
+                        TextComponent sub = new TextComponent("/tbm-server-edit battle_turn_wait_forever <true/false>");
+                        sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                        parent.append(sub);
+
+                        c.getSource().sendSuccess(parent, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("enabled", BoolArgumentType.bool()).executes(c -> {
+                        boolean enabled = BoolArgumentType.getBool(c, "enabled");
+                        TurnBasedMinecraftMod.proxy.getConfig().setBattleDecisionDurationForever(enabled);
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.battle_turn_wait_forever", enabled)) {
+                            TurnBasedMinecraftMod.logger.warn(
+                                "Failed to set \"server_config.battle_turn_wait_forever\" in config file!"
+                            );
+                            c.getSource().sendFailure(new TextComponent("Failed to set battle_turn_wait_forever to \"" + (enabled ? "true" : "false") + "\" in config file!"));
+                        } else {
+                            TextComponent response = new TextComponent("Successfully set battle_turn_wait_forever to: ");
+                            TextComponent subResponse = new TextComponent((enabled ? "true" : "false"));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
                             response.append(subResponse);
                             c.getSource().sendSuccess(response, true);

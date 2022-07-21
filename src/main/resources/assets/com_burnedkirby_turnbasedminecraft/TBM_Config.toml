@@ -36,29 +36,29 @@ anyone_can_disable_tbm_for_self = false
 # will be added to battle until there are less than max entities.
 max_in_battle = 8
 
-# If true, all entities in battle will be frozen in place
+# If true, all entities in battle will be frozen in place.
 freeze_battle_combatants = false
 
 # Entity categories that will not initiate battle.
 ignore_battle_types = ["passive", "boss"]
 
-# speed stat of all players in battle
+# Speed stat of all players in battle.
 player_speed = 50
-# speed stat of all players under the effects of haste
+# Speed stat of all players under the effects of haste.
 player_haste_speed = 80
-# speed stat of all players under the effects of slow
+# Speed stat of all players under the effects of slow.
 player_slow_speed = 20
-# attack probability stat for all players
+# Attack probability stat for all players.
 player_attack_probability = 90
-# evasion stat for all players
+# Evasion stat for all players.
 player_evasion = 10
 
-# Number of attacks that a "defend" move will block
+# Number of attacks that a "defend" move will block.
 defense_duration = 1
 
-# probability of fleeing from battle when speed is greater than fastest enemy's speed
+# Probability of fleeing from battle when speed is greater than fastest enemy's speed.
 flee_good_probability = 90
-# probability of fleeing from battle when speed is less than fastest enemy's speed
+# Probability of fleeing from battle when speed is less than fastest enemy's speed.
 flee_bad_probability = 40
 
 # Minimum hit percentage for everyone. If option is set to less than 1,
@@ -69,13 +69,17 @@ minimum_hit_percentage = 4
 # Minimum 5, maximum 60.
 battle_turn_time_seconds = 15
 
-# On what turn a Creeper will explode in battle
+# If set to true, battle_turn_time_seconds will be ignored and there will be no turn timer.
+# WARNING: If this is set to true, a player can halt a battle forever by never deciding on their turn.
+battle_turn_wait_forever = false
+
+# On what turn a Creeper will explode in battle.
 creeper_explode_turn = 5
 
-# Keep creepers from exploding when they leave a battle (for leave_battle_cooldown duration)
+# Keep creepers from exploding when they leave a battle (for leave_battle_cooldown duration).
 creeper_stop_explode_on_leave_battle = true
 
-# If false, creepers may not damage others outside of turn-based battle
+# If false, creepers may not damage others outside of turn-based battle.
 creeper_always_allow_damage = true
 
 

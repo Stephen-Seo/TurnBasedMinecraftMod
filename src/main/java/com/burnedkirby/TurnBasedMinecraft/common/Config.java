@@ -20,6 +20,7 @@ public class Config
     public static final long BATTLE_DECISION_DURATION_NANO_MAX = BATTLE_DECISION_DURATION_SEC_MAX * 1000000000L;
     public static final long BATTLE_DECISION_DURATION_NANO_DEFAULT = BATTLE_DECISION_DURATION_SEC_DEFAULT * 1000000000L;
     private long battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
+    private boolean battleDecisionDurationForever = false;
     private Map<String, EntityInfo> entityInfoMap;
     private Map<String, EntityInfo> customEntityInfoMap;
     private Set<String> ignoreBattleTypes;
@@ -492,6 +493,19 @@ public class Config
         } catch (ClassCastException e) {
             this.battleDecisionDurationNanos = BATTLE_DECISION_DURATION_NANO_DEFAULT;
             logTOMLInvalidValue("server_config.battle_turn_time_seconds", "15");
+        }
+
+        try {
+            Boolean battle_turn_wait_forever = conf.get("server_config.battle_turn_wait_forever");
+            if (battle_turn_wait_forever != null) {
+                this.battleDecisionDurationForever = battle_turn_wait_forever;
+            } else {
+                this.battleDecisionDurationForever = false;
+                logNotFound("server_config.battle_turn_wait_forever", "false");
+            }
+        } catch (ClassCastException e) {
+            this.battleDecisionDurationForever = false;
+            logTOMLInvalidValue("server_config.battle_turn_wait_forever", "false");
         }
 
         Collection<com.electronwill.nightconfig.core.Config> entities = null;
@@ -1429,5 +1443,13 @@ public class Config
 
     public void setCreeperAlwaysAllowDamage(boolean allow_damage) {
         creeperAlwaysAllowDamage = allow_damage;
+    }
+
+    public boolean isBattleDecisionDurationForever() {
+        return battleDecisionDurationForever;
+    }
+
+    public void setBattleDecisionDurationForever(boolean battleDecisionDurationForever) {
+        this.battleDecisionDurationForever = battleDecisionDurationForever;
     }
 }
