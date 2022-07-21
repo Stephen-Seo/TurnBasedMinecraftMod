@@ -61,6 +61,11 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void setBattleGuiTurnTimerMax(int timeMax) {
+        battleGui.setTurnTimerMax(timeMax);
+    }
+
+    @Override
     public void battleGuiTurnBegin() {
         battleGui.turnBegin();
     }

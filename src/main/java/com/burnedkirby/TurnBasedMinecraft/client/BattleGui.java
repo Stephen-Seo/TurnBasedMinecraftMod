@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BattleGui extends Screen {
 	private AtomicInteger timeRemaining;
+
+	private int timerMax;
 	private boolean turnTimerEnabled;
 	private long lastInstant;
 	private long elapsedTime;
@@ -82,6 +84,7 @@ public class BattleGui extends Screen {
 	public BattleGui() {
 		super(new TextComponent("Battle Gui"));
 		timeRemaining = new AtomicInteger((int) (Config.BATTLE_DECISION_DURATION_NANO_DEFAULT / 1000000000L));
+		timerMax = timeRemaining.get();
 		lastInstant = System.nanoTime();
 		elapsedTime = 0;
 		state = MenuState.MAIN_MENU;
@@ -104,7 +107,7 @@ public class BattleGui extends Screen {
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle() != null) {
 			TurnBasedMinecraftMod.proxy.getLocalBattle().setState(Battle.State.DECISION);
 		}
-		timeRemaining.set(TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationSeconds());
+		timeRemaining.set(timerMax);
 		elapsedTime = 0;
 		lastInstant = System.nanoTime();
 		setState(MenuState.MAIN_MENU);
@@ -358,5 +361,9 @@ public class BattleGui extends Screen {
 
 	public void setTurnTimerEnabled(boolean enabled) {
 		turnTimerEnabled = enabled;
+	}
+
+	public void setTurnTimerMax(int timerMax) {
+		this.timerMax = timerMax;
 	}
 }

@@ -16,6 +16,8 @@ public class PacketBattleInfo
     private Collection<Integer> sideA;
     private Collection<Integer> sideB;
     private long decisionNanos;
+
+    private long maxDecisionNanos;
     private boolean turnTimerEnabled;
     
     public PacketBattleInfo()
@@ -23,14 +25,16 @@ public class PacketBattleInfo
         sideA = new ArrayList<Integer>();
         sideB = new ArrayList<Integer>();
         decisionNanos = TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos();
+        maxDecisionNanos = decisionNanos;
         turnTimerEnabled = false;
     }
 
-    public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, boolean turnTimerEnabled)
+    public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, long maxDecisionNanos, boolean turnTimerEnabled)
     {
         this.sideA = sideA;
         this.sideB = sideB;
         this.decisionNanos = decisionNanos;
+        this.maxDecisionNanos = maxDecisionNanos;
         this.turnTimerEnabled = turnTimerEnabled;
     }
 
@@ -44,6 +48,7 @@ public class PacketBattleInfo
     		buf.writeInt(id);
     	}
     	buf.writeLong(msg.decisionNanos);
+        buf.writeLong(msg.maxDecisionNanos);
         buf.writeBoolean(msg.turnTimerEnabled);
     }
 
@@ -59,8 +64,9 @@ public class PacketBattleInfo
     		sideB.add(buf.readInt());
     	}
     	long decisionNanos = buf.readLong();
+        long maxDecisionNanos = buf.readLong();
         boolean turnTimerEnabled = buf.readBoolean();
-    	return new PacketBattleInfo(sideA, sideB, decisionNanos, turnTimerEnabled);
+        return new PacketBattleInfo(sideA, sideB, decisionNanos, maxDecisionNanos, turnTimerEnabled);
     }
     
     public static void handle(final PacketBattleInfo pkt, Supplier<NetworkEvent.Context> ctx) {
@@ -89,6 +95,7 @@ public class PacketBattleInfo
             TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(pkt.decisionNanos / 1000000000L));
             TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
             TurnBasedMinecraftMod.proxy.setBattleGuiTurnTimerEnabled(pkt.turnTimerEnabled);
+            TurnBasedMinecraftMod.proxy.setBattleGuiTurnTimerMax((int)(pkt.maxDecisionNanos / 1000000000L));
         });
         ctx.get().setPacketHandled(true);
     }

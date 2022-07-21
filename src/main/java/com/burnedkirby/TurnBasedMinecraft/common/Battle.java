@@ -445,7 +445,7 @@ public class Battle {
         if (!isServer) {
             return;
         }
-        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer, !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
+        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer, TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
         for (Combatant p : players.values()) {
             TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p.entity), infoPacket);
         }
