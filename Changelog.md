@@ -1,5 +1,14 @@
 # Upcoming changes
 
+# Version 1.18.6
+
+Add server config option to disable the turn timer (recommended to not disable
+the turn timer, otherwise a player could hang a battle for forever).
+
+Fix turn timer not respecting the server's turn timer value. For example, if the
+server had it set to 5 seconds, but the client had it set to 15 seconds, the
+turn timer would erronously show 15 seconds at the start of the next turn.
+
 # Version 1.18.5
 
 Fix invalid Battle text output when a Player drinks a potion.
