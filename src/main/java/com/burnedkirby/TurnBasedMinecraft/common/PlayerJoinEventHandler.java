@@ -1,15 +1,15 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class PlayerJoinEventHandler
 {
     @SubscribeEvent
-    public void entityJoinHandler(EntityJoinWorldEvent event)
+    public void entityJoinHandler(EntityJoinLevelEvent event)
     {
-        if(event.getWorld().isClientSide)
+        if(event.getLevel().isClientSide)
         {
             return;
         }

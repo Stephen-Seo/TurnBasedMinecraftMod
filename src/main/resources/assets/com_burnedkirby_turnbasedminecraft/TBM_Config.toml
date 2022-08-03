@@ -1,6 +1,6 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 7
+version = 8
 do_not_overwrite = false
 
 [client_config]
@@ -447,6 +447,18 @@ decision_defend_probability = 0
 decision_flee_probability = 0
 
 [[server_config.entity]]
+name = "net.minecraft.world.entity.monster.warden.Warden"
+attack_power = 28
+attack_probability = 65
+attack_variance = 10
+evasion = 7
+category = "monster"
+speed = 50
+decision_attack_probability = 95
+decision_defend_probability = 0
+decision_flee_probability = 0
+
+[[server_config.entity]]
 name = "net.minecraft.world.entity.monster.Witch"
 attack_power = 5
 attack_probability = 75
@@ -515,6 +527,17 @@ speed = 25
 decision_attack_probability = 100
 decision_defend_probability = 0
 decision_flee_probability = 0
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.allay.Allay"
+attack_power = 0
+attack_probability = 50
+evasion = 40
+category = "passive"
+speed = 50
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 100
 
 [[server_config.entity]]
 name = "net.minecraft.world.entity.animal.axolotl.Axolotl"
@@ -607,6 +630,28 @@ speed = 65
 decision_attack_probability = 70
 decision_defend_probability = 0
 decision_flee_probability = 25
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.frog.Frog"
+attack_power = 2
+attack_probability = 50
+evasion = 60
+category = "animal"
+speed = 70
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 100
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.frog.Tadpole"
+attack_power = 0
+attack_probability = 0
+evasion = 45
+category = "animal"
+speed = 50
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 100
 
 [[server_config.entity]]
 name = "net.minecraft.world.entity.animal.horse.Donkey"

@@ -9,7 +9,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public class BattleGui extends Screen {
 	}
 
 	public BattleGui() {
-		super(new TextComponent("Battle Gui"));
+		super(Component.literal("Battle Gui"));
 		timeRemaining = new AtomicInteger((int) (Config.BATTLE_DECISION_DURATION_NANO_DEFAULT / 1000000000L));
 		timerMax = timeRemaining.get();
 		lastInstant = System.nanoTime();
@@ -127,16 +127,16 @@ public class BattleGui extends Screen {
 		switch (state) {
 		case MAIN_MENU:
 			info = "What will you do?";
-			addRenderableWidget(new Button(width * 3 / 7 - 25, 40, 50, 20, new TextComponent("Attack"), (button) -> {
+			addRenderableWidget(new Button(width * 3 / 7 - 25, 40, 50, 20, Component.literal("Attack"), (button) -> {
 				buttonActionEvent(button, ButtonAction.ATTACK);
 			}));
-			addRenderableWidget(new Button(width * 4 / 7 - 25, 40, 50, 20, new TextComponent("Defend"), (button) -> {
+			addRenderableWidget(new Button(width * 4 / 7 - 25, 40, 50, 20, Component.literal("Defend"), (button) -> {
 				buttonActionEvent(button, ButtonAction.DEFEND);
 			}));
-			addRenderableWidget(new Button(width * 3 / 7 - 25, 60, 50, 20, new TextComponent("Item"), (button) -> {
+			addRenderableWidget(new Button(width * 3 / 7 - 25, 60, 50, 20, Component.literal("Item"), (button) -> {
 				buttonActionEvent(button, ButtonAction.ITEM);
 			}));
-			addRenderableWidget(new Button(width * 4 / 7 - 25, 60, 50, 20, new TextComponent("Flee"), (button) -> {
+			addRenderableWidget(new Button(width * 4 / 7 - 25, 60, 50, 20, Component.literal("Flee"), (button) -> {
 				buttonActionEvent(button, ButtonAction.FLEE);
 			}));
 			break;
@@ -178,19 +178,19 @@ public class BattleGui extends Screen {
 			} catch (ConcurrentModificationException e) {
 				// ignored
 			}
-			addRenderableWidget(new Button(width / 2 - 30, height - 120, 60, 20, new TextComponent("Cancel"), (button) -> {
+			addRenderableWidget(new Button(width / 2 - 30, height - 120, 60, 20, Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;
 		case ITEM_ACTION:
 			info = "What will you do with an item?";
-			addRenderableWidget(new Button(width * 1 / 4 - 40, height - 120, 80, 20, new TextComponent("Switch Held"), (button) -> {
+			addRenderableWidget(new Button(width * 1 / 4 - 40, height - 120, 80, 20, Component.literal("Switch Held"), (button) -> {
 				buttonActionEvent(button, ButtonAction.SWITCH_HELD_ITEM);
 			}));
-			addRenderableWidget(new Button(width * 2 / 4 - 40, height - 120, 80, 20, new TextComponent("Use"), (button) -> {
+			addRenderableWidget(new Button(width * 2 / 4 - 40, height - 120, 80, 20, Component.literal("Use"), (button) -> {
 				buttonActionEvent(button, ButtonAction.DECIDE_USE_ITEM);
 			}));
-			addRenderableWidget(new Button(width * 3 / 4 - 40, height - 120, 80, 20, new TextComponent("Cancel"), (button) -> {
+			addRenderableWidget(new Button(width * 3 / 4 - 40, height - 120, 80, 20, Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;
@@ -204,7 +204,7 @@ public class BattleGui extends Screen {
 					buttonActionEvent(button, ButtonAction.DO_ITEM_SWITCH);
 				}));
 			}
-			addRenderableWidget(new Button(width / 2 - 40, height - 120, 80, 20, new TextComponent("Cancel"), (button) -> {
+			addRenderableWidget(new Button(width / 2 - 40, height - 120, 80, 20, Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;
@@ -215,7 +215,7 @@ public class BattleGui extends Screen {
 					buttonActionEvent(button, ButtonAction.DO_USE_ITEM);
 				}));
 			}
-			addRenderableWidget(new Button(width / 2 - 40, height - 120, 80, 20, new TextComponent("Cancel"), (button) -> {
+			addRenderableWidget(new Button(width / 2 - 40, height - 120, 80, 20, Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
 			}));
 			break;

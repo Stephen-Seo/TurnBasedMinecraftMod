@@ -6,14 +6,13 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.network.chat.TextComponent;
 
 public class EntitySelectionButton extends Button {
     private int entityID;
     private boolean isSideA;
 
     public EntitySelectionButton(int x, int y, int widthIn, int heightIn, String buttonText, int entityID, boolean isSideA, Button.OnPress onPress) {
-        super(x, y, widthIn, heightIn, new TextComponent(buttonText), onPress);
+        super(x, y, widthIn, heightIn, Component.literal(buttonText), onPress);
         this.entityID = entityID;
         this.isSideA = isSideA;
     }

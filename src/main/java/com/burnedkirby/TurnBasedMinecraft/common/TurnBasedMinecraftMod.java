@@ -14,7 +14,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
@@ -38,7 +39,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.18.7";
+    public static final String VERSION = "1.19.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -157,7 +158,7 @@ public class TurnBasedMinecraftMod {
                 })
                 .executes(c -> {
                     proxy.getConfig().addBattleIgnoringPlayer(c.getSource().getPlayerOrException().getId());
-                    c.getSource().sendSuccess(new TextComponent("Disabled turn-based-combat for current player"), true);
+                    c.getSource().sendSuccess(Component.literal("Disabled turn-based-combat for current player"), true);
                     return 1;
                 }));
         // tbm-disable-all
@@ -180,7 +181,7 @@ public class TurnBasedMinecraftMod {
                 .requires(c -> !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermission(2))
                 .executes(c -> {
                     proxy.getConfig().removeBattleIgnoringPlayer(c.getSource().getPlayerOrException().getId());
-                    c.getSource().sendSuccess(new TextComponent("Enabled turn-based-combat for current player"), true);
+                    c.getSource().sendSuccess(Component.literal("Enabled turn-based-combat for current player"), true);
                     return 1;
                 }));
         // tbm-enable-all
@@ -203,7 +204,7 @@ public class TurnBasedMinecraftMod {
                     for (ServerPlayer player : EntityArgument.getPlayers(c, "targets")) {
                         proxy.getConfig().addBattleIgnoringPlayer(player.getId());
                         getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP enabled turn-based-combat for you"));
-                        c.getSource().sendSuccess(new TextComponent("Enabled turn-based-combat for " + player.getDisplayName().getString()), true);
+                        c.getSource().sendSuccess(Component.literal("Enabled turn-based-combat for " + player.getDisplayName().getString()), true);
                     }
                     return 1;
                 })));
@@ -215,7 +216,7 @@ public class TurnBasedMinecraftMod {
                     for (ServerPlayer player : EntityArgument.getPlayers(c, "targets")) {
                         proxy.getConfig().removeBattleIgnoringPlayer(player.getId());
                         getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP disabled turn-based-combat for you"));
-                        c.getSource().sendSuccess(new TextComponent("Disabled turn-based-combat for " + player.getDisplayName().getString()), true);
+                        c.getSource().sendSuccess(Component.literal("Disabled turn-based-combat for " + player.getDisplayName().getString()), true);
                     }
                     return 1;
                 })));
@@ -786,12 +787,12 @@ public class TurnBasedMinecraftMod {
                     return 1;
                 })
                 .then(Commands.literal("leave_battle_cooldown").executes(c -> {
-                        TextComponent response = new TextComponent("leave_battle_cooldown requires an integer argument. ");
-                        TextComponent subResponse = new TextComponent("leave_battle_cooldown is currently: ");
-                        response.append(subResponse);
-                        subResponse = new TextComponent(String.valueOf(TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownSeconds()));
+                        MutableComponent response = Component.literal("leave_battle_cooldown requires an integer argument. ");
+                        MutableComponent subResponse = Component.literal("leave_battle_cooldown is currently: ");
+                        response.getSiblings().add(subResponse);
+                        subResponse = Component.literal(String.valueOf(TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownSeconds()));
                         subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                        response.append(subResponse);
+                        response.getSiblings().add(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
                     })
@@ -806,27 +807,27 @@ public class TurnBasedMinecraftMod {
                                 cooldown)) {
                                 TurnBasedMinecraftMod.logger.warn(
                                     "Failed to set \"server_config.leave_battle_cooldown\" in config file!");
-                                c.getSource().sendFailure(new TextComponent("" +
+                                c.getSource().sendFailure(Component.literal("" +
                                     "Failed to set leave_battle_cooldown to \""
                                     + cooldown
                                     + "\" in config file!"));
                             } else {
-                                TextComponent response = new TextComponent("Successfully set leave_battle_cooldown to: ");
-                                TextComponent subResponse = new TextComponent(String.valueOf(cooldown));
+                                MutableComponent response = Component.literal("Successfully set leave_battle_cooldown to: ");
+                                MutableComponent subResponse = Component.literal(String.valueOf(cooldown));
                                 subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(subResponse);
+                                response.getSiblings().add(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
                             return 1;
                         })))
                 .then(Commands.literal("aggro_start_battle_max_distance").executes(c -> {
-                        TextComponent response = new TextComponent("aggro_start_battle_max_distance requires an integer argument. ");
-                        TextComponent subResponse = new TextComponent("aggro_start_battle_max_distance is currently: ");
-                        response.append(subResponse);
-                        subResponse = new TextComponent(String.valueOf(
+                        MutableComponent response = Component.literal("aggro_start_battle_max_distance requires an integer argument. ");
+                        MutableComponent subResponse = Component.literal("aggro_start_battle_max_distance is currently: ");
+                        response.getSiblings().add(subResponse);
+                        subResponse = Component.literal(String.valueOf(
                             TurnBasedMinecraftMod.proxy.getConfig().getAggroStartBattleDistance()));
                         subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                        response.append(subResponse);
+                        response.getSiblings().add(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
                     })
@@ -841,27 +842,27 @@ public class TurnBasedMinecraftMod {
                                 distance)) {
                                 TurnBasedMinecraftMod.logger.warn(
                                     "Failed to set \"server_config.aggro_start_battle_max_distance\" in config file!");
-                                c.getSource().sendFailure(new TextComponent(
+                                c.getSource().sendFailure(Component.literal(
                                     "Failed to set aggro_start_battle_max_distance to \""
                                         + distance
                                         + "\" in config file!"));
                             } else {
-                                TextComponent response = new TextComponent("Successfully set aggro_start_battle_max_distance to: ");
-                                TextComponent subResponse = new TextComponent(String.valueOf(distance));
+                                MutableComponent response = Component.literal("Successfully set aggro_start_battle_max_distance to: ");
+                                MutableComponent subResponse = Component.literal(String.valueOf(distance));
                                 subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(subResponse);
+                                response.getSiblings().add(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
                             return 1;
                         })))
                 .then(Commands.literal("old_battle_behavior").executes(c -> {
-                        TextComponent response = new TextComponent("old_battle_behavior requires a boolean argument. ");
-                        TextComponent subResponse = new TextComponent("old_battle_behavior is currently: ");
-                        response.append(subResponse);
-                        subResponse = new TextComponent(String.valueOf(
+                        MutableComponent response = Component.literal("old_battle_behavior requires a boolean argument. ");
+                        MutableComponent subResponse = Component.literal("old_battle_behavior is currently: ");
+                        response.getSiblings().add(subResponse);
+                        subResponse = Component.literal(String.valueOf(
                             TurnBasedMinecraftMod.proxy.getConfig().isOldBattleBehaviorEnabled()));
                         subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                        response.append(subResponse);
+                        response.getSiblings().add(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
                     })
@@ -874,27 +875,27 @@ public class TurnBasedMinecraftMod {
                                 enabled)) {
                                 TurnBasedMinecraftMod.logger.warn(
                                     "Failed to set \"server_config.old_battle_behavior\" in config file!");
-                                c.getSource().sendFailure(new TextComponent(
+                                c.getSource().sendFailure(Component.literal(
                                     "Failed to set old_battle_behavior to \""
                                         + enabled
                                         + "\" in config file!"));
                             } else {
-                                TextComponent response = new TextComponent("Successfully set old_battle_behavior to: ");
-                                TextComponent subResponse = new TextComponent(String.valueOf(enabled));
+                                MutableComponent response = Component.literal("Successfully set old_battle_behavior to: ");
+                                MutableComponent subResponse = Component.literal(String.valueOf(enabled));
                                 subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(subResponse);
+                                response.getSiblings().add(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
                             return 1;
                         })))
                 .then(Commands.literal("anyone_can_disable_tbm_for_self").executes(c -> {
-                        TextComponent response = new TextComponent("anyone_can_disable_tbm_for_self requires a boolean argument. ");
-                        TextComponent subResponse = new TextComponent("anyone_can_disable_tbm_for_self is currently: ");
-                        response.append(subResponse);
-                        subResponse = new TextComponent(String.valueOf(
+                        MutableComponent response = Component.literal("anyone_can_disable_tbm_for_self requires a boolean argument. ");
+                        MutableComponent subResponse = Component.literal("anyone_can_disable_tbm_for_self is currently: ");
+                        response.getSiblings().add(subResponse);
+                        subResponse = Component.literal(String.valueOf(
                             !TurnBasedMinecraftMod.proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf()));
                         subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                        response.append(subResponse);
+                        response.getSiblings().add(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
                     })
@@ -908,27 +909,27 @@ public class TurnBasedMinecraftMod {
                             )) {
                                 TurnBasedMinecraftMod.logger.warn(
                                     "Failed to set \"server_config.anyone_can_disable_tbm_for_self\" in config file!");
-                                c.getSource().sendFailure(new TextComponent(
+                                c.getSource().sendFailure(Component.literal(
                                     "Failed to set anyone_can_disable_tbm_for_self to \""
                                         + enabled_for_all
                                         + "\" in config file!"));
                             } else {
-                                TextComponent response = new TextComponent("Successfully set anyone_can_disable_tbm_for_self to: ");
-                                TextComponent subResponse = new TextComponent(String.valueOf(enabled_for_all));
+                                MutableComponent response = Component.literal("Successfully set anyone_can_disable_tbm_for_self to: ");
+                                MutableComponent subResponse = Component.literal(String.valueOf(enabled_for_all));
                                 subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(subResponse);
+                                response.getSiblings().add(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
                             return 1;
                         })))
                 .then(Commands.literal("max_in_battle").executes(c -> {
-                        TextComponent response = new TextComponent("max_in_battle requires an integer argument. ");
-                        TextComponent subResponse = new TextComponent("max_in_battle is currently: ");
-                        response.append(subResponse);
-                        subResponse = new TextComponent(String.valueOf(
+                        MutableComponent response = Component.literal("max_in_battle requires an integer argument. ");
+                        MutableComponent subResponse = Component.literal("max_in_battle is currently: ");
+                        response.getSiblings().add(subResponse);
+                        subResponse = Component.literal(String.valueOf(
                             TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()));
                         subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                        response.append(subResponse);
+                        response.getSiblings().add(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
                     })
@@ -943,27 +944,27 @@ public class TurnBasedMinecraftMod {
                                 max_amount)) {
                                 TurnBasedMinecraftMod.logger.warn(
                                     "Failed to set \"server_config.max_in_battle\" in config file!");
-                                c.getSource().sendFailure(new TextComponent(
+                                c.getSource().sendFailure(Component.literal(
                                     "Failed to set max_in_battle to \""
                                         + max_amount
                                         + "\" in config file!"));
                             } else {
-                                TextComponent response = new TextComponent("Successfully set max_in_battle to: ");
-                                TextComponent subResponse = new TextComponent(String.valueOf(max_amount));
+                                MutableComponent response = Component.literal("Successfully set max_in_battle to: ");
+                                MutableComponent subResponse = Component.literal(String.valueOf(max_amount));
                                 subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(subResponse);
+                                response.getSiblings().add(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
                             return 1;
                         })))
                 .then(Commands.literal("freeze_battle_combatants").executes(c -> {
-                        TextComponent response = new TextComponent("freeze_battle_combatants requires a boolean argument. ");
-                        TextComponent subResponse = new TextComponent("freeze_battle_combatants is currently: ");
-                        response.append(subResponse);
-                        subResponse = new TextComponent(String.valueOf(
+                        MutableComponent response = Component.literal("freeze_battle_combatants requires a boolean argument. ");
+                        MutableComponent subResponse = Component.literal("freeze_battle_combatants is currently: ");
+                        response.getSiblings().add(subResponse);
+                        subResponse = Component.literal(String.valueOf(
                             !TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled()));
                         subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                        response.append(subResponse);
+                        response.getSiblings().add(subResponse);
                         c.getSource().sendSuccess(response, false);
                         return 1;
                     })
@@ -974,34 +975,34 @@ public class TurnBasedMinecraftMod {
                             if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.freeze_battle_combatants", enabled)) {
                                 TurnBasedMinecraftMod.logger.warn(
                                     "Failed to set \"server_config.freeze_battle_combatants\" in config file!");
-                                c.getSource().sendFailure(new TextComponent(
+                                c.getSource().sendFailure(Component.literal(
                                     "Failed to set freeze_battle_combatants to \""
                                         + enabled
                                         + "\" in config file!"));
                             } else {
-                                TextComponent response = new TextComponent("Successfully set freeze_battle_combatants to: ");
-                                TextComponent subResponse = new TextComponent(String.valueOf(enabled));
+                                MutableComponent response = Component.literal("Successfully set freeze_battle_combatants to: ");
+                                MutableComponent subResponse = Component.literal(String.valueOf(enabled));
                                 subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(subResponse);
+                                response.getSiblings().add(subResponse);
                                 c.getSource().sendSuccess(response, true);
                             }
                             return 1;
                         })))
                 .then(Commands.literal("ignore_battle_types").executes(c -> {
-                        TextComponent response = new TextComponent("Use ");
-                        TextComponent subResponse = new TextComponent("/tbm-server-edit ignore_battle_types add/remove <category> ");
+                        MutableComponent response = Component.literal("Use ");
+                        MutableComponent subResponse = Component.literal("/tbm-server-edit ignore_battle_types add/remove <category> ");
                         subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.YELLOW));
-                        response.append(subResponse);
+                        response.getSiblings().add(subResponse);
 
-                        subResponse = new TextComponent("ignore_battle_types is currently: [");
-                        response.append(subResponse);
+                        subResponse = Component.literal("ignore_battle_types is currently: [");
+                        response.getSiblings().add(subResponse);
 
                         boolean isFirst = true;
                         for (String category : TurnBasedMinecraftMod.proxy.getConfig().getIgnoreBattleTypes()) {
                             if (!isFirst) {
-                                response.append(new TextComponent(", "));
+                                response.getSiblings().add(Component.literal(", "));
                             }
-                            subResponse = new TextComponent(category);
+                            subResponse = Component.literal(category);
                             subResponse.setStyle(subResponse.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(
@@ -1009,69 +1010,69 @@ public class TurnBasedMinecraftMod {
                                     "/tbm-server-edit ignore_battle_types remove " + category))
                                 .withHoverEvent(new HoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
-                                    new TextComponent("Click to remove category"))));
-                            response.append(subResponse);
+                                    Component.literal("Click to remove category"))));
+                            response.getSiblings().add(subResponse);
                             isFirst = false;
                         }
-                        response.append(new TextComponent("] "));
+                        response.getSiblings().add(Component.literal("] "));
                         c.getSource().sendSuccess(response, false);
                         return 1;
                     })
                     .then(Commands.literal("add").executes(c -> {
-                            c.getSource().sendFailure(new TextComponent("/tbm-server-edit ignore_battle_types add <category>"));
+                            c.getSource().sendFailure(Component.literal("/tbm-server-edit ignore_battle_types add <category>"));
                             return 1;
                         })
                         .then(Commands.argument("category", StringArgumentType.greedyString()).executes(c -> {
                             String category = StringArgumentType.getString(c, "category");
                             if (TurnBasedMinecraftMod.proxy.getConfig().addIgnoreBattleType(category)
                                 && TurnBasedMinecraftMod.proxy.getConfig().updateConfigAppendToStringArray("server_config.ignore_battle_types", category)) {
-                                TextComponent response = new TextComponent("Successfully appended category \"");
+                                MutableComponent response = Component.literal("Successfully appended category \"");
 
-                                TextComponent sub = new TextComponent(category);
+                                MutableComponent sub = Component.literal(category);
                                 sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(sub);
+                                response.getSiblings().add(sub);
 
-                                sub = new TextComponent("\" to ignore_battle_types");
-                                response.append(sub);
+                                sub = Component.literal("\" to ignore_battle_types");
+                                response.getSiblings().add(sub);
 
                                 c.getSource().sendSuccess(response, true);
                                 return 1;
                             }
 
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to append category \"" + category + "\" to ignore_battle_types"));
                             return 1;
                         })))
                     .then(Commands.literal("remove").executes(c -> {
-                            c.getSource().sendFailure(new TextComponent("/tbm-server-edit ignore_battle_types remove <category>"));
+                            c.getSource().sendFailure(Component.literal("/tbm-server-edit ignore_battle_types remove <category>"));
                             return 1;
                         })
                         .then(Commands.argument("category", StringArgumentType.greedyString()).executes(c -> {
                             String category = StringArgumentType.getString(c, "category");
                             if (TurnBasedMinecraftMod.proxy.getConfig().removeIgnoreBattleType(category)
                                 && TurnBasedMinecraftMod.proxy.getConfig().updateConfigRemoveFromStringArray("server_config.ignore_battle_types", category)) {
-                                TextComponent response = new TextComponent("Successfully removed category \"");
+                                MutableComponent response = Component.literal("Successfully removed category \"");
 
-                                TextComponent sub = new TextComponent(category);
+                                MutableComponent sub = Component.literal(category);
                                 sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN));
-                                response.append(sub);
+                                response.getSiblings().add(sub);
 
-                                sub = new TextComponent("\" from ignore_battle_types");
-                                response.append(sub);
+                                sub = Component.literal("\" from ignore_battle_types");
+                                response.getSiblings().add(sub);
 
                                 c.getSource().sendSuccess(response, true);
                                 return 1;
                             }
 
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to remove category \"" + category + "\" to ignore_battle_types"));
                             return 1;
                         }))))
                 .then(Commands.literal("player_speed").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit player_speed <0-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit player_speed <0-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1084,24 +1085,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_speed", speed)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.player_speed\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set player_speed to \""
                                     + speed
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set player_speed to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(speed));
+                            MutableComponent response = Component.literal("Successfully set player_speed to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(speed));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("player_haste_speed").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit player_haste_speed <0-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit player_haste_speed <0-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1114,24 +1115,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_haste_speed", haste_speed)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.player_haste_speed\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set player_haste_speed to \""
                                     + haste_speed
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set player_haste_speed to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(haste_speed));
+                            MutableComponent response = Component.literal("Successfully set player_haste_speed to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(haste_speed));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("player_slow_speed").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit player_slow_speed <0-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit player_slow_speed <0-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1144,24 +1145,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_slow_speed", slow_speed)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.player_slow_speed\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set player_slow_speed to \""
                                     + slow_speed
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set player_slow_speed to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(slow_speed));
+                            MutableComponent response = Component.literal("Successfully set player_slow_speed to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(slow_speed));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("player_attack_probability").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit player_attack_probability <1-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit player_attack_probability <1-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1174,24 +1175,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_attack_probability", probability)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.player_attack_probability\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set player_attack_probability to \""
                                     + probability
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set player_attack_probability to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(probability));
+                            MutableComponent response = Component.literal("Successfully set player_attack_probability to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(probability));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("player_evasion").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit player_evasion <0-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit player_evasion <0-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1204,24 +1205,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_evasion", evasion)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.player_evasion\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set player_evasion to \""
                                     + evasion
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set player_evasion to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(evasion));
+                            MutableComponent response = Component.literal("Successfully set player_evasion to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(evasion));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("defense_duration").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit defense_duration <0-5>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit defense_duration <0-5>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1234,24 +1235,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.defense_duration", defends)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.defense_duration\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set defense_druation to \""
                                     + defends
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set defense_duration to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(defends));
+                            MutableComponent response = Component.literal("Successfully set defense_duration to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(defends));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("flee_good_probability").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit flee_good_probability <1-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit flee_good_probability <1-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1264,24 +1265,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.flee_good_probability", probability)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.flee_good_probability\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set flee_good_probability to \""
                                     + probability
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set flee_good_probability to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(probability));
+                            MutableComponent response = Component.literal("Successfully set flee_good_probability to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(probability));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("flee_bad_probability").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit flee_bad_probability <1-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit flee_bad_probability <1-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1294,24 +1295,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.flee_bad_probability", probability)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.flee_bad_probability\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set flee_bad_probability to \""
                                     + probability
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set flee_bad_probability to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(probability));
+                            MutableComponent response = Component.literal("Successfully set flee_bad_probability to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(probability));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("minimum_hit_percentage").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit minimum_hit_percentage <1-100>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit minimum_hit_percentage <1-100>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1324,24 +1325,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.minimum_hit_percentage", percentage)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.minimum_hit_percentage\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set minimum_hit_percentage to \""
                                     + percentage
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set minimum_hit_percentage to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(percentage));
+                            MutableComponent response = Component.literal("Successfully set minimum_hit_percentage to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(percentage));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("battle_turn_wait_forever").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit battle_turn_wait_forever <true/false>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit battle_turn_wait_forever <true/false>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1353,21 +1354,21 @@ public class TurnBasedMinecraftMod {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.battle_turn_wait_forever\" in config file!"
                             );
-                            c.getSource().sendFailure(new TextComponent("Failed to set battle_turn_wait_forever to \"" + (enabled ? "true" : "false") + "\" in config file!"));
+                            c.getSource().sendFailure(Component.literal("Failed to set battle_turn_wait_forever to \"" + (enabled ? "true" : "false") + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set battle_turn_wait_forever to: ");
-                            TextComponent subResponse = new TextComponent((enabled ? "true" : "false"));
+                            MutableComponent response = Component.literal("Successfully set battle_turn_wait_forever to: ");
+                            MutableComponent subResponse = Component.literal((enabled ? "true" : "false"));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("battle_turn_time_seconds").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit battle_turn_time_seconds <5-60>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit battle_turn_time_seconds <5-60>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1380,24 +1381,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.battle_turn_time_seconds", seconds)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.battle_turn_time_seconds\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set battle_turn_time_seconds to \""
                                     + seconds
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set battle_turn_time_seconds to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(seconds));
+                            MutableComponent response = Component.literal("Successfully set battle_turn_time_seconds to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(seconds));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("creeper_explode_turn").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit creeper_explode_turn <1-10>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit creeper_explode_turn <1-10>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1410,24 +1411,24 @@ public class TurnBasedMinecraftMod {
                         if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.creeper_explode_turn", turns)) {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.creeper_explode_turn\" in config file!");
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set creeper_explode_turn to \""
                                     + turns
                                     + "\" in config file!"));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set creeper_explode_turn to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(turns));
+                            MutableComponent response = Component.literal("Successfully set creeper_explode_turn to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(turns));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("creeper_stop_explode_on_leave_battle").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit creeper_stop_explode_on_leave_battle <true/false>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit creeper_stop_explode_on_leave_battle <true/false>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1439,25 +1440,25 @@ public class TurnBasedMinecraftMod {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.creeper_stop_explode_on_leave_battle\" in config file!"
                             );
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set creeper_stop_explode_on_leave_battle to \""
                                     + stop_explode_on_leave
                                     + "\" in config file!"
                             ));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set creeper_stop_explode_on_leave_battle to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(stop_explode_on_leave));
+                            MutableComponent response = Component.literal("Successfully set creeper_stop_explode_on_leave_battle to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(stop_explode_on_leave));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;
                     })))
                 .then(Commands.literal("creeper_always_allow_damage").executes(c -> {
-                        TextComponent parent = new TextComponent("Use ");
-                        TextComponent sub = new TextComponent("/tbm-server-edit creeper_always_allow_damage <true/false>");
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit creeper_always_allow_damage <true/false>");
                         sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
 
                         c.getSource().sendSuccess(parent, false);
                         return 1;
@@ -1469,16 +1470,16 @@ public class TurnBasedMinecraftMod {
                             TurnBasedMinecraftMod.logger.warn(
                                 "Failed to set \"server_config.creeper_always_allow_damage\" in config file!"
                             );
-                            c.getSource().sendFailure(new TextComponent(
+                            c.getSource().sendFailure(Component.literal(
                                 "Failed to set creeper_always_allow_damage to \""
                                     + allow_damage
                                     + "\" in config file!"
                             ));
                         } else {
-                            TextComponent response = new TextComponent("Successfully set creeper_always_allow_damage to: ");
-                            TextComponent subResponse = new TextComponent(String.valueOf(allow_damage));
+                            MutableComponent response = Component.literal("Successfully set creeper_always_allow_damage to: ");
+                            MutableComponent subResponse = Component.literal(String.valueOf(allow_damage));
                             subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.GREEN));
-                            response.append(subResponse);
+                            response.getSiblings().add(subResponse);
                             c.getSource().sendSuccess(response, true);
                         }
                         return 1;

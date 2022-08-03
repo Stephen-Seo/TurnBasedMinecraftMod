@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import com.burnedkirby.TurnBasedMinecraft.common.Battle;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

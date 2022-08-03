@@ -147,30 +147,30 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void displayString(String message) {
-        Component parentComponent = new TextComponent("");
+        MutableComponent parentComponent = Component.empty();
 
-        TextComponent prefix = new TextComponent("TBM: ");
-        prefix.withStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
-        TextComponent text = new TextComponent(message);
-        text.withStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
+        MutableComponent prefix = Component.literal("TBM: ");
+        prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
+        MutableComponent text = Component.literal(message);
+        text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
         parentComponent.getSiblings().add(prefix);
         parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendMessage(parentComponent, new UUID(0, 0));
+        Minecraft.getInstance().player.sendSystemMessage(parentComponent);
     }
 
     @Override
     public void displayComponent(Component text) {
-        Component parentComponent = new TextComponent("");
+        MutableComponent parentComponent = Component.empty();
 
-        TextComponent prefix = new TextComponent("TBM: ");
-        prefix.withStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
+        MutableComponent prefix = Component.literal("TBM: ");
+        prefix.setStyle(prefix.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withBold(true));
 
         parentComponent.getSiblings().add(prefix);
         parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendMessage(parentComponent, new UUID(0, 0));
+        Minecraft.getInstance().player.sendSystemMessage(parentComponent);
     }
 
     private void checkBattleTypes(boolean entityLeft) {
@@ -229,7 +229,7 @@ public class ClientProxy extends CommonProxy {
         if (msg.getClass() == PacketBattleMessage.class) {
             PacketBattleMessage pkt = (PacketBattleMessage) msg;
             Entity fromEntity = getEntity(pkt.getEntityIDFrom(), pkt.getDimension());
-            Component from = new TextComponent("Unknown");
+            Component from = Component.literal("Unknown");
             if (fromEntity != null) {
                 from = fromEntity.getDisplayName();
             } else if (TurnBasedMinecraftMod.proxy.getLocalBattle() != null) {
@@ -239,7 +239,7 @@ public class ClientProxy extends CommonProxy {
                 }
             }
             Entity toEntity = TurnBasedMinecraftMod.proxy.getEntity(pkt.getEntityIDTo(), pkt.getDimension());
-            Component to = new TextComponent("Unknown");
+            Component to = Component.literal("Unknown");
             if (toEntity != null) {
                 to = toEntity.getDisplayName();
             } else if (TurnBasedMinecraftMod.proxy.getLocalBattle() != null) {
@@ -249,11 +249,11 @@ public class ClientProxy extends CommonProxy {
                 }
             }
 
-            Component parentComponent = new TextComponent("");
+            MutableComponent parentComponent = Component.empty();
             switch (pkt.getMessageType()) {
                 case ENTERED:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" entered battle!"));
+                    parentComponent.getSiblings().add(Component.literal(" entered battle!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null || TurnBasedMinecraftMod.proxy.getLocalBattle().getId() != pkt.getAmount()) {
                         TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.getAmount());
@@ -264,18 +264,18 @@ public class ClientProxy extends CommonProxy {
                 case FLEE:
                     if (pkt.getAmount() != 0) {
                         parentComponent.getSiblings().add(from);
-                        parentComponent.getSiblings().add(new TextComponent(" fled battle!"));
+                        parentComponent.getSiblings().add(Component.literal(" fled battle!"));
                         TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                         TurnBasedMinecraftMod.proxy.typeLeftBattle(pkt.getCustom());
                     } else {
                         parentComponent.getSiblings().add(from);
-                        parentComponent.getSiblings().add(new TextComponent(" tried to flee battle but failed!"));
+                        parentComponent.getSiblings().add(Component.literal(" tried to flee battle but failed!"));
                         TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     }
                     break;
                 case DIED:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" died in battle!"));
+                    parentComponent.getSiblings().add(Component.literal(" died in battle!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     TurnBasedMinecraftMod.proxy.typeLeftBattle(pkt.getCustom());
                     break;
@@ -285,74 +285,74 @@ public class ClientProxy extends CommonProxy {
                     break;
                 case ATTACK:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" attacked "));
+                    parentComponent.getSiblings().add(Component.literal(" attacked "));
                     parentComponent.getSiblings().add(to);
-                    parentComponent.getSiblings().add(new TextComponent(" and dealt "));
-                    parentComponent.getSiblings().add(new TextComponent(Integer.valueOf(pkt.getAmount()).toString()));
-                    parentComponent.getSiblings().add(new TextComponent(" damage!"));
+                    parentComponent.getSiblings().add(Component.literal(" and dealt "));
+                    parentComponent.getSiblings().add(Component.literal(Integer.valueOf(pkt.getAmount()).toString()));
+                    parentComponent.getSiblings().add(Component.literal(" damage!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DEFEND:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" blocked "));
+                    parentComponent.getSiblings().add(Component.literal(" blocked "));
                     parentComponent.getSiblings().add(to);
-                    parentComponent.getSiblings().add(new TextComponent("'s attack!"));
+                    parentComponent.getSiblings().add(Component.literal("'s attack!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DEFENSE_DAMAGE:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" retaliated from "));
+                    parentComponent.getSiblings().add(Component.literal(" retaliated from "));
                     parentComponent.getSiblings().add(to);
-                    parentComponent.getSiblings().add(new TextComponent("'s attack and dealt "));
-                    parentComponent.getSiblings().add(new TextComponent(Integer.valueOf(pkt.getAmount()).toString()));
-                    parentComponent.getSiblings().add(new TextComponent(" damage!"));
+                    parentComponent.getSiblings().add(Component.literal("'s attack and dealt "));
+                    parentComponent.getSiblings().add(Component.literal(Integer.valueOf(pkt.getAmount()).toString()));
+                    parentComponent.getSiblings().add(Component.literal(" damage!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case MISS:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" attacked "));
+                    parentComponent.getSiblings().add(Component.literal(" attacked "));
                     parentComponent.getSiblings().add(to);
-                    parentComponent.getSiblings().add(new TextComponent(" but missed!"));
+                    parentComponent.getSiblings().add(Component.literal(" but missed!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DEFENDING:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" is defending!"));
+                    parentComponent.getSiblings().add(Component.literal(" is defending!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case DID_NOTHING:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" did nothing!"));
+                    parentComponent.getSiblings().add(Component.literal(" did nothing!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case USED_ITEM:
                     parentComponent.getSiblings().add(from);
                     switch (PacketBattleMessage.UsedItemAction.valueOf(pkt.getAmount())) {
                         case USED_NOTHING:
-                            parentComponent.getSiblings().add(new TextComponent(" tried to use nothing!"));
+                            parentComponent.getSiblings().add(Component.literal(" tried to use nothing!"));
                             TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             break;
                         case USED_INVALID:
                             if (pkt.getCustom().length() > 0) {
-                                parentComponent.getSiblings().add(new TextComponent(" tried to consume "));
-                                parentComponent.getSiblings().add(new TextComponent(pkt.getCustom()));
-                                parentComponent.getSiblings().add(new TextComponent(" and failed!"));
+                                parentComponent.getSiblings().add(Component.literal(" tried to consume "));
+                                parentComponent.getSiblings().add(Component.literal(pkt.getCustom()));
+                                parentComponent.getSiblings().add(Component.literal(" and failed!"));
                                 TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             } else {
-                                parentComponent.getSiblings().add(new TextComponent(" tried to consume an invalid item and failed!"));
+                                parentComponent.getSiblings().add(Component.literal(" tried to consume an invalid item and failed!"));
                                 TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             }
                             break;
                         case USED_FOOD:
-                            parentComponent.getSiblings().add(new TextComponent(" ate a "));
-                            parentComponent.getSiblings().add(new TextComponent(pkt.getCustom()));
-                            parentComponent.getSiblings().add(new TextComponent("!"));
+                            parentComponent.getSiblings().add(Component.literal(" ate a "));
+                            parentComponent.getSiblings().add(Component.literal(pkt.getCustom()));
+                            parentComponent.getSiblings().add(Component.literal("!"));
                             TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             break;
                         case USED_POTION:
-                            parentComponent.getSiblings().add(new TextComponent(" drank a "));
-                            parentComponent.getSiblings().add(new TextComponent(pkt.getCustom()));
-                            parentComponent.getSiblings().add(new TextComponent("!"));
+                            parentComponent.getSiblings().add(Component.literal(" drank a "));
+                            parentComponent.getSiblings().add(Component.literal(pkt.getCustom()));
+                            parentComponent.getSiblings().add(Component.literal("!"));
                             TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             break;
                     }
@@ -374,48 +374,48 @@ public class ClientProxy extends CommonProxy {
                 case SWITCHED_ITEM:
                     if (pkt.getAmount() != 0) {
                         parentComponent.getSiblings().add(from);
-                        parentComponent.getSiblings().add(new TextComponent(" switched to a different item!"));
+                        parentComponent.getSiblings().add(Component.literal(" switched to a different item!"));
                         TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     } else {
                         parentComponent.getSiblings().add(from);
-                        parentComponent.getSiblings().add(new TextComponent(" switched to a different item but failed because it was invalid!"));
+                        parentComponent.getSiblings().add(Component.literal(" switched to a different item but failed because it was invalid!"));
                         TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     }
                     break;
                 case WAS_AFFECTED:
                     parentComponent.getSiblings().add(to);
-                    parentComponent.getSiblings().add(new TextComponent(" was " + pkt.getCustom() + " by "));
+                    parentComponent.getSiblings().add(Component.literal(" was " + pkt.getCustom() + " by "));
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent("!"));
+                    parentComponent.getSiblings().add(Component.literal("!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case BECAME_CREATIVE:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" entered creative mode and left battle!"));
+                    parentComponent.getSiblings().add(Component.literal(" entered creative mode and left battle!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case FIRED_ARROW:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" let loose an arrow towards "));
+                    parentComponent.getSiblings().add(Component.literal(" let loose an arrow towards "));
                     parentComponent.getSiblings().add(to);
-                    parentComponent.getSiblings().add(new TextComponent("!"));
+                    parentComponent.getSiblings().add(Component.literal("!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case ARROW_HIT:
                     parentComponent.getSiblings().add(to);
-                    parentComponent.getSiblings().add(new TextComponent(" was hit by "));
+                    parentComponent.getSiblings().add(Component.literal(" was hit by "));
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent("'s arrow!"));
+                    parentComponent.getSiblings().add(Component.literal("'s arrow!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case BOW_NO_AMMO:
                     parentComponent.getSiblings().add(from);
-                    parentComponent.getSiblings().add(new TextComponent(" tried to use their bow but ran out of ammo!"));
+                    parentComponent.getSiblings().add(Component.literal(" tried to use their bow but ran out of ammo!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 case CREEPER_WAIT: {
                     parentComponent.getSiblings().add(from);
-                    TextComponent message = new TextComponent(" is charging up!");
+                    MutableComponent message = Component.literal(" is charging up!");
                     message.setStyle(message.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)));
                     parentComponent.getSiblings().add(message);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
@@ -423,7 +423,7 @@ public class ClientProxy extends CommonProxy {
                 break;
                 case CREEPER_WAIT_FINAL: {
                     parentComponent.getSiblings().add(from);
-                    TextComponent message = new TextComponent(" is about to explode!");
+                    MutableComponent message = Component.literal(" is about to explode!");
                     message.setStyle(message.getStyle().withColor(TextColor.fromRgb(0xFFFF5050)));
                     parentComponent.getSiblings().add(message);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
@@ -431,7 +431,7 @@ public class ClientProxy extends CommonProxy {
                 break;
                 case CREEPER_EXPLODE: {
                     parentComponent.getSiblings().add(from);
-                    TextComponent message = new TextComponent(" exploded!");
+                    MutableComponent message = Component.literal(" exploded!");
                     message.setStyle(message.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
                     parentComponent.getSiblings().add(message);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
@@ -443,13 +443,13 @@ public class ClientProxy extends CommonProxy {
             displayString(pkt.getMessage());
         } else if (msg.getClass() == PacketEditingMessage.class) {
             PacketEditingMessage pkt = (PacketEditingMessage) msg;
-            Component parentComponent = new TextComponent("");
+            MutableComponent parentComponent = Component.empty();
             switch (pkt.getType()) {
                 case ATTACK_ENTITY: {
-                    TextComponent text = new TextComponent("Attack the entity you want to edit for TurnBasedMinecraftMod. ");
+                    MutableComponent text = Component.literal("Attack the entity you want to edit for TurnBasedMinecraftMod. ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
-                    TextComponent cancel = new TextComponent("Cancel");
+                    MutableComponent cancel = Component.literal("Cancel");
                     cancel.setStyle(cancel.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit cancel")));
 
                     parentComponent.getSiblings().add(text);
@@ -458,128 +458,128 @@ public class ClientProxy extends CommonProxy {
                     break;
                 }
                 case PICK_EDIT: {
-                    TextComponent text = new TextComponent("Edit what value? ");
+                    MutableComponent text = Component.literal("Edit what value? ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
-                    TextComponent option = new TextComponent("IgB");
+                    MutableComponent option = Component.literal("IgB");
                     // HoverEvent.Action.SHOW_TEXT is probably SHOW_TEXT
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("IgnoreBattle"))));
-                    TextComponent value = new TextComponent("(" + pkt.getEntityInfo().ignoreBattle + ") ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("IgnoreBattle"))));
+                    MutableComponent value = Component.literal("(" + pkt.getEntityInfo().ignoreBattle + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("AP");
+                    option = Component.literal("AP");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackPower"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("AttackPower"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().attackPower + ") ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackPower"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().attackPower + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("APr");
+                    option = Component.literal("APr");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackProbability"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("AttackProbability"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().attackProbability + "%) ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackProbability"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().attackProbability + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("AV");
+                    option = Component.literal("AV");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackVariance"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("AttackVariance"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().attackVariance + ") ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackVariance"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().attackVariance + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("AE");
+                    option = Component.literal("AE");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("AttackEffect"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().attackEffect.toString() + ") ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffect"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().attackEffect.toString() + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("AEPr");
+                    option = Component.literal("AEPr");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("AttackEffectProbability"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().attackEffectProbability + "%) ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffectProbability"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().attackEffectProbability + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("DD");
+                    option = Component.literal("DD");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamage"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("DefenseDamage"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().defenseDamage + ") ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamage"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().defenseDamage + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("DDPr");
+                    option = Component.literal("DDPr");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamageProbability"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("DefenseDamageProbability"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().defenseDamageProbability + "%) ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamageProbability"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().defenseDamageProbability + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("E");
+                    option = Component.literal("E");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit evasion"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("Evasion"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().evasion + "%) ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Evasion"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().evasion + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("S");
+                    option = Component.literal("S");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit speed"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("Speed"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().speed + ") ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Speed"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().speed + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("C");
+                    option = Component.literal("C");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("Category"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().category + ") ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Category"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().category + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("DecA");
+                    option = Component.literal("DecA");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionAttack"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("DecisionAttack"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().decisionAttack + "%) ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionAttack"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().decisionAttack + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("DecD");
+                    option = Component.literal("DecD");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionDefend"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("DecisionDefend"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().decisionDefend + "%) ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionDefend"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().decisionDefend + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("DecF");
+                    option = Component.literal("DecF");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionFlee"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("DecisionFlee"))));
-                    value = new TextComponent("(" + pkt.getEntityInfo().decisionFlee + "%) ");
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionFlee"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().decisionFlee + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = new TextComponent("Finished Editing");
+                    option = Component.literal("Finished Editing");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit finish")));
                     text.getSiblings().add(option);
-                    text.getSiblings().add(new TextComponent(" "));
+                    text.getSiblings().add(Component.literal(" "));
 
-                    option = new TextComponent("Cancel");
+                    option = Component.literal("Cancel");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit cancel")));
                     text.getSiblings().add(option);
 
@@ -588,156 +588,148 @@ public class ClientProxy extends CommonProxy {
                     break;
                 }
                 case SERVER_EDIT: {
-                    TextComponent parent = new TextComponent("Edit what server value? ");
+                    MutableComponent parent = Component.literal("Edit what server value? ");
                     parent.setStyle(parent.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
-                    TextComponent sub = new TextComponent("leave_battle_cooldown ");
+                    MutableComponent sub = Component.literal("leave_battle_cooldown ");
                     sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 1; i <= 10; ++i) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
-                        sub.setStyle(
-                            sub.getStyle()
-                                .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(
-                                    ClickEvent.Action.RUN_COMMAND,
-                                    "/tbm-server-edit leave_battle_cooldown " + i)));
-                        parent.append(sub);
+                        sub = Component.literal(String.valueOf(i) + ' ');
+                        sub.setStyle(sub.getStyle()
+                            .withColor(ChatFormatting.GREEN)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit leave_battle_cooldown " + i)));
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("aggro_start_battle_max_distance ");
+                    sub = Component.literal("aggro_start_battle_max_distance ");
                     sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("5 ");
-                    sub.setStyle(
-                        sub.getStyle()
-                            .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/tbm-server-edit aggro_start_battle_max_distance 5")));
-                    parent.append(sub);
+                    sub = Component.literal("5 ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit aggro_start_battle_max_distance 5")));
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("8 ");
-                    sub.setStyle(
-                        sub.getStyle()
-                            .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/tbm-server-edit aggro_start_battle_max_distance 8")));
-                    parent.append(sub);
+                    sub = Component.literal("8 ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit aggro_start_battle_max_distance 8")));
+                    parent.getSiblings().add(sub);
 
                     for (int i = 10; i <= 50; i += 5) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
-                        sub.setStyle(
-                            sub.getStyle()
-                                .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(
-                                    ClickEvent.Action.RUN_COMMAND,
-                                    "/tbm-server-edit aggro_start_battle_max_distance " + String.valueOf(i))));
-                        parent.append(sub);
+                        sub = Component.literal(String.valueOf(i) + ' ');
+                        sub.setStyle(sub.getStyle()
+                            .withColor(ChatFormatting.GREEN)
+                            .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/tbm-server-edit aggro_start_battle_max_distance " + String.valueOf(i))));
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("old_battle_behavior ");
+                    sub = Component.literal("old_battle_behavior ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("If enabled, battles only start on a hit, not including mobs targeting players")))
+                            Component.literal("If enabled, battles only start on a hit, not including mobs targeting players")))
                         .withBold(true));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("true ");
-                    sub.setStyle(
-                        sub.getStyle()
-                            .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/tbm-server-edit old_battle_behavior true")));
-                    parent.append(sub);
+                    sub = Component.literal("true ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit old_battle_behavior true")));
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("false ");
-                    sub.setStyle(
-                        sub.getStyle()
-                            .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/tbm-server-edit old_battle_behavior false")));
-                    parent.append(sub);
+                    sub = Component.literal("false ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit old_battle_behavior false")));
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("anyone_can_disable_tbm_for_self ");
+                    sub = Component.literal("anyone_can_disable_tbm_for_self ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Allows use for /tbm-disable and /tbm-enable for all")))
+                            Component.literal("Allows use for /tbm-disable and /tbm-enable for all")))
                         .withBold(true));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("true ");
-                    sub.setStyle(
-                        sub.getStyle()
-                            .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/tbm-server-edit anyone_can_disable_tbm_for_self true")));
-                    parent.append(sub);
+                    sub = Component.literal("true ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit anyone_can_disable_tbm_for_self true")));
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("false ");
-                    sub.setStyle(
-                        sub.getStyle()
-                            .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/tbm-server-edit anyone_can_disable_tbm_for_self false")));
-                    parent.append(sub);
+                    sub = Component.literal("false ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit anyone_can_disable_tbm_for_self false")));
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("max_in_battle ");
+                    sub = Component.literal("max_in_battle ");
                     sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("2 ");
+                    sub = Component.literal("2 ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit max_in_battle 2")));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 5; i < 30; i += 5) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit max_in_battle " + String.valueOf(i))));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("freeze_battle_combatants ");
+                    sub = Component.literal("freeze_battle_combatants ");
                     sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW).withBold(true));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("true ");
+                    sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit freeze_battle_combatants true"
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("false ");
+                    sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(
                             ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit freeze_battle_combatants false"
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("ignore_battle_types ");
+                    sub = Component.literal("ignore_battle_types ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.DARK_GREEN)
                         .withClickEvent(new ClickEvent(
@@ -745,333 +737,333 @@ public class ClientProxy extends CommonProxy {
                             "/tbm-server-edit ignore_battle_types"))
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Click to show current ignored categories, or use /tbm-server-edit ignore_battle_types add/remove <category_name>")
+                            Component.literal("Click to show current ignored categories, or use /tbm-server-edit ignore_battle_types add/remove <category_name>")
                         ))
                         .withBold(true));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("player_speed ");
+                    sub = Component.literal("player_speed ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Player default speed"))));
-                    parent.append(sub);
+                            Component.literal("Player default speed"))));
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit player_speed " + i)));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("player_haste_speed ");
+                    sub = Component.literal("player_haste_speed ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Player speed when under the effects of \"Speed\"")
+                            Component.literal("Player speed when under the effects of \"Speed\"")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit player_haste_speed " + i)));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("player_slow_speed ");
+                    sub = Component.literal("player_slow_speed ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Player speed when under the effects of \"Slow\"")
+                            Component.literal("Player speed when under the effects of \"Slow\"")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit player_slow_speed " + i)));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("player_attack_probability ");
+                    sub = Component.literal("player_attack_probability ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Base Player attack probability in percentage")
+                            Component.literal("Base Player attack probability in percentage")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
                         if (i == 0) {
-                            sub = new TextComponent("1 ");
+                            sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit player_attack_probability 1")));
                         } else {
-                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit player_attack_probability " + i)));
                         }
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("player_evasion ");
+                    sub = Component.literal("player_evasion ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Base Player evasion rate in percentage")
+                            Component.literal("Base Player evasion rate in percentage")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit player_evasion " + i)));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("defense_duration ");
+                    sub = Component.literal("defense_duration ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Number of attacks that a \"Defend\" move blocks (lasts until next action)")
+                            Component.literal("Number of attacks that a \"Defend\" move blocks (lasts until next action)")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 5; ++i) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit defense_duration " + i)));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("flee_good_probability ");
+                    sub = Component.literal("flee_good_probability ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Probability of flee success when Player's speed is higher than the fastest opposing Entity")
+                            Component.literal("Probability of flee success when Player's speed is higher than the fastest opposing Entity")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
                         if (i == 0) {
-                            sub = new TextComponent("1 ");
+                            sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit flee_good_probability 1")));
                         } else {
-                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit flee_good_probability " + i)));
                         }
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("flee_bad_probability ");
+                    sub = Component.literal("flee_bad_probability ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Probability of flee success when Player's speed is lower than the fastest opposing Entity")
+                            Component.literal("Probability of flee success when Player's speed is lower than the fastest opposing Entity")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
                         if (i == 0) {
-                            sub = new TextComponent("1 ");
+                            sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit flee_bad_probability 1")));
                         } else {
-                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit flee_bad_probability " + i)));
                         }
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("minimum_hit_percentage ");
+                    sub = Component.literal("minimum_hit_percentage ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("The minimum percentage possible when calculating hit percentage for any attacker")
+                            Component.literal("The minimum percentage possible when calculating hit percentage for any attacker")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 0; i <= 100; i += 5) {
                         if (i == 0) {
-                            sub = new TextComponent("1 ");
+                            sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit minimum_hit_percentage 1")));
                         } else {
-                            sub = new TextComponent(String.valueOf(i) + ' ');
+                            sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     "/tbm-server-edit minimum_hit_percentage " + i)));
                         }
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("battle_turn_wait_forever ");
+                    sub = Component.literal("battle_turn_wait_forever ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Disables the turn timer (recommended to leave this to false)"))
+                            Component.literal("Disables the turn timer (recommended to leave this to false)"))
                         ));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("true ");
+                    sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                         "/tbm-server-edit battle_turn_wait_forever true")));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("false ");
+                    sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                         "/tbm-server-edit battle_turn_wait_forever false")));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("battle_turn_time_seconds ");
+                    sub = Component.literal("battle_turn_time_seconds ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("The time in seconds to wait for all Players to choose their move")
+                            Component.literal("The time in seconds to wait for all Players to choose their move")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 5; i <= 60; i += 5) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit battle_turn_time_seconds " + i)));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("creeper_explode_turn ");
+                    sub = Component.literal("creeper_explode_turn ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("The number of turns it takes for a creeper to explode")
+                            Component.literal("The number of turns it takes for a creeper to explode")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     for (int i = 1; i <= 10; ++i) {
-                        sub = new TextComponent(String.valueOf(i) + ' ');
+                        sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                 "/tbm-server-edit creeper_explode_turn " + i)));
-                        parent.append(sub);
+                        parent.getSiblings().add(sub);
                     }
 
-                    sub = new TextComponent("creeper_stop_explode_on_leave_battle ");
+                    sub = Component.literal("creeper_stop_explode_on_leave_battle ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Stops creepers from exploding when they leave battle (during leave battle cooldown)")
+                            Component.literal("Stops creepers from exploding when they leave battle (during leave battle cooldown)")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("true ");
+                    sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit creeper_stop_explode_on_leave_battle true")));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("false ");
+                    sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit creeper_stop_explode_on_leave_battle false")));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("creeper_always_allow_damage ");
+                    sub = Component.literal("creeper_always_allow_damage ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
                         .withHoverEvent(new HoverEvent(
                             HoverEvent.Action.SHOW_TEXT,
-                            new TextComponent("Allows creepers to damage anyone who just left battle (in cooldown)")
+                            Component.literal("Allows creepers to damage anyone who just left battle (in cooldown)")
                         )));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("true ");
+                    sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit creeper_always_allow_damage true")));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
-                    sub = new TextComponent("false ");
+                    sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit creeper_always_allow_damage false")));
-                    parent.append(sub);
+                    parent.getSiblings().add(sub);
 
                     TurnBasedMinecraftMod.proxy.displayComponent(parent);
                     break;
                 }
                 case EDIT_IGNORE_BATTLE: {
-                    TextComponent text = new TextComponent("ignoreBattle: ");
+                    MutableComponent text = Component.literal("ignoreBattle: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
-                    TextComponent option = new TextComponent("true");
+                    MutableComponent option = Component.literal("true");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle true")));
                     text.getSiblings().add(option);
 
-                    text.getSiblings().add(new TextComponent(" "));
+                    text.getSiblings().add(Component.literal(" "));
 
-                    option = new TextComponent("false");
+                    option = Component.literal("false");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle false")));
                     text.getSiblings().add(option);
 
@@ -1080,73 +1072,73 @@ public class ClientProxy extends CommonProxy {
                     break;
                 }
                 case EDIT_ATTACK_POWER: {
-                    TextComponent text = new TextComponent("attackPower: ");
+                    MutableComponent text = Component.literal("attackPower: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 15; ++i) {
-                        TextComponent option = new TextComponent(Integer.toString(i));
+                        MutableComponent option = Component.literal(Integer.toString(i));
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackPower " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 15) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackPower <integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit attackPower <integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_PROBABILITY: {
-                    TextComponent text = new TextComponent("attackProbability: ");
+                    MutableComponent text = Component.literal("attackProbability: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 10; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i) + "%");
+                        MutableComponent option = Component.literal(Integer.toString(i) + "%");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackProbability " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackProbability <percentage-integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit attackProbability <percentage-integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_VARIANCE: {
-                    TextComponent text = new TextComponent("attackVariance: ");
+                    MutableComponent text = Component.literal("attackVariance: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 10; ++i) {
-                        TextComponent option = new TextComponent(Integer.toString(i));
+                        MutableComponent option = Component.literal(Integer.toString(i));
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackVariance " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 10) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackVariance <integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit attackVariance <integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_ATTACK_EFFECT: {
-                    TextComponent text = new TextComponent("attackEffect: ");
+                    MutableComponent text = Component.literal("attackEffect: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (EntityInfo.Effect e : EntityInfo.Effect.values()) {
-                        TextComponent option = new TextComponent(e.toString());
+                        MutableComponent option = Component.literal(e.toString());
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect " + e.toString())));
                         text.getSiblings().add(option);
                         if (e != EntityInfo.Effect.UNKNOWN) {
                             // TODO find a better way to handle printing comma for items before last
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
@@ -1155,229 +1147,229 @@ public class ClientProxy extends CommonProxy {
                     break;
                 }
                 case EDIT_ATTACK_EFFECT_PROBABILITY: {
-                    TextComponent text = new TextComponent("attackEffectProbability: ");
+                    MutableComponent text = Component.literal("attackEffectProbability: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i) + "%");
+                        MutableComponent option = Component.literal(Integer.toString(i) + "%");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit attackEffectProbability <percentage-integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit attackEffectProbability <percentage-integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DEFENSE_DAMAGE: {
-                    TextComponent text = new TextComponent("defenseDamage: ");
+                    MutableComponent text = Component.literal("defenseDamage: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 15; ++i) {
-                        TextComponent option = new TextComponent(Integer.toString(i));
+                        MutableComponent option = Component.literal(Integer.toString(i));
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamage " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 15) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit defenseDamage <integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit defenseDamage <integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DEFENSE_DAMAGE_PROBABILITY: {
-                    TextComponent text = new TextComponent("defenseDamageProbability: ");
+                    MutableComponent text = Component.literal("defenseDamageProbability: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i) + "%");
+                        MutableComponent option = Component.literal(Integer.toString(i) + "%");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamageProbability " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit defenseDamageProbability <percentage-integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit defenseDamageProbability <percentage-integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_EVASION: {
-                    TextComponent text = new TextComponent("evasion: ");
+                    MutableComponent text = Component.literal("evasion: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i) + "%");
+                        MutableComponent option = Component.literal(Integer.toString(i) + "%");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit evasion " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit evasion <percentage-integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit evasion <percentage-integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_SPEED: {
-                    TextComponent text = new TextComponent("speed: ");
+                    MutableComponent text = Component.literal("speed: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i));
+                        MutableComponent option = Component.literal(Integer.toString(i));
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit speed " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit speed <integer>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit speed <integer>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_CATEGORY: {
-                    TextComponent text = new TextComponent("category: ");
+                    MutableComponent text = Component.literal("category: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
-                    TextComponent option = new TextComponent("monster");
+                    MutableComponent option = Component.literal("monster");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category monster")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("monster")) {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("disabled");
+                        MutableComponent optionInfoBool = Component.literal("disabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     } else {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("enabled");
+                        MutableComponent optionInfoBool = Component.literal("enabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     }
                     text.getSiblings().add(option);
-                    text.getSiblings().add(new TextComponent(", "));
+                    text.getSiblings().add(Component.literal(", "));
 
-                    option = new TextComponent("animal");
+                    option = Component.literal("animal");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category animal")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("animal")) {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("disabled");
+                        MutableComponent optionInfoBool = Component.literal("disabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     } else {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("enabled");
+                        MutableComponent optionInfoBool = Component.literal("enabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     }
                     text.getSiblings().add(option);
-                    text.getSiblings().add(new TextComponent(", "));
+                    text.getSiblings().add(Component.literal(", "));
 
-                    option = new TextComponent("passive");
+                    option = Component.literal("passive");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category passive")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("passive")) {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("disabled");
+                        MutableComponent optionInfoBool = Component.literal("disabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     } else {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("enabled");
+                        MutableComponent optionInfoBool = Component.literal("enabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     }
                     text.getSiblings().add(option);
-                    text.getSiblings().add(new TextComponent(", "));
+                    text.getSiblings().add(Component.literal(", "));
 
-                    option = new TextComponent("boss");
+                    option = Component.literal("boss");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category boss")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("boss")) {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("disabled");
+                        MutableComponent optionInfoBool = Component.literal("disabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     } else {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("enabled");
+                        MutableComponent optionInfoBool = Component.literal("enabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     }
                     text.getSiblings().add(option);
-                    text.getSiblings().add(new TextComponent(", "));
+                    text.getSiblings().add(Component.literal(", "));
 
-                    option = new TextComponent("player");
+                    option = Component.literal("player");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category player")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("player")) {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("disabled");
+                        MutableComponent optionInfoBool = Component.literal("disabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     } else {
-                        TextComponent optionInfo = new TextComponent("(battle-");
+                        MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        TextComponent optionInfoBool = new TextComponent("enabled");
+                        MutableComponent optionInfoBool = Component.literal("enabled");
                         optionInfoBool.setStyle(optionInfoBool.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)));
                         optionInfo.getSiblings().add(optionInfoBool);
-                        optionInfo.getSiblings().add(new TextComponent(")"));
+                        optionInfo.getSiblings().add(Component.literal(")"));
                         option.getSiblings().add(optionInfo);
                     }
                     text.getSiblings().add(option);
 
-                    text.getSiblings().add(new TextComponent(" (or use command \"/tbm-edit edit category <string>\")"));
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit category <string>\")"));
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
                 case EDIT_DECISION_ATTACK: {
-                    TextComponent text = new TextComponent("decisionAttack: ");
+                    MutableComponent text = Component.literal("decisionAttack: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i) + "%");
+                        MutableComponent option = Component.literal(Integer.toString(i) + "%");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionAttack " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
@@ -1386,15 +1378,15 @@ public class ClientProxy extends CommonProxy {
                     break;
                 }
                 case EDIT_DECISION_DEFEND: {
-                    TextComponent text = new TextComponent("decisionDefend: ");
+                    MutableComponent text = Component.literal("decisionDefend: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i) + "%");
+                        MutableComponent option = Component.literal(Integer.toString(i) + "%");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionDefend " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 
@@ -1403,15 +1395,15 @@ public class ClientProxy extends CommonProxy {
                     break;
                 }
                 case EDIT_DECISION_FLEE: {
-                    TextComponent text = new TextComponent("decisionFlee: ");
+                    MutableComponent text = Component.literal("decisionFlee: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     for (int i = 0; i <= 100; i += 10) {
-                        TextComponent option = new TextComponent(Integer.toString(i) + "%");
+                        MutableComponent option = Component.literal(Integer.toString(i) + "%");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionFlee " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
-                            text.getSiblings().add(new TextComponent(", "));
+                            text.getSiblings().add(Component.literal(", "));
                         }
                     }
 

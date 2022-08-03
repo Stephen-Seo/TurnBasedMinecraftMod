@@ -55,7 +55,7 @@ public class Utility
     }
 
     public static String serializeDimension(ResourceKey<Level> dimObject) {
-        return dimObject.getRegistryName().toString();
+        return dimObject.registry().toString();
     }
 
     public static ResourceKey<Level> deserializeDimension(String dimString) {
