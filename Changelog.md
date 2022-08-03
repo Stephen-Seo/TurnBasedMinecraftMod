@@ -1,5 +1,15 @@
 # Upcoming changes
 
+# Version 1.19
+
+Updated to work with forge-1.19-41.1.0. (Somehow, this mod's version number
+ended up being the same as Minecraft's version number. Don't count on this to
+remain the same.)
+
+Added Allay, Frog, Tadpole, and Warden entities to the config. (The config
+version has incremented, so existing config will be replaced. Note that existing
+config will not be deleted, but renamed.)
+
 # Version 1.18.7
 
 Incremented network channel's protocol version to 2, because a packet's format
