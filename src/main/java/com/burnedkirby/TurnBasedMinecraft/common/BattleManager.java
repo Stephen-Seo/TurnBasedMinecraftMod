@@ -351,7 +351,7 @@ public class BattleManager
         return result;
     }
 
-    public boolean isInBattle(int entityID) {
-        return entityToBattleMap.keySet().parallelStream().anyMatch(pair -> pair.id == entityID);
+    public boolean isInBattle(Entity entity) {
+        return entityToBattleMap.keySet().contains(new EntityIDDimPair(entity));
     }
 }

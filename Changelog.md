@@ -1,5 +1,12 @@
 # Upcoming changes
 
+# Version 1.21.2
+
+Refactored checking-if-in-battle code from `O(n)` to `O(1)` complexity.
+(In other words, utilizes the HashMap's constant time lookup of a key instead of
+checking every key's id if the entity's id is the same. This speeds up the
+lookup from linear to constant time.)
+
 # Version 1.21.1
 
 Refactored checking-if-in-battle code to be more efficient.
