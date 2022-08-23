@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.21.0
+
+Updated mod to use forge-1.19.2-43.1.1
+
 # Version 1.20
 
 Implemented ignoring specific damage sources while in battle (like lava or
