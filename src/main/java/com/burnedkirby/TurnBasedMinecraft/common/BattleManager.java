@@ -352,12 +352,6 @@ public class BattleManager
     }
 
     public boolean isInBattle(int entityID) {
-        for (Battle battle : battleMap.values()) {
-            if (battle.hasCombatant(entityID)) {
-                return true;
-            }
-        }
-
-        return false;
+        return entityToBattleMap.keySet().parallelStream().anyMatch(pair -> pair.id == entityID);
     }
 }

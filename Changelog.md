@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.21.1
+
+Refactored checking-if-in-battle code to be more efficient.
+
 # Version 1.21.0
 
 Updated mod to use forge-1.19.2-43.1.1
