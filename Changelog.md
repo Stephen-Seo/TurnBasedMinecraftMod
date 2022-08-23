@@ -1,5 +1,13 @@
 # Upcoming changes
 
+# Version 1.20
+
+Implemented ignoring specific damage sources while in battle (like lava or
+drowning). The damage sources can be tweaked with `/tbm-server-edit`.
+
+Also updated entity entries in the config so that the mod logs much less when an
+entity does not have specific values (which gets logged if missing).
+
 # Version 1.19
 
 Updated to work with forge-1.19-41.1.0. (Somehow, this mod's version number
