@@ -12,6 +12,11 @@ drowning). The damage sources can be tweaked with `/tbm-server-edit`.
 Also updated entity entries in the config so that the mod logs much less when an
 entity does not have specific values (which gets logged if missing).
 
+Note that the TBM_Config.toml file has been updated. This means that your existing
+TBM_Config.toml will be renamed and replaced by the newly updated config.
+If you made changes to this file, you will need to apply them again to the new
+updated config to keep the changes.
+
 # Version 1.19
 
 Updated to work with forge-1.19-41.1.0. (Somehow, this mod's version number
