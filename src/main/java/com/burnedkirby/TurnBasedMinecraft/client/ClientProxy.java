@@ -17,7 +17,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class ClientProxy extends CommonProxy {
@@ -1048,6 +1047,19 @@ public class ClientProxy extends CommonProxy {
                         .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             "/tbm-server-edit creeper_always_allow_damage false")));
+                    parent.getSiblings().add(sub);
+
+                    sub = Component.literal("ignore_damage_sources ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.DARK_GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit ignore_damage_sources"))
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            Component.literal("Click to show current ignored damage sources (during battle), or use /tbm-server-edit ignore_damage_sources add/remove <type>")
+                        ))
+                        .withBold(true));
                     parent.getSiblings().add(sub);
 
                     TurnBasedMinecraftMod.proxy.displayComponent(parent);

@@ -350,4 +350,14 @@ public class BattleManager
         }
         return result;
     }
+
+    public boolean isInBattle(int entityID) {
+        for (Battle battle : battleMap.values()) {
+            if (battle.hasCombatant(entityID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

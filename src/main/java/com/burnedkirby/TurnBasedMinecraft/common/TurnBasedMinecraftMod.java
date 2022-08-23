@@ -13,8 +13,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +39,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.19.0";
+    public static final String VERSION = "1.20.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -126,6 +126,7 @@ public class TurnBasedMinecraftMod {
         MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
         MinecraftForge.EVENT_BUS.register(new PlayerJoinEventHandler());
         MinecraftForge.EVENT_BUS.register(new DimensionChangedHandler());
+        MinecraftForge.EVENT_BUS.register(new HurtEventHandler());
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
@@ -1065,7 +1066,7 @@ public class TurnBasedMinecraftMod {
                             }
 
                             c.getSource().sendFailure(Component.literal(
-                                "Failed to remove category \"" + category + "\" to ignore_battle_types"));
+                                "Failed to remove category \"" + category + "\" from ignore_battle_types"));
                             return 1;
                         }))))
                 .then(Commands.literal("player_speed").executes(c -> {
@@ -1484,6 +1485,110 @@ public class TurnBasedMinecraftMod {
                         }
                         return 1;
                     })))
+                .then(Commands.literal("ignore_damage_sources").executes(c -> {
+                        MutableComponent response = Component.literal("Use ");
+                        MutableComponent subResponse = Component.literal("/tbm-server-edit ignore_damage_sources add/remove <type> ");
+                        subResponse.setStyle(subResponse.getStyle().withColor(ChatFormatting.YELLOW));
+                        response.getSiblings().add(subResponse);
+
+                        subResponse = Component.literal("ignore_damage_sources is currently: [");
+                        response.getSiblings().add(subResponse);
+
+                        boolean isFirst = true;
+                        for (String type : TurnBasedMinecraftMod.proxy.getConfig().getIgnoreHurtDamageSources()) {
+                            if (!isFirst) {
+                                response.getSiblings().add(Component.literal(", "));
+                            }
+                            subResponse = Component.literal(type);
+                            subResponse.setStyle(subResponse.getStyle()
+                                .withColor(ChatFormatting.GREEN)
+                                .withClickEvent(new ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit ignore_damage_sources remove " + type))
+                                .withHoverEvent(new HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    Component.literal("Click to remove type"))));
+                            response.getSiblings().add(subResponse);
+                            isFirst = false;
+                        }
+                        response.getSiblings().add(Component.literal("] "));
+
+                        subResponse = Component.literal("Possible Damage Sources: [");
+                        response.getSiblings().add(subResponse);
+
+                        isFirst = true;
+                        for (String type : TurnBasedMinecraftMod.proxy.getConfig().getPossibleIgnoreHurtDamageSources()) {
+                            if (!isFirst) {
+                                response.getSiblings().add(Component.literal(", "));
+                            }
+                            subResponse = Component.literal(type);
+                            subResponse.setStyle(subResponse.getStyle()
+                                .withColor(ChatFormatting.YELLOW)
+                                .withClickEvent(new ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/tbm-server-edit ignore_damage_sources add " + type))
+                                .withHoverEvent(new HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    Component.literal("Click to add type")
+                                )));
+                            response.getSiblings().add(subResponse);
+                            isFirst = false;
+                        }
+                        response.getSiblings().add(Component.literal("] "));
+
+                        c.getSource().sendSuccess(response, false);
+                        return 1;
+                    })
+                    .then(Commands.literal("add").executes(c -> {
+                            c.getSource().sendFailure(Component.literal("/tbm-server-edit ignore_damage_sources add <type>"));
+                            return 1;
+                        })
+                        .then(Commands.argument("type", StringArgumentType.greedyString()).executes(c -> {
+                            String type = StringArgumentType.getString(c, "type");
+                            if (TurnBasedMinecraftMod.proxy.getConfig().addIgnoreHurtDamageSource(type)
+                                && TurnBasedMinecraftMod.proxy.getConfig().updateConfigAppendToStringArray("server_config.ignore_damage_sources", type)) {
+                                MutableComponent response = Component.literal("Successfully appended Damage Source type \"");
+
+                                MutableComponent sub = Component.literal(type);
+                                sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN));
+                                response.getSiblings().add(sub);
+
+                                sub = Component.literal("\" to ignore_damage_sources");
+                                response.getSiblings().add(sub);
+
+                                c.getSource().sendSuccess(response, true);
+                                return 1;
+                            }
+
+                            c.getSource().sendFailure(Component.literal(
+                                "Failed to append type \"" + type + "\" to ignore_damage_sources"
+                            ));
+                            return 1;
+                        })))
+                    .then(Commands.literal("remove").executes(c -> {
+                            c.getSource().sendFailure(Component.literal("/tbm-server-edit ignore_damage_sources remove <type>"));
+                            return 1;
+                        })
+                        .then(Commands.argument("type", StringArgumentType.greedyString()).executes(c -> {
+                            String type = StringArgumentType.getString(c, "type");
+                            if (TurnBasedMinecraftMod.proxy.getConfig().removeIgnoreHurtDamageSource(type)
+                                && TurnBasedMinecraftMod.proxy.getConfig().updateConfigRemoveFromStringArray("server_config.ignore_damage_sources", type)) {
+                                MutableComponent response = Component.literal("Successfully removed category \"");
+
+                                MutableComponent sub = Component.literal(type);
+                                sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN));
+                                response.getSiblings().add(sub);
+
+                                sub = Component.literal("\" from ignore_damage_sources");
+                                response.getSiblings().add(sub);
+
+                                c.getSource().sendSuccess(response, true);
+                                return 1;
+                            }
+
+                            c.getSource().sendFailure(Component.literal("Failed to remove type \"" + type + "\" from ignore_damage_sources"));
+                            return 1;
+                        }))))
         );
     }
 

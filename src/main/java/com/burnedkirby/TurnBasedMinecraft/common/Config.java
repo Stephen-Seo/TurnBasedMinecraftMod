@@ -50,6 +50,9 @@ public class Config
     private boolean creeperStopExplodeOnLeaveBattle = true;
     private boolean creeperAlwaysAllowDamage = true;
 
+    private Set<String> possibleIgnoreHurtDamageSources;
+    private Set<String> ignoreHurtDamageSources;
+
     public Config(Logger logger)
     {
         entityInfoMap = new HashMap<String, EntityInfo>();
@@ -59,6 +62,32 @@ public class Config
         musicBattleTypes = new HashSet<String>();
         musicSillyTypes = new HashSet<String>();
         battleIgnoringPlayers = new HashSet<Integer>();
+        possibleIgnoreHurtDamageSources = new HashSet<String>();
+        ignoreHurtDamageSources = new HashSet<String>();
+
+        possibleIgnoreHurtDamageSources.add("inFire");
+        possibleIgnoreHurtDamageSources.add("lightningBolt");
+        possibleIgnoreHurtDamageSources.add("onFire");
+        possibleIgnoreHurtDamageSources.add("lava");
+        possibleIgnoreHurtDamageSources.add("hotFloor");
+        possibleIgnoreHurtDamageSources.add("inWall");
+        possibleIgnoreHurtDamageSources.add("cramming");
+        possibleIgnoreHurtDamageSources.add("drown");
+        possibleIgnoreHurtDamageSources.add("starve");
+        possibleIgnoreHurtDamageSources.add("cactus");
+        possibleIgnoreHurtDamageSources.add("fall");
+        possibleIgnoreHurtDamageSources.add("flyIntoWall");
+        possibleIgnoreHurtDamageSources.add("outOfWorld");
+        possibleIgnoreHurtDamageSources.add("magic");
+        possibleIgnoreHurtDamageSources.add("wither");
+        possibleIgnoreHurtDamageSources.add("anvil");
+        possibleIgnoreHurtDamageSources.add("fallingBlock");
+        possibleIgnoreHurtDamageSources.add("dragonBreath");
+        possibleIgnoreHurtDamageSources.add("dryout");
+        possibleIgnoreHurtDamageSources.add("sweetBerryBush");
+        possibleIgnoreHurtDamageSources.add("freeze");
+        possibleIgnoreHurtDamageSources.add("fallingStalactite");
+        possibleIgnoreHurtDamageSources.add("stalagmite");
 
         {
             File confPath = new File(TurnBasedMinecraftMod.CONFIG_DIRECTORY);
@@ -506,6 +535,17 @@ public class Config
         } catch (ClassCastException e) {
             this.battleDecisionDurationForever = false;
             logTOMLInvalidValue("server_config.battle_turn_wait_forever", "false");
+        }
+
+        try {
+            Collection<String> damage_sources = conf.get("server_config.ignore_damage_sources");
+            for (String source : damage_sources) {
+                if (possibleIgnoreHurtDamageSources.contains(source)) {
+                    ignoreHurtDamageSources.add(source);
+                }
+            }
+        } catch (ClassCastException e) {
+            logTOMLInvalidValue("server_config.ignore_damage_sources");
         }
 
         Collection<com.electronwill.nightconfig.core.Config> entities = null;
@@ -1451,5 +1491,26 @@ public class Config
 
     public void setBattleDecisionDurationForever(boolean battleDecisionDurationForever) {
         this.battleDecisionDurationForever = battleDecisionDurationForever;
+    }
+
+    public final Collection<String> getPossibleIgnoreHurtDamageSources() {
+        return possibleIgnoreHurtDamageSources;
+    }
+
+    public final Collection<String> getIgnoreHurtDamageSources() {
+        return ignoreHurtDamageSources;
+    }
+
+    public boolean addIgnoreHurtDamageSource(String source) {
+        if (possibleIgnoreHurtDamageSources.contains(source) && !ignoreHurtDamageSources.contains(source)) {
+            ignoreHurtDamageSources.add(source);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean removeIgnoreHurtDamageSource(String source) {
+        return ignoreHurtDamageSources.remove(source);
     }
 }
