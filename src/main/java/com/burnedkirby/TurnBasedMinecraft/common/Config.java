@@ -53,6 +53,8 @@ public class Config
     private Set<String> possibleIgnoreHurtDamageSources;
     private Set<String> ignoreHurtDamageSources;
 
+    private boolean playerOnlyBattles = false;
+
     public Config(Logger logger)
     {
         entityInfoMap = new HashMap<String, EntityInfo>();
@@ -546,6 +548,19 @@ public class Config
             }
         } catch (ClassCastException e) {
             logTOMLInvalidValue("server_config.ignore_damage_sources");
+        }
+
+        try {
+            Boolean is_only_player_battles_enabled = conf.get("server_config.player_only_battles");
+            if (is_only_player_battles_enabled != null) {
+                playerOnlyBattles = is_only_player_battles_enabled;
+            } else {
+                playerOnlyBattles = false;
+                logNotFound("server_config.player_only_battles", "false");
+            }
+        } catch (ClassCastException e) {
+            playerOnlyBattles = false;
+            logTOMLInvalidValue("server_config.player_only_battles", "false");
         }
 
         Collection<com.electronwill.nightconfig.core.Config> entities = null;
@@ -1512,5 +1527,13 @@ public class Config
 
     public boolean removeIgnoreHurtDamageSource(String source) {
         return ignoreHurtDamageSources.remove(source);
+    }
+
+    public boolean isPlayerOnlyBattlesEnabled() {
+        return playerOnlyBattles;
+    }
+
+    public void setIsPlayerOnlyBattles(boolean enabled) {
+        playerOnlyBattles = enabled;
     }
 }

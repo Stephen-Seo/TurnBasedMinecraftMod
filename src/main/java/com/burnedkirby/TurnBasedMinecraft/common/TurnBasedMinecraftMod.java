@@ -39,7 +39,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.21.2";
+    public static final String VERSION = "1.21.3";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -1589,6 +1589,30 @@ public class TurnBasedMinecraftMod {
                             c.getSource().sendFailure(Component.literal("Failed to remove type \"" + type + "\" from ignore_damage_sources"));
                             return 1;
                         }))))
+                .then(Commands.literal("player_only_battles").executes(c -> {
+                        MutableComponent parent = Component.literal("Use ");
+                        MutableComponent sub = Component.literal("/tbm-server-edit player_only_battles <true/false>");
+                        sub.setStyle(sub.getStyle().withColor(ChatFormatting.YELLOW));
+                        parent.getSiblings().add(sub);
+
+                        c.getSource().sendSuccess(parent, false);
+                        return 1;
+                    })
+                    .then(Commands.argument("player_only_battles", BoolArgumentType.bool()).executes(c -> {
+                        boolean player_only_battles = BoolArgumentType.getBool(c, "player_only_battles");
+                        TurnBasedMinecraftMod.proxy.getConfig().setIsPlayerOnlyBattles(player_only_battles);
+                        if (!TurnBasedMinecraftMod.proxy.getConfig().updateConfig("server_config.player_only_battles", player_only_battles)) {
+                            TurnBasedMinecraftMod.logger.warn("Failed to set \"server_config.player_only_battles\" in config file!");
+                            c.getSource().sendFailure(Component.literal("Failed to set player_only_battles to \"" + player_only_battles + "\" in config file"));
+                        } else {
+                            MutableComponent response = Component.literal("Successfully set player_only_battles to: ");
+                            MutableComponent sub = Component.literal(String.valueOf(player_only_battles));
+                            sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN));
+                            response.getSiblings().add(sub);
+                            c.getSource().sendSuccess(response, true);
+                        }
+                        return 1;
+                    })))
         );
     }
 

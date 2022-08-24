@@ -15,7 +15,7 @@ license="MIT"
 # The modid of the mod
 modId="com_burnedkirby_turnbasedminecraft" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="1.21.2" #mandatory
+version="1.21.3" #mandatory
  # A display name for the mod
 displayName="TurnBasedMinecraftMod" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>

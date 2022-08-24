@@ -1062,6 +1062,34 @@ public class ClientProxy extends CommonProxy {
                         .withBold(true));
                     parent.getSiblings().add(sub);
 
+                    sub = Component.literal("player_only_battles ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.YELLOW)
+                        .withBold(true)
+                        .withHoverEvent(new HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            Component.literal("Disables battle for non-player entities")
+                        )));
+                    parent.getSiblings().add(sub);
+
+                    sub = Component.literal("enable ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit player_only_battles true"
+                        )));
+                    parent.getSiblings().add(sub);
+
+                    sub = Component.literal("disable ");
+                    sub.setStyle(sub.getStyle()
+                        .withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/tbm-server-edit player_only_battles false"
+                        )));
+                    parent.getSiblings().add(sub);
+
                     TurnBasedMinecraftMod.proxy.displayComponent(parent);
                     break;
                 }

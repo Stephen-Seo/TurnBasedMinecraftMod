@@ -66,11 +66,14 @@ public class BattleManager
             attackerCustomName = null;
         }
 
-        // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
+        // Verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo.
+        // Also check if "player_only_battles" is enabled and both entities are players.
         if(!((event.getEntity() instanceof Player && !((Player)event.getEntity()).isCreative())
                 || (config.getEntityInfoReference(receiverClassName) != null || config.getCustomEntityInfoReference(receiverCustomName) != null))
             || !((event.getSource().getEntity() instanceof Player && !((Player)event.getSource().getEntity()).isCreative())
-                || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null)))
+                || (config.getEntityInfoReference(attackerClassName) != null || config.getCustomEntityInfoReference(attackerCustomName) != null))
+            || (TurnBasedMinecraftMod.proxy.getConfig().isPlayerOnlyBattlesEnabled() &&
+                (!(event.getEntity() instanceof Player) || !(event.getSource().getEntity() instanceof Player))))
         {
 //            logger.debug("BattleManager: Failed first check, attacker is \"" + attackerClassName + "\", defender is \"" + receiverClassName + "\"");
             return false;
@@ -176,6 +179,12 @@ public class BattleManager
     
     public void checkTargeted(LivingSetAttackTargetEvent event)
     {
+        // Check if "player_only_battles" is enabled and if both entities are players.
+        if (TurnBasedMinecraftMod.proxy.getConfig().isPlayerOnlyBattlesEnabled() &&
+            (!(event.getEntity() instanceof Player) || !(event.getTarget() instanceof Player))) {
+            return;
+        }
+
         String targetedCustomName;
         try {
             targetedCustomName = event.getTarget().getCustomName().getString();

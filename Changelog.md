@@ -1,5 +1,11 @@
 # Upcoming changes
 
+# Version 1.21.3
+
+Implemented "player-only" battles, which can be enabled in the server-side
+config or set using `/tbm-server-edit`. (Somewhat untested because I am only 1
+person.)
+
 # Version 1.21.2
 
 Refactored checking-if-in-battle code from `O(n)` to `O(1)` complexity.
