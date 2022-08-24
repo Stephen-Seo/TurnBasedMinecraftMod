@@ -23,6 +23,7 @@ public class BattleManager
     private Map<Integer, Combatant> recentlyLeftBattle;
     private BattleUpdater battleUpdater;
     private Map<EntityIDDimPair, Integer> entityToBattleMap;
+    private EntityIDDimPair tempIDPair;
 
     public BattleManager(Logger logger)
     {
@@ -32,6 +33,7 @@ public class BattleManager
         battleUpdater = new BattleUpdater(this);
         entityToBattleMap = new HashMap<EntityIDDimPair, Integer>();
         MinecraftForge.EVENT_BUS.register(battleUpdater);
+        tempIDPair = new EntityIDDimPair();
     }
     
     /**
@@ -361,6 +363,10 @@ public class BattleManager
     }
 
     public boolean isInBattle(Entity entity) {
-        return entityToBattleMap.keySet().contains(new EntityIDDimPair(entity));
+        synchronized(tempIDPair) {
+            tempIDPair.id = entity.getId();
+            tempIDPair.dim = entity.level.dimension();
+            return entityToBattleMap.keySet().contains(tempIDPair);
+        }
     }
 }

@@ -1,5 +1,7 @@
 # Upcoming changes
 
+More refactoring of check-if-in-battle lookup code.
+
 # Version 1.21.3
 
 Implemented "player-only" battles, which can be enabled in the server-side
