@@ -73,6 +73,8 @@ public class OtherModHandler {
                 TurnBasedMinecraftMod.logger.warn("Failed to invoke NpcAPI.events(), InvocationTargetException!");
             } catch (IllegalAccessException e) {
                 TurnBasedMinecraftMod.logger.warn("Failed to invoke NpcAPI.events(), IllegalAccessException!");
+            } catch (ClassCastException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to cast NpcAPI.events(), ClassCastException!");
             }
             if (customNPCsEventBus == null) {
                 break;
