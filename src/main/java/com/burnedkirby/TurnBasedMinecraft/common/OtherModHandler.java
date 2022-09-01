@@ -83,7 +83,8 @@ public class OtherModHandler {
             final Class<?> finalCustomNPCsIEntity = customNPCsIEntity;
 
             customNPCsEventBus.addListener(EventPriority.LOWEST, true, (event) -> {
-                if (finalCustomNPCsPlayerHurtEvent.isInstance(event)) {
+                if (finalCustomNPCsPlayerHurtEvent.isInstance(event)
+                        && TurnBasedMinecraftMod.proxy.getAttackingEntity() != null) {
                     Field damageSourceField;
                     try {
                         damageSourceField = finalCustomNPCsPlayerHurtEvent.getField("damageSource");
@@ -167,6 +168,7 @@ public class OtherModHandler {
                     }
                 }
             });
+            TurnBasedMinecraftMod.logger.info("Enabled NpcAPI handling of Player damaged event");
         }
     }
 }
