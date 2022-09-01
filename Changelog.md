@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.17.2.2
+
+Fix potential NullPointerException crash bug.
+
 # Version 1.17.2.1
 
 Attempt to fix CustomNPCs mods not damaging players in TurnBased combat.
