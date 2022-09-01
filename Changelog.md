@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.17.2.1
+
+Attempt to fix CustomNPCs mods not damaging players in TurnBased combat.
+
 # Version 1.17.2
 
 (try to) Fix potential freeze bug when an entity leaves battle.

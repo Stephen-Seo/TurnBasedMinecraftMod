@@ -25,12 +25,15 @@ public class CommonProxy
     private Config config = null;
     protected Logger logger = null;
     private Map<Integer, EditingInfo> editingPlayers;
+
+    private OtherModHandler otherModHandler;
     
     public final void initialize()
     {
         attackerViaBow = new HashSet<AttackerViaBow>();
         editingPlayers = new Hashtable<Integer, EditingInfo>();
         initializeClient();
+        otherModHandler = new OtherModHandler();
         logger.debug("Init proxy for com_burnedkirby_turnbasedminecraft");
     }
     
@@ -77,6 +80,8 @@ public class CommonProxy
         postInitClient();
         pamsFoodIntegrationLoading();
         logger.debug("postInit proxy for com_burnedkirby_turnbasedminecraft");
+
+        otherModHandler.postInit();
     }
     
     protected void postInitClient() {}
