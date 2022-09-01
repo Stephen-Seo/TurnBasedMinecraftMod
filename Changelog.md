@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version 1.17.2.3
+
+Fix potential unhandled exception crash bug related to handling CustomNPCs
+Player hurt events.
+
 # Version 1.17.2.2
 
 Fix potential NullPointerException crash bug.
