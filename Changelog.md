@@ -94,6 +94,18 @@ Note that the mod's version is confusingly similar (1.18.0).
 
 TBM should allow players to eat any food from any mod (including food items from Pam's HarvestCraft).
 
+# Version 1.17.2.2
+
+(Branched from 1.17.2)
+
+Fix potential NullPointerException crash bug.
+
+# Version 1.17.2.1
+
+(Branched from 1.17.2)
+
+Attempt to fix CustomNPCs mods not damaging players in TurnBased combat.
+
 # Version 1.17.2
 
 (try to) Fix potential freeze bug when an entity leaves battle.
