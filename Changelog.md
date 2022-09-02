@@ -94,6 +94,12 @@ Note that the mod's version is confusingly similar (1.18.0).
 
 TBM should allow players to eat any food from any mod (including food items from Pam's HarvestCraft).
 
+# Version 1.17.2.4
+
+(Branched from 1.17.2)
+
+Fix usage of NpcAPI.
+
 # Version 1.17.2.3
 
 (Branched from 1.17.2)
