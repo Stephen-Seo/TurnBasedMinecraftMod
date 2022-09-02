@@ -1,6 +1,12 @@
 # Upcoming changes
 
+# Version 1.21.4
+
 More refactoring of check-if-in-battle lookup code.
+
+Fix potential bug where clients cannot attack entities if their config didn't
+exist client-side. They should now always be available to attack regardless of
+whether or not the client has the config entry for an entity.
 
 # Version 1.21.3
 

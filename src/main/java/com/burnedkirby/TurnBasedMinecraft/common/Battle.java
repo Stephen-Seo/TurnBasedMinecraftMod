@@ -266,7 +266,7 @@ public class Battle {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
         }
 
-        if (entityInfo == null && !(e instanceof Player) && TurnBasedMinecraftMod.proxy.isServerRunning()) {
+        if (isServer && entityInfo == null && !(e instanceof Player) && TurnBasedMinecraftMod.proxy.isServerRunning()) {
             return;
         }
         Combatant newCombatant = new Combatant(e, entityInfo);
@@ -314,7 +314,7 @@ public class Battle {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
         }
 
-        if (entityInfo == null && !(e instanceof Player) && TurnBasedMinecraftMod.proxy.isServerRunning()) {
+        if (isServer && entityInfo == null && !(e instanceof Player) && TurnBasedMinecraftMod.proxy.isServerRunning()) {
             return;
         }
         Combatant newCombatant = new Combatant(e, entityInfo);
