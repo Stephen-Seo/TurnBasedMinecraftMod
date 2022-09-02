@@ -61,6 +61,11 @@ public class BattleManager
         } catch (NullPointerException e) {
             receiverCustomName = null;
         }
+        if (receiverCustomName == null) {
+            // If entity does not have a "custom name", see if it is a CustomNPC and get its name.
+            receiverCustomName = OtherModHandler.getCustomNPCName(event.getEntity());
+        }
+
         String attackerClassName;
         try {
             attackerClassName = event.getSource().getEntity().getClass().getName();
@@ -72,6 +77,10 @@ public class BattleManager
             attackerCustomName = event.getSource().getEntity().getCustomName().getString();
         } catch (NullPointerException e) {
             attackerCustomName = null;
+        }
+        if (attackerCustomName == null) {
+            // If entity does not have a "custom name", see if it is a CustomNPC and get its name.
+            attackerCustomName = OtherModHandler.getCustomNPCName(event.getSource().getEntity());
         }
 
         // verify that both entities are EntityPlayer and not in creative or has a corresponding EntityInfo
@@ -190,11 +199,19 @@ public class BattleManager
         } catch (NullPointerException e) {
             targetedCustomName = null;
         }
+        if (targetedCustomName == null) {
+            // If entity does not have a "custom name", see if it is a CustomNPC and get its name.
+            targetedCustomName = OtherModHandler.getCustomNPCName(event.getEntity());
+        }
         String attackerCustomName;
         try {
             attackerCustomName = event.getEntity().getCustomName().getString();
         } catch (NullPointerException e) {
             attackerCustomName = null;
+        }
+        if (attackerCustomName == null) {
+            // If entity does not have a "custom name", see if it is a CustomNPC and get its name.
+            attackerCustomName = OtherModHandler.getCustomNPCName(event.getEntity());
         }
 
         EntityInfo attackerInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(attackerCustomName);

@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version 1.17.2.6
+
+Implemented getting EntityInfo for CustomNPCs that have the same name as a
+"custom entry" in the "server\_config.entity" array in the config.
+
 # Version 1.17.2.5
 
 Refactored OtherModHandling.java to be more efficient when handling CustomNPCs

@@ -151,7 +151,11 @@ public class BattleGui extends Screen {
 				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle()
 						.getSideAEntrySet()) {
 					if (e.getValue().entity != null) {
-						addButton(new EntitySelectionButton(width / 4 - 60, y, 120, 20, e.getValue().entity.getName().getString(), e.getKey(), true, (button) -> {
+						String name = e.getValue().entity.getName().getString();
+						if (name.isEmpty()) {
+							name = "Unknown";
+						}
+						addButton(new EntitySelectionButton(width / 4 - 60, y, 120, 20, name, e.getKey(), true, (button) -> {
 							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					} else {
@@ -169,7 +173,11 @@ public class BattleGui extends Screen {
 				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle()
 						.getSideBEntrySet()) {
 					if (e.getValue().entity != null) {
-						addButton(new EntitySelectionButton(width * 3 / 4 - 60, y, 120, 20, e.getValue().entity.getName().getString(), e.getKey(), false, (button) -> {
+						String name = e.getValue().entity.getName().getString();
+						if (name.isEmpty()) {
+							name = "Unknown";
+						}
+						addButton(new EntitySelectionButton(width * 3 / 4 - 60, y, 120, 20, name, e.getKey(), false, (button) -> {
 							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					} else {

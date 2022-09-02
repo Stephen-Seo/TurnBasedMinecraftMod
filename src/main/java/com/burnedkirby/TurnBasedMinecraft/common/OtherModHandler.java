@@ -4,10 +4,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import net.minecraft.entity.Entity;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 public class OtherModHandler {
+
+    private static boolean customNPCsExists = false;
+    private static Object NpcAPIObject = null;
+    private static Class<?> NpcAPIClass = null;
+    private static Method NpcAPI_getEntity = null;
+    private static Class<?> ICustomNPCClass = null;
+    private static Method ICustomNPC_getDisplayMethod = null;
+    private static Class<?> INPCDisplayClass = null;
+    private static Method INPCDisplay_getNameMethod = null;
+
     public OtherModHandler() {
     }
 
@@ -15,13 +26,12 @@ public class OtherModHandler {
         // Check if CustomNPCs is available, and handle player damage events if it is.
         for (int i = 0; i < 1; ++i) {
             // Check if required classes exist
-            Class<?> customNPCsAPI = null;
             try {
-                customNPCsAPI = Class.forName("noppes.npcs.api.NpcAPI");
+                NpcAPIClass = Class.forName("noppes.npcs.api.NpcAPI");
             } catch (ClassNotFoundException e) {
                 TurnBasedMinecraftMod.logger.info("NpcAPI not found, not handling it.");
             }
-            if (customNPCsAPI == null) {
+            if (NpcAPIClass == null) {
                 break;
             }
 
@@ -96,12 +106,11 @@ public class OtherModHandler {
             }
 
             // Check if available
-            Object instance = null;
             try {
-                Method instanceMethod = customNPCsAPI.getMethod("Instance");
-                instance = instanceMethod.invoke(null);
-                if (!customNPCsAPI.isInstance(instance)) {
-                    instance = null;
+                Method instanceMethod = NpcAPIClass.getMethod("Instance");
+                NpcAPIObject = instanceMethod.invoke(null);
+                if (!NpcAPIClass.isInstance(NpcAPIObject)) {
+                    NpcAPIObject = null;
                     TurnBasedMinecraftMod.logger.error("NpcAPI.Instance() is not NpcAPI!");
                 }
             } catch (NoSuchMethodException e) {
@@ -111,14 +120,14 @@ public class OtherModHandler {
             } catch (IllegalAccessException e) {
                 TurnBasedMinecraftMod.logger.error("Failed to call NpcAPI.Instance(), IllegalAccessException!");
             }
-            if (instance == null) {
+            if (NpcAPIObject == null) {
                 break;
             }
 
             Boolean isAvailable = false;
             try {
-                Method isAvailableMethod = customNPCsAPI.getMethod("IsAvailable");
-                isAvailable = (Boolean)isAvailableMethod.invoke(instance);
+                Method isAvailableMethod = NpcAPIClass.getMethod("IsAvailable");
+                isAvailable = (Boolean)isAvailableMethod.invoke(NpcAPIObject);
             } catch (NoSuchMethodException e) {
                 TurnBasedMinecraftMod.logger.warn("NpcAPI.IsAvailable() does not exist!");
             } catch (InvocationTargetException e) {
@@ -137,7 +146,7 @@ public class OtherModHandler {
 
             Method getNPCsEventBusMethod = null;
             try {
-                getNPCsEventBusMethod = customNPCsAPI.getMethod("events");
+                getNPCsEventBusMethod = NpcAPIClass.getMethod("events");
             } catch (NoSuchMethodException e) {
                 TurnBasedMinecraftMod.logger.warn("NpcAPI.events() could not be found!");
             }
@@ -147,7 +156,7 @@ public class OtherModHandler {
 
             IEventBus customNPCsEventBus = null;
             try {
-                customNPCsEventBus = (IEventBus) getNPCsEventBusMethod.invoke(instance);
+                customNPCsEventBus = (IEventBus) getNPCsEventBusMethod.invoke(NpcAPIObject);
             } catch (InvocationTargetException e) {
                 TurnBasedMinecraftMod.logger.warn("Failed to invoke NpcAPI.events(), InvocationTargetException!");
             } catch (IllegalAccessException e) {
@@ -227,6 +236,105 @@ public class OtherModHandler {
                 }
             });
             TurnBasedMinecraftMod.logger.info("Enabled NpcAPI handling of Player damaged event");
+
+            try {
+                NpcAPI_getEntity = NpcAPIClass.getMethod("getIEntity", Entity.class);
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to reflect NpcAPI.getIEntity() method");
+            }
+            if (NpcAPI_getEntity == null) {
+                break;
+            }
+
+            try {
+                ICustomNPCClass = Class.forName("noppes.npcs.api.entity.ICustomNpc");
+            } catch (ClassNotFoundException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to reflect ICustomNPC class");
+            }
+            if (ICustomNPCClass == null) {
+                break;
+            }
+
+            try {
+                ICustomNPC_getDisplayMethod = ICustomNPCClass.getMethod("getDisplay");
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to reflect ICustomNPC.getDisplay() method");
+            }
+            if (ICustomNPC_getDisplayMethod == null) {
+                break;
+            }
+
+            try {
+                INPCDisplayClass = Class.forName("noppes.npcs.api.entity.data.INPCDisplay");
+            } catch (ClassNotFoundException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to reflect INPCDisplay class");
+            }
+            if (INPCDisplayClass == null) {
+                break;
+            }
+
+            try {
+                INPCDisplay_getNameMethod = INPCDisplayClass.getMethod("getName");
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to reflect INPCDisplay.getName() method");
+            }
+            if (INPCDisplay_getNameMethod == null) {
+                break;
+            }
+
+            customNPCsExists = true;
+        }
+    }
+
+    public static String getCustomNPCName(Entity entity) {
+        if (customNPCsExists) {
+            Object ientity = null;
+            try {
+                ientity = NpcAPI_getEntity.invoke(NpcAPIObject, entity);
+            } catch (InvocationTargetException e) {
+                TurnBasedMinecraftMod.logger.debug("Cannot getCustomNPCName, NpcAPI.getEntity(...) InvocationTargetException");
+            } catch (IllegalAccessException e) {
+                TurnBasedMinecraftMod.logger.debug("Cannot getCustomNPCName, NpcAPI.getEntity(...) IllegalAccessException");
+            }
+            if (ientity == null) {
+                return null;
+            }
+
+            if (!ICustomNPCClass.isInstance(ientity)) {
+                TurnBasedMinecraftMod.logger.debug("Cannot getCustomNPCName, entity is not ICustomNPC!");
+                return null;
+            }
+            Object objINPCDisplay = null;
+            try {
+                objINPCDisplay = ICustomNPC_getDisplayMethod.invoke(ientity);
+            } catch (InvocationTargetException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to get INPCDisplay object, InvocationTargetException!");
+            } catch (IllegalAccessException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to get INPCDisplay object, IllegalAccessException!");
+            }
+            if (!INPCDisplayClass.isInstance(objINPCDisplay)) {
+                TurnBasedMinecraftMod.logger.debug("Cannot getCustomNPCName, ientity object is not ICustomNPC!");
+                return null;
+            }
+
+            String name = null;
+            try {
+                name = (String)INPCDisplay_getNameMethod.invoke(objINPCDisplay);
+            } catch (InvocationTargetException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to get INPCDisplay name, InvocationTargetException!");
+            } catch (IllegalAccessException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to get INPCDisplay name, IllegalAccessException!");
+            } catch (ClassCastException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to get INPCDisplay name, ClassCastException!");
+            }
+
+            if (name == null) {
+                TurnBasedMinecraftMod.logger.debug("Cannot getCustomNPCName, got null name!");
+            }
+            return name;
+        } else {
+            TurnBasedMinecraftMod.logger.debug("Cannot getCustomNPCName, reflected classes/methods not loaded!");
+            return null;
         }
     }
 }

@@ -142,6 +142,14 @@ public class Battle
                 } catch(NullPointerException exception) {
                     entityInfo = null;
                 }
+                if (entityInfo == null) {
+                    // Check if is CustomNPC with matching name entry.
+                    try {
+                        entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(OtherModHandler.getCustomNPCName(e));
+                    } catch(NullPointerException exception) {
+                        entityInfo = null;
+                    }
+                }
                 if(entityInfo == null)
                 {
                     entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
@@ -179,6 +187,14 @@ public class Battle
                     entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getString());
                 } catch(NullPointerException exception) {
                     entityInfo = null;
+                }
+                if (entityInfo == null) {
+                    // Check if is CustomNPC with matching name entry.
+                    try {
+                        entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(OtherModHandler.getCustomNPCName(e));
+                    } catch(NullPointerException exception) {
+                        entityInfo = null;
+                    }
                 }
                 if(entityInfo == null)
                 {
@@ -311,12 +327,20 @@ public class Battle
         } catch(NullPointerException exception) {
             entityInfo = null;
         }
+        if (entityInfo == null) {
+            // Check if entity is CustomNPC entity.
+            try {
+                entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(OtherModHandler.getCustomNPCName(e));
+            } catch(NullPointerException exception) {
+                entityInfo = null;
+            }
+        }
         if(entityInfo == null)
         {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
         }
 
-        if(entityInfo == null && !(e instanceof PlayerEntity) && TurnBasedMinecraftMod.proxy.isServerRunning())
+        if(isServer && entityInfo == null && !(e instanceof PlayerEntity) && TurnBasedMinecraftMod.proxy.isServerRunning())
         {
             return;
         }
@@ -374,12 +398,20 @@ public class Battle
         } catch(NullPointerException exception) {
             entityInfo = null;
         }
+        if (entityInfo == null) {
+            // Check if entity is CustomNPC entity.
+            try {
+                entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(OtherModHandler.getCustomNPCName(e));
+            } catch(NullPointerException exception) {
+                entityInfo = null;
+            }
+        }
         if(entityInfo == null)
         {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
         }
 
-        if(entityInfo == null && !(e instanceof PlayerEntity) && TurnBasedMinecraftMod.proxy.isServerRunning())
+        if(isServer && entityInfo == null && !(e instanceof PlayerEntity) && TurnBasedMinecraftMod.proxy.isServerRunning())
         {
             return;
         }
