@@ -14,9 +14,10 @@ public class OtherModHandler {
     public void postInit() {
         // Check if CustomNPCs is available, and handle player damage events if it is.
         for (int i = 0; i < 1; ++i) {
+            // Check if required classes exist
             Class<?> customNPCsAPI = null;
             try {
-                customNPCsAPI = Class.forName("noppes.npcs.scripted.NpcAPI");
+                customNPCsAPI = Class.forName("noppes.npcs.api.NpcAPI");
             } catch (ClassNotFoundException e) {
                 TurnBasedMinecraftMod.logger.info("NpcAPI not found, not handling it.");
             }
@@ -26,7 +27,7 @@ public class OtherModHandler {
 
             Class<?> customNPCsPlayerHurtEvent = null;
             try {
-                customNPCsPlayerHurtEvent = Class.forName("noppes.npcs.scripted.event.PlayerEvent.DamagedEvent");
+                customNPCsPlayerHurtEvent = Class.forName("noppes.npcs.api.event.PlayerEvent$DamagedEvent");
             } catch (ClassNotFoundException e) {
                 TurnBasedMinecraftMod.logger.info("CustomNPCs Player Hurt Event class not found, not handling it.");
             }
@@ -36,7 +37,7 @@ public class OtherModHandler {
 
             Class<?> customNPCsIDamageSource = null;
             try {
-                customNPCsIDamageSource = Class.forName("noppes.npcs.scripted.interfaces.IDamageSource");
+                customNPCsIDamageSource = Class.forName("noppes.npcs.api.IDamageSource");
             } catch (ClassNotFoundException e) {
                 TurnBasedMinecraftMod.logger.info("CustomNPCs IDamageSource not found, not handling it.");
             }
@@ -46,11 +47,49 @@ public class OtherModHandler {
 
             Class<?> customNPCsIEntity = null;
             try {
-                customNPCsIEntity = Class.forName("noppes.npcs.scripted.interfaces.entity.IEntity");
+                customNPCsIEntity = Class.forName("noppes.npcs.api.entity.IEntity");
             } catch (ClassNotFoundException e) {
                 TurnBasedMinecraftMod.logger.info("CustomNPCs IEntity not found, not handling it.");
             }
             if (customNPCsIEntity == null) {
+                break;
+            }
+
+            // Check if available
+            Object instance = null;
+            try {
+                Method instanceMethod = customNPCsAPI.getMethod("Instance");
+                instance = instanceMethod.invoke(null);
+                if (!customNPCsAPI.isInstance(instance)) {
+                    instance = null;
+                    TurnBasedMinecraftMod.logger.error("NpcAPI.Instance() is not NpcAPI!");
+                }
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.warn("NpcAPI.Instance() does not exist!");
+            } catch (InvocationTargetException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to call NpcAPI.Instance(), InvocationTargetException!");
+            } catch (IllegalAccessException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to call NpcAPI.Instance(), IllegalAccessException!");
+            }
+            if (instance == null) {
+                break;
+            }
+
+            Boolean isAvailable = false;
+            try {
+                Method isAvailableMethod = customNPCsAPI.getMethod("IsAvailable");
+                isAvailable = (Boolean)isAvailableMethod.invoke(instance);
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.warn("NpcAPI.IsAvailable() does not exist!");
+            } catch (InvocationTargetException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to call NpcAPI.IsAvailable(), InvocationTargetException!");
+            } catch (IllegalAccessException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to call NpcAPI.IsAvailable(), IllegalAccessException!");
+            } catch (ClassCastException e) {
+                TurnBasedMinecraftMod.logger.warn("Result of NpcAPI.IsAvailable() is not a Boolean!");
+            }
+            if (!isAvailable) {
+                TurnBasedMinecraftMod.logger.warn("NpcAPI is not available!");
                 break;
             }
 
@@ -68,7 +107,7 @@ public class OtherModHandler {
 
             IEventBus customNPCsEventBus = null;
             try {
-                customNPCsEventBus = (IEventBus) getNPCsEventBusMethod.invoke(customNPCsAPI);
+                customNPCsEventBus = (IEventBus) getNPCsEventBusMethod.invoke(instance);
             } catch (InvocationTargetException e) {
                 TurnBasedMinecraftMod.logger.warn("Failed to invoke NpcAPI.events(), InvocationTargetException!");
             } catch (IllegalAccessException e) {
@@ -127,17 +166,22 @@ public class OtherModHandler {
                         return;
                     }
 
-                    Method getEntityIDMethod;
+                    if (!finalCustomNPCsIEntity.isInstance(iEntityObject)) {
+                        TurnBasedMinecraftMod.logger.error("IDamageSource.getTrueSource() is not IEntity!");
+                        return;
+                    }
+
+                    Method getEntityUUIDMethod;
                     try {
-                        getEntityIDMethod = finalCustomNPCsIEntity.getMethod("getEntityId");
+                        getEntityUUIDMethod = finalCustomNPCsIEntity.getMethod("getUUID");
                     } catch (NoSuchMethodException e) {
                         TurnBasedMinecraftMod.logger.error("Failed to get CustomNPCs \".getEntityId()\"!");
                         return;
                     }
 
-                    Integer entityId;
+                    String entityUUID;
                     try {
-                        entityId = (Integer)getEntityIDMethod.invoke(iEntityObject);
+                        entityUUID = (String)getEntityUUIDMethod.invoke(iEntityObject);
                     } catch (InvocationTargetException e) {
                         TurnBasedMinecraftMod.logger.error("Failed to get CustomNPCs IEntity ID, InvocationTargetException!");
                         return;
@@ -149,13 +193,13 @@ public class OtherModHandler {
                         return;
                     }
 
-                    if (entityId != TurnBasedMinecraftMod.proxy.getAttackingEntity().getId()) {
+                    if (!TurnBasedMinecraftMod.proxy.getAttackingEntity().getStringUUID().equals(entityUUID)) {
                         return;
                     }
 
                     Method getCanceledMethod;
                     try {
-                        getCanceledMethod = finalCustomNPCsPlayerHurtEvent.getMethod("setCanceled", Boolean.class);
+                        getCanceledMethod = finalCustomNPCsPlayerHurtEvent.getMethod("setCanceled", boolean.class);
                     } catch (NoSuchMethodException e) {
                         TurnBasedMinecraftMod.logger.error("CustomNPCs PlayerHurtEvent does not have setCanceled(...)!");
                         return;

@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.17.2.4
+
+Fix usage of NpcAPI.
+
 # Version 1.17.2.3
 
 Fix potential unhandled exception crash bug related to handling CustomNPCs
