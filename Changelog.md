@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version 1.17.2.5
+
+Refactored OtherModHandling.java to be more efficient when handling CustomNPCs
+DamagedEvent.
+
 # Version 1.17.2.4
 
 Fix usage of NpcAPI.

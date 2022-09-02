@@ -35,6 +35,16 @@ public class OtherModHandler {
                 break;
             }
 
+            Field damageSourceField = null;
+            try {
+                damageSourceField = customNPCsPlayerHurtEvent.getField("damageSource");
+            } catch (NoSuchFieldException e) {
+                TurnBasedMinecraftMod.logger.error("CustomNPCs PlayerHurtEvent does not have \".damageSource\"!");
+            }
+            if (damageSourceField == null) {
+                break;
+            }
+
             Class<?> customNPCsIDamageSource = null;
             try {
                 customNPCsIDamageSource = Class.forName("noppes.npcs.api.IDamageSource");
@@ -45,6 +55,16 @@ public class OtherModHandler {
                 break;
             }
 
+            Method trueSourceMethod = null;
+            try {
+                trueSourceMethod = customNPCsIDamageSource.getMethod("getTrueSource");
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.error("CustomNPCs IDamageSource does not have \".getTrueSource()\"!");
+            }
+            if (trueSourceMethod == null) {
+                break;
+            }
+
             Class<?> customNPCsIEntity = null;
             try {
                 customNPCsIEntity = Class.forName("noppes.npcs.api.entity.IEntity");
@@ -52,6 +72,26 @@ public class OtherModHandler {
                 TurnBasedMinecraftMod.logger.info("CustomNPCs IEntity not found, not handling it.");
             }
             if (customNPCsIEntity == null) {
+                break;
+            }
+
+            Method getEntityUUIDMethod = null;
+            try {
+                getEntityUUIDMethod = customNPCsIEntity.getMethod("getUUID");
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.error("Failed to get CustomNPCs \".getEntityId()\"!");
+            }
+            if (getEntityUUIDMethod == null) {
+                break;
+            }
+
+            Method getCanceledMethod = null;
+            try {
+                getCanceledMethod = customNPCsPlayerHurtEvent.getMethod("setCanceled", boolean.class);
+            } catch (NoSuchMethodException e) {
+                TurnBasedMinecraftMod.logger.error("CustomNPCs PlayerHurtEvent does not have setCanceled(...)!");
+            }
+            if (getCanceledMethod == null) {
                 break;
             }
 
@@ -120,23 +160,19 @@ public class OtherModHandler {
             }
 
             final Class<?> finalCustomNPCsPlayerHurtEvent = customNPCsPlayerHurtEvent;
+            final Field finalDamageSourceField = damageSourceField;
             final Class<?> finalCustomNPCsIDamageSource = customNPCsIDamageSource;
+            final Method finalTrueSourceMethod = trueSourceMethod;
             final Class<?> finalCustomNPCsIEntity = customNPCsIEntity;
+            final Method finalGetEntityUUIDMethod = getEntityUUIDMethod;
+            final Method finalGetCanceledMethod = getCanceledMethod;
 
             customNPCsEventBus.addListener(EventPriority.LOWEST, true, (event) -> {
                 if (finalCustomNPCsPlayerHurtEvent.isInstance(event)
                         && TurnBasedMinecraftMod.proxy.getAttackingEntity() != null) {
-                    Field damageSourceField;
-                    try {
-                        damageSourceField = finalCustomNPCsPlayerHurtEvent.getField("damageSource");
-                    } catch (NoSuchFieldException e) {
-                        TurnBasedMinecraftMod.logger.error("CustomNPCs PlayerHurtEvent does not have \".damageSource\"!");
-                        return;
-                    }
-
                     Object damageSourceObject;
                     try {
-                        damageSourceObject = damageSourceField.get(event);
+                        damageSourceObject = finalDamageSourceField.get(event);
                     } catch (IllegalAccessException e) {
                         TurnBasedMinecraftMod.logger.error("CustomNPCs PlayerHurtEvent failed to get \".damageSource\"!");
                         return;
@@ -147,17 +183,9 @@ public class OtherModHandler {
                         return;
                     }
 
-                    Method trueSourceMethod;
-                    try {
-                        trueSourceMethod = finalCustomNPCsIDamageSource.getMethod("getTrueSource");
-                    } catch (NoSuchMethodException e) {
-                        TurnBasedMinecraftMod.logger.error("CustomNPCs IDamageSource does not have \".getTrueSource()\"!");
-                        return;
-                    }
-
                     Object iEntityObject;
                     try {
-                        iEntityObject = trueSourceMethod.invoke(damageSourceObject);
+                        iEntityObject = finalTrueSourceMethod.invoke(damageSourceObject);
                     } catch (IllegalAccessException e) {
                         TurnBasedMinecraftMod.logger.error("Failed to get CustomNPCs IEntity from IDamageSource, IllegalAccessException!");
                         return;
@@ -171,17 +199,9 @@ public class OtherModHandler {
                         return;
                     }
 
-                    Method getEntityUUIDMethod;
-                    try {
-                        getEntityUUIDMethod = finalCustomNPCsIEntity.getMethod("getUUID");
-                    } catch (NoSuchMethodException e) {
-                        TurnBasedMinecraftMod.logger.error("Failed to get CustomNPCs \".getEntityId()\"!");
-                        return;
-                    }
-
                     String entityUUID;
                     try {
-                        entityUUID = (String)getEntityUUIDMethod.invoke(iEntityObject);
+                        entityUUID = (String)finalGetEntityUUIDMethod.invoke(iEntityObject);
                     } catch (InvocationTargetException e) {
                         TurnBasedMinecraftMod.logger.error("Failed to get CustomNPCs IEntity ID, InvocationTargetException!");
                         return;
@@ -197,16 +217,8 @@ public class OtherModHandler {
                         return;
                     }
 
-                    Method getCanceledMethod;
                     try {
-                        getCanceledMethod = finalCustomNPCsPlayerHurtEvent.getMethod("setCanceled", boolean.class);
-                    } catch (NoSuchMethodException e) {
-                        TurnBasedMinecraftMod.logger.error("CustomNPCs PlayerHurtEvent does not have setCanceled(...)!");
-                        return;
-                    }
-
-                    try {
-                        getCanceledMethod.invoke(event, false);
+                        finalGetCanceledMethod.invoke(event, false);
                     } catch (IllegalAccessException e) {
                         TurnBasedMinecraftMod.logger.error("Failed to un-cancel Player hurt event, IllegalAccessException!");
                     } catch (InvocationTargetException e) {
