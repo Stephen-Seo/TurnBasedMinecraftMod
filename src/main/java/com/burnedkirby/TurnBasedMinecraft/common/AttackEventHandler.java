@@ -9,7 +9,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
 
@@ -146,23 +146,23 @@ public class AttackEventHandler
     }
     
     @SubscribeEvent
-    public void entityTargeted(LivingSetAttackTargetEvent event)
+    public void entityTargeted(LivingChangeTargetEvent event)
     {
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
         BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();
         if(event.getEntity().level.isClientSide
                 || config.isOldBattleBehaviorEnabled()
                 || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getId()))
-                || (event.getTarget() != null && battleManager.isRecentlyLeftBattle(event.getTarget().getId()))
-                || (event.getEntity() != null && event.getTarget() != null && Utility.distanceBetweenEntities(event.getEntity(), event.getTarget()) > (double)config.getAggroStartBattleDistance()))
+                || (event.getNewTarget() != null && battleManager.isRecentlyLeftBattle(event.getNewTarget().getId()))
+                || (event.getEntity() != null && event.getNewTarget() != null && Utility.distanceBetweenEntities(event.getEntity(), event.getNewTarget()) > (double)config.getAggroStartBattleDistance()))
         {
             return;
         }
         else if(event.getEntity() != null
-                && event.getTarget() != null
+                && event.getNewTarget() != null
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getId())
-                && !config.getBattleIgnoringPlayers().contains(event.getTarget().getId())
-                && event.getEntity().level.dimension().equals(event.getTarget().level.dimension()))
+                && !config.getBattleIgnoringPlayers().contains(event.getNewTarget().getId())
+                && event.getEntity().level.dimension().equals(event.getNewTarget().level.dimension()))
         {
             TurnBasedMinecraftMod.proxy.getBattleManager().checkTargeted(event);
         }

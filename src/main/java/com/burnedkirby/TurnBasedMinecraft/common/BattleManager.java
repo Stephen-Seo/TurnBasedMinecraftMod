@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
@@ -179,17 +179,17 @@ public class BattleManager
         return true;
     }
     
-    public void checkTargeted(LivingSetAttackTargetEvent event)
+    public void checkTargeted(LivingChangeTargetEvent event)
     {
         // Check if "player_only_battles" is enabled and if both entities are players.
         if (TurnBasedMinecraftMod.proxy.getConfig().isPlayerOnlyBattlesEnabled() &&
-            (!(event.getEntity() instanceof Player) || !(event.getTarget() instanceof Player))) {
+            (!(event.getEntity() instanceof Player) || !(event.getNewTarget() instanceof Player))) {
             return;
         }
 
         String targetedCustomName;
         try {
-            targetedCustomName = event.getTarget().getCustomName().getString();
+            targetedCustomName = event.getNewTarget().getCustomName().getString();
         } catch (NullPointerException e) {
             targetedCustomName = null;
         }
@@ -207,7 +207,7 @@ public class BattleManager
         }
 
         EntityInfo targetedInfo;
-        if(event.getTarget() instanceof Player)
+        if(event.getNewTarget() instanceof Player)
         {
             targetedInfo = null;
         }
@@ -216,10 +216,10 @@ public class BattleManager
             targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(targetedCustomName);
             if(targetedInfo == null)
             {
-                targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getTarget());
+                targetedInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(event.getNewTarget());
             }
         }
-        if((event.getTarget() instanceof Player && ((Player)event.getTarget()).isCreative())
+        if((event.getNewTarget() instanceof Player && ((Player)event.getNewTarget()).isCreative())
                 || attackerInfo == null
                 || attackerInfo.ignoreBattle
                 || TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType(attackerInfo.category)
@@ -235,8 +235,8 @@ public class BattleManager
         if(attackerBattle != null && !attackerBattle.hasCombatant(event.getEntity().getId())) {
             attackerBattle = null;
         }
-        Battle defenderBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getTarget())));
-        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getTarget().getId())) {
+        Battle defenderBattle = battleMap.get(entityToBattleMap.get(new EntityIDDimPair(event.getNewTarget())));
+        if(defenderBattle != null && !defenderBattle.hasCombatant(event.getNewTarget().getId())) {
             defenderBattle = null;
         }
 
@@ -244,13 +244,13 @@ public class BattleManager
             return;
         } else if(attackerBattle == null && defenderBattle == null) {
             // neither in battle
-            if(event.getEntity() instanceof Player || event.getTarget() instanceof Player)
+            if(event.getEntity() instanceof Player || event.getNewTarget() instanceof Player)
             {
                 // at least one is a player, create battle
                 Collection<Entity> sideA = new ArrayList<Entity>(1);
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
-                sideB.add(event.getTarget());
+                sideB.add(event.getNewTarget());
                 createBattle(sideA, sideB, event.getEntity().level.dimension());
                 logger.debug("neither in battle, at least one is player, creating new battle");
             }
@@ -261,16 +261,16 @@ public class BattleManager
                     // battle max reached, cannot add to battle
                     return;
                 } else if (attackerBattle.hasCombatantInSideA(event.getEntity().getId())) {
-                    attackerBattle.addCombatantToSideB(event.getTarget());
+                    attackerBattle.addCombatantToSideB(event.getNewTarget());
                 } else {
-                    attackerBattle.addCombatantToSideA(event.getTarget());
+                    attackerBattle.addCombatantToSideA(event.getNewTarget());
                 }
-                entityToBattleMap.put(new EntityIDDimPair(event.getTarget()), attackerBattle.getId());
+                entityToBattleMap.put(new EntityIDDimPair(event.getNewTarget()), attackerBattle.getId());
             } else {
                 if (defenderBattle.getSize() >= TurnBasedMinecraftMod.proxy.getConfig().getMaxInBattle()) {
                     // battle max reached, cannot add to battle
                     return;
-                } else if (defenderBattle.hasCombatantInSideA(event.getTarget().getId())) {
+                } else if (defenderBattle.hasCombatantInSideA(event.getNewTarget().getId())) {
                     defenderBattle.addCombatantToSideB(event.getEntity());
                 } else {
                     defenderBattle.addCombatantToSideA(event.getEntity());

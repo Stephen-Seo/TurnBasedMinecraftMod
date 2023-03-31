@@ -7,6 +7,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -127,18 +128,18 @@ public class BattleGui extends Screen {
 		switch (state) {
 		case MAIN_MENU:
 			info = "What will you do?";
-			addRenderableWidget(new Button(width * 3 / 7 - 25, 40, 50, 20, Component.literal("Attack"), (button) -> {
+			addRenderableWidget(Button.builder(Component.literal("Attack"), (button) -> {
 				buttonActionEvent(button, ButtonAction.ATTACK);
-			}));
-			addRenderableWidget(new Button(width * 4 / 7 - 25, 40, 50, 20, Component.literal("Defend"), (button) -> {
+			}).bounds(width * 3 / 7 - 25, 40, 50, 20).build());
+			addRenderableWidget(Button.builder(Component.literal("Defend"), (button) -> {
 				buttonActionEvent(button, ButtonAction.DEFEND);
-			}));
-			addRenderableWidget(new Button(width * 3 / 7 - 25, 60, 50, 20, Component.literal("Item"), (button) -> {
+			}).bounds(width * 4 / 7 - 25, 40, 50, 20).build());
+			addRenderableWidget(Button.builder(Component.literal("Item"), (button) -> {
 				buttonActionEvent(button, ButtonAction.ITEM);
-			}));
-			addRenderableWidget(new Button(width * 4 / 7 - 25, 60, 50, 20, Component.literal("Flee"), (button) -> {
+			}).bounds(width * 3 / 7 - 25, 60, 50, 20).build());
+			addRenderableWidget(Button.builder(Component.literal("Flee"), (button) -> {
 				buttonActionEvent(button, ButtonAction.FLEE);
-			}));
+			}).bounds(width * 4 / 7 - 25, 60, 50, 20).build());
 			break;
 		case ATTACK_TARGET:
 			info = "Who will you attack?";
@@ -178,21 +179,21 @@ public class BattleGui extends Screen {
 			} catch (ConcurrentModificationException e) {
 				// ignored
 			}
-			addRenderableWidget(new Button(width / 2 - 30, height - 120, 60, 20, Component.literal("Cancel"), (button) -> {
+			addRenderableWidget(Button.builder(Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
-			}));
+			}).bounds(width / 2 - 30, height - 120, 60, 20).build());
 			break;
 		case ITEM_ACTION:
 			info = "What will you do with an item?";
-			addRenderableWidget(new Button(width * 1 / 4 - 40, height - 120, 80, 20, Component.literal("Switch Held"), (button) -> {
+			addRenderableWidget(Button.builder(Component.literal("Switch Held"), (button) -> {
 				buttonActionEvent(button, ButtonAction.SWITCH_HELD_ITEM);
-			}));
-			addRenderableWidget(new Button(width * 2 / 4 - 40, height - 120, 80, 20, Component.literal("Use"), (button) -> {
+			}).bounds(width / 4 - 40, height - 120, 80, 20).build());
+			addRenderableWidget(Button.builder(Component.literal("Use"), (button) -> {
 				buttonActionEvent(button, ButtonAction.DECIDE_USE_ITEM);
-			}));
-			addRenderableWidget(new Button(width * 3 / 4 - 40, height - 120, 80, 20, Component.literal("Cancel"), (button) -> {
+			}).bounds(width * 2 / 4 - 40, height - 120, 80, 20).build());
+			addRenderableWidget(Button.builder(Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
-			}));
+			}).bounds(width * 3 / 4 - 40, height - 120, 80, 20).build());
 			break;
 		case WAITING:
 			info = "Waiting...";
@@ -204,9 +205,9 @@ public class BattleGui extends Screen {
 					buttonActionEvent(button, ButtonAction.DO_ITEM_SWITCH);
 				}));
 			}
-			addRenderableWidget(new Button(width / 2 - 40, height - 120, 80, 20, Component.literal("Cancel"), (button) -> {
+			addRenderableWidget(Button.builder(Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
-			}));
+			}).bounds(width / 2 - 40, height - 120, 80, 20).build());
 			break;
 		case USE_ITEM:
 			info = "Which item will you use?";
@@ -215,9 +216,9 @@ public class BattleGui extends Screen {
 					buttonActionEvent(button, ButtonAction.DO_USE_ITEM);
 				}));
 			}
-			addRenderableWidget(new Button(width / 2 - 40, height - 120, 80, 20, Component.literal("Cancel"), (button) -> {
+			addRenderableWidget(Button.builder(Component.literal("Cancel"), (button) -> {
 				buttonActionEvent(button, ButtonAction.CANCEL);
-			}));
+			}).bounds(width / 2 - 40, height - 120, 80, 20).build());
 			break;
 		}
 	}
@@ -267,7 +268,7 @@ public class BattleGui extends Screen {
 		drawString(poseStack, info, width / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
 	}
 
-	protected void buttonActionEvent(Button button, ButtonAction action) {
+	protected void buttonActionEvent(AbstractButton button, ButtonAction action) {
 		switch (action) {
 		case ATTACK:
 			setState(MenuState.ATTACK_TARGET);

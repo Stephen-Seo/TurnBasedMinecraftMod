@@ -1,24 +1,31 @@
 package com.burnedkirby.TurnBasedMinecraft.client;
 
+import com.burnedkirby.TurnBasedMinecraft.common.CommonProxy;
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
-public class EntitySelectionButton extends Button {
+public class EntitySelectionButton extends AbstractButton {
+    TBMButtonPress onPress;
     private int entityID;
     private boolean isSideA;
 
-    public EntitySelectionButton(int x, int y, int widthIn, int heightIn, String buttonText, int entityID, boolean isSideA, Button.OnPress onPress) {
-        super(x, y, widthIn, heightIn, Component.literal(buttonText), onPress);
+    public EntitySelectionButton(int x, int y, int widthIn, int heightIn, String buttonText, int entityID, boolean isSideA, TBMButtonPress onPress) {
+        super(x, y, widthIn, heightIn, Component.literal(buttonText));
+        this.onPress = onPress;
         this.entityID = entityID;
         this.isSideA = isSideA;
     }
 
-    public EntitySelectionButton(int x, int y, int widthIn, int heightIn, Component buttonTextComponent, int entityID, boolean isSideA, Button.OnPress onPress) {
-        super(x, y, widthIn, heightIn, buttonTextComponent, onPress);
+    public EntitySelectionButton(int x, int y, int widthIn, int heightIn, Component buttonTextComponent, int entityID, boolean isSideA, TBMButtonPress onPress) {
+        super(x, y, widthIn, heightIn, buttonTextComponent);
+        this.onPress = onPress;
         this.entityID = entityID;
         this.isSideA = isSideA;
     }
@@ -83,11 +90,13 @@ public class EntitySelectionButton extends Button {
         }
     }
 
-    private int getX() {
-        return x;
+    @Override
+    protected void updateWidgetNarration(NarrationElementOutput p_259858_) {
+        p_259858_.add(NarratedElementType.HINT, TurnBasedMinecraftMod.proxy.getEntity(entityID, Minecraft.getInstance().level.dimension()).getName());
     }
 
-    private int getY() {
-        return y;
+    @Override
+    public void onPress() {
+        onPress.onPress(this);
     }
 }

@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version 1.22.0
+
+Update to Forge 1.19.3-44.1.1.
+
 # Version 1.21.4
 
 More refactoring of check-if-in-battle lookup code.
