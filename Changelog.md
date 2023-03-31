@@ -2,7 +2,7 @@
 
 # Version 1.22.0
 
-Update to Forge 1.19.3-44.1.1.
+Update to Forge 1.19.3-44.1.0.
 
 # Version 1.21.4
 
