@@ -6,8 +6,8 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
+        classpath 'com.github.johnrengelman:shadow:8.1.1'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -180,7 +180,8 @@ jar {
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"TurnBasedMinecraftMod_BK",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            // Do not place timestamp for the sake of reproducible builds
+//            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
 //            "ContainedDeps": "javamp3-1.0.3.jar"
         ])
     }
@@ -198,6 +199,12 @@ assemble.dependsOn shadowJar
 
 reobf {
     shadowJar {} // reobfuscate the shadowed jar
+}
+
+// Reproducible Builds
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
 
 // Example configuration to allow publishing using the maven-publish task
