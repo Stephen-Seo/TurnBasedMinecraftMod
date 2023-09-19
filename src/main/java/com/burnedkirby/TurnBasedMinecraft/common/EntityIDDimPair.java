@@ -21,7 +21,7 @@ public class EntityIDDimPair {
 
     EntityIDDimPair(Entity entity) {
         id = entity.getId();
-        dim = entity.level.dimension();
+        dim = entity.level().dimension();
     }
 
     public Entity getEntity() {

@@ -13,6 +13,7 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.util.*;
@@ -786,7 +787,7 @@ public class Battle {
                                         ((ServerPlayer) nextEntity).connection.teleport(nextEntity.getX(), nextEntity.getY(), nextEntity.getZ(), yawDirection, pitchDirection);
                                         BowItem itemBow = (BowItem) heldItemStack.getItem();
                                         TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
-                                        itemBow.releaseUsing(((Player) nextEntity).getMainHandItem(), nextEntity.level, (LivingEntity) nextEntity, randomTimeLeft);
+                                        itemBow.releaseUsing(((Player) nextEntity).getMainHandItem(), nextEntity.level(), (LivingEntity) nextEntity, randomTimeLeft);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getId(), targetEntity.getId(), 0);
                                     } else {
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.BOW_NO_AMMO, next.entity.getId(), 0, 0);
@@ -835,7 +836,7 @@ public class Battle {
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), TurnBasedMinecraftMod.proxy.getAttackingDamage());
                                         if (defenseDamageTriggered) {
                                             // defense damage
-                                            DamageSource defenseDamageSource = DamageSource.mobAttack((LivingEntity) targetEntity);
+                                            DamageSource defenseDamageSource = targetEntity.damageSources().mobAttack((LivingEntity) targetEntity);
                                             TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
                                             nextEntity.invulnerableTime = 0;
                                             nextEntity.hurt(defenseDamageSource, targetEntityInfo.defenseDamage);
@@ -898,7 +899,7 @@ public class Battle {
                                 if (random.nextInt(100) < hitChance) {
                                     if (target.remainingDefenses <= 0) {
                                         debugLog += " hit success";
-                                        DamageSource damageSource = DamageSource.mobAttack((LivingEntity) next.entity);
+                                        DamageSource damageSource = next.entity.damageSources().mobAttack((LivingEntity) next.entity);
                                         int damageAmount = next.entityInfo.attackPower;
                                         if (next.entityInfo.attackVariance > 0) {
                                             damageAmount += random.nextInt(next.entityInfo.attackVariance * 2 + 1) - next.entityInfo.attackVariance;
@@ -942,7 +943,7 @@ public class Battle {
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), finalDamageAmount);
                                         if (defenseDamageTriggered) {
                                             // defense damage
-                                            DamageSource defenseDamageSource = DamageSource.mobAttack((LivingEntity) targetEntity);
+                                            DamageSource defenseDamageSource = targetEntity.damageSources().mobAttack((LivingEntity) targetEntity);
                                             TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
                                             nextEntity.invulnerableTime = 0;
                                             nextEntity.hurt(defenseDamageSource, targetEntityInfo.defenseDamage);
@@ -1068,24 +1069,28 @@ public class Battle {
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                                 final Entity nextEntity = next.entity;
                                 final int nextItemToUse = next.itemToUse;
-                                ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level, (LivingEntity) nextEntity));
+                                ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level(), (LivingEntity) nextEntity));
                             } else {
                                 // then check vanilla foods
-                                if (CreativeModeTabs.FOOD_AND_DRINKS.contains(targetItemStack) && targetItem.isEdible()) {
+                                final CreativeModeTab foodAndDrinksTab = CreativeModeTabRegistry.getTab(CreativeModeTabs.FOOD_AND_DRINKS.location());
+                                if (foodAndDrinksTab.contains(targetItemStack) && targetItem.isEdible()) {
                                     debugLog += " food";
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                                     final Entity nextEntity = next.entity;
                                     final int nextItemToUse = next.itemToUse;
-                                    ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level, (LivingEntity) nextEntity));
+                                    ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level(), (LivingEntity) nextEntity));
                                 } else if (targetItem instanceof PotionItem) {
                                     debugLog += " potion";
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName().getString());
                                     final Entity nextEntity = next.entity;
                                     final int nextItemToUse = next.itemToUse;
-                                    ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level, (LivingEntity) nextEntity));
+                                    ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level(), (LivingEntity) nextEntity));
                                 } else {
                                     debugLog += " non-consumable";
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getString());
+                                    final Entity nextEntity = next.entity;
+                                    final int nextItemToUse = next.itemToUse;
+                                    ((Player)nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level(), (LivingEntity) nextEntity));
                                 }
                             }
                             break;
@@ -1149,7 +1154,7 @@ public class Battle {
 
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         targetEntity.invulnerableTime = 0;
-                                        targetEntity.hurt(DamageSource.mobAttack((LivingEntity) nextEntity), finalDamageAmount);
+                                        targetEntity.hurt(nextEntity.damageSources().mobAttack((LivingEntity) nextEntity), finalDamageAmount);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), finalDamageAmount);
                                         if (attackEffectTriggered) {
@@ -1194,7 +1199,7 @@ public class Battle {
 
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         targetEntity.invulnerableTime = 0;
-                                        targetEntity.hurt(DamageSource.mobAttack((LivingEntity) nextEntity), finalDamageAmount);
+                                        targetEntity.hurt(nextEntity.damageSources().mobAttack((LivingEntity) nextEntity), finalDamageAmount);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), finalDamageAmount);
                                         if (attackEffectTriggered) {

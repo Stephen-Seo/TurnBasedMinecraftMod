@@ -7,6 +7,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -224,10 +225,10 @@ public class BattleGui extends Screen {
 	}
 
 	@Override
-	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
 			// drawHoveringText("Waiting...", width / 2 - 50, height / 2);
-			drawString(poseStack, "Waiting...", width / 2 - 50, height / 2, 0xFFFFFFFF);
+			drawString(guiGraphics, "Waiting...", width / 2 - 50, height / 2, 0xFFFFFFFF);
 			return;
 		}
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle().getState() == Battle.State.DECISION
@@ -243,7 +244,7 @@ public class BattleGui extends Screen {
 
 		updateState();
 
-		super.render(poseStack, mouseX, mouseY, partialTicks);
+		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
 		String timeRemainingString = "Time remaining: ";
 		int timeRemainingInt = timeRemaining.get();
@@ -261,11 +262,11 @@ public class BattleGui extends Screen {
 			timeRemainingString += Integer.toString(timeRemainingInt);
 		}
 		int stringWidth = font.width(timeRemainingString);
-		fill(poseStack, width / 2 - stringWidth / 2, 5, width / 2 + stringWidth / 2, 15, 0x70000000);
-		drawString(poseStack, timeRemainingString, width / 2 - stringWidth / 2, 5, 0xFFFFFFFF);
+		guiGraphics.fill(width / 2 - stringWidth / 2, 5, width / 2 + stringWidth / 2, 15, 0x70000000);
+		drawString(guiGraphics, timeRemainingString, width / 2 - stringWidth / 2, 5, 0xFFFFFFFF);
 		stringWidth = font.width(info);
-		fill(poseStack, width / 2 - stringWidth / 2, 20, width / 2 + stringWidth / 2, 30, 0x70000000);
-		drawString(poseStack, info, width / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
+		guiGraphics.fill(width / 2 - stringWidth / 2, 20, width / 2 + stringWidth / 2, 30, 0x70000000);
+		drawString(guiGraphics, info, width / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
 	}
 
 	protected void buttonActionEvent(AbstractButton button, ButtonAction action) {
@@ -356,8 +357,8 @@ public class BattleGui extends Screen {
 		timeRemaining.set(remaining);
 	}
 
-	private void drawString(PoseStack poseStack, String string, int x, int y, int color) {
-		font.draw(poseStack, string, x, y, color);
+	private void drawString(GuiGraphics guiGraphics, String string, int x, int y, int color) {
+		guiGraphics.drawString(font, string, x, y, color);
 	}
 
 	public void setTurnTimerEnabled(boolean enabled) {

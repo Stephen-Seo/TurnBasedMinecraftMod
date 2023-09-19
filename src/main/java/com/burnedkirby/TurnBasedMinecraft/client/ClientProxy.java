@@ -333,12 +333,12 @@ public class ClientProxy extends CommonProxy {
                             break;
                         case USED_INVALID:
                             if (pkt.getCustom().length() > 0) {
-                                parentComponent.getSiblings().add(Component.literal(" tried to consume "));
+                                parentComponent.getSiblings().add(Component.literal(" tried to use "));
                                 parentComponent.getSiblings().add(Component.literal(pkt.getCustom()));
-                                parentComponent.getSiblings().add(Component.literal(" and failed!"));
+                                parentComponent.getSiblings().add(Component.literal("!"));
                                 TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             } else {
-                                parentComponent.getSiblings().add(Component.literal(" tried to consume an invalid item and failed!"));
+                                parentComponent.getSiblings().add(Component.literal(" tried to use an item!"));
                                 TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                             }
                             break;

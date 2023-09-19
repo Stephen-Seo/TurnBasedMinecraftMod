@@ -1,6 +1,7 @@
 package com.burnedkirby.TurnBasedMinecraft.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -22,13 +23,13 @@ public class ItemSelectionButton extends AbstractButton {
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float unk) {
         if (visible) {
             boolean hovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + getWidth() && mouseY < getY() + getHeight();
             if (hovered) {
-                fill(poseStack, getX(), getY(), getX() + getWidth(), getY() + getHeight(), 0x80FFFFFF);
+                guiGraphics.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), 0x80FFFFFF);
             } else {
-                fill(poseStack, getX(), getY(), getX() + getWidth(), getY() + getHeight(), 0x20707070);
+                guiGraphics.fill(getX(), getY(), getX() + getWidth(), getY() + getHeight(), 0x20707070);
             }
         }
     }

@@ -1,5 +1,16 @@
 # Upcoming changes
 
+# Version 1.23.0
+
+Support reproducible builds. This means that if this mod is compiled, then it
+should be byte-by-byte exactly the same as another compiled jar (assuming it
+was compiled with the same version of Java and same mod version.)
+
+Update to Forge 1.20.1-47.1.0.
+
+Experimental support for "use item" for unrecognized items. Note that this uses
+the Minecraft API's `Item.finishUsingItem(...)`.
+
 # Version 1.22.0
 
 Update to Forge 1.19.3-44.1.0.

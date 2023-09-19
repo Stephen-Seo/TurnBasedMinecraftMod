@@ -1,6 +1,9 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 9
+version = 10
+# Change this to "true" if you want the config to never be replaced. This means
+# that you will not get new mob listings from future updates unless this remains
+# "false"!
 do_not_overwrite = false
 
 [client_config]
@@ -1270,4 +1273,34 @@ speed = 68
 decision_attack_probability = 100
 decision_defend_probability = 0
 decision_flee_probability = 0
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.camel.Camel"
+attack_power = 0
+attack_probability = 70
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 10
+category = "passive"
+speed = 55
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.sniffer.Sniffer"
+attack_power = 0
+attack_probability = 70
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 10
+category = "passive"
+speed = 15
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 90
 ignore_battle = false

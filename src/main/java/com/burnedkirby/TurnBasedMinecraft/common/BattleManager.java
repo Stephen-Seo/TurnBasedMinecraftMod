@@ -142,7 +142,7 @@ public class BattleManager
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
                 sideB.add(event.getSource().getEntity());
-                createBattle(sideA, sideB, event.getEntity().level.dimension());
+                createBattle(sideA, sideB, event.getEntity().level().dimension());
                 logger.debug("Attack Not Canceled: new battle created");
             }
             else
@@ -251,7 +251,7 @@ public class BattleManager
                 Collection<Entity> sideB = new ArrayList<Entity>(1);
                 sideA.add(event.getEntity());
                 sideB.add(event.getNewTarget());
-                createBattle(sideA, sideB, event.getEntity().level.dimension());
+                createBattle(sideA, sideB, event.getEntity().level().dimension());
                 logger.debug("neither in battle, at least one is player, creating new battle");
             }
         } else {
@@ -365,7 +365,7 @@ public class BattleManager
     public boolean isInBattle(Entity entity) {
         synchronized(tempIDPair) {
             tempIDPair.id = entity.getId();
-            tempIDPair.dim = entity.level.dimension();
+            tempIDPair.dim = entity.level().dimension();
             return entityToBattleMap.keySet().contains(tempIDPair);
         }
     }

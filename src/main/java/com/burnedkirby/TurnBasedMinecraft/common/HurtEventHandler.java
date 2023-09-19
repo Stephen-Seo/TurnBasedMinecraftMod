@@ -7,9 +7,9 @@ public class HurtEventHandler {
     @SubscribeEvent
     public void handleHurtEvent(LivingHurtEvent event) {
         CommonProxy proxy = TurnBasedMinecraftMod.proxy;
-        if (event.getEntity().level.isClientSide || proxy.getBattleManager() == null) {
+        if (event.getEntity().level().isClientSide || proxy.getBattleManager() == null) {
             return;
-        } else if (proxy.getConfig().getIgnoreHurtDamageSources().contains(event.getSource().msgId) && proxy.getBattleManager().isInBattle(event.getEntity())) {
+        } else if (proxy.getConfig().getIgnoreHurtDamageSources().contains(event.getSource().getMsgId()) && proxy.getBattleManager().isInBattle(event.getEntity())) {
             event.setCanceled(true);
         }
     }

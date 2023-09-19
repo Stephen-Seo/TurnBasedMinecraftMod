@@ -6,6 +6,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -38,7 +39,7 @@ public class AttackEventHandler
                     {
                         iter.remove();
                     }
-                    else if(event.getSource().getEntity().equals(attacker.entity) && event.getSource().isProjectile())
+                    else if(event.getSource().getEntity().equals(attacker.entity) && event.getSource().is(DamageTypes.ARROW))
                     {
                         iter.remove();
                         if(!isValid)
@@ -60,7 +61,7 @@ public class AttackEventHandler
     @SubscribeEvent
     public void entityAttacked(LivingAttackEvent event)
     {
-        if(event.getEntity().level.isClientSide)
+        if(event.getEntity().level().isClientSide)
         {
             return;
         }
@@ -130,7 +131,7 @@ public class AttackEventHandler
                 && event.getEntity() != event.getSource().getEntity()
                 && !config.getBattleIgnoringPlayers().contains(event.getSource().getEntity().getId())
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getId())
-                && event.getEntity().level.dimension().equals(event.getSource().getEntity().level.dimension())
+                && event.getEntity().level().dimension().equals(event.getSource().getEntity().level().dimension())
                 && battleManager.checkAttack(event))
         {
 //            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.proxy.getAttackingEntity() + " and " + event.getEntity());
@@ -150,7 +151,7 @@ public class AttackEventHandler
     {
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
         BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();
-        if(event.getEntity().level.isClientSide
+        if(event.getEntity().level().isClientSide
                 || config.isOldBattleBehaviorEnabled()
                 || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getId()))
                 || (event.getNewTarget() != null && battleManager.isRecentlyLeftBattle(event.getNewTarget().getId()))
@@ -162,7 +163,7 @@ public class AttackEventHandler
                 && event.getNewTarget() != null
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getId())
                 && !config.getBattleIgnoringPlayers().contains(event.getNewTarget().getId())
-                && event.getEntity().level.dimension().equals(event.getNewTarget().level.dimension()))
+                && event.getEntity().level().dimension().equals(event.getNewTarget().level().dimension()))
         {
             TurnBasedMinecraftMod.proxy.getBattleManager().checkTargeted(event);
         }
