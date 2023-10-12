@@ -1,5 +1,13 @@
 # Upcoming changes
 
+# Version 1.23.1
+
+More robust handling of disallowed Damage Sources in battle (via config).
+Basically, the mod will load all possible damage sources. Damage sources to be
+ignored in battle can be modified with "/tbm-server-edit" and clicking on
+"ignore\_damage\_sources". It can also be manually modified in the server
+config's "ignore\_damage\_sources" array.
+
 # Version 1.23.0
 
 Support reproducible builds. This means that if this mod is compiled, then it

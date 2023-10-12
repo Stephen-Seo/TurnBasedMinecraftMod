@@ -7,6 +7,8 @@ import java.util.*;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.registries.VanillaRegistries;
 import org.apache.logging.log4j.Logger;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
@@ -67,29 +69,7 @@ public class Config
         possibleIgnoreHurtDamageSources = new HashSet<String>();
         ignoreHurtDamageSources = new HashSet<String>();
 
-        possibleIgnoreHurtDamageSources.add("inFire");
-        possibleIgnoreHurtDamageSources.add("lightningBolt");
-        possibleIgnoreHurtDamageSources.add("onFire");
-        possibleIgnoreHurtDamageSources.add("lava");
-        possibleIgnoreHurtDamageSources.add("hotFloor");
-        possibleIgnoreHurtDamageSources.add("inWall");
-        possibleIgnoreHurtDamageSources.add("cramming");
-        possibleIgnoreHurtDamageSources.add("drown");
-        possibleIgnoreHurtDamageSources.add("starve");
-        possibleIgnoreHurtDamageSources.add("cactus");
-        possibleIgnoreHurtDamageSources.add("fall");
-        possibleIgnoreHurtDamageSources.add("flyIntoWall");
-        possibleIgnoreHurtDamageSources.add("outOfWorld");
-        possibleIgnoreHurtDamageSources.add("magic");
-        possibleIgnoreHurtDamageSources.add("wither");
-        possibleIgnoreHurtDamageSources.add("anvil");
-        possibleIgnoreHurtDamageSources.add("fallingBlock");
-        possibleIgnoreHurtDamageSources.add("dragonBreath");
-        possibleIgnoreHurtDamageSources.add("dryout");
-        possibleIgnoreHurtDamageSources.add("sweetBerryBush");
-        possibleIgnoreHurtDamageSources.add("freeze");
-        possibleIgnoreHurtDamageSources.add("fallingStalactite");
-        possibleIgnoreHurtDamageSources.add("stalagmite");
+        loadDamageSources();
 
         {
             File confPath = new File(TurnBasedMinecraftMod.CONFIG_DIRECTORY);
@@ -1535,5 +1515,16 @@ public class Config
 
     public void setIsPlayerOnlyBattles(boolean enabled) {
         playerOnlyBattles = enabled;
+    }
+
+    private void loadDamageSources() {
+        possibleIgnoreHurtDamageSources.clear();
+
+        try {
+            VanillaRegistries.createLookup().lookupOrThrow(Registries.DAMAGE_TYPE).listElements().forEach(dt -> possibleIgnoreHurtDamageSources.add(dt.get().msgId()));
+        } catch (Exception e) {
+            logger.warn("Config failed to load possible DamageSources! Undesired things may happen, like Zombies dying from Fire during battle!");
+            logger.warn(e);
+        }
     }
 }

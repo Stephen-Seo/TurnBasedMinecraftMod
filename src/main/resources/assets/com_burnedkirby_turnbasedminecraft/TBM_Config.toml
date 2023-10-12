@@ -87,10 +87,7 @@ creeper_always_allow_damage = true
 
 # This array lists damage sources that are ignored for an entity in battle.
 # To allow damage from all sources during battle, make this array empty.
-# Valid values:
-# "inFire", "lightningBolt", "onFire", "lava", "hotFloor", "inWall", "cramming", "drown", "starve",
-# "cactus", "fall", "flyIntoWall", "outOfWorld", "magic", "wither", "anvil", "fallingBlock",
-# "dragonBreath", "dryout", "sweetBerryBush", "freeze", "fallingStalactite", "stalagmite"
+# Check the output of "/tbm-server-edit" and clicking on "ignore_damage_sources" for possible values.
 ignore_damage_sources = [
     "inFire",
     "onFire",

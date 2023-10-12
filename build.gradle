@@ -6,7 +6,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-version = "1.23.0"
+version = "1.23.1"
 group = "com.burnedkirby.TurnBasedMinecraft"
 archivesBaseName = "TurnBasedMinecraft"
 
