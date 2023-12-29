@@ -2,7 +2,8 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
@@ -11,8 +12,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketBattleMessage
 {
@@ -39,7 +40,8 @@ public class PacketBattleMessage
         BOW_NO_AMMO(18),
         CREEPER_WAIT(19),
         CREEPER_WAIT_FINAL(20),
-        CREEPER_EXPLODE(21);
+        CREEPER_EXPLODE(21),
+        CROSSBOW_NO_AMMO(22);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -153,31 +155,46 @@ public class PacketBattleMessage
         this.amount = amount;
         this.custom = custom;
     }
-    
-    public static void encode(PacketBattleMessage pkt, FriendlyByteBuf buf) {
-        buf.writeInt(pkt.messageType.getValue());
-        buf.writeInt(pkt.entityIDFrom);
-        buf.writeInt(pkt.entityIDTo);
-        buf.writeUtf(Utility.serializeDimension(pkt.dimension));
-        buf.writeInt(pkt.amount);
-        buf.writeUtf(pkt.custom);
+
+    public static class Encoder implements BiConsumer<PacketBattleMessage, FriendlyByteBuf> {
+        public Encoder() {}
+
+        @Override
+        public void accept(PacketBattleMessage pkt, FriendlyByteBuf buf) {
+            buf.writeInt(pkt.messageType.getValue());
+            buf.writeInt(pkt.entityIDFrom);
+            buf.writeInt(pkt.entityIDTo);
+            buf.writeUtf(Utility.serializeDimension(pkt.dimension));
+            buf.writeInt(pkt.amount);
+            buf.writeUtf(pkt.custom);
+        }
     }
-    
-    public static PacketBattleMessage decode(FriendlyByteBuf buf) {
-    	return new PacketBattleMessage(
-    		MessageType.valueOf(
-    			buf.readInt()),
-			buf.readInt(),
-			buf.readInt(),
-			Utility.deserializeDimension(buf.readUtf()),
-			buf.readInt(),
-			buf.readUtf());
+
+    public static class Decoder implements Function<FriendlyByteBuf, PacketBattleMessage> {
+        public Decoder() {}
+
+        @Override
+        public PacketBattleMessage apply(FriendlyByteBuf buf) {
+            return new PacketBattleMessage(
+                MessageType.valueOf(
+                    buf.readInt()),
+                buf.readInt(),
+                buf.readInt(),
+                Utility.deserializeDimension(buf.readUtf()),
+                buf.readInt(),
+                buf.readUtf());
+        }
     }
-    
-    public static void handle(final PacketBattleMessage pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
-        });
-        ctx.get().setPacketHandled(true);
+
+    public static class Consumer implements BiConsumer<PacketBattleMessage, CustomPayloadEvent.Context> {
+        public Consumer() {}
+
+        @Override
+        public void accept(PacketBattleMessage pkt, CustomPayloadEvent.Context ctx) {
+            ctx.enqueueWork(() -> {
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
+            });
+            ctx.setPacketHandled(true);
+        }
     }
 }

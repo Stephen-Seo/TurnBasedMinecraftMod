@@ -1,13 +1,14 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import java.util.function.Supplier;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
 
 public class PacketGeneralMessage
 {
@@ -26,19 +27,34 @@ public class PacketGeneralMessage
     {
         this.message = message;
     }
-    
-    public static void encode(PacketGeneralMessage pkt, FriendlyByteBuf buf) {
-    	buf.writeUtf(pkt.message);
+
+    public static class Encoder implements BiConsumer<PacketGeneralMessage, FriendlyByteBuf> {
+        public Encoder() {}
+
+        @Override
+        public void accept(PacketGeneralMessage pkt, FriendlyByteBuf buf) {
+            buf.writeUtf(pkt.message);
+        }
     }
-    
-    public static PacketGeneralMessage decode(FriendlyByteBuf buf) {
-    	return new PacketGeneralMessage(buf.readUtf());
+
+    public static class Decoder implements Function<FriendlyByteBuf, PacketGeneralMessage> {
+        public Decoder() {}
+
+        @Override
+        public PacketGeneralMessage apply(FriendlyByteBuf buf) {
+            return new PacketGeneralMessage(buf.readUtf());
+        }
     }
-    
-    public static void handle(final PacketGeneralMessage pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
-        });
-        ctx.get().setPacketHandled(true);
+
+    public static class Consumer implements BiConsumer<PacketGeneralMessage, CustomPayloadEvent.Context> {
+        public Consumer() {}
+
+        @Override
+        public void accept(PacketGeneralMessage pkt, CustomPayloadEvent.Context ctx) {
+            ctx.enqueueWork(() -> {
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
+            });
+            ctx.setPacketHandled(true);
+        }
     }
 }

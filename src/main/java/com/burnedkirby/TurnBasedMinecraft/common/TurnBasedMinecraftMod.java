@@ -29,9 +29,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.network.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.23.1";
+    public static final String VERSION = "1.24.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -50,13 +48,14 @@ public class TurnBasedMinecraftMod {
     public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
 
-    private static final String PROTOCOL_VERSION = Integer.toString(2);
+    private static final Integer PROTOCOL_VERSION = 3;
     private static final ResourceLocation HANDLER_ID = new ResourceLocation(MODID, "main_channel");
-    private static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
+
+    private static final SimpleChannel HANDLER = ChannelBuilder
         .named(HANDLER_ID)
-        .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-        .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-        .networkProtocolVersion(() -> PROTOCOL_VERSION)
+        .clientAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
+        .serverAcceptedVersions(Channel.VersionTest.exact(PROTOCOL_VERSION))
+        .networkProtocolVersion(PROTOCOL_VERSION)
         .simpleChannel();
     protected static Logger logger = LogManager.getLogger();
 
@@ -84,43 +83,36 @@ public class TurnBasedMinecraftMod {
         proxy.initialize();
 
         // register packets
-        int packetHandlerID = 0;
-        HANDLER.registerMessage(
-            packetHandlerID++,
-            PacketBattleInfo.class,
-            PacketBattleInfo::encode,
-            PacketBattleInfo::decode,
-            PacketBattleInfo::handle);
-        HANDLER.registerMessage(
-            packetHandlerID++,
-            PacketBattleRequestInfo.class,
-            PacketBattleRequestInfo::encode,
-            PacketBattleRequestInfo::decode,
-            PacketBattleRequestInfo::handle);
-        HANDLER.registerMessage(
-            packetHandlerID++,
-            PacketBattleDecision.class,
-            PacketBattleDecision::encode,
-            PacketBattleDecision::decode,
-            PacketBattleDecision::handle);
-        HANDLER.registerMessage(
-            packetHandlerID++,
-            PacketBattleMessage.class,
-            PacketBattleMessage::encode,
-            PacketBattleMessage::decode,
-            PacketBattleMessage::handle);
-        HANDLER.registerMessage(
-            packetHandlerID++,
-            PacketGeneralMessage.class,
-            PacketGeneralMessage::encode,
-            PacketGeneralMessage::decode,
-            PacketGeneralMessage::handle);
-        HANDLER.registerMessage(
-            packetHandlerID++,
-            PacketEditingMessage.class,
-            PacketEditingMessage::encode,
-            PacketEditingMessage::decode,
-            PacketEditingMessage::handle);
+        HANDLER.messageBuilder(PacketBattleInfo.class, NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(new PacketBattleInfo.Encoder())
+            .decoder(new PacketBattleInfo.Decoder())
+            .consumerNetworkThread(new PacketBattleInfo.Consumer())
+            .add();
+        HANDLER.messageBuilder(PacketBattleRequestInfo.class, NetworkDirection.PLAY_TO_SERVER)
+            .encoder(new PacketBattleRequestInfo.Encoder())
+            .decoder(new PacketBattleRequestInfo.Decoder())
+            .consumerNetworkThread(new PacketBattleRequestInfo.Consumer())
+            .add();
+        HANDLER.messageBuilder(PacketBattleDecision.class, NetworkDirection.PLAY_TO_SERVER)
+            .encoder(new PacketBattleDecision.Encoder())
+            .decoder(new PacketBattleDecision.Decoder())
+            .consumerNetworkThread(new PacketBattleDecision.Consumer())
+            .add();
+        HANDLER.messageBuilder(PacketBattleMessage.class, NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(new PacketBattleMessage.Encoder())
+            .decoder(new PacketBattleMessage.Decoder())
+            .consumerNetworkThread(new PacketBattleMessage.Consumer())
+            .add();
+        HANDLER.messageBuilder(PacketGeneralMessage.class, NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(new PacketGeneralMessage.Encoder())
+            .decoder(new PacketGeneralMessage.Decoder())
+            .consumerNetworkThread(new PacketGeneralMessage.Consumer())
+            .add();
+        HANDLER.messageBuilder(PacketEditingMessage.class, NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(new PacketEditingMessage.Encoder())
+            .decoder(new PacketEditingMessage.Decoder())
+            .consumerNetworkThread(new PacketEditingMessage.Consumer())
+            .add();
 
         // register event handler(s)
         MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
@@ -172,7 +164,7 @@ public class TurnBasedMinecraftMod {
                     proxy.getConfig().setBattleDisabledForAll(true);
                     for (ServerPlayer player : c.getSource().getServer().getPlayerList().getPlayers()) {
                         proxy.getConfig().addBattleIgnoringPlayer(player.getId());
-                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP disabled turn-based-combat for everyone"));
+                        getHandler().send(new PacketGeneralMessage("OP disabled turn-based-combat for everyone"), PacketDistributor.PLAYER.with(player));
                     }
                     return 1;
                 }));
@@ -193,7 +185,7 @@ public class TurnBasedMinecraftMod {
                     proxy.getConfig().setBattleDisabledForAll(false);
                     proxy.getConfig().clearBattleIgnoringPlayers();
                     for (ServerPlayer player : c.getSource().getServer().getPlayerList().getPlayers()) {
-                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP enabled turn-based-combat for everyone"));
+                        getHandler().send(new PacketGeneralMessage("OP enabled turn-based-combat for everyone"), PacketDistributor.PLAYER.with(player));
                     }
                     return 1;
                 }));
@@ -204,7 +196,7 @@ public class TurnBasedMinecraftMod {
                 .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
                     for (ServerPlayer player : EntityArgument.getPlayers(c, "targets")) {
                         proxy.getConfig().addBattleIgnoringPlayer(player.getId());
-                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP enabled turn-based-combat for you"));
+                        getHandler().send(new PacketGeneralMessage("OP enabled turn-based-combat for you"), PacketDistributor.PLAYER.with(player));
                         c.getSource().sendSuccess(() -> Component.literal("Enabled turn-based-combat for " + player.getDisplayName().getString()), true);
                     }
                     return 1;
@@ -216,7 +208,7 @@ public class TurnBasedMinecraftMod {
                 .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
                     for (ServerPlayer player : EntityArgument.getPlayers(c, "targets")) {
                         proxy.getConfig().removeBattleIgnoringPlayer(player.getId());
-                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("OP disabled turn-based-combat for you"));
+                        getHandler().send(new PacketGeneralMessage("OP disabled turn-based-combat for you"), PacketDistributor.PLAYER.with(player));
                         c.getSource().sendSuccess(() -> Component.literal("Disabled turn-based-combat for " + player.getDisplayName().getString()), true);
                     }
                     return 1;
@@ -229,12 +221,12 @@ public class TurnBasedMinecraftMod {
                     ServerPlayer player = c.getSource().getPlayerOrException();
                     EditingInfo editingInfo = proxy.getEditingInfo(player.getId());
                     if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                        getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                     } else if (editingInfo != null) {
-                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                        getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                     } else {
                         proxy.setEditingPlayer(player);
-                        getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                        getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                         logger.info("Begin editing TBM Entity for player \"" + player.getDisplayName().getString() + "\" (\"" + c.getSource().getDisplayName() + "\")");
                     }
                     return 1;
@@ -245,14 +237,14 @@ public class TurnBasedMinecraftMod {
                         EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                         if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                             if (!proxy.getConfig().editEntityEntry(editingInfo.entityInfo)) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("An error occurred while attempting to save an entry to the config"));
+                                getHandler().send(new PacketGeneralMessage("An error occurred while attempting to save an entry to the config"), PacketDistributor.PLAYER.with(player));
                                 proxy.removeEditingInfo(player.getId());
                             } else {
                                 proxy.removeEditingInfo(player.getId());
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("Entity info saved in config and loaded."));
+                                getHandler().send(new PacketGeneralMessage("Entity info saved in config and loaded."), PacketDistributor.PLAYER.with(player));
                             }
                         } else if (editingInfo != null) {
-                            getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                            getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                         } else {
                             Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                             throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -265,7 +257,7 @@ public class TurnBasedMinecraftMod {
                         EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                         if (editingInfo != null) {
                             proxy.removeEditingInfo(player.getId());
-                            getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketGeneralMessage("Cancelled editing entry."));
+                            getHandler().send(new PacketGeneralMessage("Cancelled editing entry."), PacketDistributor.PLAYER.with(player));
                         }
                         return 1;
                     }))
@@ -277,11 +269,11 @@ public class TurnBasedMinecraftMod {
                             Message exceptionMessage = new LiteralMessage("Invalid action for tbm-edit");
                             throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
                         } else if (editingInfo != null) {
-                            getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                            getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                         } else {
                             proxy.setEditingPlayer(player);
                             proxy.getEditingInfo(player.getId()).isEditingCustomName = true;
-                            getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                            getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             logger.info("Begin editing custom TBM Entity for player \"" + player.getDisplayName().getString() + "\" (\"" + c.getSource().getDisplayName() + "\")");
                         }
                         return 1;
@@ -291,9 +283,9 @@ public class TurnBasedMinecraftMod {
                         ServerPlayer player = c.getSource().getPlayerOrException();
                         EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                         if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                            getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                            getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                         } else if (editingInfo != null) {
-                            getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                            getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                         } else {
                             Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                             throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -305,9 +297,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_IGNORE_BATTLE));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_IGNORE_BATTLE), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -321,9 +313,9 @@ public class TurnBasedMinecraftMod {
                                 boolean ignoreBattle = BoolArgumentType.getBool(c, "ignoreBattle");
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.ignoreBattle = ignoreBattle;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -336,9 +328,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_POWER));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_POWER), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -355,9 +347,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.attackPower = attackPower;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -370,9 +362,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_PROBABILITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_PROBABILITY), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -391,9 +383,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.attackProbability = attackProbability;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -406,9 +398,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_VARIANCE));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_VARIANCE), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -425,9 +417,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.attackVariance = attackVariance;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -440,9 +432,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_EFFECT));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_EFFECT), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -456,9 +448,9 @@ public class TurnBasedMinecraftMod {
                                 EntityInfo.Effect effect = EntityInfo.Effect.fromString(StringArgumentType.getString(c, "attackEffect"));
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.attackEffect = effect;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -471,9 +463,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_EFFECT_PROBABILITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_ATTACK_EFFECT_PROBABILITY), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -492,9 +484,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.attackEffectProbability = attackEffectProbability;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -507,9 +499,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DEFENSE_DAMAGE));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DEFENSE_DAMAGE), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -526,9 +518,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.defenseDamage = defenseDamage;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -541,9 +533,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DEFENSE_DAMAGE_PROBABILITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DEFENSE_DAMAGE_PROBABILITY), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -562,9 +554,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.defenseDamageProbability = defenseDamageProbability;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -577,9 +569,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_EVASION));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_EVASION), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -598,9 +590,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.evasion = evasion;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -613,9 +605,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_SPEED));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_SPEED), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -632,9 +624,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.speed = speed;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -647,9 +639,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_CATEGORY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_CATEGORY), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -663,9 +655,9 @@ public class TurnBasedMinecraftMod {
                                 String category = StringArgumentType.getString(c, "category");
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.category = category;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -678,9 +670,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_ATTACK));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_ATTACK), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -699,9 +691,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.decisionAttack = decisionAttack;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -714,9 +706,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_DEFEND));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_DEFEND), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -735,9 +727,9 @@ public class TurnBasedMinecraftMod {
                                 }
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.decisionDefend = decisionDefend;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -750,9 +742,9 @@ public class TurnBasedMinecraftMod {
                             ServerPlayer player = c.getSource().getPlayerOrException();
                             EditingInfo editingInfo = TurnBasedMinecraftMod.proxy.getEditingInfo(player.getId());
                             if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_FLEE));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.EDIT_DECISION_FLEE), PacketDistributor.PLAYER.with(player));
                             } else if (editingInfo != null) {
-                                getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                             } else {
                                 Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                 throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -766,9 +758,9 @@ public class TurnBasedMinecraftMod {
                                 int decisionFlee = IntegerArgumentType.getInteger(c, "decisionFlee");
                                 if (editingInfo != null && !editingInfo.isPendingEntitySelection) {
                                     editingInfo.entityInfo.decisionFlee = decisionFlee;
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with(player));
                                 } else if (editingInfo != null) {
-                                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY));
+                                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.ATTACK_ENTITY), PacketDistributor.PLAYER.with(player));
                                 } else {
                                     Message exceptionMessage = new LiteralMessage("Cannot edit entity without starting editing (use \"/tbm-edit\").");
                                     throw new CommandSyntaxException(new SimpleCommandExceptionType(exceptionMessage), exceptionMessage);
@@ -784,7 +776,7 @@ public class TurnBasedMinecraftMod {
                 .requires(c -> c.hasPermission(2))
                 .executes(c -> {
                     ServerPlayer player = c.getSource().getPlayerOrException();
-                    getHandler().send(PacketDistributor.PLAYER.with(() -> player), new PacketEditingMessage(PacketEditingMessage.Type.SERVER_EDIT));
+                    getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.SERVER_EDIT), PacketDistributor.PLAYER.with(player));
                     return 1;
                 })
                 .then(Commands.literal("leave_battle_cooldown").executes(c -> {

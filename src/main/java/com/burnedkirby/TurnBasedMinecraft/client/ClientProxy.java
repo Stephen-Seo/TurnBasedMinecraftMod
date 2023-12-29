@@ -15,9 +15,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 
 public class ClientProxy extends CommonProxy {
     private BattleGui battleGui = null;
@@ -224,7 +222,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public <MSG> void handlePacket(MSG msg, Supplier<NetworkEvent.Context> ctx) {
+    public <MSG> void handlePacket(MSG msg, CustomPayloadEvent.Context ctx) {
         if (msg.getClass() == PacketBattleMessage.class) {
             PacketBattleMessage pkt = (PacketBattleMessage) msg;
             Entity fromEntity = getEntity(pkt.getEntityIDFrom(), pkt.getDimension());
@@ -433,6 +431,12 @@ public class ClientProxy extends CommonProxy {
                     MutableComponent message = Component.literal(" exploded!");
                     message.setStyle(message.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)));
                     parentComponent.getSiblings().add(message);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
+                }
+                break;
+                case CROSSBOW_NO_AMMO: {
+                    parentComponent.getSiblings().add(from);
+                    parentComponent.getSiblings().add(Component.literal(" tried to use their crossbow but ran out of ammo!"));
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                 }
                 break;

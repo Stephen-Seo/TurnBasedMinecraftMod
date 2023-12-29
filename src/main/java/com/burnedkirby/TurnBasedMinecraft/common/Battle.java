@@ -4,6 +4,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -448,7 +449,7 @@ public class Battle {
         }
         PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer, TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
         for (Combatant p : players.values()) {
-            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p.entity), infoPacket);
+            TurnBasedMinecraftMod.getHandler().send(infoPacket, PacketDistributor.PLAYER.with((ServerPlayer)p.entity));
         }
     }
 
@@ -463,7 +464,7 @@ public class Battle {
         PacketBattleMessage packet = new PacketBattleMessage(type, from, to, dimension, amount, custom);
         for (Combatant p : players.values()) {
             if (p.entity.isAlive()) {
-                TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p.entity), packet);
+                TurnBasedMinecraftMod.getHandler().send(packet, PacketDistributor.PLAYER.with((ServerPlayer)p.entity));
             }
         }
     }
@@ -573,7 +574,7 @@ public class Battle {
 
     private void removeCombatantPostRemove(Combatant c) {
         if (c.entity instanceof Player) {
-            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) c.entity), new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, dimension, 0));
+            TurnBasedMinecraftMod.getHandler().send(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, dimension, 0), PacketDistributor.PLAYER.with((ServerPlayer)c.entity));
         }
         battleManager.addRecentlyLeftBattle(c);
     }
@@ -791,6 +792,29 @@ public class Battle {
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getId(), targetEntity.getId(), 0);
                                     } else {
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.BOW_NO_AMMO, next.entity.getId(), 0, 0);
+                                    }
+                                    continue;
+                                } else if (heldItemStack.getItem() instanceof CrossbowItem) {
+                                    debugLog += " with crossbow";
+                                    if (Utility.doesPlayerHaveArrows((Player)next.entity)) {
+                                        // Similar to attack with bow.
+                                        final Entity nextEntity = next.entity;
+                                        final Entity targetEntity = target.entity;
+                                        final float yawDirection = Utility.yawDirection(next.entity.getX(), next.entity.getZ(), target.entity.getX(), target.entity.getZ());
+                                        final float pitchDirection = Utility.pitchDirection(next.entity.getX(), next.entity.getY(), next.entity.getZ(), target.entity.getX(), target.entity.getY(), target.entity.getZ());
+                                        if (TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled()) {
+                                            next.yaw = yawDirection;
+                                            next.pitch = pitchDirection;
+                                        }
+                                        // have player look at attack target
+                                        ((ServerPlayer) nextEntity).connection.teleport(nextEntity.getX(), nextEntity.getY(), nextEntity.getZ(), yawDirection, pitchDirection);
+                                        CrossbowItem itemCrossbow = (CrossbowItem) heldItemStack.getItem();
+                                        TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
+                                        itemCrossbow.releaseUsing(((Player) nextEntity).getMainHandItem(), nextEntity.level(), (LivingEntity) nextEntity, -100);
+                                        itemCrossbow.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND);
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getId(), targetEntity.getId(), 0);
+                                    } else {
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.CROSSBOW_NO_AMMO, next.entity.getId(), 0, 0);
                                     }
                                     continue;
                                 }

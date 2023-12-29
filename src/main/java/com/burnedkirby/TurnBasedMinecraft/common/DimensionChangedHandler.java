@@ -15,8 +15,8 @@ public class DimensionChangedHandler {
         if(TurnBasedMinecraftMod.proxy.getBattleManager().forceLeaveBattle(new EntityIDDimPair(event.getEntity()))
                 && event.getEntity() instanceof ServerPlayer) {
             TurnBasedMinecraftMod.getHandler().send(
-                    PacketDistributor.PLAYER.with(() -> (ServerPlayer)event.getEntity()),
-                    new PacketGeneralMessage("Left battle due to moving to a different dimension"));
+                new PacketGeneralMessage("Left battle due to moving to a different dimension"),
+                PacketDistributor.PLAYER.with((ServerPlayer)event.getEntity()));
         }
     }
 }

@@ -61,7 +61,7 @@ configured for them.)
 # Building
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
-finished jar will be saved at "build/libs/TurnBasedMinecraft-1.23.1.jar"
+finished jar will be saved at "build/libs/TurnBasedMinecraft-Forge-1.24.0.jar"
 
 # Other notes
 

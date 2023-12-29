@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
 
@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class CommonProxy
 {
@@ -173,5 +172,5 @@ public class CommonProxy
         return ServerLifecycleHooks.getCurrentServer().getLevel(dim).getEntity(id);
     }
 
-    public <MSG> void handlePacket(MSG msg, Supplier<NetworkEvent.Context> ctx) {}
+    public <MSG> void handlePacket(MSG msg,CustomPayloadEvent.Context ctx) {}
 }

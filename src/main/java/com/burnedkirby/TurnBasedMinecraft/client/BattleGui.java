@@ -5,13 +5,13 @@ import com.burnedkirby.TurnBasedMinecraft.common.Combatant;
 import com.burnedkirby.TurnBasedMinecraft.common.Config;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleDecision;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -269,29 +269,35 @@ public class BattleGui extends Screen {
 		drawString(guiGraphics, info, width / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
 	}
 
+	@Override
+	public void renderBackground(GuiGraphics p_283688_, int p_299421_, int p_298679_, float p_297268_) {
+	}
+
 	protected void buttonActionEvent(AbstractButton button, ButtonAction action) {
 		switch (action) {
 		case ATTACK:
 			setState(MenuState.ATTACK_TARGET);
 			break;
 		case DEFEND:
-			TurnBasedMinecraftMod.getHandler().sendToServer(new PacketBattleDecision(
-					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.DEFEND, 0));
+			TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
+				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.DEFEND, 0),
+				PacketDistributor.SERVER.noArg());
 			setState(MenuState.WAITING);
 			break;
 		case ITEM:
 			setState(MenuState.ITEM_ACTION);
 			break;
 		case FLEE:
-			TurnBasedMinecraftMod.getHandler().sendToServer(new PacketBattleDecision(
-					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.FLEE, 0));
+			TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
+				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.FLEE, 0),
+				PacketDistributor.SERVER.noArg());
 			setState(MenuState.WAITING);
 			break;
 		case ATTACK_TARGET:
 			if (button instanceof EntitySelectionButton) {
-				TurnBasedMinecraftMod.getHandler()
-						.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(),
-								Battle.Decision.ATTACK, ((EntitySelectionButton) button).getID()));
+				TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
+					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.ATTACK, ((EntitySelectionButton) button).getID()),
+					PacketDistributor.SERVER.noArg());
 				setState(MenuState.WAITING);
 			} else {
 				setState(MenuState.MAIN_MENU);
@@ -308,9 +314,9 @@ public class BattleGui extends Screen {
 			break;
 		case DO_ITEM_SWITCH:
 			if (button instanceof ItemSelectionButton) {
-				TurnBasedMinecraftMod.getHandler()
-						.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(),
-								Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton) button).getID()));
+				TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
+					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton) button).getID()),
+					PacketDistributor.SERVER.noArg());
 				if (((ItemSelectionButton) button).getID() >= 0 && ((ItemSelectionButton) button).getID() < 9) {
 					Minecraft.getInstance().player.getInventory().selected = ((ItemSelectionButton) button).getID();
 				}
@@ -321,9 +327,9 @@ public class BattleGui extends Screen {
 			break;
 		case DO_USE_ITEM:
 			if (button instanceof ItemSelectionButton) {
-				TurnBasedMinecraftMod.getHandler()
-						.sendToServer(new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(),
-								Battle.Decision.USE_ITEM, ((ItemSelectionButton) button).getID()));
+				TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
+					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.USE_ITEM, ((ItemSelectionButton) button).getID()),
+					PacketDistributor.SERVER.noArg());
 				setState(MenuState.WAITING);
 			} else {
 				setState(MenuState.MAIN_MENU);
