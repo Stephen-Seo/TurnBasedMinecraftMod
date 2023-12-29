@@ -4,6 +4,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -13,8 +14,8 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.CreativeModeTabRegistry;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.CreativeModeTabRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -791,6 +792,28 @@ public class Battle {
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getId(), targetEntity.getId(), 0);
                                     } else {
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.BOW_NO_AMMO, next.entity.getId(), 0, 0);
+                                    }
+                                    continue;
+                                } else if (heldItemStack.getItem() instanceof CrossbowItem) {
+                                    debugLog += " with crossbow";
+                                    if (Utility.doesPlayerHaveArrows((Player) next.entity)) {
+                                        final Entity nextEntity = next.entity;
+                                        final Entity targetEntity = target.entity;
+                                        final float yawDirection = Utility.yawDirection(next.entity.getX(), next.entity.getZ(), target.entity.getX(), target.entity.getZ());
+                                        final float pitchDirection = Utility.pitchDirection(next.entity.getX(), next.entity.getY(), next.entity.getZ(), target.entity.getX(), target.entity.getY(), target.entity.getZ());
+                                        if (TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled()) {
+                                            next.yaw = yawDirection;
+                                            next.pitch = pitchDirection;
+                                        }
+                                        // have player look at attack target
+                                        ((ServerPlayer) nextEntity).connection.teleport(nextEntity.getX(), nextEntity.getY(), nextEntity.getZ(), yawDirection, pitchDirection);
+                                        CrossbowItem itemCrossbow = (CrossbowItem) heldItemStack.getItem();
+                                        TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
+                                        itemCrossbow.releaseUsing(heldItemStack, nextEntity.level(), (LivingEntity)nextEntity, -100);
+                                        itemCrossbow.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND);
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getId(), targetEntity.getId(), 0);
+                                    } else {
+                                        sendMessageToAllPlayers(PacketBattleMessage.MessageType.CROSSBOW_NO_AMMO, next.entity.getId(), 0, 0);
                                     }
                                     continue;
                                 }

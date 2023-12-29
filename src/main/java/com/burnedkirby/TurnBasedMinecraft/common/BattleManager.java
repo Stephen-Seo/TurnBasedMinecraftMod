@@ -7,10 +7,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
@@ -32,7 +32,7 @@ public class BattleManager
         recentlyLeftBattle = new HashMap<Integer, Combatant>();
         battleUpdater = new BattleUpdater(this);
         entityToBattleMap = new HashMap<EntityIDDimPair, Integer>();
-        MinecraftForge.EVENT_BUS.register(battleUpdater);
+        NeoForge.EVENT_BUS.register(battleUpdater);
         tempIDPair = new EntityIDDimPair();
     }
     
@@ -307,7 +307,7 @@ public class BattleManager
     public void cleanup()
     {
         battleUpdater.setRunning(false);
-        MinecraftForge.EVENT_BUS.unregister(battleUpdater);
+        NeoForge.EVENT_BUS.unregister(battleUpdater);
         battleMap.clear();
         battleUpdater = null;
     }

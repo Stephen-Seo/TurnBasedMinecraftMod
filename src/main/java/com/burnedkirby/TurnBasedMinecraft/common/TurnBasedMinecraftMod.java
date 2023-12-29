@@ -1,5 +1,6 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
+import ca.weblite.objc.Client;
 import com.burnedkirby.TurnBasedMinecraft.client.ClientProxy;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.*;
 import com.mojang.brigadier.LiteralMessage;
@@ -18,20 +19,20 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.network.NetworkRegistry;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.23.1";
+    public static final String VERSION = "1.24.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -50,7 +51,7 @@ public class TurnBasedMinecraftMod {
     public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
 
-    private static final String PROTOCOL_VERSION = Integer.toString(2);
+    private static final String PROTOCOL_VERSION = Integer.toString(3);
     private static final ResourceLocation HANDLER_ID = new ResourceLocation(MODID, "main_channel");
     private static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
         .named(HANDLER_ID)
@@ -75,11 +76,15 @@ public class TurnBasedMinecraftMod {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::secondInitClient);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::secondInitServer);
 
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(this);
     }
 
     private void firstInit(final FMLCommonSetupEvent event) {
-        proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+        if (FMLEnvironment.dist.isClient()) {
+            proxy = new ClientProxy();
+        } else {
+            proxy = new CommonProxy();
+        }
         proxy.setLogger(logger);
         proxy.initialize();
 
@@ -88,45 +93,45 @@ public class TurnBasedMinecraftMod {
         HANDLER.registerMessage(
             packetHandlerID++,
             PacketBattleInfo.class,
-            PacketBattleInfo::encode,
-            PacketBattleInfo::decode,
-            PacketBattleInfo::handle);
+            new PacketBattleInfo.Encoder(),
+            new PacketBattleInfo.Decoder(),
+            new PacketBattleInfo.Consumer());
         HANDLER.registerMessage(
             packetHandlerID++,
             PacketBattleRequestInfo.class,
-            PacketBattleRequestInfo::encode,
-            PacketBattleRequestInfo::decode,
-            PacketBattleRequestInfo::handle);
+            new PacketBattleRequestInfo.Encoder(),
+            new PacketBattleRequestInfo.Decoder(),
+            new PacketBattleRequestInfo.Consumer());
         HANDLER.registerMessage(
             packetHandlerID++,
             PacketBattleDecision.class,
-            PacketBattleDecision::encode,
-            PacketBattleDecision::decode,
-            PacketBattleDecision::handle);
+            new PacketBattleDecision.Encoder(),
+            new PacketBattleDecision.Decoder(),
+            new PacketBattleDecision.Consumer());
         HANDLER.registerMessage(
             packetHandlerID++,
             PacketBattleMessage.class,
-            PacketBattleMessage::encode,
-            PacketBattleMessage::decode,
-            PacketBattleMessage::handle);
+            new PacketBattleMessage.Encoder(),
+            new PacketBattleMessage.Decoder(),
+            new PacketBattleMessage.Consumer());
         HANDLER.registerMessage(
             packetHandlerID++,
             PacketGeneralMessage.class,
-            PacketGeneralMessage::encode,
-            PacketGeneralMessage::decode,
-            PacketGeneralMessage::handle);
+            new PacketGeneralMessage.Encoder(),
+            new PacketGeneralMessage.Decoder(),
+            new PacketGeneralMessage.Consumer());
         HANDLER.registerMessage(
             packetHandlerID++,
             PacketEditingMessage.class,
-            PacketEditingMessage::encode,
-            PacketEditingMessage::decode,
-            PacketEditingMessage::handle);
+            new PacketEditingMessage.Encoder(),
+            new PacketEditingMessage.Decoder(),
+            new PacketEditingMessage.Consumer());
 
         // register event handler(s)
-        MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
-        MinecraftForge.EVENT_BUS.register(new PlayerJoinEventHandler());
-        MinecraftForge.EVENT_BUS.register(new DimensionChangedHandler());
-        MinecraftForge.EVENT_BUS.register(new HurtEventHandler());
+        NeoForge.EVENT_BUS.register(new AttackEventHandler());
+        NeoForge.EVENT_BUS.register(new PlayerJoinEventHandler());
+        NeoForge.EVENT_BUS.register(new DimensionChangedHandler());
+        NeoForge.EVENT_BUS.register(new HurtEventHandler());
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }

@@ -1,8 +1,8 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 
 public class PlayerJoinEventHandler
 {

@@ -9,10 +9,10 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class AttackEventHandler
 {

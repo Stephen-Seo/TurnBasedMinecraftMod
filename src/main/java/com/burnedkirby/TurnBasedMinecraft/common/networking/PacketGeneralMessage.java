@@ -1,13 +1,13 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import java.util.function.Supplier;
-
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.DistExecutor;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.simple.MessageFunctions;
 
 public class PacketGeneralMessage
 {
@@ -26,19 +26,36 @@ public class PacketGeneralMessage
     {
         this.message = message;
     }
-    
-    public static void encode(PacketGeneralMessage pkt, FriendlyByteBuf buf) {
-    	buf.writeUtf(pkt.message);
+
+    public static class Encoder implements MessageFunctions.MessageEncoder<PacketGeneralMessage> {
+        public Encoder() {}
+
+        @Override
+        public void encode(PacketGeneralMessage pkt, FriendlyByteBuf buf) {
+            buf.writeUtf(pkt.message);
+        }
     }
-    
-    public static PacketGeneralMessage decode(FriendlyByteBuf buf) {
-    	return new PacketGeneralMessage(buf.readUtf());
+
+    public static class Decoder implements MessageFunctions.MessageDecoder<PacketGeneralMessage> {
+        public Decoder() {}
+
+        @Override
+        public PacketGeneralMessage decode(FriendlyByteBuf buf) {
+            return new PacketGeneralMessage(buf.readUtf());
+        }
     }
-    
-    public static void handle(final PacketGeneralMessage pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
-        });
-        ctx.get().setPacketHandled(true);
+
+    public static class Consumer implements MessageFunctions.MessageConsumer<PacketGeneralMessage> {
+        public Consumer() {}
+
+        @Override
+        public void handle(PacketGeneralMessage pkt, NetworkEvent.Context ctx) {
+            ctx.enqueueWork(() -> {
+                if (FMLEnvironment.dist.isClient()) {
+                    TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
+                }
+            });
+            ctx.setPacketHandled(true);
+        }
     }
 }

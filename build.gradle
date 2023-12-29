@@ -2,168 +2,88 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'net.neoforged.gradle.userdev' version '7.0.57'
 }
 
-version = "1.23.1"
+version = "1.24.0"
 group = "com.burnedkirby.TurnBasedMinecraft"
-archivesBaseName = "TurnBasedMinecraft"
+archivesBaseName = "TurnBasedMinecraft-NeoForge"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
-minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: mapping_channel, version: mapping_version
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+jarJar.enable()
 
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+// Default run configurations.
+// These can be tweaked, removed, or duplicated as needed.
+runs {
+    // applies to all the run configs below
+    configureEach {
+        // Recommended logging data for a userdev environment
+        // The markers can be added/remove as needed separated by commas.
+        // "SCAN": For mods scan.
+        // "REGISTRIES": For firing of registry events.
+        // "REGISTRYDUMP": For getting the contents of all registries.
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
 
-    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    // It is REQUIRED to be set to true for this template to function.
-    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-    copyIdeResources = true
+        // Recommended logging level for the console
+        // You can set various levels here.
+        // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+        systemProperty 'forge.logging.console.level', 'debug'
 
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        client {
-            workingDirectory project.file('run')
+        modSource project.sourceSets.main
+    }
 
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
+    client {
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
 
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
+    server {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
+    }
 
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'TurnBasedMinecraftMod'
+    // This run config launches GameTestServer and runs all registered gametests, then exits.
+    // By default, the server will crash when no gametests are provided.
+    // The gametest system is also enabled by default for other run configs under the /test command.
+    gameTestServer {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
 
-            mods {
-                TurnBasedMinecraftMod {
-                    source sourceSets.main
-                }
-            }
-        }
+    data {
+        // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
+        // workingDirectory project.file('run-data')
 
-        server {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'TurnBasedMinecraftMod'
-
-            mods {
-                TurnBasedMinecraftMod {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            // The markers can be added/remove as needed separated by commas.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
-
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'TurnBasedMinecraftMod'
-
-            mods {
-                TurnBasedMinecraftMod {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'TurnBasedMinecraftMod', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources')
-
-            mods {
-                TurnBasedMinecraftMod {
-                    source sourceSets.main
-                }
-            }
-        }
+        // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
 // Include resources generated by data generators.
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-//repositories {
-//    // Put repositories for dependencies here
-//    // ForgeGradle automatically adds the Forge maven and Maven Central for you
-//
-//    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
-//    // flatDir {
-//    //     dir 'libs'
-//    // }
-//    mavenCentral()
-//    jcenter()
-//
-//    dependencies {
-//        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
-//    }
-//}
-
-apply plugin: 'com.github.johnrengelman.shadow'
-
-configurations {
-    shade
-    impelmentation.extendsFrom shade
+repositories {
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    // Specify the version of Minecraft to use.
+    // Depending on the plugin applied there are several options. We will assume you applied the userdev plugin as shown above.
+    // The group for userdev is net.neoforged, the module name is neoforge, and the version is the same as the neoforge version.
+    // You can however also use the vanilla plugin (net.neoforged.gradle.vanilla) to use a version of Minecraft without the neoforge loader.
+    // And its provides the option to then use net.minecraft as the group, and one of; client, server or joined as the module name, plus the game version as version.
+    // For all intends and purposes: You can treat this dependency as if it is a normal library you would use.
+    implementation "net.neoforged:neoforge:${neo_version}"
 
-    // Real mod deobf dependency examples - these get remapped to your current mappings
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
-    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
-    // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
+//    implementation files('libs/javamp3-1.0.3.jar')
+    implementation 'fr.delthas:javamp3:1.0.3'
 
-    // Examples using mod jars from ./libs
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
-
-    // For more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    implementation files('libs/javamp3-1.0.3.jar')
-
-    shade files('libs/javamp3-1.0.3.jar')
+    jarJar(group: 'fr.delthas', name: 'javamp3', version: '[1.0.0,2.0.0)') {
+        jarJar.pin(it, '1.0.3')
+    }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -173,7 +93,7 @@ dependencies {
 tasks.named('processResources', ProcessResources).configure {
     var replaceProperties = [
             minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-            forge_version: forge_version, forge_version_range: forge_version_range,
+            neo_version         : neo_version, neo_version_range: neo_version_range,
             loader_version_range: loader_version_range,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
             mod_authors: mod_authors, mod_description: mod_description,
@@ -203,24 +123,14 @@ jar {
     }
 }
 
-shadowJar {
-    archiveClassifier = ''
-    //project.configurations.shadow.setTransitive(true);
-    configurations = [project.configurations.shade]
-    relocate 'fr.delthas', 'com.burnedkirby.tbm_repack.fr.delthas'
-    finalizedBy 'reobfShadowJar'
-}
-
-assemble.dependsOn shadowJar
-
-reobf {
-    shadowJar {} // reobfuscate the shadowed jar
-}
-
 // Reproducible Builds
 tasks.withType(AbstractArchiveTask).configureEach {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
 // Example configuration to allow publishing using the maven-publish task

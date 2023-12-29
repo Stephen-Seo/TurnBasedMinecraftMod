@@ -1521,7 +1521,7 @@ public class Config
         possibleIgnoreHurtDamageSources.clear();
 
         try {
-            VanillaRegistries.createLookup().lookupOrThrow(Registries.DAMAGE_TYPE).listElements().forEach(dt -> possibleIgnoreHurtDamageSources.add(dt.get().msgId()));
+            VanillaRegistries.createLookup().lookupOrThrow(Registries.DAMAGE_TYPE).listElements().forEach(dt -> possibleIgnoreHurtDamageSources.add(dt.value().msgId()));
         } catch (Exception e) {
             logger.warn("Config failed to load possible DamageSources! Undesired things may happen, like Zombies dying from Fire during battle!");
             logger.warn(e);

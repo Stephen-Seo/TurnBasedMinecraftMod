@@ -2,7 +2,6 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 
@@ -10,9 +9,9 @@ import com.burnedkirby.TurnBasedMinecraft.common.Utility;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.simple.MessageFunctions;
 
 public class PacketBattleMessage
 {
@@ -39,7 +38,8 @@ public class PacketBattleMessage
         BOW_NO_AMMO(18),
         CREEPER_WAIT(19),
         CREEPER_WAIT_FINAL(20),
-        CREEPER_EXPLODE(21);
+        CREEPER_EXPLODE(21),
+        CROSSBOW_NO_AMMO(22);
         
         private int value;
         private static Map<Integer, MessageType> map = new HashMap<Integer, MessageType>();
@@ -153,31 +153,48 @@ public class PacketBattleMessage
         this.amount = amount;
         this.custom = custom;
     }
-    
-    public static void encode(PacketBattleMessage pkt, FriendlyByteBuf buf) {
-        buf.writeInt(pkt.messageType.getValue());
-        buf.writeInt(pkt.entityIDFrom);
-        buf.writeInt(pkt.entityIDTo);
-        buf.writeUtf(Utility.serializeDimension(pkt.dimension));
-        buf.writeInt(pkt.amount);
-        buf.writeUtf(pkt.custom);
+
+    public static class Encoder implements MessageFunctions.MessageEncoder<PacketBattleMessage> {
+        public Encoder() {}
+
+        @Override
+        public void encode(PacketBattleMessage pkt, FriendlyByteBuf buf) {
+            buf.writeInt(pkt.messageType.getValue());
+            buf.writeInt(pkt.entityIDFrom);
+            buf.writeInt(pkt.entityIDTo);
+            buf.writeUtf(Utility.serializeDimension(pkt.dimension));
+            buf.writeInt(pkt.amount);
+            buf.writeUtf(pkt.custom);
+        }
     }
-    
-    public static PacketBattleMessage decode(FriendlyByteBuf buf) {
-    	return new PacketBattleMessage(
-    		MessageType.valueOf(
-    			buf.readInt()),
-			buf.readInt(),
-			buf.readInt(),
-			Utility.deserializeDimension(buf.readUtf()),
-			buf.readInt(),
-			buf.readUtf());
+
+    public static class Decoder implements MessageFunctions.MessageDecoder<PacketBattleMessage> {
+        public Decoder() {}
+
+        @Override
+        public PacketBattleMessage decode(FriendlyByteBuf buf) {
+            return new PacketBattleMessage(
+                MessageType.valueOf(
+                    buf.readInt()),
+                buf.readInt(),
+                buf.readInt(),
+                Utility.deserializeDimension(buf.readUtf()),
+                buf.readInt(),
+                buf.readUtf());
+        }
     }
-    
-    public static void handle(final PacketBattleMessage pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
-        });
-        ctx.get().setPacketHandled(true);
+
+    public static class Consumer implements MessageFunctions.MessageConsumer<PacketBattleMessage> {
+        public Consumer() {}
+
+        @Override
+        public void handle(PacketBattleMessage pkt, NetworkEvent.Context ctx) {
+            ctx.enqueueWork(() -> {
+                if (FMLEnvironment.dist.isClient()) {
+                    TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
+                }
+            });
+            ctx.setPacketHandled(true);
+        }
     }
 }

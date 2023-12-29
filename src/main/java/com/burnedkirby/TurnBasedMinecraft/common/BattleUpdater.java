@@ -1,8 +1,8 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
 
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.TickEvent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

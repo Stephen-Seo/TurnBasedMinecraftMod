@@ -368,4 +368,9 @@ public class BattleGui extends Screen {
 	public void setTurnTimerMax(int timerMax) {
 		this.timerMax = timerMax;
 	}
+
+	@Override
+	public void renderBackground(GuiGraphics p_283688_, int p_296369_, int p_296477_, float p_294317_) {
+		// Prevent graying of background.
+	}
 }

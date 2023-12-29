@@ -2,9 +2,9 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class DimensionChangedHandler {
     @SubscribeEvent

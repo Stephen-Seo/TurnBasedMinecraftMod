@@ -3,13 +3,12 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 import com.burnedkirby.TurnBasedMinecraft.common.EntityInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.simple.MessageFunctions;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class PacketEditingMessage
 {
@@ -87,59 +86,76 @@ public class PacketEditingMessage
             this.entityInfo = entityInfo;
         }
     }
-    
-    public static void encode(PacketEditingMessage pkt, FriendlyByteBuf buf) {
-    	buf.writeInt(pkt.type.getValue());
-    	if(pkt.entityInfo.classType != null) {
-    		buf.writeUtf(pkt.entityInfo.classType.getName());
-    	} else {
-    		buf.writeUtf("unknown");
-    	}
-    	buf.writeBoolean(pkt.entityInfo.ignoreBattle);
-    	buf.writeInt(pkt.entityInfo.attackPower);
-    	buf.writeInt(pkt.entityInfo.attackProbability);
-    	buf.writeInt(pkt.entityInfo.attackVariance);
-    	buf.writeUtf(pkt.entityInfo.attackEffect.toString());
-    	buf.writeInt(pkt.entityInfo.attackEffectProbability);
-    	buf.writeInt(pkt.entityInfo.defenseDamage);
-    	buf.writeInt(pkt.entityInfo.defenseDamageProbability);
-    	buf.writeInt(pkt.entityInfo.evasion);
-    	buf.writeInt(pkt.entityInfo.speed);
-    	buf.writeUtf(pkt.entityInfo.category);
-    	buf.writeInt(pkt.entityInfo.decisionAttack);
-    	buf.writeInt(pkt.entityInfo.decisionDefend);
-    	buf.writeInt(pkt.entityInfo.decisionFlee);
-    	buf.writeUtf(pkt.entityInfo.customName);
-    }
-    
-    public static PacketEditingMessage decode(FriendlyByteBuf buf) {
-    	Type type = Type.valueOf(buf.readInt());
-    	EntityInfo einfo = new EntityInfo();
-    	try {
-    		einfo.classType = einfo.getClass().getClassLoader().loadClass(buf.readUtf());
-    	} catch (ClassNotFoundException e) { /* ignored */ }
-        einfo.ignoreBattle = buf.readBoolean();
-        einfo.attackPower = buf.readInt();
-        einfo.attackProbability = buf.readInt();
-        einfo.attackVariance = buf.readInt();
-        einfo.attackEffect = EntityInfo.Effect.fromString(buf.readUtf());
-        einfo.attackEffectProbability = buf.readInt();
-        einfo.defenseDamage = buf.readInt();
-        einfo.defenseDamageProbability = buf.readInt();
-        einfo.evasion = buf.readInt();
-        einfo.speed = buf.readInt();
-        einfo.category = buf.readUtf();
-        einfo.decisionAttack = buf.readInt();
-        einfo.decisionDefend = buf.readInt();
-        einfo.decisionFlee = buf.readInt();
-        einfo.customName = buf.readUtf();
-    	return new PacketEditingMessage(type, einfo);
+
+    public static class Encoder implements MessageFunctions.MessageEncoder<PacketEditingMessage> {
+        public Encoder() {}
+
+        @Override
+        public void encode(PacketEditingMessage pkt, FriendlyByteBuf buf) {
+            buf.writeInt(pkt.type.getValue());
+            if(pkt.entityInfo.classType != null) {
+                buf.writeUtf(pkt.entityInfo.classType.getName());
+            } else {
+                buf.writeUtf("unknown");
+            }
+            buf.writeBoolean(pkt.entityInfo.ignoreBattle);
+            buf.writeInt(pkt.entityInfo.attackPower);
+            buf.writeInt(pkt.entityInfo.attackProbability);
+            buf.writeInt(pkt.entityInfo.attackVariance);
+            buf.writeUtf(pkt.entityInfo.attackEffect.toString());
+            buf.writeInt(pkt.entityInfo.attackEffectProbability);
+            buf.writeInt(pkt.entityInfo.defenseDamage);
+            buf.writeInt(pkt.entityInfo.defenseDamageProbability);
+            buf.writeInt(pkt.entityInfo.evasion);
+            buf.writeInt(pkt.entityInfo.speed);
+            buf.writeUtf(pkt.entityInfo.category);
+            buf.writeInt(pkt.entityInfo.decisionAttack);
+            buf.writeInt(pkt.entityInfo.decisionDefend);
+            buf.writeInt(pkt.entityInfo.decisionFlee);
+            buf.writeUtf(pkt.entityInfo.customName);
+        }
     }
 
-    public static void handle(final PacketEditingMessage pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
-        });
-        ctx.get().setPacketHandled(true);
+    public static class Decoder implements MessageFunctions.MessageDecoder<PacketEditingMessage> {
+        public Decoder() {}
+
+        @Override
+        public PacketEditingMessage decode(FriendlyByteBuf buf) {
+            Type type = Type.valueOf(buf.readInt());
+            EntityInfo einfo = new EntityInfo();
+            try {
+                einfo.classType = einfo.getClass().getClassLoader().loadClass(buf.readUtf());
+            } catch (ClassNotFoundException e) { /* ignored */ }
+            einfo.ignoreBattle = buf.readBoolean();
+            einfo.attackPower = buf.readInt();
+            einfo.attackProbability = buf.readInt();
+            einfo.attackVariance = buf.readInt();
+            einfo.attackEffect = EntityInfo.Effect.fromString(buf.readUtf());
+            einfo.attackEffectProbability = buf.readInt();
+            einfo.defenseDamage = buf.readInt();
+            einfo.defenseDamageProbability = buf.readInt();
+            einfo.evasion = buf.readInt();
+            einfo.speed = buf.readInt();
+            einfo.category = buf.readUtf();
+            einfo.decisionAttack = buf.readInt();
+            einfo.decisionDefend = buf.readInt();
+            einfo.decisionFlee = buf.readInt();
+            einfo.customName = buf.readUtf();
+            return new PacketEditingMessage(type, einfo);
+        }
+    }
+
+    public static class Consumer implements MessageFunctions.MessageConsumer<PacketEditingMessage> {
+        public Consumer() {}
+
+        @Override
+        public void handle(PacketEditingMessage pkt, NetworkEvent.Context ctx) {
+            ctx.enqueueWork(() -> {
+                if (FMLEnvironment.dist.isClient()) {
+                    TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
+                }
+            });
+            ctx.setPacketHandled(true);
+        }
     }
 }
