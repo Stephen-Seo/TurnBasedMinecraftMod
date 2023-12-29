@@ -3,7 +3,7 @@
   "modid": "com_burnedkirby_turnbasedminecraft",
   "name": "Turn Based Minecraft",
   "description": "Changes battles to be turn-based.",
-  "version": "1.23.1",
+  "version": "1.24.0",
   "mcversion": "1.20.1",
   "url": "",
   "updateUrl": "",
