@@ -1,5 +1,11 @@
 # Upcoming changes
 
+# Version NeoForge-1.24.0
+
+Update to NeoForge 1.20.2-20.2.88.
+
+Allow use of Crossbows in battle (it should behave identically to Bows).
+
 # Version Forge-1.24.0
 
 Update to Forge 1.20.2-48.1.0.
