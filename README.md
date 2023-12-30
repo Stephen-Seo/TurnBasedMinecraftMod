@@ -12,6 +12,12 @@ https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files
 (Once modrinth.com has approved this mod, the modrinth page of this mod will be
 linked here.)
 
+# Forge or NeoForge
+
+The `master` branch tracks the version of the mod for Minecraft Forge.
+
+The `neoforge` branch tracks the version of the mod for Minecraft NeoForge.
+
 # What changed in what version
 
 See the [Changelog](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/master/Changelog.md)
@@ -61,7 +67,7 @@ configured for them.)
 # Building
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
-finished jar will be saved at "build/libs/TurnBasedMinecraft-1.23.1.jar"
+finished jar will be saved at "build/libs/TurnBasedMinecraft-NeoForge-1.24.0-all.jar"
 
 # Other notes
 
