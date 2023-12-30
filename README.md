@@ -12,6 +12,11 @@ https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files
 (Once modrinth.com has approved this mod, the modrinth page of this mod will be
 linked here.)
 
+# Reproducibility
+
+This mod should support reproducible builds. See `Reproducibility.md` to see
+more details.
+
 # Forge or NeoForge
 
 The `master` branch tracks the version of the mod for Minecraft Forge.
