@@ -12,11 +12,6 @@ https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files
 (Once modrinth.com has approved this mod, the modrinth page of this mod will be
 linked here.)
 
-# Reproducibility
-
-This mod should support reproducible builds. See `Reproducibility.md` to see
-more details.
-
 # Forge or NeoForge
 
 The `master` branch tracks the version of the mod for Minecraft Forge.
@@ -73,6 +68,11 @@ configured for them.)
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
 finished jar will be saved at "build/libs/TurnBasedMinecraft-Forge-1.24.0.jar"
+
+# Reproducibility
+
+This mod should support reproducible builds. See `Reproducibility.md` to see
+more details.
 
 # Other notes
 
