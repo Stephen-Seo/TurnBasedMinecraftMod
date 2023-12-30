@@ -12,6 +12,12 @@ https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files
 (Once modrinth.com has approved this mod, the modrinth page of this mod will be
 linked here.)
 
+# Forge or NeoForge
+
+The `master` branch tracks the version of the mod for Minecraft Forge.
+
+The `neoforge` branch tracks the version of the mod for Minecraft NeoForge.
+
 # What changed in what version
 
 See the [Changelog](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/master/Changelog.md)
