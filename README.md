@@ -8,9 +8,7 @@ Precompiled jars are available here:
 https://seodisparate.com/static/tbm_releases/  
 https://burnedkirby.com/tbmm_downloads/  
 https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files
-
-(Once modrinth.com has approved this mod, the modrinth page of this mod will be
-linked here.)
+https://modrinth.com/mod/turnbasedmc
 
 # Forge or NeoForge
 
