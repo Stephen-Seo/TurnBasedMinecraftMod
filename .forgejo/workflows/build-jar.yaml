@@ -15,5 +15,5 @@ jobs:
       - run: cd TBMM/build/libs && find . -type f -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
       - uses: actions/upload-artifact@v3
         with:
-          name: built-jars-and-metadata
+          name: TBMM_Forge_jars_sha256sums
           path: TBMM/build/libs/
