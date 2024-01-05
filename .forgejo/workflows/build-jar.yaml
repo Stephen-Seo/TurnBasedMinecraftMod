@@ -10,7 +10,7 @@ jobs:
     steps:
       - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TurnBasedMinecraftMod
       - run: cd TurnBasedMinecraftMod && git checkout neoforge
-      - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx700m/' gradle.properties
+      - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx700m/' gradle.properties && echo 'neogradle.subsystems.decompiler.maxMemory=700m' >> gradle.properties && echo 'neogradle.subsystems.recompiler.maxMemory=700m' >> gradle.properties
       - run: cd TurnBasedMinecraftMod && ./gradlew --console=plain build
       - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
       - uses: actions/upload-artifact@v3
