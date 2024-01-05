@@ -8,12 +8,12 @@ jobs:
   build-and-store-artifact:
     runs-on: archLinux
     steps:
-      - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TBMM
-      - run: cd TBMM && git checkout master
-      - run: cd TBMM && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx700m/' gradle.properties
-      - run: cd TBMM && ./gradlew --console=plain build
-      - run: cd TBMM/build/libs && find . -type f -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
+      - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TurnBasedMinecraftMod
+      - run: cd TurnBasedMinecraftMod && git checkout master
+      - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx700m/' gradle.properties
+      - run: cd TurnBasedMinecraftMod && ./gradlew --console=plain build
+      - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
       - uses: actions/upload-artifact@v3
         with:
           name: TBMM_Forge_jars_sha256sums
-          path: TBMM/build/libs/
+          path: TurnBasedMinecraftMod/build/libs/
