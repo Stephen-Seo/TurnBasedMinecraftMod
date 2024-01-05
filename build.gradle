@@ -193,7 +193,7 @@ jar {
             "Specification-Title": "TurnBasedMinecraftMod",
             "Specification-Vendor": "TurnBasedMinecraftMod_BK",
             "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
+            "Implementation-Title": "TurnBasedMinecraftMod",
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"TurnBasedMinecraftMod_BK",
             // Do not place timestamp for the sake of reproducible builds
