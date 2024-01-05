@@ -15,5 +15,5 @@ jobs:
       - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
       - uses: actions/upload-artifact@v3
         with:
-          name: TBMM_Forge_jars_sha256sums
+          name: TBMM_Forge_jars_sha256sums_${GITHUB_REF_NAME}
           path: TurnBasedMinecraftMod/build/libs/
