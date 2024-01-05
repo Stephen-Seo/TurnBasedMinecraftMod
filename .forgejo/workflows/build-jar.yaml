@@ -1,0 +1,19 @@
+name: Build TurnBasedMC and store Artifact
+on:
+  push:
+    branches:
+      - 'neoforge'
+
+jobs:
+  build-and-store-artifact:
+    runs-on: archLinux
+    steps:
+      - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TBMM
+      - run: cd TBMM && git checkout neoforge
+      - run: cd TBMM && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx700m/' gradle.properties
+      - run: cd TBMM && ./gradlew --console=plain build
+      - run: cd TBMM/build/libs && find . -type f -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: TBMM_NeoForge_jars_sha256sums
+          path: TBMM/build/libs/
