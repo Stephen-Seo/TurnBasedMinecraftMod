@@ -1,15 +1,15 @@
 name: Build TurnBasedMC and store Artifact
 on:
   push:
-    branches:
-      - 'master'
+    tags:
+      - *
 
 jobs:
   build-and-store-artifact:
     runs-on: archLinux
     steps:
       - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TurnBasedMinecraftMod
-      - run: cd TurnBasedMinecraftMod && git checkout master
+      - run: cd TurnBasedMinecraftMod && git checkout ${GITHUB_REF_NAME}
       - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx700m/' gradle.properties
       - run: cd TurnBasedMinecraftMod && ./gradlew --console=plain build
       - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
