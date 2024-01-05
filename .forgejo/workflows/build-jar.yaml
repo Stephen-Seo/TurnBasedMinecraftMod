@@ -11,7 +11,7 @@ jobs:
       - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TBMM
       - run: cd TBMM && git checkout master
       - run: cd TBMM && ./gradlew build
-      - run: cd TBMM/build/libs && java --version >> javaVersion.txt && javac --version >> javaVersion.txt && find . -type f -exec bash -c 'sha256sum {} >> sha256sums.txt'
+      - run: cd TBMM/build/libs && java --version >> javaVersion.txt && javac --version >> javaVersion.txt && find . -type f -exec bash -c 'sha256sum {} >> sha256sums.txt' ';'
       - uses: actions/upload-artifact@v3
         with:
           name: built-jars-and-metadata
