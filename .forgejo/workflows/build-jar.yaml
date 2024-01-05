@@ -2,7 +2,7 @@ name: Build TurnBasedMC and store Artifact
 on:
   push:
     tags:
-      - *
+      - '*'
 
 jobs:
   build-and-store-artifact:
