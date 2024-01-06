@@ -23,8 +23,9 @@ jobs:
           -d "{
           \"name\": \"TurnBasedMinecraftMod version ${GITHUB_REF_NAME}\",
           \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/neoforge/Changelog.md)
-          $(javac --version)
-          $(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$' -exec sha256sum '{}' ';')\",
+
+              $(javac --version)
+              $(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$' -exec sha256sum '{}' ';')\",
           \"tag_name\": \"${GITHUB_REF_NAME}\"
           }" > response.json \
           && curl --fail-with-body -X 'POST' \
