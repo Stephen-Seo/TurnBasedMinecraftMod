@@ -21,7 +21,7 @@ jobs:
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H 'Content-Type: application/json' \
           -d "{
-          \"name\": \"TurnBasedMinecraftMod version NeoForge ${GITHUB_REF_NAME}\",
+          \"name\": \"TurnBasedMinecraftMod version ${GITHUB_REF_NAME}\",
           \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/neoforge/Changelog.md)
           $(javac --version)
           $(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$' -exec sha256sum '{}' ';')\",
