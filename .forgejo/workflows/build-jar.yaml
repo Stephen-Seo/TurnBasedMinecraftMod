@@ -10,10 +10,26 @@ jobs:
     steps:
       - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TurnBasedMinecraftMod
       - run: cd TurnBasedMinecraftMod && git checkout ${GITHUB_REF_NAME}
-      - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx2048m/' gradle.properties
+      - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx1024m/' gradle.properties && echo 'neogradle.subsystems.decompiler.maxThreads=1' >> gradle.properties
       - run: cd TurnBasedMinecraftMod && ./gradlew --console=plain build
-      - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
-      - uses: actions/upload-artifact@v3
-        with:
-          name: TBMM_NeoForge_jars_sha256sums_${GITHUB_REF_NAME}
-          path: TurnBasedMinecraftMod/build/libs/
+      - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -regex '.*all.jar$' -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
+      - name: Create release and attach jar
+        run: |
+          curl --fail-with-body -X 'POST' \
+          "https://git.seodisparate.com/api/v1/repos/stephenseo/TurnBasedMinecraftMod/releases" \
+          -H 'accept: application/json' \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H 'Content-Type: application/json' \
+          -d "{
+          \"name\": \"TurnBasedMinecraftMod version NeoForge ${GITHUB_REF_NAME}\",
+          \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/neoforge/Changelog.md)
+          $(javac --version)
+          $(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$' -exec sha256sum '{}' ';')\",
+          \"tag_name\": \"${GITHUB_REF_NAME}\"
+          }" > response.json \
+          && curl --fail-with-body -X 'POST' \
+          "https://git.seodisparate.com/api/v1/repos/stephenseo/TurnBasedMinecraftMod/releases/$(jq .id < response.json)/assets" \
+          -H 'accept: application/json' \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H 'Content-Type: multipart/form-data' \
+          -F "attachment=@$(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$');type=application/java-archive" > response2.json
