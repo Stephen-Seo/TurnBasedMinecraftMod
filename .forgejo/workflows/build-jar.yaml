@@ -13,7 +13,23 @@ jobs:
       - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx700m/' gradle.properties
       - run: cd TurnBasedMinecraftMod && ./gradlew --console=plain build
       - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
-      - uses: actions/upload-artifact@v3
-        with:
-          name: TBMM_Forge_jars_sha256sums_${GITHUB_REF_NAME}
-          path: TurnBasedMinecraftMod/build/libs/
+      - name: Create release and attach jar
+        run: |
+          curl --fail-with-body -X 'POST' \
+          "https://git.seodisparate.com/api/v1/repos/stephenseo/TurnBasedMinecraftMod/releases" \
+          -H 'accept: application/json' \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H 'Content-Type: application/json' \
+          -d "{
+          \"name\": \"TurnBasedMinecraftMod version ${GITHUB_REF_NAME}\",
+          \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/neoforge/Changelog.md)
+          $(javac --version)
+          $(find TurnBasedMinecraftMod/build/libs -regex '.*[0-9].jar$' -exec sha256sum '{}' ';')\",
+          \"tag_name\": \"${GITHUB_REF_NAME}\"
+          }" > response.json \
+          && curl --fail-with-body -X 'POST' \
+          "https://git.seodisparate.com/api/v1/repos/stephenseo/TurnBasedMinecraftMod/releases/$(jq .id < response.json)/assets" \
+          -H 'accept: application/json' \
+          -H "Authorization: token ${GITHUB_TOKEN}" \
+          -H 'Content-Type: multipart/form-data' \
+          -F "attachment=@$(find TurnBasedMinecraftMod/build/libs -regex '.*[0-9].jar$');type=application/java-archive" > response2.json
