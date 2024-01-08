@@ -65,7 +65,7 @@ configured for them.)
 # Building
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
-finished jar will be saved at "build/libs/TurnBasedMinecraft-NeoForge-1.24.0-all.jar"
+finished jar will be saved at "build/libs/TurnBasedMinecraft-NeoForge-1.25.0-all.jar"
 
 # Reproducibility
 
@@ -73,6 +73,10 @@ This mod should support reproducible builds. See `Reproducibility.md` to see
 more details.
 
 # Other notes
+
+This mod uses [j-ogg-vorbis](https://github.com/stephengold/j-ogg-all)
+available from [http://www.j-ogg.de](http://www.j-ogg.de) and copyrighted by
+Tor-Einar Jarnbjo.
 
 This mod also uses [JavaMP3](https://github.com/kevinstadler/JavaMP3)
 which is licensed under the [MIT License](https://github.com/kevinstadler/JavaMP3/blob/master/LICENSE).

@@ -1,5 +1,15 @@
 # Upcoming changes
 
+NeoForge: Will incorporate same changes as Forge-1.25.0.
+
+# Version Forge-1.25.0
+
+Remove usage of "shadow jar" in build.gradle, and use jarJar instead.
+
+Add new dependency `j-ogg-vorbis`.
+
+Implement playing Vorbis encoded .ogg files for battle/silly music.
+
 # Version NeoForge-1.24.0
 
 Update to NeoForge 1.20.2-20.2.88.
