@@ -45,14 +45,18 @@ When playing multiplayer, some configuration of the config on the server may be 
 between them
 - Supports use of the vanilla Minecraft bow and arrows (have bow selected when
 in battle)
-- Supports custom battle music to be played when fighting enemies. (They must be
-placed in `.minecraft/config/TurnBasedMinecraft/Music/battle` or
-`.minecraft/config/TurnBasedMinecraft/Music/silly`. Client-side config determines
-which song plays in battle for the client. only `.wav`, ~~`.mid`~~, and `.mp3` files
-supported.  ~~Only `.mid` files are not affected by volume options (master and
-music sliders))~~ Midi file playback has been disabled for now due to lack of volume
-control issues. MP3 file playback sometimes fails, but seems to work better when the
-file is as "barebones" as possible (no album art metadata in the file).
+- Supports custom battle music to be played when fighting enemies. (They must
+  be placed in `.minecraft/config/TurnBasedMinecraft/Music/battle` or
+  `.minecraft/config/TurnBasedMinecraft/Music/silly`. Client-side config
+  determines which song plays in battle for the client. only `.wav`,
+  ~~`.mid`~~, `.mp3`, and `.ogg` files supported.  ~~Only `.mid` files are not
+  affected by volume options (master and music sliders))~~ Midi file playback
+  has been disabled for now due to lack of volume control issues. MP3 file
+  playback sometimes fails, but seems to work better when the file is as
+  "barebones" as possible (no album art metadata in the file). It is recommended
+  to use `.ogg` files for music. Note that ogg Vorbis is supported, and NOT ogg
+  Opus. One can convert to ogg Vorbis with ffmpeg like this: `ffmpeg -i
+  <my_music_file_to_convert> -map a:0 -c:a libvorbis output.ogg`.
 - Config allows limiting number of combatants in turn-based battle.
 - Config can be modified (server-side) to add entries of mobs from other mods.
 (by default an unknown mob cannot enter turn-based battle, so the config must be
@@ -74,8 +78,9 @@ more details.
 
 # Other notes
 
-This mod uses [shadow](https://github.com/johnrengelman/shadow) which is
-licenced under the [Apache License 2.0](https://github.com/johnrengelman/shadow/blob/master/LICENSE).
+This mod uses [j-ogg-vorbis](https://github.com/stephengold/j-ogg-all) available
+from [http://www.j-ogg.de](http://www.j-ogg.de) and copyrighted by Tor-Einar
+Jarnbjo.
 
 This mod also uses [JavaMP3](https://github.com/kevinstadler/JavaMP3)
 which is licensed under the [MIT License](https://github.com/kevinstadler/JavaMP3/blob/master/LICENSE).
