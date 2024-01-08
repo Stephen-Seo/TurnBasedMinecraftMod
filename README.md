@@ -45,14 +45,18 @@ When playing multiplayer, some configuration of the config on the server may be 
 between them
 - Supports use of the vanilla Minecraft bow and arrows (have bow selected when
 in battle)
-- Supports custom battle music to be played when fighting enemies. (They must be
-placed in `.minecraft/config/TurnBasedMinecraft/Music/battle` or
-`.minecraft/config/TurnBasedMinecraft/Music/silly`. Client-side config determines
-which song plays in battle for the client. only `.wav`, ~~`.mid`~~, and `.mp3` files
-supported.  ~~Only `.mid` files are not affected by volume options (master and
-music sliders))~~ Midi file playback has been disabled for now due to lack of volume
-control issues. MP3 file playback sometimes fails, but seems to work better when the
-file is as "barebones" as possible (no album art metadata in the file).
+- Supports custom battle music to be played when fighting enemies. (They must
+  be placed in `.minecraft/config/TurnBasedMinecraft/Music/battle` or
+  `.minecraft/config/TurnBasedMinecraft/Music/silly`. Client-side config
+  determines which song plays in battle for the client. only `.wav`,
+  ~~`.mid`~~, `.mp3`, and `.ogg` files supported.  ~~Only `.mid` files are not
+  affected by volume options (master and music sliders))~~ Midi file playback
+  has been disabled for now due to lack of volume control issues. MP3 file
+  playback sometimes fails, but seems to work better when the file is as
+  "barebones" as possible (no album art metadata in the file). It is recommended
+  to use `.ogg` files for music. Note that ogg Vorbis is supported, and NOT ogg
+  Opus. One can convert to ogg Vorbis with ffmpeg like this: `ffmpeg -i
+  <my_music_file_to_convert> -map a:0 -c:a libvorbis output.ogg`.
 - Config allows limiting number of combatants in turn-based battle.
 - Config can be modified (server-side) to add entries of mobs from other mods.
 (by default an unknown mob cannot enter turn-based battle, so the config must be
@@ -65,7 +69,8 @@ configured for them.)
 # Building
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
-finished jar will be saved at "build/libs/TurnBasedMinecraft-NeoForge-1.25.0-all.jar"
+finished jar will be saved at
+`build/libs/TurnBasedMinecraft-NeoForge-1.25.0-all.jar`
 
 # Reproducibility
 
