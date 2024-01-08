@@ -30,7 +30,7 @@ loading any mp3 file that isn't "barebones". Try removing the metadata of the
 mp3 file. I've found that using mp3s without album art embedded in it seems to
 work.
 
-It is recommended to use .ogg Vorbis files instead of .mp3 files.
+**It is recommended to use .ogg Vorbis files instead of .mp3 files.**
 
 ## Why do passive mobs don't start turn-based battle?
 
