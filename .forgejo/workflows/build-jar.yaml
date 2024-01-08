@@ -26,7 +26,7 @@ jobs:
 
               (Using OpenJDK Java.)
               $(javac --version)
-              $(find TurnBasedMinecraftMod/build/libs -regex '.*[0-9].jar$' -exec sha256sum '{}' ';')\",
+              $(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$' -exec sha256sum '{}' ';')\",
           \"tag_name\": \"${GITHUB_REF_NAME}\"
           }" > response.json \
           && curl --fail-with-body -X 'POST' \
@@ -34,4 +34,4 @@ jobs:
           -H 'accept: application/json' \
           -H "Authorization: token ${GITHUB_TOKEN}" \
           -H 'Content-Type: multipart/form-data' \
-          -F "attachment=@$(find TurnBasedMinecraftMod/build/libs -regex '.*[0-9].jar$');type=application/java-archive" > response2.json
+          -F "attachment=@$(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$');type=application/java-archive" > response2.json
