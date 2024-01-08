@@ -53,10 +53,11 @@ in battle)
   affected by volume options (master and music sliders))~~ Midi file playback
   has been disabled for now due to lack of volume control issues. MP3 file
   playback sometimes fails, but seems to work better when the file is as
-  "barebones" as possible (no album art metadata in the file). It is recommended
-  to use `.ogg` files for music. Note that ogg Vorbis is supported, and NOT ogg
-  Opus. One can convert to ogg Vorbis with ffmpeg like this: `ffmpeg -i
-  <my_music_file_to_convert> -map a:0 -c:a libvorbis output.ogg`.
+  "barebones" as possible (no album art metadata in the file).
+  - It is recommended to use `.ogg` files for music.
+  - Note that ogg Vorbis is supported, and NOT ogg Opus.
+  - One can convert to ogg Vorbis with ffmpeg like this: `ffmpeg -i
+    <my_music_file_to_convert> -map a:0 -c:a libvorbis output.ogg`.
 - Config allows limiting number of combatants in turn-based battle.
 - Config can be modified (server-side) to add entries of mobs from other mods.
 (by default an unknown mob cannot enter turn-based battle, so the config must be
