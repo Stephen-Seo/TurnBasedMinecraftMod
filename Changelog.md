@@ -1,5 +1,7 @@
 # Upcoming changes
 
+Implement playing Vorbis encoded .ogg files for battle/silly music.
+
 # Version NeoForge-1.24.0
 
 Update to NeoForge 1.20.2-20.2.88.

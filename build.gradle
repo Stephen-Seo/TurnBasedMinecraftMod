@@ -3,15 +3,16 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-version = "1.24.0"
+version = "1.25.0"
 group = "com.burnedkirby.TurnBasedMinecraft"
 archivesBaseName = "TurnBasedMinecraft-Forge"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
+jarJar.enable()
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -137,11 +138,10 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 //    }
 //}
 
-apply plugin: 'com.github.johnrengelman.shadow'
-
-configurations {
-    shade
-    impelmentation.extendsFrom shade
+repositories {
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
@@ -161,9 +161,16 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    implementation files('libs/javamp3-1.0.3.jar')
+    //implementation files('libs/javamp3-1.0.3.jar')
+    implementation 'fr.delthas:javamp3:1.0.3'
 
-    shade files('libs/javamp3-1.0.3.jar')
+    implementation 'com.github.stephengold:j-ogg-vorbis:1.0.4'
+
+    jarJar(group: 'fr.delthas', name: 'javamp3', version: '[1.0.0,2.0.0)') {
+        jarJar.pin(it, '1.0.3')
+    }
+
+    jarJar(group: 'com.github.stephengold', name: 'j-ogg-vorbis', version: '[1.0.4, 2.0.0)')
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -201,20 +208,6 @@ jar {
 //            "ContainedDeps": "javamp3-1.0.3.jar"
         ])
     }
-}
-
-shadowJar {
-    archiveClassifier = ''
-    //project.configurations.shadow.setTransitive(true);
-    configurations = [project.configurations.shade]
-    relocate 'fr.delthas', 'com.burnedkirby.tbm_repack.fr.delthas'
-    finalizedBy 'reobfShadowJar'
-}
-
-assemble.dependsOn shadowJar
-
-reobf {
-    shadowJar {} // reobfuscate the shadowed jar
 }
 
 // Reproducible Builds
