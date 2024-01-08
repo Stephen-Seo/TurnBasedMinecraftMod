@@ -5,7 +5,7 @@ on:
       - '*'
 
 jobs:
-  build-and-store-artifact:
+  build-and-create-release:
     runs-on: archLinux
     steps:
       - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TurnBasedMinecraftMod
