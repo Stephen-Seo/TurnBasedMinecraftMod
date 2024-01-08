@@ -69,7 +69,8 @@ configured for them.)
 # Building
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
-finished jar will be saved at "build/libs/TurnBasedMinecraft-Forge-1.25.0.jar"
+finished jar will be saved at
+`build/libs/TurnBasedMinecraft-Forge-1.25.0-all.jar`
 
 # Reproducibility
 
