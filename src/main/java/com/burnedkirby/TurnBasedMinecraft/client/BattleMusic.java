@@ -1,6 +1,7 @@
 package com.burnedkirby.TurnBasedMinecraft.client;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import de.jarnbjo.vorbis.VorbisAudioFileReader;
 import fr.delthas.javamp3.Sound;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +29,9 @@ public class BattleMusic
     private boolean playingIsSilly;
     private boolean isPlaying;
     private Thread mp3StreamThread;
+    private Thread oggVorbisStreamThread;
     private MP3Streamer mp3StreamRunnable;
+    private OGGVorbisStreamer oggVorbisStreamRunnable;
 
     public BattleMusic(Logger logger)
     {
@@ -81,7 +84,7 @@ public class BattleMusic
                 }
                 String ext = name.substring(extIndex + 1).toLowerCase();
 //                return ext.equals("mid") || ext.equals("wav") || ext.equals("mp3");
-                return ext.equals("wav") || ext.equals("mp3"); // midi disabled
+                return ext.equals("wav") || ext.equals("mp3") || ext.equals("ogg"); // midi disabled
             }
         });
         for(File f : battleFiles)
@@ -101,7 +104,7 @@ public class BattleMusic
                 }
                 String ext = name.substring(extIndex + 1).toLowerCase();
 //                return ext.equals("mid") || ext.equals("wav") || ext.equals("mp3");
-                return ext.equals("wav") || ext.equals("mp3"); // midi disabled
+                return ext.equals("wav") || ext.equals("mp3") || ext.equals("ogg"); // midi disabled
             }
         });
         for(File f : sillyFiles)
@@ -303,6 +306,39 @@ public class BattleMusic
                     return;
                 }
             }
+            else if (suffix.equals("ogg")) {
+                if(sequencer != null && sequencer.isRunning())
+                {
+                    sequencer.stop();
+                }
+                if(clip != null && clip.isActive())
+                {
+                    clip.stop();
+                    clip.close();
+                }
+                if(mp3StreamThread != null && mp3StreamThread.isAlive())
+                {
+                    mp3StreamRunnable.setKeepPlaying(false);
+                    try { mp3StreamThread.join(); } catch (Throwable t) { /* ignored */ }
+                }
+
+                try {
+                    if (oggVorbisStreamRunnable == null) {
+                        oggVorbisStreamRunnable = new OGGVorbisStreamer(next, logger, volume);
+                    } else {
+                        oggVorbisStreamRunnable.setOggVorbisFile(next);
+                        oggVorbisStreamRunnable.setVolume(volume);
+                    }
+
+                    oggVorbisStreamThread = new Thread(oggVorbisStreamRunnable);
+                    oggVorbisStreamThread.start();
+                    logger.info("Started playing OggVorbis " + next.getName());
+                } catch (Throwable t) {
+                    logger.error("Failed to play battle music (ogg)");
+                    t.printStackTrace();
+                    return;
+                }
+            }
         }
     }
     
@@ -319,6 +355,10 @@ public class BattleMusic
         {
             mp3StreamRunnable.setKeepPlaying(false);
             try { mp3StreamThread.join(); } catch (Throwable t) { /* ignored */ }
+        }
+        if (oggVorbisStreamThread != null && oggVorbisStreamThread.isAlive()) {
+            oggVorbisStreamRunnable.setKeepPlaying(false);
+            try { oggVorbisStreamThread.join(); } catch (Throwable t) { /* ignored */ }
         }
         if(resumeMCSounds)
         {
@@ -448,6 +488,95 @@ public class BattleMusic
             }
             if(sdl != null)
             {
+                sdl.stop();
+                sdl.flush();
+                sdl.close();
+            }
+        }
+    }
+
+    private class OGGVorbisStreamer implements Runnable {
+        private AtomicBoolean keepPlaying;
+        private File oggVorbisFile;
+        private Logger logger;
+        private float volume;
+
+        public OGGVorbisStreamer(File oggVorbisFile, Logger logger, float volume) {
+            keepPlaying = new AtomicBoolean(true);
+            this.oggVorbisFile = oggVorbisFile;
+            this.logger = logger;
+            this.volume = volume;
+            if (this.volume > 1.0F) {
+                this.volume = 1.0F;
+            } else if (this.volume < 0.0F) {
+                this.volume = 0.0F;
+            }
+        }
+
+        public void setKeepPlaying(boolean playing) {
+            keepPlaying.set(playing);
+        }
+
+        public void setOggVorbisFile(File oggVorbisFile) {
+            this.oggVorbisFile = oggVorbisFile;
+        }
+
+        public void setVolume(float volume) {
+            this.volume = volume;
+        }
+
+        @Override
+        public void run() {
+            keepPlaying.set(true);
+            SourceDataLine sdl = null;
+            try {
+                VorbisAudioFileReader reader = new VorbisAudioFileReader();
+                AudioFormat audioFormat = reader.getAudioFileFormat(oggVorbisFile).getFormat();
+                sdl = AudioSystem.getSourceDataLine(audioFormat);
+                sdl.open(audioFormat);
+                {
+                    FloatControl volumeControl = (FloatControl) sdl.getControl(FloatControl.Type.MASTER_GAIN);
+                    volumeControl.setValue(volume * 20.0f - 20.0f); // in decibels
+                }
+
+                AudioInputStream ais = reader.getAudioInputStream(oggVorbisFile);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] cached = null;
+                int cachedOffset = 0;
+                int cachedSize = 0;
+                byte[] buf = new byte[4096];
+                sdl.start();
+                int read = ais.read(buf);
+                while (keepPlaying.get()) {
+                    if (baos != null) {
+                        if (read != -1) {
+                            sdl.write(buf, 0, read);
+                            baos.write(buf, 0, read);
+                            read = ais.read(buf);
+                        } else {
+                            ais.close();
+                            ais = null;
+                            cached = baos.toByteArray();
+                            baos = null;
+                        }
+                    } else {
+                        cachedSize = cached.length - cachedOffset;
+                        if (cachedSize > 4096) {
+                            cachedSize = 4096;
+                        }
+                        sdl.write(cached, cachedOffset, cachedSize);
+                        cachedOffset += cachedSize;
+                        if (cachedOffset >= cached.length) {
+                            cachedOffset = 0;
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                logger.error("Stream play oggVorbis", t);
+            }
+
+            if (sdl != null) {
                 sdl.stop();
                 sdl.flush();
                 sdl.close();
