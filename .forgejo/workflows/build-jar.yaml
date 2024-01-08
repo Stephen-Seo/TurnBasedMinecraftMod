@@ -1,4 +1,4 @@
-name: Build TurnBasedMC and store Artifact
+name: Build TurnBasedMC and create Release
 on:
   push:
     tags:
@@ -24,6 +24,7 @@ jobs:
           \"name\": \"TurnBasedMinecraftMod version ${GITHUB_REF_NAME}\",
           \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/master/Changelog.md)
 
+              (Using OpenJDK Java.)
               $(javac --version)
               $(find TurnBasedMinecraftMod/build/libs -regex '.*[0-9].jar$' -exec sha256sum '{}' ';')\",
           \"tag_name\": \"${GITHUB_REF_NAME}\"
