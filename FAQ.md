@@ -20,8 +20,8 @@ generally "passive" mobs trigger the "silly" music and everything else triggers
 "battle" music. Note that the default server config has turn-based-battle
 disabled for "passive" mobs.
 
-Note that while .ogg Vorbis files are supported, .ogg Opus files are NOT
-supported.
+**Note that while .ogg Vorbis files are supported, .ogg Opus files are NOT
+supported.**
 
 ## Why can't the mod play my mp3 files?
 
