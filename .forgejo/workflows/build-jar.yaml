@@ -24,7 +24,7 @@ jobs:
           \"name\": \"TurnBasedMinecraftMod version ${GITHUB_REF_NAME}\",
           \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/neoforge/Changelog.md)
 
-              (Using OpenJDK Java.)
+              $(java --version | sed -n '1p;2,$s/^/    /p')
               $(javac --version)
               $(find TurnBasedMinecraftMod/build/libs -regex '.*all.jar$' -exec sha256sum '{}' ';')\",
           \"tag_name\": \"${GITHUB_REF_NAME}\"
