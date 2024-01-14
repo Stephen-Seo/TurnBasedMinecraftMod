@@ -3,7 +3,7 @@
   "modid": "com_burnedkirby_turnbasedminecraft",
   "name": "Turn Based Minecraft",
   "description": "Changes battles to be turn-based.",
-  "version": "1.25.0",
+  "version": "1.25.1",
   "mcversion": "1.20.2",
   "url": "",
   "updateUrl": "",
@@ -11,7 +11,7 @@
   "credits": "The Forge and FML guys, for making this possible.
     Dependencies:
         JavaMP3 by delthas, josephx86, GlaDOSik, and kevinstadler (MIT License)",
-  "logoFile": "",
+  "logoFile": "/assets/com_burnedkirby_turnbasedminecraft/tbmm_icon.png",
   "screenshots": [],
   "dependencies": []
 }
