@@ -1,5 +1,7 @@
 # Upcoming changes
 
+Add icon for mod in Mod list description.
+
 # Version NeoForge-1.25.0
 
 Add new dependency `j-ogg-vorbis`.
