@@ -4,6 +4,19 @@ Starting with version 1.24.0 of this mod, this file will list what version of
 Java was used to compile the jars. In theory, using the same version of Java
 should result in an identical jar due to reproducible builds.
 
+## NeoForge 1.25.1
+
+    $ java --version
+    openjdk 17.0.9 2023-10-17
+    OpenJDK Runtime Environment (build 17.0.9+8)
+    OpenJDK 64-Bit Server VM (build 17.0.9+8, mixed mode)
+
+    $ javac --version
+    javac 17.0.9
+
+    $ sha256sum build/libs/TurnBasedMinecraft-NeoForge-1.25.1-all.jar
+    b0ec086c356c4d3662dcea4bdd9aeb2b0786e4ef40e061599e81b529746e01ea  build/libs/TurnBasedMinecraft-NeoForge-1.25.1-all.jar
+
 ## NeoForge 1.25.0
 
     $ java --version
