@@ -2,6 +2,13 @@
 
 Add icon for mod in Mod list description.
 
+# Version NeoForge-1.25.1
+
+Add icon for mod in Mod list description.
+
+Update for NeoForge 20.4.108-beta.  
+Works on NeoForge Minecraft 1.20.4.
+
 # Version NeoForge-1.25.0
 
 Add new dependency `j-ogg-vorbis`.
