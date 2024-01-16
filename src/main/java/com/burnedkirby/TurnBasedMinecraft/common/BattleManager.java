@@ -317,7 +317,7 @@ public class BattleManager
         c.time = System.nanoTime();
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
         if(c.entity instanceof ServerPlayer) {
-            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayer) c.entity), new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"));
+            PacketDistributor.PLAYER.with((ServerPlayer)c.entity).send(new PacketGeneralMessage("You just left battle! " + config.getLeaveBattleCooldownSeconds() + " seconds until you can attack/be-attacked again!"));
         }
         recentlyLeftBattle.put(c.entity.getId(), c);
         entityToBattleMap.remove(new EntityIDDimPair(c.entity));
@@ -337,7 +337,7 @@ public class BattleManager
                 iter.remove();
                 if(entry.getValue().entity instanceof ServerPlayer)
                 {
-                    TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(()->(ServerPlayer)entry.getValue().entity), new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."));
+                    PacketDistributor.PLAYER.with((ServerPlayer)entry.getValue().entity).send(new PacketGeneralMessage("Timer ended, you can now attack/be-attacked again."));
                 }
             }
         }

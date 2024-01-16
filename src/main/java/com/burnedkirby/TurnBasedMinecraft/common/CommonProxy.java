@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
 
@@ -172,5 +172,5 @@ public class CommonProxy
         return ServerLifecycleHooks.getCurrentServer().getLevel(dim).getEntity(id);
     }
 
-    public <MSG> void handlePacket(MSG msg, NetworkEvent.Context ctx) {}
+    public <MSG> void handlePacket(final MSG msg, final PlayPayloadContext ctx) {}
 }

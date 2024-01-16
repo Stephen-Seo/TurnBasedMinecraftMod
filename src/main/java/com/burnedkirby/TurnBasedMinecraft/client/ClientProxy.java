@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public class ClientProxy extends CommonProxy {
     private BattleGui battleGui = null;
@@ -222,7 +222,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public <MSG> void handlePacket(MSG msg, NetworkEvent.Context ctx) {
+    public <MSG> void handlePacket(final MSG msg, final PlayPayloadContext ctx) {
         if (msg.getClass() == PacketBattleMessage.class) {
             PacketBattleMessage pkt = (PacketBattleMessage) msg;
             Entity fromEntity = getEntity(pkt.getEntityIDFrom(), pkt.getDimension());

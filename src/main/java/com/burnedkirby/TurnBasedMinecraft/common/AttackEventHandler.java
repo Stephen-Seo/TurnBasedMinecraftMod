@@ -82,7 +82,7 @@ public class AttackEventHandler
                     	if(!event.getEntity().hasCustomName())
                         {
                             TurnBasedMinecraftMod.logger.error("Cannot edit custom name from entity without custom name");
-                            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer)editingInfo.editor), new PacketGeneralMessage("Cannot edit custom name from entity without custom name"));
+                            PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketGeneralMessage("Cannot edit custom name from entity without custom name"));
                             return;
                         }
                         editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getString());
@@ -91,9 +91,9 @@ public class AttackEventHandler
                             editingInfo.entityInfo = new EntityInfo();
                             editingInfo.entityInfo.customName = event.getEntity().getCustomName().getString();
                         }
-                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer)editingInfo.editor), new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getString() + "\""));
+                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getString() + "\""));
                         TurnBasedMinecraftMod.logger.info("Begin editing custom \"" + event.getEntity().getCustomName().getString() + "\"");
-                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer)editingInfo.editor), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     }
                     else
                     {
@@ -107,9 +107,9 @@ public class AttackEventHandler
                         {
                             editingInfo.entityInfo = editingInfo.entityInfo.clone();
                         }
-                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer)editingInfo.editor), new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""));
+                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""));
                         TurnBasedMinecraftMod.logger.info("Begin editing \"" + editingInfo.entityInfo.classType.getName() + "\"");
-                        TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer)editingInfo.editor), new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     }
                     return;
                 }

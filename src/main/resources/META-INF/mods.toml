@@ -33,14 +33,14 @@ description='''
 Implements turn-based-battle in Minecraft.
 '''
 
-logoFile="/assets/com_burnedkirby_turnbasedminecraft/tbmm_icon.png"
+logoFile="assets/com_burnedkirby_turnbasedminecraft/tbmm_icon.png"
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.com_burnedkirby_turnbasedminecraft]] #optional
     # the modid of the dependency
     modId="neoforge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
-    mandatory=true #mandatory
+    type="required" #mandatory
     # The version range of the dependency
     versionRange="${neo_version_range}" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
@@ -50,7 +50,7 @@ logoFile="/assets/com_burnedkirby_turnbasedminecraft/tbmm_icon.png"
 # Here's another dependency
 [[dependencies.com_burnedkirby_turnbasedminecraft]]
     modId="minecraft"
-    mandatory=true
+    type="required"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"

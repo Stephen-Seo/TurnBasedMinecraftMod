@@ -449,7 +449,7 @@ public class Battle {
         }
         PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer, TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
         for (Combatant p : players.values()) {
-            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p.entity), infoPacket);
+            PacketDistributor.PLAYER.with((ServerPlayer)p.entity).send(infoPacket);
         }
     }
 
@@ -464,7 +464,7 @@ public class Battle {
         PacketBattleMessage packet = new PacketBattleMessage(type, from, to, dimension, amount, custom);
         for (Combatant p : players.values()) {
             if (p.entity.isAlive()) {
-                TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p.entity), packet);
+                PacketDistributor.PLAYER.with((ServerPlayer)p.entity).send(packet);
             }
         }
     }
@@ -574,7 +574,7 @@ public class Battle {
 
     private void removeCombatantPostRemove(Combatant c) {
         if (c.entity instanceof Player) {
-            TurnBasedMinecraftMod.getHandler().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) c.entity), new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, dimension, 0));
+            PacketDistributor.PLAYER.with((ServerPlayer)c.entity).send(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, dimension, 0));
         }
         battleManager.addRecentlyLeftBattle(c);
     }
