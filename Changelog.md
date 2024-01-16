@@ -1,6 +1,11 @@
 # Upcoming changes
 
+# Version Forge-1.25.1
+
 Add icon for mod in Mod list description.
+
+Update for Forge 49.0.19.
+Works on Forge Minecraft 1.20.4.
 
 # Version NeoForge-1.25.1
 
