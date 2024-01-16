@@ -150,11 +150,11 @@ public class BattleGui extends Screen {
 						.getSideAEntrySet()) {
 					if (e.getValue().entity != null) {
 						addRenderableWidget(new EntitySelectionButton(width / 4 - 60, y, 120, 20, e.getValue().entity.getDisplayName(), e.getKey(), true, (button) -> {
-							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
+							entityButtonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					} else {
 						addRenderableWidget(new EntitySelectionButton(width / 4 - 60, y, 120, 20, "Unknown", e.getKey(), true, (button) -> {
-							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
+							entityButtonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					}
 					y += 20;
@@ -168,11 +168,11 @@ public class BattleGui extends Screen {
 						.getSideBEntrySet()) {
 					if (e.getValue().entity != null) {
 						addRenderableWidget(new EntitySelectionButton(width * 3 / 4 - 60, y, 120, 20, e.getValue().entity.getDisplayName(), e.getKey(), false, (button) -> {
-							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
+							entityButtonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					} else {
 						addRenderableWidget(new EntitySelectionButton(width * 3 / 4 - 60, y, 120, 20, "Unknown", e.getKey(), false, (button) -> {
-							buttonActionEvent(button, ButtonAction.ATTACK_TARGET);
+							entityButtonActionEvent(button, ButtonAction.ATTACK_TARGET);
 						}));
 					}
 					y += 20;
@@ -202,8 +202,8 @@ public class BattleGui extends Screen {
 		case SWITCH_ITEM:
 			info = "To which item will you switch to?";
 			for (int i = 0; i < 9; ++i) {
-				addRenderableWidget(new ItemSelectionButton(width / 2 - 88 + i * 20, height - 19, 16, 16, "", i, (button) -> {
-					buttonActionEvent(button, ButtonAction.DO_ITEM_SWITCH);
+				addRenderableWidget(new ItemSelectionButton(width / 2 - 88 + i * 20, height - 19, 16, 16, i, (button) -> {
+					itemButtonActionEvent(button, ButtonAction.DO_ITEM_SWITCH);
 				}));
 			}
 			addRenderableWidget(Button.builder(Component.literal("Cancel"), (button) -> {
@@ -213,8 +213,8 @@ public class BattleGui extends Screen {
 		case USE_ITEM:
 			info = "Which item will you use?";
 			for (int i = 0; i < 9; ++i) {
-				addRenderableWidget(new ItemSelectionButton(width / 2 - 88 + i * 20, height - 19, 16, 16, "", i, (button) -> {
-					buttonActionEvent(button, ButtonAction.DO_USE_ITEM);
+				addRenderableWidget(new ItemSelectionButton(width / 2 - 88 + i * 20, height - 19, 16, 16, i, (button) -> {
+					itemButtonActionEvent(button, ButtonAction.DO_USE_ITEM);
 				}));
 			}
 			addRenderableWidget(Button.builder(Component.literal("Cancel"), (button) -> {
@@ -269,10 +269,6 @@ public class BattleGui extends Screen {
 		drawString(guiGraphics, info, width / 2 - stringWidth / 2, 20, 0xFFFFFFFF);
 	}
 
-	@Override
-	public void renderBackground(GuiGraphics p_283688_, int p_299421_, int p_298679_, float p_297268_) {
-	}
-
 	protected void buttonActionEvent(AbstractButton button, ButtonAction action) {
 		switch (action) {
 		case ATTACK:
@@ -294,14 +290,8 @@ public class BattleGui extends Screen {
 			setState(MenuState.WAITING);
 			break;
 		case ATTACK_TARGET:
-			if (button instanceof EntitySelectionButton) {
-				TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
-					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.ATTACK, ((EntitySelectionButton) button).getID()),
-					PacketDistributor.SERVER.noArg());
-				setState(MenuState.WAITING);
-			} else {
-				setState(MenuState.MAIN_MENU);
-			}
+			// Invalid but set to main menu anyways.
+			setState(MenuState.MAIN_MENU);
 			break;
 		case SWITCH_HELD_ITEM:
 			setState(MenuState.SWITCH_ITEM);
@@ -313,28 +303,47 @@ public class BattleGui extends Screen {
 			setState(MenuState.MAIN_MENU);
 			break;
 		case DO_ITEM_SWITCH:
-			if (button instanceof ItemSelectionButton) {
-				TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
-					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.SWITCH_ITEM, ((ItemSelectionButton) button).getID()),
-					PacketDistributor.SERVER.noArg());
-				if (((ItemSelectionButton) button).getID() >= 0 && ((ItemSelectionButton) button).getID() < 9) {
-					Minecraft.getInstance().player.getInventory().selected = ((ItemSelectionButton) button).getID();
-				}
-				setState(MenuState.WAITING);
-			} else {
-				setState(MenuState.MAIN_MENU);
-			}
+			// Invalid but set to main menu anyways.
+			setState(MenuState.MAIN_MENU);
 			break;
 		case DO_USE_ITEM:
-			if (button instanceof ItemSelectionButton) {
-				TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
-					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.USE_ITEM, ((ItemSelectionButton) button).getID()),
+			// Invalid, but set menu to main menu anyways.
+			setState(MenuState.MAIN_MENU);
+			break;
+		}
+	}
+
+	protected void entityButtonActionEvent(EntitySelectionButton button, ButtonAction action) {
+		if (action.equals(ButtonAction.ATTACK_TARGET)) {
+			TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
+					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.ATTACK, button.getID()),
+				PacketDistributor.SERVER.noArg());
+			setState(MenuState.WAITING);
+		} else {
+			setState(MenuState.MAIN_MENU);
+		}
+	}
+
+	protected void itemButtonActionEvent(ItemSelectionButton button, ButtonAction action) {
+		switch (action) {
+			case DO_ITEM_SWITCH:
+				TurnBasedMinecraftMod.getHandler().send(
+					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.SWITCH_ITEM, button.getID()),
+					PacketDistributor.SERVER.noArg());
+				if (button.getID() >= 0 && button.getID() < 9) {
+					Minecraft.getInstance().player.getInventory().selected = button.getID();
+				}
+				setState(MenuState.WAITING);
+				break;
+			case DO_USE_ITEM:
+				TurnBasedMinecraftMod.getHandler().send(
+					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.USE_ITEM, button.getID()),
 					PacketDistributor.SERVER.noArg());
 				setState(MenuState.WAITING);
-			} else {
+				break;
+			default:
 				setState(MenuState.MAIN_MENU);
-			}
-			break;
+				break;
 		}
 	}
 
@@ -349,6 +358,11 @@ public class BattleGui extends Screen {
 			return super.keyPressed(a, b, c);
 		}
 		return false; // TODO verify return value
+	}
+
+	@Override
+	public void renderBackground(GuiGraphics p_283688_, int p_299421_, int p_298679_, float p_297268_) {
+		// Left blank to not render background.
 	}
 
 	@Override

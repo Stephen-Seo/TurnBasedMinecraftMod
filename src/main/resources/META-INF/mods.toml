@@ -33,7 +33,7 @@ description='''
 Implements turn-based-battle in Minecraft.
 '''
 
-logoFile="/assets/com_burnedkirby_turnbasedminecraft/tbmm_icon.png"
+logoFile="assets/com_burnedkirby_turnbasedminecraft/tbmm_icon.png"
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.com_burnedkirby_turnbasedminecraft]] #optional
