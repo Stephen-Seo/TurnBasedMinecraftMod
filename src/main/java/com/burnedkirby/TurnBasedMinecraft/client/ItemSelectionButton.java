@@ -14,6 +14,7 @@ public class ItemSelectionButton implements Renderable, GuiEventListener, Narrat
     private int height;
     TBMItemButtonPress onPress;
     private int itemStackID;
+    private boolean focused;
 
     public ItemSelectionButton(int x, int y, int widthIn, int heightIn, int itemStackID, TBMItemButtonPress onPress) {
         this.x = x;
@@ -44,17 +45,17 @@ public class ItemSelectionButton implements Renderable, GuiEventListener, Narrat
 
     @Override
     public void setFocused(boolean b) {
-
+        focused = b;
     }
 
     @Override
     public boolean isFocused() {
-        return false;
+        return focused;
     }
 
     @Override
     public NarrationPriority narrationPriority() {
-        return null;
+        return NarrationPriority.FOCUSED;
     }
 
     @Override
