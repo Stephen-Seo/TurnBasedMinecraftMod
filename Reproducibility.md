@@ -15,7 +15,7 @@ should result in an identical jar due to reproducible builds.
     javac 17.0.10
 
     $ sha256sum build/libs/TurnBasedMinecraft-NeoForge-1.25.2-all.jar
-    241da01582400f73a1c0bab292b2e5c11e92b431d89eb9b8c08728616211f194  build/libs/TurnBasedMinecraft-NeoForge-1.25.2-all.jar
+    c59533059eb322a616f38ab40ccbc7d4d6c1667a651328a4c6eb187fe16d7a6f  build/libs/TurnBasedMinecraft-NeoForge-1.25.2-all.jar
 
 ## Forge 1.25.2
 
