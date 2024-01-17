@@ -1103,7 +1103,7 @@ public class Battle {
                                     final Entity nextEntity = next.entity;
                                     final int nextItemToUse = next.itemToUse;
                                     ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level(), (LivingEntity) nextEntity));
-                                } else if (targetItem instanceof PotionItem) {
+                                } else if (targetItem instanceof PotionItem && !(targetItem instanceof ThrowablePotionItem)) {
                                     debugLog += " potion";
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_POTION.getValue(), targetItemStack.getDisplayName().getString());
                                     final Entity nextEntity = next.entity;
@@ -1114,7 +1114,10 @@ public class Battle {
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getString());
                                     final Entity nextEntity = next.entity;
                                     final int nextItemToUse = next.itemToUse;
-                                    ((Player)nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level(), (LivingEntity) nextEntity));
+                                    final int prevItem = ((Player)nextEntity).getInventory().selected;
+                                    ((Player)nextEntity).getInventory().selected = nextItemToUse;
+                                    ((Player)nextEntity).getInventory().setItem(nextItemToUse, targetItem.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND).getObject());
+                                    ((Player)nextEntity).getInventory().selected = prevItem;
                                 }
                             }
                             break;
