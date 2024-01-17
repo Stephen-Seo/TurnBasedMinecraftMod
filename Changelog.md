@@ -1,5 +1,14 @@
 # Upcoming changes
 
+# Version Forge-1.25.2
+
+Fix invalid use of throwable potions. (Previously, the Player would "drink"
+splash/lingering potions when used.) Now, if a splash/lingering potion is
+"Use"d in battle, it will be thrown.
+
+Add experimental support for "right-click" of arbitrary items on hotbar when
+"Use" is used in battle.
+
 # Version Forge-1.25.1
 
 Add icon for mod in Mod list description.
