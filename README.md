@@ -9,6 +9,7 @@ https://seodisparate.com/static/tbm_releases/
 https://burnedkirby.com/tbmm_downloads/  
 https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files  
 https://modrinth.com/mod/turnbasedmc
+https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/releases
 
 # Forge or NeoForge
 
