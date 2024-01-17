@@ -23,6 +23,10 @@ disabled for "passive" mobs.
 **Note that while .ogg Vorbis files are supported, .ogg Opus files are NOT
 supported.**
 
+One can use FFmpeg to convert music files into .ogg Vorbis:
+
+    ffmpeg -i <music_file_to_convert> -map a:0 -c:a libvorbis output.ogg
+
 ## Why can't the mod play my mp3 files?
 
 The third-party-library used to load mp3 files seems to have issues with
