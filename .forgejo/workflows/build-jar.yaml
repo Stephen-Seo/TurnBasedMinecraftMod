@@ -5,7 +5,20 @@ on:
       - '*'
 
 jobs:
+  check-release-exists:
+    runs-on: any_archLinux
+    outputs:
+      status: ${{ steps.release_exists_check.outputs.http_code }}
+    steps:
+      - name: Check if release already exists
+        id: release_exists_check
+        run: |
+          curl -X GET "https://git.seodisparate.com/api/v1/repos/stephenseo/TurnBasedMinecraftMod/releases/tags/${GITHUB_REF_NAME}" \
+          -H 'accept: application/json' -o release_check_resp.json 2>/dev/null \
+          -w '%{http_code}\n' | sed 's/^\([0-9]\+\)/http_code=\1/' >> "$GITHUB_OUTPUT"
   build-and-create-release:
+    needs: check-release-exists
+    if: ${{ needs.check-release-exists.outputs.status == '404' }}
     runs-on: any_archLinux
     steps:
       - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TurnBasedMinecraftMod
