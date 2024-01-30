@@ -13,7 +13,7 @@ https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/releases
 
 # Forge or NeoForge
 
-The `master` branch tracks the version of the mod for Minecraft Forge.
+The `forge` branch tracks the version of the mod for Minecraft Forge.
 
 The `neoforge` branch tracks the version of the mod for Minecraft NeoForge.
 
