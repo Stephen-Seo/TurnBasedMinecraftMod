@@ -259,7 +259,7 @@ public class BattleMusic
                 
                 // set volume
                 FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(volume * 20.0f - 20.0f); // in decibels
+                gainControl.setValue(BattleMusic.percentageToDecibels(volume));
 
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 clip.start();
@@ -387,6 +387,17 @@ public class BattleMusic
         return !sillyMusic.isEmpty();
     }
 
+    /// Percentage must be between 0 and 1.
+    public static float percentageToDecibels(float percentage) {
+        if (percentage > 1.0F) {
+            return 0.0F;
+        } else if (percentage <= 0.0F) {
+            return Float.NEGATIVE_INFINITY;
+        } else {
+            return (float) (Math.log10(percentage) * 20.0);
+        }
+    }
+
     private class MP3Streamer implements Runnable
     {
         private AtomicBoolean keepPlaying;
@@ -438,7 +449,7 @@ public class BattleMusic
                 sdl.open(audioFormat);
                 {
                     FloatControl volumeControl = (FloatControl) sdl.getControl(FloatControl.Type.MASTER_GAIN);
-                    volumeControl.setValue(volume * 20.0f - 20.0f); // in decibels
+                    volumeControl.setValue(BattleMusic.percentageToDecibels(volume));
                 }
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -536,7 +547,7 @@ public class BattleMusic
                 sdl.open(audioFormat);
                 {
                     FloatControl volumeControl = (FloatControl) sdl.getControl(FloatControl.Type.MASTER_GAIN);
-                    volumeControl.setValue(volume * 20.0f - 20.0f); // in decibels
+                    volumeControl.setValue(BattleMusic.percentageToDecibels(volume));
                 }
 
                 AudioInputStream ais = reader.getAudioInputStream(oggVorbisFile);

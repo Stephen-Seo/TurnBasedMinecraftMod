@@ -1,5 +1,8 @@
 # Upcoming changes
 
+Fix volume handling of battle/silly music. (Previous implementation did not
+properly reduce volume based on Minecraft's "music volume" setting.)
+
 # Version NeoForge-1.25.2
 
 Fix invalid use of throwable potions. (Previously, the Player would "drink"
