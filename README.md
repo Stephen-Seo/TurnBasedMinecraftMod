@@ -72,7 +72,7 @@ configured for them.)
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
 finished jar will be saved at
-`build/libs/TurnBasedMinecraft-NeoForge-1.25.2-all.jar`
+`build/libs/TurnBasedMinecraft-NeoForge-1.25.3-all.jar`
 
 # Reproducibility
 
