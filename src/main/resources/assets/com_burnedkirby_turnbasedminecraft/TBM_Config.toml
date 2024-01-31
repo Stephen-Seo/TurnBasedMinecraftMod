@@ -6,16 +6,8 @@ version = 10
 # "false"!
 do_not_overwrite = false
 
-[client_config]
 
-# What categories play this type of music (battle_music). Unknown categories will default to this type.
-battle_music = ["monster", "animal", "boss", "player"]
-# What categories play this type of music (silly_music).
-silly_music = ["passive"]
-
-# Minimum percentage of silly entities in battle to use silly music.
-silly_music_threshold = 40
-
+# Note that client config is no longer stored here but rather in the settings.
 
 [server_config]
 

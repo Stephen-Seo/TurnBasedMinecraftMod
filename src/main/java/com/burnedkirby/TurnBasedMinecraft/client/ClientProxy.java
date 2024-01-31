@@ -94,13 +94,21 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void playBattleMusic() {
         Options gs = Minecraft.getInstance().options;
-        battleMusic.playBattle(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER));
+        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
+            battleMusic.playBattle(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
+        } else {
+            battleMusic.playBattle(gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
+        }
     }
 
     @Override
     public void playSillyMusic() {
         Options gs = Minecraft.getInstance().options;
-        battleMusic.playSilly(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER));
+        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
+            battleMusic.playSilly(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
+        } else {
+            battleMusic.playSilly(gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
+        }
     }
 
     @Override
@@ -116,9 +124,9 @@ public class ClientProxy extends CommonProxy {
         if (localBattle == null) {
             return;
         }
-        if (type == null || type.isEmpty() || getConfig().isBattleMusicType(type)) {
+        if (type == null || type.isEmpty() || ClientConfig.CLIENT.battleMusicList.get().contains(type)) {
             ++battleMusicCount;
-        } else if (getConfig().isSillyMusicType(type)) {
+        } else if (ClientConfig.CLIENT.sillyMusicList.get().contains(type)) {
             ++sillyMusicCount;
         } else {
             ++battleMusicCount;
@@ -132,9 +140,9 @@ public class ClientProxy extends CommonProxy {
             battleMusicCount = 0;
             sillyMusicCount = 0;
             return;
-        } else if (type == null || type.isEmpty() || getConfig().isBattleMusicType(type)) {
+        } else if (type == null || type.isEmpty() || ClientConfig.CLIENT.battleMusicList.get().contains(type)) {
             --battleMusicCount;
-        } else if (getConfig().isSillyMusicType(type)) {
+        } else if (ClientConfig.CLIENT.sillyMusicList.get().contains(type)) {
             --sillyMusicCount;
         } else {
             --battleMusicCount;
@@ -185,7 +193,7 @@ public class ClientProxy extends CommonProxy {
             percentage = 100.0f * (float) sillyMusicCount / (float) (sillyMusicCount + battleMusicCount);
         }
 
-        if (percentage >= (float) getConfig().getSillyMusicThreshold()) {
+        if (percentage >= (float) ClientConfig.CLIENT.sillyMusicThreshold.get()) {
             if (battleMusic.isPlaying()) {
                 if (!battleMusic.isPlayingSilly() && battleMusic.hasSillyMusic()) {
                     stopMusic(false);

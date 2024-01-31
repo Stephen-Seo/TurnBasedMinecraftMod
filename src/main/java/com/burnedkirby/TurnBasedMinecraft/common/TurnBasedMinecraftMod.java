@@ -1,6 +1,7 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
 import ca.weblite.objc.Client;
+import com.burnedkirby.TurnBasedMinecraft.client.ClientConfig;
 import com.burnedkirby.TurnBasedMinecraft.client.ClientProxy;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.*;
 import com.mojang.brigadier.LiteralMessage;
@@ -21,6 +22,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -67,6 +71,7 @@ public class TurnBasedMinecraftMod {
         eventBus.addListener(this::secondInitServer);
         eventBus.addListener(this::registerNetwork);
         NeoForge.EVENT_BUS.register(this);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_SPEC);
     }
 
     private void registerNetwork(final RegisterPayloadHandlerEvent event) {
