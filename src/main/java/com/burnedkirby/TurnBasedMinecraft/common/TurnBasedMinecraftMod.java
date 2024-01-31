@@ -1,6 +1,5 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import ca.weblite.objc.Client;
 import com.burnedkirby.TurnBasedMinecraft.client.ClientConfig;
 import com.burnedkirby.TurnBasedMinecraft.client.ClientProxy;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.*;
@@ -24,7 +23,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -94,6 +92,9 @@ public class TurnBasedMinecraftMod {
 
         registrar.play(PacketGeneralMessage.ID, PacketGeneralMessage::new, handler -> handler
             .client(PacketGeneralMessage.PayloadHandler.getInstance()::handleData));
+
+        registrar.play(PacketClientGUI.ID, PacketClientGUI::new, handler -> handler
+            .client(PacketClientGUI.PayloadHandler.getInstance()::handleData));
 
         logger.debug("Register packets com_burnedkirby_turnbasedminecraft");
     }
@@ -1675,6 +1676,15 @@ public class TurnBasedMinecraftMod {
                         }
                         return 1;
                     })))
+        );
+
+        // tbm-client-edit
+        event.getDispatcher().register(
+            Commands.literal("tbm-client-edit").executes(c -> {
+                ServerPlayer player = c.getSource().getPlayerOrException();
+                PacketDistributor.PLAYER.with(player).send(new PacketClientGUI());
+                return 1;
+            })
         );
     }
 
