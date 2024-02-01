@@ -7,6 +7,10 @@ Move client-config to NeoForge's configuration.
 
 Add GUI to edit client-config that can be opened with /tbm-client-edit command.
 
+Add option in client-config to set battle/silly music volume, and an option for
+whether or not battle/silly music volume is affected by global music volume
+setting.
+
 # Version NeoForge-1.25.2
 
 Fix invalid use of throwable potions. (Previously, the Player would "drink"
