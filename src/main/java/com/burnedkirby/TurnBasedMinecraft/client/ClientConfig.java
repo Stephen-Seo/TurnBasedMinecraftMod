@@ -124,7 +124,7 @@ public class ClientConfig {
 
             addRenderableWidget(new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Silly Music Threshold").setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("0-100 percentage minimum count of silly mobs to play silly music")))), font));
             if (sillyMusicThresholdSlider == null) {
-                sillyMusicThresholdSlider = new Slider100(this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Silly Music Threshold: " + CLIENT.sillyMusicThreshold.get()), CLIENT.sillyMusicThreshold.get(), "Silly Music Threshold: ");
+                sillyMusicThresholdSlider = new Slider100(this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Silly Music Threshold: " + String.format("%d%%",CLIENT.sillyMusicThreshold.get())), CLIENT.sillyMusicThreshold.get(), "Silly Music Threshold: ");
             } else {
                 sillyMusicThresholdSlider.setPosition(this.width / 2 + widget_x_offset, top_offset);
                 sillyMusicThresholdSlider.setSize(widget_width, widget_height);
@@ -148,7 +148,7 @@ public class ClientConfig {
 
             addRenderableWidget(new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Music Volume").setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Volume of battle/silly music")))), font));
             if (volumeSlider == null) {
-                volumeSlider = new SliderDouble(this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Volume: " + String.format("%.2f", CLIENT.musicVolume.get())), CLIENT.musicVolume.get(), "Volume: ");
+                volumeSlider = new SliderDouble(this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Volume: " + String.format("%.1f%%", CLIENT.musicVolume.get() * 100.0)), CLIENT.musicVolume.get(), "Volume: ");
             } else {
                 volumeSlider.setPosition(this.width / 2 + widget_x_offset, top_offset);
                 volumeSlider.setSize(widget_width, widget_height);
@@ -225,7 +225,7 @@ public class ClientConfig {
 
             @Override
             protected void updateMessage() {
-                setMessage(Component.literal(messagePrefix + (int) (value * 100.0)));
+                setMessage(Component.literal(messagePrefix + String.format("%d%%", (int)(value * 100.0))));
             }
 
             @Override
@@ -246,7 +246,7 @@ public class ClientConfig {
 
             @Override
             protected void updateMessage() {
-                setMessage(Component.literal(messagePrefix + String.format("%.2f", percentage)));
+                setMessage(Component.literal(messagePrefix + String.format("%.1f%%", percentage * 100.0)));
             }
 
             @Override
