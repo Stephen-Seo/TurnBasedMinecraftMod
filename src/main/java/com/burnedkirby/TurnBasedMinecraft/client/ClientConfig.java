@@ -20,14 +20,15 @@ public class ClientConfig {
     public static final ModConfigSpec CLIENT_SPEC;
 
     static {
-        Pair<ClientConfig, ModConfigSpec> pair = new ModConfigSpec.Builder().configure(ClientConfig::new);
+        Pair<ClientConfig, ModConfigSpec> pair =
+            new ModConfigSpec.Builder().configure(ClientConfig::new);
         CLIENT = pair.getKey();
         CLIENT_SPEC = pair.getValue();
     }
 
     public final ModConfigSpec.ConfigValue<List<? extends String>> battleMusicList;
     public final ModConfigSpec.ConfigValue<List<? extends String>> sillyMusicList;
-    public final ModConfigSpec.IntValue sillyMusicThreshold;
+    public final ModConfigSpec.DoubleValue sillyMusicThreshold;
     public final ModConfigSpec.BooleanValue volumeAffectedByMusicVolume;
     public final ModConfigSpec.DoubleValue musicVolume;
 
@@ -39,17 +40,30 @@ public class ClientConfig {
         battleMusicList.add("animal");
         battleMusicList.add("boss");
         battleMusicList.add("player");
-        this.battleMusicList = builder.comment("What categories of mobs that play \"battle\" music").translation(TurnBasedMinecraftMod.MODID + ".clientconfig.battle_music_list").defineList("battleMusicList", battleMusicList, (v) -> v instanceof String);
+        this.battleMusicList = builder.comment("What categories of mobs that play \"battle\" music")
+            .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.battle_music_list")
+            .defineList("battleMusicList", battleMusicList, (v) -> v instanceof String);
 
         List<String> sillyMusicList = new ArrayList<String>(4);
         sillyMusicList.add("passive");
-        this.sillyMusicList = builder.comment("What categories of mobs that play \"silly\" music").translation(TurnBasedMinecraftMod.MODID + ".clientconfig.silly_music_list").defineList("sillyMusicList", sillyMusicList, (v) -> true);
+        this.sillyMusicList = builder.comment("What categories of mobs that play \"silly\" music")
+            .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.silly_music_list")
+            .defineList("sillyMusicList", sillyMusicList, (v) -> true);
 
-        this.sillyMusicThreshold = builder.comment("Minimum percentage of silly entities in battle to use silly music").translation(TurnBasedMinecraftMod.MODID + ".clientconfig.silly_percentage").defineInRange("sillyMusicThreshold", 40, 0, 100);
+        this.sillyMusicThreshold =
+            builder.comment("Minimum percentage of silly entities in battle to use silly music")
+                .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.silly_percentage")
+                .defineInRange("sillyMusicThreshold", 0.4, 0.0, 1.0);
 
-        this.volumeAffectedByMusicVolume = builder.comment("If \"true\", music volume will be affected by global Music volume setting").translation(TurnBasedMinecraftMod.MODID + ".clientconfig.volume_affected_by_volume").define("volumeAffectedByMusicVolume", true);
+        this.volumeAffectedByMusicVolume = builder.comment(
+                "If \"true\", music volume will be affected by global Music volume setting")
+            .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.volume_affected_by_volume")
+            .define("volumeAffectedByMusicVolume", true);
 
-        this.musicVolume = builder.comment("Volume of battle/silly music as a percentage between 0.0 and 1.0").translation(TurnBasedMinecraftMod.MODID + ".clientconfig.music_volume").defineInRange("musicVolume", 0.7, 0.0, 1.0);
+        this.musicVolume =
+            builder.comment("Volume of battle/silly music as a percentage between 0.0 and 1.0")
+                .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.music_volume")
+                .defineInRange("musicVolume", 0.7, 0.0, 1.0);
 
         //builder.pop();
     }
@@ -60,9 +74,9 @@ public class ClientConfig {
         private boolean accepted;
         private EditBox battleListEditBox = null;
         private EditBox sillyListEditBox = null;
-        private Slider100 sillyMusicThresholdSlider = null;
+        private SliderPercentage sillyMusicThresholdSlider = null;
         private Checkbox affectedByMusicVolCheckbox = null;
-        private SliderDouble volumeSlider = null;
+        private SliderPercentage volumeSlider = null;
 
         public CliConfGui() {
             super(Component.literal("TurnBasedMC Client Config"));
@@ -80,9 +94,14 @@ public class ClientConfig {
             int widget_width = this.width / 2 - widget_x_offset * 2;
             int top_offset = 5;
 
-            addRenderableWidget(new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Battle Music Categories"), font));
+            addRenderableWidget(
+                new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
+                    widget_width, widget_height, Component.literal("Battle Music Categories"),
+                    font));
             if (battleListEditBox == null) {
-                battleListEditBox = new EditBox(font, this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Battle Music Categories Edit Box"));
+                battleListEditBox =
+                    new EditBox(font, this.width / 2 + widget_x_offset, top_offset, widget_width,
+                        widget_height, Component.literal("Battle Music Categories Edit Box"));
             } else {
                 battleListEditBox.setPosition(this.width / 2 + widget_x_offset, top_offset);
                 battleListEditBox.setSize(widget_width, widget_height);
@@ -101,9 +120,14 @@ public class ClientConfig {
 
             top_offset += widget_height;
 
-            addRenderableWidget(new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Silly Music Categories"), font));
+            addRenderableWidget(
+                new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
+                    widget_width, widget_height, Component.literal("Silly Music Categories"),
+                    font));
             if (sillyListEditBox == null) {
-                sillyListEditBox = new EditBox(font, this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Silly Music Categories Edit Box"));
+                sillyListEditBox =
+                    new EditBox(font, this.width / 2 + widget_x_offset, top_offset, widget_width,
+                        widget_height, Component.literal("Silly Music Categories Edit Box"));
             } else {
                 sillyListEditBox.setPosition(this.width / 2 + widget_x_offset, top_offset);
                 sillyListEditBox.setSize(widget_width, widget_height);
@@ -122,9 +146,19 @@ public class ClientConfig {
 
             top_offset += widget_height;
 
-            addRenderableWidget(new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Silly Music Threshold").setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("0-100 percentage minimum count of silly mobs to play silly music")))), font));
+            addRenderableWidget(
+                new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
+                    widget_width, widget_height, Component.literal("Silly Music Threshold")
+                    .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
+                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(
+                            "0-100 percentage minimum count of silly mobs to play silly music")))),
+                    font));
             if (sillyMusicThresholdSlider == null) {
-                sillyMusicThresholdSlider = new Slider100(this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Silly Music Threshold: " + String.format("%d%%",CLIENT.sillyMusicThreshold.get())), CLIENT.sillyMusicThreshold.get(), "Silly Music Threshold: ");
+                sillyMusicThresholdSlider =
+                    new SliderPercentage(this.width / 2 + widget_x_offset, top_offset, widget_width,
+                        widget_height, Component.literal("Silly Music Threshold: " +
+                        String.format("%.1f%%", CLIENT.sillyMusicThreshold.get() * 100.0)),
+                        CLIENT.sillyMusicThreshold.get(), "Silly Music Threshold: ");
             } else {
                 sillyMusicThresholdSlider.setPosition(this.width / 2 + widget_x_offset, top_offset);
                 sillyMusicThresholdSlider.setSize(widget_width, widget_height);
@@ -133,32 +167,55 @@ public class ClientConfig {
 
             top_offset += widget_height;
 
-            addRenderableWidget(new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Affected by Music Vol.").setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("If enabled, volume is affected by global music volume.")))), font));
+            addRenderableWidget(
+                new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
+                    widget_width, widget_height, Component.literal("Affected by Music Vol.")
+                    .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
+                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(
+                            "If enabled, volume is affected by global music volume.")))), font));
             if (affectedByMusicVolCheckbox == null) {
-                affectedByMusicVolCheckbox = Checkbox.builder(Component.literal(""), font).pos(this.width / 2 + widget_x_offset, top_offset).build();
+                affectedByMusicVolCheckbox = Checkbox.builder(Component.literal(""), font)
+                    .pos(this.width / 2 + widget_x_offset, top_offset).build();
             } else {
-                affectedByMusicVolCheckbox.setPosition(this.width / 2 + widget_x_offset, top_offset);
+                affectedByMusicVolCheckbox.setPosition(this.width / 2 + widget_x_offset,
+                    top_offset);
             }
-            if ((CLIENT.volumeAffectedByMusicVolume.get() && !affectedByMusicVolCheckbox.selected()) || (!CLIENT.volumeAffectedByMusicVolume.get() && affectedByMusicVolCheckbox.selected())) {
+            if ((CLIENT.volumeAffectedByMusicVolume.get() &&
+                !affectedByMusicVolCheckbox.selected()) ||
+                (!CLIENT.volumeAffectedByMusicVolume.get() &&
+                    affectedByMusicVolCheckbox.selected())) {
                 affectedByMusicVolCheckbox.onPress();
             }
             addRenderableWidget(affectedByMusicVolCheckbox);
 
             top_offset += widget_height;
 
-            addRenderableWidget(new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Music Volume").setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Volume of battle/silly music")))), font));
+            addRenderableWidget(
+                new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
+                    widget_width, widget_height, Component.literal("Music Volume").setStyle(
+                    Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
+                        new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                            Component.literal("Volume of battle/silly music")))), font));
             if (volumeSlider == null) {
-                volumeSlider = new SliderDouble(this.width / 2 + widget_x_offset, top_offset, widget_width, widget_height, Component.literal("Volume: " + String.format("%.1f%%", CLIENT.musicVolume.get() * 100.0)), CLIENT.musicVolume.get(), "Volume: ");
+                volumeSlider =
+                    new SliderPercentage(this.width / 2 + widget_x_offset, top_offset, widget_width,
+                        widget_height, Component.literal(
+                        "Volume: " + String.format("%.1f%%", CLIENT.musicVolume.get() * 100.0)),
+                        CLIENT.musicVolume.get(), "Volume: ");
             } else {
                 volumeSlider.setPosition(this.width / 2 + widget_x_offset, top_offset);
                 volumeSlider.setSize(widget_width, widget_height);
             }
             addRenderableWidget(volumeSlider);
 
-            addRenderableWidget(Button.builder(Component.literal("Cancel"), (b) -> Minecraft.getInstance().setScreen(null)).bounds(this.width / 2 - widget_width + widget_x_offset, this.height - widget_height, widget_width, widget_height).build());
+            addRenderableWidget(Button.builder(Component.literal("Cancel"),
+                    (b) -> Minecraft.getInstance().setScreen(null))
+                .bounds(this.width / 2 - widget_width + widget_x_offset,
+                    this.height - widget_height, widget_width, widget_height).build());
             addRenderableWidget(Button.builder(Component.literal("Accept"), (b) -> {
                 accepted = true;
-            }).bounds(this.width / 2 + widget_x_offset, this.height - widget_height, widget_width, widget_height).build());
+            }).bounds(this.width / 2 + widget_x_offset, this.height - widget_height, widget_width,
+                widget_height).build());
 
             dirtyFlag = false;
         }
@@ -182,7 +239,7 @@ public class ClientConfig {
                 CLIENT.sillyMusicList.set(sillyList);
             }
 
-            CLIENT.sillyMusicThreshold.set(sillyMusicThresholdSlider.percentageInt);
+            CLIENT.sillyMusicThreshold.set(sillyMusicThresholdSlider.percentage);
 
             CLIENT.volumeAffectedByMusicVolume.set(affectedByMusicVolCheckbox.selected());
 
@@ -213,32 +270,11 @@ public class ClientConfig {
             super.resize(pMinecraft, pWidth, pHeight);
         }
 
-        private static class Slider100 extends AbstractSliderButton {
-            private int percentageInt;
-            private String messagePrefix;
-
-            public Slider100(int x, int y, int width, int height, Component message, int percentage, String messagePrefix) {
-                super(x, y, width, height, message, percentage / 100.0);
-                this.percentageInt = percentage;
-                this.messagePrefix = messagePrefix;
-            }
-
-            @Override
-            protected void updateMessage() {
-                setMessage(Component.literal(messagePrefix + String.format("%d%%", (int)(value * 100.0))));
-            }
-
-            @Override
-            protected void applyValue() {
-                percentageInt = (int) (value * 100.0);
-            }
-        }
-
-        private static class SliderDouble extends AbstractSliderButton {
+        private static class SliderPercentage extends AbstractSliderButton {
             private final String messagePrefix;
             private double percentage;
 
-            public SliderDouble(int x, int y, int width, int height, Component message, double percentage, String messagePrefix) {
+            public SliderPercentage(int x, int y, int width, int height, Component message, double percentage, String messagePrefix) {
                 super(x, y, width, height, message, percentage);
                 this.percentage = percentage;
                 this.messagePrefix = messagePrefix;
@@ -246,7 +282,8 @@ public class ClientConfig {
 
             @Override
             protected void updateMessage() {
-                setMessage(Component.literal(messagePrefix + String.format("%.1f%%", percentage * 100.0)));
+                setMessage(
+                    Component.literal(messagePrefix + String.format("%.1f%%", percentage * 100.0)));
             }
 
             @Override

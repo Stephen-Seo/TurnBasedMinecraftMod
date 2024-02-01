@@ -184,16 +184,16 @@ public class ClientProxy extends CommonProxy {
             return;
         }
 
-        float percentage = 0.0f;
+        double percentage = 0.0;
         if (sillyMusicCount == 0 && battleMusicCount == 0) {
-            percentage = 0.0f;
+            percentage = 0.0;
         } else if (battleMusicCount == 0) {
-            percentage = 100.0f;
+            percentage = 1.0;
         } else {
-            percentage = 100.0f * (float) sillyMusicCount / (float) (sillyMusicCount + battleMusicCount);
+            percentage = (double) sillyMusicCount / (double) (sillyMusicCount + battleMusicCount);
         }
 
-        if (percentage >= (float) ClientConfig.CLIENT.sillyMusicThreshold.get()) {
+        if (percentage >= ClientConfig.CLIENT.sillyMusicThreshold.get()) {
             if (battleMusic.isPlaying()) {
                 if (!battleMusic.isPlayingSilly() && battleMusic.hasSillyMusic()) {
                     stopMusic(false);
