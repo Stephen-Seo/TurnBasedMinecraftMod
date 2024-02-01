@@ -94,21 +94,27 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void playBattleMusic() {
         Options gs = Minecraft.getInstance().options;
-        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
-            battleMusic.playBattle(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
-        } else {
-            battleMusic.playBattle(gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
+        float volume = ClientConfig.CLIENT.musicVolume.get().floatValue();
+        if (ClientConfig.CLIENT.volumeAffectedByMasterVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MASTER);
         }
+        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MUSIC);
+        }
+        battleMusic.playBattle(volume);
     }
 
     @Override
     public void playSillyMusic() {
         Options gs = Minecraft.getInstance().options;
-        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
-            battleMusic.playSilly(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
-        } else {
-            battleMusic.playSilly(gs.getSoundSourceVolume(SoundSource.MASTER) * ClientConfig.CLIENT.musicVolume.get().floatValue());
+        float volume = ClientConfig.CLIENT.musicVolume.get().floatValue();
+        if (ClientConfig.CLIENT.volumeAffectedByMasterVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MASTER);
         }
+        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MUSIC);
+        }
+        battleMusic.playSilly(volume);
     }
 
     @Override

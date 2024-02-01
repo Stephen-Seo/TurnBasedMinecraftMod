@@ -29,6 +29,7 @@ public class ClientConfig {
     public final ModConfigSpec.ConfigValue<List<? extends String>> battleMusicList;
     public final ModConfigSpec.ConfigValue<List<? extends String>> sillyMusicList;
     public final ModConfigSpec.DoubleValue sillyMusicThreshold;
+    public final ModConfigSpec.BooleanValue volumeAffectedByMasterVolume;
     public final ModConfigSpec.BooleanValue volumeAffectedByMusicVolume;
     public final ModConfigSpec.DoubleValue musicVolume;
 
@@ -55,6 +56,11 @@ public class ClientConfig {
                 .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.silly_percentage")
                 .defineInRange("sillyMusicThreshold", 0.4, 0.0, 1.0);
 
+        this.volumeAffectedByMasterVolume = builder.comment(
+                "If \"true\", music volume will be affected by global Master volume setting")
+            .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.volume_affected_by_master")
+            .define("volumeAffectedByMasterVolume", true);
+
         this.volumeAffectedByMusicVolume = builder.comment(
                 "If \"true\", music volume will be affected by global Music volume setting")
             .translation(TurnBasedMinecraftMod.MODID + ".clientconfig.volume_affected_by_volume")
@@ -75,6 +81,7 @@ public class ClientConfig {
         private EditBox battleListEditBox = null;
         private EditBox sillyListEditBox = null;
         private SliderPercentage sillyMusicThresholdSlider = null;
+        private Checkbox affectedByMasterVolCheckbox = null;
         private Checkbox affectedByMusicVolCheckbox = null;
         private SliderPercentage volumeSlider = null;
 
@@ -169,6 +176,29 @@ public class ClientConfig {
 
             addRenderableWidget(
                 new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
+                    widget_width, widget_height, Component.literal("Affected by Master Vol.")
+                    .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
+                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(
+                            "If enabled, volume is affected by global master volume.")))), font));
+            if (affectedByMasterVolCheckbox == null) {
+                affectedByMasterVolCheckbox = Checkbox.builder(Component.literal(""), font)
+                    .pos(this.width / 2 + widget_x_offset, top_offset).build();
+            } else {
+                affectedByMasterVolCheckbox.setPosition(this.width / 2 + widget_x_offset,
+                    top_offset);
+            }
+            if ((CLIENT.volumeAffectedByMasterVolume.get() &&
+                !affectedByMasterVolCheckbox.selected()) ||
+                (!CLIENT.volumeAffectedByMasterVolume.get() &&
+                    affectedByMasterVolCheckbox.selected())) {
+                affectedByMasterVolCheckbox.onPress();
+            }
+            addRenderableWidget(affectedByMasterVolCheckbox);
+
+            top_offset += widget_height;
+
+            addRenderableWidget(
+                new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
                     widget_width, widget_height, Component.literal("Affected by Music Vol.")
                     .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
                         new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(
@@ -240,6 +270,8 @@ public class ClientConfig {
             }
 
             CLIENT.sillyMusicThreshold.set(sillyMusicThresholdSlider.percentage);
+
+            CLIENT.volumeAffectedByMasterVolume.set(affectedByMasterVolCheckbox.selected());
 
             CLIENT.volumeAffectedByMusicVolume.set(affectedByMusicVolCheckbox.selected());
 
