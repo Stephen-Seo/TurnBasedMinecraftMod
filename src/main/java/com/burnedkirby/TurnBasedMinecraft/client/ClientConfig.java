@@ -6,9 +6,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -153,13 +150,12 @@ public class ClientConfig {
 
             top_offset += widget_height;
 
-            addRenderableWidget(
+            StringWidget stringWidget =
                 new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
-                    widget_width, widget_height, Component.literal("Silly Music Threshold")
-                    .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
-                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(
-                            "0-100 percentage minimum count of silly mobs to play silly music")))),
-                    font));
+                    widget_width, widget_height, Component.literal("Silly Music Threshold"), font);
+            stringWidget.setTooltip(Tooltip.create(
+                Component.literal("Ratio of minimum of silly mobs in battle to play silly music")));
+            addRenderableWidget(stringWidget);
             if (sillyMusicThresholdSlider == null) {
                 sillyMusicThresholdSlider =
                     new SliderPercentage(this.width / 2 + widget_x_offset, top_offset, widget_width,
@@ -174,12 +170,13 @@ public class ClientConfig {
 
             top_offset += widget_height;
 
-            addRenderableWidget(
+            stringWidget =
                 new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
-                    widget_width, widget_height, Component.literal("Affected by Master Vol.")
-                    .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
-                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(
-                            "If enabled, volume is affected by global master volume.")))), font));
+                    widget_width, widget_height, Component.literal("Affected by Master Vol."),
+                    font);
+            stringWidget.setTooltip(Tooltip.create(
+                Component.literal("If enabled, volume is affected by global master volume.")));
+            addRenderableWidget(stringWidget);
             if (affectedByMasterVolCheckbox == null) {
                 affectedByMasterVolCheckbox = Checkbox.builder(Component.literal(""), font)
                     .pos(this.width / 2 + widget_x_offset, top_offset).build();
@@ -197,12 +194,12 @@ public class ClientConfig {
 
             top_offset += widget_height;
 
-            addRenderableWidget(
+            stringWidget =
                 new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
-                    widget_width, widget_height, Component.literal("Affected by Music Vol.")
-                    .setStyle(Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
-                        new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(
-                            "If enabled, volume is affected by global music volume.")))), font));
+                    widget_width, widget_height, Component.literal("Affected by Music Vol."), font);
+            stringWidget.setTooltip(Tooltip.create(
+                Component.literal("If enabled, volume is affected by global music volume.")));
+            addRenderableWidget(stringWidget);
             if (affectedByMusicVolCheckbox == null) {
                 affectedByMusicVolCheckbox = Checkbox.builder(Component.literal(""), font)
                     .pos(this.width / 2 + widget_x_offset, top_offset).build();
@@ -220,12 +217,12 @@ public class ClientConfig {
 
             top_offset += widget_height;
 
-            addRenderableWidget(
+            stringWidget =
                 new StringWidget(this.width / 2 - widget_width + widget_x_offset, top_offset,
-                    widget_width, widget_height, Component.literal("Music Volume").setStyle(
-                    Style.EMPTY.withColor(TextColor.fromRgb(0XFFFFFFFF)).withHoverEvent(
-                        new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            Component.literal("Volume of battle/silly music")))), font));
+                    widget_width, widget_height, Component.literal("Music Volume"), font);
+            stringWidget.setTooltip(
+                Tooltip.create(Component.literal("Volume of battle/silly music")));
+            addRenderableWidget(stringWidget);
             if (volumeSlider == null) {
                 volumeSlider =
                     new SliderPercentage(this.width / 2 + widget_x_offset, top_offset, widget_width,
