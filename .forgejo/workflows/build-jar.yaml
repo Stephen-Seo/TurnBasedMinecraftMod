@@ -6,7 +6,7 @@ on:
 
 jobs:
   check-release-exists:
-    runs-on: any_archLinux
+    runs-on: highmem_self
     outputs:
       status: ${{ steps.release_exists_check.outputs.http_code }}
     steps:
