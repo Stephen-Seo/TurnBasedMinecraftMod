@@ -19,7 +19,7 @@ jobs:
   build-and-create-release:
     needs: check-release-exists
     if: ${{ needs.check-release-exists.outputs.status == '404' }}
-    runs-on: any_archLinux
+    runs-on: highmem_self
     steps:
       - run: git clone --depth=1 --no-single-branch https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod.git TurnBasedMinecraftMod
       - run: cd TurnBasedMinecraftMod && git checkout ${GITHUB_REF_NAME}
