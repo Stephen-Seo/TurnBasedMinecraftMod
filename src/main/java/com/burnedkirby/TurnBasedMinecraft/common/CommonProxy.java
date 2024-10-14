@@ -1,18 +1,18 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CommonProxy
 {
@@ -172,5 +172,9 @@ public class CommonProxy
         return ServerLifecycleHooks.getCurrentServer().getLevel(dim).getEntity(id);
     }
 
-    public <MSG> void handlePacket(final MSG msg, final PlayPayloadContext ctx) {}
+    public <MSG> void handlePacket(final MSG msg, final IPayloadContext ctx) {}
+
+    public static final StreamCodec<ByteBuf, Collection<Integer>> COLLECTION_INT_CODEC = ByteBufCodecs.INT.apply(ByteBufCodecs.collection(ArrayList::new));
+
+    public void showClientConfigGui() {}
 }

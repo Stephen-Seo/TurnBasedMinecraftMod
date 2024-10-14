@@ -2,8 +2,8 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class DimensionChangedHandler {
@@ -14,7 +14,7 @@ public class DimensionChangedHandler {
         }
         if(TurnBasedMinecraftMod.proxy.getBattleManager().forceLeaveBattle(new EntityIDDimPair(event.getEntity()))
                 && event.getEntity() instanceof ServerPlayer) {
-            PacketDistributor.PLAYER.with((ServerPlayer)event.getEntity()).send(new PacketGeneralMessage("Left battle due to moving to a different dimension"));
+            PacketDistributor.sendToPlayer((ServerPlayer)event.getEntity(), new PacketGeneralMessage("Left battle due to moving to a different dimension"));
         }
     }
 }

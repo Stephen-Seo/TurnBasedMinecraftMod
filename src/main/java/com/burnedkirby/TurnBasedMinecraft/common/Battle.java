@@ -449,7 +449,7 @@ public class Battle {
         }
         PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer, TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
         for (Combatant p : players.values()) {
-            PacketDistributor.PLAYER.with((ServerPlayer)p.entity).send(infoPacket);
+            PacketDistributor.sendToPlayer((ServerPlayer)p.entity, infoPacket);
         }
     }
 
@@ -464,7 +464,7 @@ public class Battle {
         PacketBattleMessage packet = new PacketBattleMessage(type, from, to, dimension, amount, custom);
         for (Combatant p : players.values()) {
             if (p.entity.isAlive()) {
-                PacketDistributor.PLAYER.with((ServerPlayer)p.entity).send(packet);
+                PacketDistributor.sendToPlayer((ServerPlayer)p.entity, packet);
             }
         }
     }
@@ -574,7 +574,7 @@ public class Battle {
 
     private void removeCombatantPostRemove(Combatant c) {
         if (c.entity instanceof Player) {
-            PacketDistributor.PLAYER.with((ServerPlayer)c.entity).send(new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, dimension, 0));
+            PacketDistributor.sendToPlayer((ServerPlayer)c.entity, new PacketBattleMessage(PacketBattleMessage.MessageType.ENDED, 0, 0, dimension, 0));
         }
         battleManager.addRecentlyLeftBattle(c);
     }
@@ -779,7 +779,7 @@ public class Battle {
                                         final Entity targetEntity = target.entity;
                                         final float yawDirection = Utility.yawDirection(next.entity.getX(), next.entity.getZ(), target.entity.getX(), target.entity.getZ());
                                         final float pitchDirection = Utility.pitchDirection(next.entity.getX(), next.entity.getY(), next.entity.getZ(), target.entity.getX(), target.entity.getY(), target.entity.getZ());
-                                        final int randomTimeLeft = random.nextInt(heldItemStack.getItem().getUseDuration(heldItemStack) / 3);
+                                        final int randomTimeLeft = random.nextInt(heldItemStack.getItem().getUseDuration(heldItemStack, (LivingEntity)next.entity) / 3);
                                         if (TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled()) {
                                             next.yaw = yawDirection;
                                             next.pitch = pitchDirection;
@@ -1087,7 +1087,7 @@ public class Battle {
                                 debugLog += " null";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_NOTHING.getValue());
                                 break;
-                            } else if (targetItem.isEdible()) {
+                            } else if (Utility.isItemEdible(targetItemStack, (LivingEntity)next.entity)) {
                                 debugLog += " food";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                                 final Entity nextEntity = next.entity;
@@ -1096,7 +1096,7 @@ public class Battle {
                             } else {
                                 // then check vanilla foods
                                 final CreativeModeTab foodAndDrinksTab = CreativeModeTabRegistry.getTab(CreativeModeTabs.FOOD_AND_DRINKS.location());
-                                if (foodAndDrinksTab.contains(targetItemStack) && targetItem.isEdible()) {
+                                if (foodAndDrinksTab.contains(targetItemStack) && Utility.isItemEdible(targetItemStack, (LivingEntity)next.entity)) {
                                     debugLog += " food";
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                                     final Entity nextEntity = next.entity;

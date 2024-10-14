@@ -2,61 +2,52 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import com.burnedkirby.TurnBasedMinecraft.common.Battle;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import org.jetbrains.annotations.NotNull;
 
-public class PacketBattleRequestInfo implements CustomPacketPayload
+public record PacketBattleRequestInfo(int battleID) implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = new ResourceLocation(TurnBasedMinecraftMod.MODID, "network_packetbattlerequestinfo");
+    public static final CustomPacketPayload.Type<PacketBattleRequestInfo> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattlerequestinfo"));
 
-    private int battleID;
-    
-    public PacketBattleRequestInfo() {}
-    
+    public static final StreamCodec<ByteBuf, PacketBattleRequestInfo> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
+        PacketBattleRequestInfo::battleID,
+        PacketBattleRequestInfo::new
+    );
+
     public PacketBattleRequestInfo(int battleID)
     {
         this.battleID = battleID;
     }
 
-    public PacketBattleRequestInfo(final FriendlyByteBuf buf) {
-        battleID = buf.readInt();
-    }
-
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeInt(battleID);
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
-
-    public static class PayloadHandler {
-        private static final PayloadHandler INSTANCE = new PayloadHandler();
-
-        public static PayloadHandler getInstance() {
-            return INSTANCE;
-        }
-
-        public void handleData(final PacketBattleRequestInfo pkt, final PlayPayloadContext ctx) {
-            ctx.workHandler().submitAsync(() -> {
+    public static class PayloadHandler implements IPayloadHandler<PacketBattleRequestInfo> {
+        @Override
+        public void handle(final @NotNull PacketBattleRequestInfo pkt, final IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
                 Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
                 if(b == null) {
                     return;
                 }
-                ctx.replyHandler().send(new PacketBattleInfo(
-                    b.getSideAIDs(),
-                    b.getSideBIDs(),
-                    b.getTimerNanos(),
-                    TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(),
-                    !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever()));
+                ctx.reply(new PacketBattleInfo(
+                        b.getSideAIDs(),
+                        b.getSideBIDs(),
+                        b.getTimerNanos(),
+                        TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(),
+                        !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever()));
             }).exceptionally(e -> {
-                ctx.packetHandler().disconnect(Component.literal("Exception handling PacketBattleRequestInfo! " + e.getMessage()));
+                ctx.disconnect(Component.literal("Exception handling PacketBattleRequestInfo! " + e.getMessage()));
                 return null;
             });
         }

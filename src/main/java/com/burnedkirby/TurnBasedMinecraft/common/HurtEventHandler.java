@@ -1,11 +1,11 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.living.LivingHurtEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 public class HurtEventHandler {
     @SubscribeEvent
-    public void handleHurtEvent(LivingHurtEvent event) {
+    public void handleHurtEvent(LivingIncomingDamageEvent event) {
         CommonProxy proxy = TurnBasedMinecraftMod.proxy;
         if (event.getEntity().level().isClientSide || proxy.getBattleManager() == null) {
             return;

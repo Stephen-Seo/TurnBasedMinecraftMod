@@ -1,8 +1,11 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+
+import java.nio.charset.StandardCharsets;
 
 public class EntityInfo
 {
@@ -276,7 +279,7 @@ public class EntityInfo
         {
             if(this == FIRE)
             {
-                entity.setSecondsOnFire(duration / 20);
+                entity.setRemainingFireTicks(duration / 2);
                 return;
             }
             else if(this != UNKNOWN)
@@ -372,6 +375,28 @@ public class EntityInfo
         decisionFlee = 10;
         customName = new String();
     }
+
+    public EntityInfo(Class classType, boolean ignoreBattle, int attackPower, int attackProbability, int attackVariance,
+                      Effect attackEffect, int attackEffectProbability, int defenseDamage, int defenseDamageProbability,
+                      int evasion, int speed, String category, int decisionAttack, int decisionDefend, int decisionFlee,
+                      String customName) {
+        this.classType = classType;
+        this.ignoreBattle = ignoreBattle;
+        this.attackPower = attackPower;
+        this.attackProbability = attackProbability;
+        this.attackVariance = attackVariance;
+        this.attackEffect = attackEffect;
+        this.attackEffectProbability = attackEffectProbability;
+        this.defenseDamage = defenseDamage;
+        this.defenseDamageProbability = defenseDamageProbability;
+        this.evasion = evasion;
+        this.speed = speed;
+        this.category = category;
+        this.decisionAttack = decisionAttack;
+        this.decisionDefend = decisionDefend;
+        this.decisionFlee = decisionFlee;
+        this.customName = customName;
+    }
     
     public EntityInfo clone()
     {
@@ -393,5 +418,94 @@ public class EntityInfo
         newEntityInfo.decisionFlee = decisionFlee;
         newEntityInfo.customName = new String(customName);
         return newEntityInfo;
+    }
+
+    public EntityInfo(ByteBuf buffer) {
+        int name_bytes_len = buffer.readInt();
+        if (name_bytes_len > 0) {
+            ByteBuf name_bytes = buffer.readBytes(name_bytes_len);
+            try {
+                classType = Class.forName(name_bytes.toString(StandardCharsets.UTF_8));
+            } catch (ClassNotFoundException e) {
+                TurnBasedMinecraftMod.logger.warn("Failed to decode EntityInfo.classType", e);
+                classType = null;
+            }
+        } else {
+            classType = null;
+        }
+
+        ignoreBattle = buffer.readBoolean();
+        attackPower = buffer.readInt();
+        attackProbability = buffer.readInt();
+        attackVariance = buffer.readInt();
+
+        int effect_len = buffer.readInt();
+        ByteBuf effect_bytes = buffer.readBytes(effect_len);
+        attackEffect = Effect.fromString(effect_bytes.toString(StandardCharsets.UTF_8));
+
+        attackEffectProbability = buffer.readInt();
+        defenseDamage = buffer.readInt();
+        defenseDamageProbability = buffer.readInt();
+        evasion = buffer.readInt();
+        speed = buffer.readInt();
+
+        int category_len = buffer.readInt();
+        ByteBuf category_bytes = buffer.readBytes(category_len);
+        category = category_bytes.toString(StandardCharsets.UTF_8);
+
+        decisionAttack = buffer.readInt();
+        decisionDefend = buffer.readInt();
+        decisionFlee = buffer.readInt();
+
+        int custom_len = buffer.readInt();
+        if (custom_len > 0) {
+            ByteBuf custom_bytes = buffer.readBytes(custom_len);
+            customName = custom_bytes.toString(StandardCharsets.UTF_8);
+        } else {
+            customName = "";
+        }
+    }
+
+    public void encode(ByteBuf buffer) {
+        if (classType == null) {
+            buffer.writeInt(0);
+        } else {
+            String name = classType.getName();
+            byte[] name_bytes = name.getBytes(StandardCharsets.UTF_8);
+            buffer.writeInt(name_bytes.length);
+            buffer.writeBytes(name_bytes);
+        }
+
+        buffer.writeBoolean(ignoreBattle);
+        buffer.writeInt(attackPower);
+        buffer.writeInt(attackProbability);
+        buffer.writeInt(attackVariance);
+
+        String effect_name = attackEffect.toString();
+        byte[] effect_bytes = effect_name.getBytes(StandardCharsets.UTF_8);
+        buffer.writeInt(effect_bytes.length);
+        buffer.writeBytes(effect_bytes);
+
+        buffer.writeInt(attackEffectProbability);
+        buffer.writeInt(defenseDamage);
+        buffer.writeInt(defenseDamageProbability);
+        buffer.writeInt(evasion);
+        buffer.writeInt(speed);
+
+        byte[] category_bytes = category.getBytes(StandardCharsets.UTF_8);
+        buffer.writeInt(category_bytes.length);
+        buffer.writeBytes(category_bytes);
+
+        buffer.writeInt(decisionAttack);
+        buffer.writeInt(decisionDefend);
+        buffer.writeInt(decisionFlee);
+
+        if (customName.isEmpty()) {
+            buffer.writeInt(0);
+        } else {
+            byte[] custom_bytes = customName.getBytes(StandardCharsets.UTF_8);
+            buffer.writeInt(custom_bytes.length);
+            buffer.writeBytes(custom_bytes);
+        }
     }
 }

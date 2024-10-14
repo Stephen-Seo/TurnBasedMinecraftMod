@@ -275,16 +275,16 @@ public class BattleGui extends Screen {
 			setState(MenuState.ATTACK_TARGET);
 			break;
 		case DEFEND:
-			PacketDistributor.SERVER.noArg().send(new PacketBattleDecision(
-				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.DEFEND, 0));
+			PacketDistributor.sendToServer(new PacketBattleDecision(
+				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.DEFEND.getValue(), 0));
 			setState(MenuState.WAITING);
 			break;
 		case ITEM:
 			setState(MenuState.ITEM_ACTION);
 			break;
 		case FLEE:
-			PacketDistributor.SERVER.noArg().send(new PacketBattleDecision(
-				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.FLEE, 0));
+			PacketDistributor.sendToServer(new PacketBattleDecision(
+				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.FLEE.getValue(), 0));
 			setState(MenuState.WAITING);
 			break;
 		case ATTACK_TARGET:
@@ -313,9 +313,9 @@ public class BattleGui extends Screen {
 
 	protected void entityButtonActionEvent(EntitySelectionButton button, ButtonAction action) {
 		if (action.equals(ButtonAction.ATTACK_TARGET)) {
-			PacketDistributor.SERVER.noArg().send(
+			PacketDistributor.sendToServer(
 				new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(),
-					Battle.Decision.ATTACK, ((EntitySelectionButton) button).getID()));
+					Battle.Decision.ATTACK.getValue(), ((EntitySelectionButton) button).getID()));
 			setState(MenuState.WAITING);
 		} else {
 			setState(MenuState.MAIN_MENU);
@@ -325,18 +325,18 @@ public class BattleGui extends Screen {
 	protected void itemButtonActionEvent(ItemSelectionButton button, ButtonAction action) {
 		switch (action) {
 			case DO_ITEM_SWITCH:
-				PacketDistributor.SERVER.noArg().send(
+				PacketDistributor.sendToServer(
 					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(),
-						Battle.Decision.SWITCH_ITEM, button.getID()));
+						Battle.Decision.SWITCH_ITEM.getValue(), button.getID()));
 				if (button.getID() >= 0 && button.getID() < 9) {
 					Minecraft.getInstance().player.getInventory().selected = button.getID();
 				}
 				setState(MenuState.WAITING);
 				break;
 			case DO_USE_ITEM:
-				PacketDistributor.SERVER.noArg().send(
+				PacketDistributor.sendToServer(
 					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(),
-						Battle.Decision.USE_ITEM, button.getID()));
+						Battle.Decision.USE_ITEM.getValue(), button.getID()));
 				setState(MenuState.WAITING);
 				break;
 			default:

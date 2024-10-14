@@ -2,69 +2,49 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import com.burnedkirby.TurnBasedMinecraft.common.Battle;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-import com.burnedkirby.TurnBasedMinecraft.common.Battle.Decision;
-
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import org.jetbrains.annotations.NotNull;
 
-public class PacketBattleDecision implements CustomPacketPayload
+public record PacketBattleDecision(int battleID, int decision, int targetIDorItemID) implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = new ResourceLocation(TurnBasedMinecraftMod.MODID, "network_packetbattledecision");
+    public static final CustomPacketPayload.Type<PacketBattleDecision> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattledecision"));
 
-    private int battleID;
-    private Battle.Decision decision;
-    private int targetIDOrItemID;
-    
-    public PacketBattleDecision() {}
-    
-    public PacketBattleDecision(int battleID, Battle.Decision decision, int targetIDOrItemID)
-    {
-        this.battleID = battleID;
-        this.decision = decision;
-        this.targetIDOrItemID = targetIDOrItemID;
-    }
-
-    public PacketBattleDecision(final FriendlyByteBuf buf) {
-        this.battleID = buf.readInt();
-        this.decision = Decision.valueOf(buf.readInt());
-        this.targetIDOrItemID = buf.readInt();
-    }
+    public static final StreamCodec<ByteBuf, PacketBattleDecision> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
+        PacketBattleDecision::battleID,
+        ByteBufCodecs.VAR_INT,
+        PacketBattleDecision::decision,
+        ByteBufCodecs.INT,
+        PacketBattleDecision::targetIDorItemID,
+        PacketBattleDecision::new
+    );
 
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeInt(battleID);
-        buf.writeInt(decision.getValue());
-        buf.writeInt(targetIDOrItemID);
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
-
-    public static class PayloadHandler {
-        private static final PayloadHandler INSTANCE = new PayloadHandler();
-
-        public static PayloadHandler getInstance() {
-            return INSTANCE;
-        }
-
-        public void handleData(final PacketBattleDecision pkt, final PlayPayloadContext ctx) {
-           ctx.workHandler().submitAsync(() -> {
-               Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
-               if(b != null)
-               {
-                   Player player = ctx.player().get();
-                   b.setDecision(player.getId(), pkt.decision, pkt.targetIDOrItemID);
-               }
-           }).exceptionally(e -> {
-               ctx.packetHandler().disconnect(Component.literal("Exception handling PacketBattleDecision! " + e.getMessage()));
-               return null;
-           });
+    public static class PayloadHandler implements IPayloadHandler<PacketBattleDecision> {
+        @Override
+        public void handle(final @NotNull PacketBattleDecision pkt, final IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                Battle b = TurnBasedMinecraftMod.proxy.getBattleManager().getBattleByID(pkt.battleID);
+                if(b != null) {
+                    Player player = ctx.player();
+                    b.setDecision(player.getId(), Battle.Decision.valueOf(pkt.decision), pkt.targetIDorItemID);
+                }
+            }).exceptionally(e -> {
+                ctx.disconnect(Component.literal("Exception handling PacketBattleDecision! " + e.getMessage()));
+                return null;
+            });
         }
     }
 }

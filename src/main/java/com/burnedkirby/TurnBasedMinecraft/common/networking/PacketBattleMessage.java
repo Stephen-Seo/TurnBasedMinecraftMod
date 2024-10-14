@@ -1,37 +1,46 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
 import com.burnedkirby.TurnBasedMinecraft.common.Utility;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PacketBattleMessage implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = new ResourceLocation(TurnBasedMinecraftMod.MODID, "network_packetbattlemessage");
+    public static final CustomPacketPayload.Type<PacketBattleMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattlemessage"));
+
+    public static final StreamCodec<ByteBuf, PacketBattleMessage> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.VAR_INT.map(MessageType::valueOf, MessageType::getValue),
+        PacketBattleMessage::getMessageType,
+        ByteBufCodecs.INT,
+        PacketBattleMessage::getEntityIDFrom,
+        ByteBufCodecs.INT,
+        PacketBattleMessage::getEntityIDTo,
+        ByteBufCodecs.STRING_UTF8.map(Utility::deserializeDimension, Utility::serializeDimension),
+        PacketBattleMessage::getDimension,
+        ByteBufCodecs.INT,
+        PacketBattleMessage::getAmount,
+        ByteBufCodecs.STRING_UTF8,
+        PacketBattleMessage::getCustom,
+        PacketBattleMessage::new
+    );
 
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeInt(messageType.getValue());
-        buf.writeInt(entityIDFrom);
-        buf.writeInt(entityIDTo);
-        buf.writeUtf(Utility.serializeDimension(dimension));
-        buf.writeInt(amount);
-        buf.writeUtf(custom);
-    }
-
-    @Override
-    public ResourceLocation id() {
-        return ID;
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public enum MessageType
@@ -151,6 +160,11 @@ public class PacketBattleMessage implements CustomPacketPayload
     public ResourceKey<Level> getDimension() {
         return dimension;
     }
+
+    public String getDimensionSerialized() {
+        return Utility.serializeDimension(dimension);
+    }
+
     public PacketBattleMessage() { custom = new String(); }
     
     public PacketBattleMessage(MessageType messageType, int entityIDFrom, int entityIDTo, ResourceKey<Level> dimension, int amount)
@@ -173,29 +187,15 @@ public class PacketBattleMessage implements CustomPacketPayload
         this.custom = custom;
     }
 
-    public PacketBattleMessage(final FriendlyByteBuf buf) {
-        this.messageType = MessageType.valueOf(buf.readInt());
-        this.entityIDFrom = buf.readInt();
-        this.entityIDTo = buf.readInt();
-        this.dimension = Utility.deserializeDimension(buf.readUtf());
-        this.amount = buf.readInt();
-        this.custom = buf.readUtf();
-    }
-
-    public static class PayloadHandler {
-        private static final PayloadHandler INSTANCE = new PayloadHandler();
-
-        public static PayloadHandler getInstance() {
-            return INSTANCE;
-        }
-
-        public void handleData(final PacketBattleMessage pkt, final PlayPayloadContext ctx) {
-            ctx.workHandler().submitAsync(() -> {
+    public static class PayloadHandler implements IPayloadHandler<PacketBattleMessage> {
+        @Override
+        public void handle(final @NotNull PacketBattleMessage pkt, final IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
                 if (FMLEnvironment.dist.isClient()) {
                     TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
                 }
             }).exceptionally(e -> {
-                ctx.packetHandler().disconnect(Component.literal("Exception handling PacketBattleMessage! " + e.getMessage()));
+                ctx.disconnect(Component.literal("Exception handling PacketBattleMessage! " + e.getMessage()));
                 return null;
             });
         }

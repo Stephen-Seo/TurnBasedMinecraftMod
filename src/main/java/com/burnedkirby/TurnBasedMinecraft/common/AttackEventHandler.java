@@ -1,22 +1,21 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
-import java.util.Iterator;
-
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
-
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.Iterator;
 
 public class AttackEventHandler
 {
-    private boolean isAttackerValid(LivingAttackEvent event)
+    private boolean isAttackerValid(LivingIncomingDamageEvent event)
     {
         if(event.getSource().getEntity() == null)
         {
@@ -59,7 +58,7 @@ public class AttackEventHandler
     }
     
     @SubscribeEvent
-    public void entityAttacked(LivingAttackEvent event)
+    public void entityAttacked(LivingIncomingDamageEvent event)
     {
         if(event.getEntity().level().isClientSide)
         {
@@ -82,7 +81,7 @@ public class AttackEventHandler
                     	if(!event.getEntity().hasCustomName())
                         {
                             TurnBasedMinecraftMod.logger.error("Cannot edit custom name from entity without custom name");
-                            PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketGeneralMessage("Cannot edit custom name from entity without custom name"));
+                            PacketDistributor.sendToPlayer((ServerPlayer)editingInfo.editor, new PacketGeneralMessage("Cannot edit custom name from entity without custom name"));
                             return;
                         }
                         editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getString());
@@ -91,9 +90,9 @@ public class AttackEventHandler
                             editingInfo.entityInfo = new EntityInfo();
                             editingInfo.entityInfo.customName = event.getEntity().getCustomName().getString();
                         }
-                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getString() + "\""));
+                        PacketDistributor.sendToPlayer((ServerPlayer)editingInfo.editor, new PacketGeneralMessage("Editing custom name \"" + event.getEntity().getCustomName().getString() + "\""));
                         TurnBasedMinecraftMod.logger.info("Begin editing custom \"" + event.getEntity().getCustomName().getString() + "\"");
-                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                        PacketDistributor.sendToPlayer((ServerPlayer)editingInfo.editor, new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     }
                     else
                     {
@@ -107,9 +106,9 @@ public class AttackEventHandler
                         {
                             editingInfo.entityInfo = editingInfo.entityInfo.clone();
                         }
-                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""));
+                        PacketDistributor.sendToPlayer((ServerPlayer)editingInfo.editor, new PacketGeneralMessage("Editing entity \"" + editingInfo.entityInfo.classType.getName() + "\""));
                         TurnBasedMinecraftMod.logger.info("Begin editing \"" + editingInfo.entityInfo.classType.getName() + "\"");
-                        PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor).send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
+                        PacketDistributor.sendToPlayer((ServerPlayer)editingInfo.editor, new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo));
                     }
                     return;
                 }
@@ -154,16 +153,16 @@ public class AttackEventHandler
         if(event.getEntity().level().isClientSide
                 || config.isOldBattleBehaviorEnabled()
                 || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getId()))
-                || (event.getNewTarget() != null && battleManager.isRecentlyLeftBattle(event.getNewTarget().getId()))
-                || (event.getEntity() != null && event.getNewTarget() != null && Utility.distanceBetweenEntities(event.getEntity(), event.getNewTarget()) > (double)config.getAggroStartBattleDistance()))
+                || (event.getNewAboutToBeSetTarget() != null && battleManager.isRecentlyLeftBattle(event.getNewAboutToBeSetTarget().getId()))
+                || (event.getEntity() != null && event.getNewAboutToBeSetTarget() != null && Utility.distanceBetweenEntities(event.getEntity(), event.getNewAboutToBeSetTarget()) > (double)config.getAggroStartBattleDistance()))
         {
             return;
         }
         else if(event.getEntity() != null
-                && event.getNewTarget() != null
+                && event.getNewAboutToBeSetTarget() != null
                 && !config.getBattleIgnoringPlayers().contains(event.getEntity().getId())
-                && !config.getBattleIgnoringPlayers().contains(event.getNewTarget().getId())
-                && event.getEntity().level().dimension().equals(event.getNewTarget().level().dimension()))
+                && !config.getBattleIgnoringPlayers().contains(event.getNewAboutToBeSetTarget().getId())
+                && event.getEntity().level().dimension().equals(event.getNewAboutToBeSetTarget().level().dimension()))
         {
             TurnBasedMinecraftMod.proxy.getBattleManager().checkTargeted(event);
         }

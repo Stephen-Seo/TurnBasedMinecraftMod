@@ -2,7 +2,7 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 
 
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,8 +25,9 @@ public class BattleUpdater
     }
 
     @SubscribeEvent
-    public void update(TickEvent.ServerTickEvent tickEvent) {
-        if(tickEvent.phase != TickEvent.Phase.START && isRunning.get() && ++tick > tickLimit) {
+    public void update(ServerTickEvent.Post tickEvent) {
+        //if(tickEvent.phase != TickEvent.Phase.START && isRunning.get() && ++tick > tickLimit) {
+        if(isRunning.get() && ++tick > tickLimit) {
             tick = 0;
             manager.battleMap.entrySet().removeIf(entry -> entry.getValue().update());
             manager.updateRecentlyLeftBattle();

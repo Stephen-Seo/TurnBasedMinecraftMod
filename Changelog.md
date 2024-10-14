@@ -1,5 +1,9 @@
 # Upcoming changes
 
+Make it possible to open the client-config from the Mod-list GUI.
+
+Port to NeoForge 21.1.69 (Minecraft 1.21.1).
+
 Fix volume handling of battle/silly music. (Previous implementation did not
 properly reduce volume based on Minecraft's "music volume" setting.)
 

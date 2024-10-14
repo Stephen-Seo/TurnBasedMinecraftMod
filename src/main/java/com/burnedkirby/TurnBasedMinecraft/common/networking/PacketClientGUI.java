@@ -1,50 +1,40 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import com.burnedkirby.TurnBasedMinecraft.client.ClientConfig;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import org.jetbrains.annotations.NotNull;
 
-public class PacketClientGUI implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(TurnBasedMinecraftMod.MODID, "network_packetclientgui");
+public record PacketClientGUI(int reserved) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<PacketClientGUI> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetclientgui"));
 
-    int reserved;
-
-    public PacketClientGUI() {
-        reserved = 0;
-    }
-
-    public PacketClientGUI(FriendlyByteBuf buf) {
-        reserved = buf.readInt();
-    }
+    public static final StreamCodec<ByteBuf, PacketClientGUI> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.VAR_INT,
+        PacketClientGUI::reserved,
+        PacketClientGUI::new
+    );
 
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeInt(0);
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
-
-    public static class PayloadHandler {
-        private static final PayloadHandler INSTANCE = new PayloadHandler();
-
-        public static PayloadHandler getInstance() { return INSTANCE; }
-
-        public void handleData(final PacketClientGUI pkt, final PlayPayloadContext ctx) {
-            ctx.workHandler().submitAsync(() -> {
+    public static class PayloadHandler implements IPayloadHandler<PacketClientGUI> {
+        @Override
+        public void handle(final @NotNull PacketClientGUI pkt, final IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
                 if (FMLEnvironment.dist.isClient()) {
-                    Minecraft.getInstance().setScreen(new ClientConfig.CliConfGui());
+                    TurnBasedMinecraftMod.proxy.showClientConfigGui();
                 }
             }).exceptionally(e -> {
-                ctx.packetHandler().disconnect(Component.literal("Exception handling PacketClientGUI! " + e.getMessage()));
+                ctx.disconnect(Component.literal("Exception handling PacketClientGUI! " + e.getMessage()));
                 return null;
             });
         }

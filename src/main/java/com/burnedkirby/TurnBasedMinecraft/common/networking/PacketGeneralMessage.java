@@ -1,62 +1,50 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import org.jetbrains.annotations.NotNull;
 
-public class PacketGeneralMessage implements CustomPacketPayload
+public record PacketGeneralMessage(String message) implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = new ResourceLocation(TurnBasedMinecraftMod.MODID, "network_packetgeneralmessage");
+    public static final CustomPacketPayload.Type<PacketGeneralMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetgeneralmessage"));
 
-    String message;
+    public static final StreamCodec<ByteBuf, PacketGeneralMessage> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.STRING_UTF8,
+        PacketGeneralMessage::message,
+        PacketGeneralMessage::new
+    );
 
     public String getMessage() {
         return message;
     }
-    
-    public PacketGeneralMessage()
-    {
-        message = new String();
-    }
-    
+
     public PacketGeneralMessage(String message)
     {
         this.message = message;
     }
 
-    public PacketGeneralMessage(final FriendlyByteBuf buf) {
-        this.message = buf.readUtf();
-    }
-
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeUtf(message);
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
-
-    public static class PayloadHandler {
-        private static final PayloadHandler INSTANCE = new PayloadHandler();
-
-        public static PayloadHandler getInstance() {
-            return INSTANCE;
-        }
-
-        public void handleData(final PacketGeneralMessage pkt, final PlayPayloadContext ctx) {
-            ctx.workHandler().submitAsync(() -> {
+    public static class PayloadHandler implements IPayloadHandler<PacketGeneralMessage> {
+        @Override
+        public void handle(final @NotNull PacketGeneralMessage pkt, final IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
                 if (FMLEnvironment.dist.isClient()) {
                     TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
                 }
             }).exceptionally(e -> {
-                ctx.packetHandler().disconnect(Component.literal("Exception handling PacketGeneralMessage! " + e.getMessage()));
+                ctx.disconnect(Component.literal("Exception handling PacketGeneralMessage! " + e.getMessage()));
                 return null;
             });
         }

@@ -4,9 +4,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArrowItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+
+import javax.annotation.Nullable;
 
 public class Utility
 {
@@ -59,7 +63,11 @@ public class Utility
     }
 
     public static ResourceKey<Level> deserializeDimension(String dimString) {
-        ResourceLocation dimRes = new ResourceLocation(dimString);
+        ResourceLocation dimRes = ResourceLocation.parse(dimString);
         return ResourceKey.create(Registries.DIMENSION, dimRes);
+    }
+
+    public static boolean isItemEdible(ItemStack itemStack, @Nullable LivingEntity entity) {
+        return itemStack.getFoodProperties(entity) != null;
     }
 }
