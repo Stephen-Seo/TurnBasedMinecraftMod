@@ -212,6 +212,8 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
         ClientConfig.CLIENT.volumeAffectedByMusicVolume.set(affectedByMusicVolCheckbox.selected());
 
         ClientConfig.CLIENT.musicVolume.set(volumeSlider.percentage);
+
+        ClientConfig.CLIENT_SPEC.save();
     }
 
     @Override
