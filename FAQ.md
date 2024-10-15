@@ -23,6 +23,8 @@ disabled for "passive" mobs.
 **Note that while .ogg Vorbis files are supported, .ogg Opus files are NOT
 supported.**
 
+**It is recommended to use .ogg Vorbis files instead of .mp3 files.**
+
 One can use FFmpeg to convert music files into .ogg Vorbis:
 
     ffmpeg -i <music_file_to_convert> -map a:0 -c:a libvorbis output.ogg
