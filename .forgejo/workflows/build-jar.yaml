@@ -35,7 +35,7 @@ jobs:
           -H 'Content-Type: application/json' \
           -d "{
           \"name\": \"TurnBasedMinecraftMod version ${GITHUB_REF_NAME}\",
-          \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/master/Changelog.md)
+          \"body\": \"See the [Changelog](https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/src/branch/forge/Changelog.md)
 
               $(java --version | sed -n '1p;2,$s/^/    /p')
               $(javac --version)
