@@ -46,7 +46,8 @@ ways.
 
   - Run the command `/tbm-client-edit` to open the menu.
   - Open the Mod list from the options screen, click on TBMM on the left column
-    and click on "Config".
+    and click on "Config". (Note that this way of opening the client-config-gui
+    is unavailable on Forge, and is only available on NeoForge.)
 
 Note that "Accept" must be clicked on to save the client-config.
 
