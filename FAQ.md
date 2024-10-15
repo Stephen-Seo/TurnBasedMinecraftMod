@@ -38,6 +38,20 @@ work.
 
 **It is recommended to use .ogg Vorbis files instead of .mp3 files.**
 
+## How do I configure battle music?
+
+There is a way to edit client-config that deals with music settings, like what
+mob groups trigger battle/silly music and volume. This menu can be opened in one
+way.
+
+  - Run the command `/tbm-client-edit` to open the menu.
+
+Note that "Accept" must be clicked on to save the client-config.
+
+Note that the NeoForge version of this mod can access this menu through the mod
+list GUI. Minecraft Forge currently does not have this capability, so it can be
+only accessed via the command.
+
 ## Why do passive mobs don't start turn-based battle?
 
 By default, the `passive` category is set to "ignore turn-based-battle" in the
