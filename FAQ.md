@@ -38,6 +38,18 @@ work.
 
 **It is recommended to use .ogg Vorbis files instead of .mp3 files.**
 
+## How do I configure battle music?
+
+There is a way to edit client-config that deals with music settings, like what
+mob groups trigger battle/silly music and volume. This menu can be opened in two
+ways.
+
+  - Run the command `/tbm-client-edit` to open the menu.
+  - Open the Mod list from the options screen, click on TBMM on the left column
+    and click on "Config".
+
+Note that "Accept" must be clicked on to save the client-config.
+
 ## Why do passive mobs don't start turn-based battle?
 
 By default, the `passive` category is set to "ignore turn-based-battle" in the
