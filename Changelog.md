@@ -15,6 +15,8 @@ Add option in client-config to set battle/silly music volume, and an option for
 whether or not battle/silly music volume is affected by global music volume
 setting and whether or not it is affected by master volume setting.
 
+Added Armadillo, Bogged, and Breeze to mob list in config.
+
 # Version NeoForge-1.25.2
 
 Fix invalid use of throwable potions. (Previously, the Player would "drink"
