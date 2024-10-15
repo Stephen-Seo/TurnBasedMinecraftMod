@@ -1,5 +1,21 @@
 # Upcoming changes
 
+# Version Forge-1.26.0
+
+Port to Forge 52.0.21 (Minecraft 1.21.1).
+
+Client-config available via `/tbm-client-edit` (same as NeoForge), but there is
+no way to access it via the mod-list (unlike NeoForge). Removed from file
+holding server-side config (same as NeoForge).
+
+Add option in client-config to set battle/silly music volume, and an option for
+whether or not battle/silly music volume is affected by global music volume
+setting and whether or not it is affected by master volume setting.
+
+Proper volume handling (like in the NeoForge branch).
+
+Added Armadillo, Bogged, and Breeze to mob list in config.
+
 # Version NeoForge-1.26.0
 
 Make it possible to open the client-config from the Mod-list GUI.
