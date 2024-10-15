@@ -37,7 +37,8 @@ usually because a new entry has been added, the existing config is renamed to a 
 a timestamp in the filename of when it was replaced. One can set a config option in the
 config to prevent it being overwritten if necessary.
 
-Some options in the config file only affect the Server, and some only affect the Client.
+Some options in the config file only affect the Server, and ~~some only affect the Client.~~
+[Client-config can only be opened with `/tbm-client-edit`.](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/forge/FAQ.md#how-do-i-configure-battle-music)
 When playing multiplayer, some configuration of the config on the server may be needed.
 
 # Features
