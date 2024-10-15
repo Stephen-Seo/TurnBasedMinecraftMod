@@ -2,7 +2,7 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import com.burnedkirby.TurnBasedMinecraft.common.EntityInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -89,11 +89,11 @@ public class PacketEditingMessage
         }
     }
 
-    public static class Encoder implements BiConsumer<PacketEditingMessage, FriendlyByteBuf> {
+    public static class Encoder implements BiConsumer<PacketEditingMessage, RegistryFriendlyByteBuf> {
         public Encoder() {}
 
         @Override
-        public void accept(PacketEditingMessage pkt, FriendlyByteBuf buf) {
+        public void accept(PacketEditingMessage pkt, RegistryFriendlyByteBuf buf) {
             buf.writeInt(pkt.type.getValue());
             if(pkt.entityInfo.classType != null) {
                 buf.writeUtf(pkt.entityInfo.classType.getName());
@@ -118,11 +118,11 @@ public class PacketEditingMessage
         }
     }
 
-    public static class Decoder implements Function<FriendlyByteBuf, PacketEditingMessage> {
+    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketEditingMessage> {
         public Decoder() {}
 
         @Override
-        public PacketEditingMessage apply(FriendlyByteBuf buf) {
+        public PacketEditingMessage apply(RegistryFriendlyByteBuf buf) {
             Type type = Type.valueOf(buf.readInt());
             EntityInfo einfo = new EntityInfo();
             try {

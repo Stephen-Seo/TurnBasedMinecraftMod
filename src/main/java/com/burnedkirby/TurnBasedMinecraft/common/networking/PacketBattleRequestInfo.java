@@ -1,13 +1,12 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
 import com.burnedkirby.TurnBasedMinecraft.common.Battle;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class PacketBattleRequestInfo
 {
@@ -20,20 +19,20 @@ public class PacketBattleRequestInfo
         this.battleID = battleID;
     }
 
-    public static class Encoder implements BiConsumer<PacketBattleRequestInfo, FriendlyByteBuf> {
+    public static class Encoder implements BiConsumer<PacketBattleRequestInfo, RegistryFriendlyByteBuf> {
         public Encoder() {}
 
         @Override
-        public void accept(PacketBattleRequestInfo pkt, FriendlyByteBuf buf) {
+        public void accept(PacketBattleRequestInfo pkt, RegistryFriendlyByteBuf buf) {
             buf.writeInt(pkt.battleID);
         }
     }
 
-    public static class Decoder implements Function<FriendlyByteBuf, PacketBattleRequestInfo> {
+    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketBattleRequestInfo> {
         public Decoder() {}
 
         @Override
-        public PacketBattleRequestInfo apply(FriendlyByteBuf buf) {
+        public PacketBattleRequestInfo apply(RegistryFriendlyByteBuf buf) {
             return new PacketBattleRequestInfo(buf.readInt());
         }
     }

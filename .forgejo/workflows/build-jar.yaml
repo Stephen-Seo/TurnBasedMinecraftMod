@@ -25,7 +25,7 @@ jobs:
       - run: cd TurnBasedMinecraftMod && git checkout ${GITHUB_REF_NAME}
       - run: cd TurnBasedMinecraftMod && sed -i '/org.gradle.jvmargs/s/Xmx[0-9]\+m/Xmx1024m/' gradle.properties
       - run: cd TurnBasedMinecraftMod && ./gradlew --console=plain build
-      - run: cd TurnBasedMinecraftMod/build/libs && find . -type f -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
+      - run: cd TurnBasedMinecraftMod/build/libs && find . -regex '.*all.jar$' -exec sha256sum '{}' ';' -exec bash -c 'sha256sum {} >> sha256sums.txt' ';' && java --version >> javaVersion.txt && javac --version >> javaVersion.txt
       - name: Create release and attach jar
         run: |
           curl --fail-with-body -X 'POST' \

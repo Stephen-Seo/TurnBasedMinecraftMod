@@ -1,5 +1,6 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
+import com.burnedkirby.TurnBasedMinecraft.client.ClientConfig;
 import com.burnedkirby.TurnBasedMinecraft.client.ClientProxy;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.*;
 import com.mojang.brigadier.LiteralMessage;
@@ -25,6 +26,7 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
@@ -48,8 +50,8 @@ public class TurnBasedMinecraftMod {
     public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
 
-    private static final Integer PROTOCOL_VERSION = 3;
-    private static final ResourceLocation HANDLER_ID = new ResourceLocation(MODID, "main_channel");
+    private static final Integer PROTOCOL_VERSION = 4;
+    private static final ResourceLocation HANDLER_ID = ResourceLocation.fromNamespaceAndPath(MODID, "main_channel");
 
     private static final SimpleChannel HANDLER = ChannelBuilder
         .named(HANDLER_ID)
@@ -69,12 +71,14 @@ public class TurnBasedMinecraftMod {
 
     public static CommonProxy proxy;
 
-    public TurnBasedMinecraftMod() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::firstInit);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::secondInitClient);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::secondInitServer);
+    public TurnBasedMinecraftMod(FMLJavaModLoadingContext ctx) {
+        ctx.getModEventBus().addListener(this::firstInit);
+        ctx.getModEventBus().addListener(this::secondInitClient);
+        ctx.getModEventBus().addListener(this::secondInitServer);
 
         MinecraftForge.EVENT_BUS.register(this);
+
+        ctx.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_SPEC);
     }
 
     private void firstInit(final FMLCommonSetupEvent event) {
@@ -112,6 +116,11 @@ public class TurnBasedMinecraftMod {
             .encoder(new PacketEditingMessage.Encoder())
             .decoder(new PacketEditingMessage.Decoder())
             .consumerNetworkThread(new PacketEditingMessage.Consumer())
+            .add();
+        HANDLER.messageBuilder(PacketClientGui.class, NetworkDirection.PLAY_TO_CLIENT)
+            .encoder(new PacketClientGui.Encoder())
+            .decoder(new PacketClientGui.Decoder())
+            .consumerNetworkThread(new PacketClientGui.Consumer())
             .add();
 
         // register event handler(s)
@@ -1682,6 +1691,15 @@ public class TurnBasedMinecraftMod {
                         }
                         return 1;
                     })))
+        );
+
+        // tbm-client-edit
+        event.getDispatcher().register(
+            Commands.literal("tbm-client-edit").executes(c -> {
+                ServerPlayer player = c.getSource().getPlayerOrException();
+                getHandler().send(new PacketClientGui(), PacketDistributor.PLAYER.with(player));
+                return 1;
+            })
         );
     }
 

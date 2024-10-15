@@ -1,14 +1,13 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
+
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class PacketGeneralMessage
 {
@@ -28,20 +27,20 @@ public class PacketGeneralMessage
         this.message = message;
     }
 
-    public static class Encoder implements BiConsumer<PacketGeneralMessage, FriendlyByteBuf> {
+    public static class Encoder implements BiConsumer<PacketGeneralMessage, RegistryFriendlyByteBuf> {
         public Encoder() {}
 
         @Override
-        public void accept(PacketGeneralMessage pkt, FriendlyByteBuf buf) {
+        public void accept(PacketGeneralMessage pkt, RegistryFriendlyByteBuf buf) {
             buf.writeUtf(pkt.message);
         }
     }
 
-    public static class Decoder implements Function<FriendlyByteBuf, PacketGeneralMessage> {
+    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketGeneralMessage> {
         public Decoder() {}
 
         @Override
-        public PacketGeneralMessage apply(FriendlyByteBuf buf) {
+        public PacketGeneralMessage apply(RegistryFriendlyByteBuf buf) {
             return new PacketGeneralMessage(buf.readUtf());
         }
     }

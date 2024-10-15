@@ -1,19 +1,18 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
 import com.burnedkirby.TurnBasedMinecraft.common.Utility;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class PacketBattleMessage
 {
@@ -156,11 +155,11 @@ public class PacketBattleMessage
         this.custom = custom;
     }
 
-    public static class Encoder implements BiConsumer<PacketBattleMessage, FriendlyByteBuf> {
+    public static class Encoder implements BiConsumer<PacketBattleMessage, RegistryFriendlyByteBuf> {
         public Encoder() {}
 
         @Override
-        public void accept(PacketBattleMessage pkt, FriendlyByteBuf buf) {
+        public void accept(PacketBattleMessage pkt, RegistryFriendlyByteBuf buf) {
             buf.writeInt(pkt.messageType.getValue());
             buf.writeInt(pkt.entityIDFrom);
             buf.writeInt(pkt.entityIDTo);
@@ -170,11 +169,11 @@ public class PacketBattleMessage
         }
     }
 
-    public static class Decoder implements Function<FriendlyByteBuf, PacketBattleMessage> {
+    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketBattleMessage> {
         public Decoder() {}
 
         @Override
-        public PacketBattleMessage apply(FriendlyByteBuf buf) {
+        public PacketBattleMessage apply(RegistryFriendlyByteBuf buf) {
             return new PacketBattleMessage(
                 MessageType.valueOf(
                     buf.readInt()),

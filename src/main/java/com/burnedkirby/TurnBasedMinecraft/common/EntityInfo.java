@@ -276,7 +276,7 @@ public class EntityInfo
         {
             if(this == FIRE)
             {
-                entity.setSecondsOnFire(duration / 20);
+                entity.setRemainingFireTicks(duration / 2);
                 return;
             }
             else if(this != UNKNOWN)

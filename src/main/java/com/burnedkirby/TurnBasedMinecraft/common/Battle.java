@@ -779,7 +779,7 @@ public class Battle {
                                         final Entity targetEntity = target.entity;
                                         final float yawDirection = Utility.yawDirection(next.entity.getX(), next.entity.getZ(), target.entity.getX(), target.entity.getZ());
                                         final float pitchDirection = Utility.pitchDirection(next.entity.getX(), next.entity.getY(), next.entity.getZ(), target.entity.getX(), target.entity.getY(), target.entity.getZ());
-                                        final int randomTimeLeft = random.nextInt(heldItemStack.getItem().getUseDuration(heldItemStack) / 3);
+                                        final int randomTimeLeft = random.nextInt(heldItemStack.getUseDuration((LivingEntity)next.entity) / 3);
                                         if (TurnBasedMinecraftMod.proxy.getConfig().isFreezeCombatantsEnabled()) {
                                             next.yaw = yawDirection;
                                             next.pitch = pitchDirection;
@@ -1088,7 +1088,7 @@ public class Battle {
                                 debugLog += " null";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_NOTHING.getValue());
                                 break;
-                            } else if (targetItem.isEdible()) {
+                            } else if (Utility.isItemEdible(targetItemStack)) {
                                 debugLog += " food";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                                 final Entity nextEntity = next.entity;
@@ -1097,7 +1097,7 @@ public class Battle {
                             } else {
                                 // then check vanilla foods
                                 final CreativeModeTab foodAndDrinksTab = CreativeModeTabRegistry.getTab(CreativeModeTabs.FOOD_AND_DRINKS.location());
-                                if (foodAndDrinksTab.contains(targetItemStack) && targetItem.isEdible()) {
+                                if (foodAndDrinksTab.contains(targetItemStack) && Utility.isItemEdible(targetItemStack)) {
                                     debugLog += " food";
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
                                     final Entity nextEntity = next.entity;

@@ -1,21 +1,13 @@
 # Please do not change this option, the mod uses this to keep track of what new
 # changes to add to the config.
-version = 10
+version = 11
 # Change this to "true" if you want the config to never be replaced. This means
 # that you will not get new mob listings from future updates unless this remains
 # "false"!
 do_not_overwrite = false
 
-[client_config]
 
-# What categories play this type of music (battle_music). Unknown categories will default to this type.
-battle_music = ["monster", "animal", "boss", "player"]
-# What categories play this type of music (silly_music).
-silly_music = ["passive"]
-
-# Minimum percentage of silly entities in battle to use silly music.
-silly_music_threshold = 40
-
+# Note that client config is no longer stored here but rather in the settings.
 
 [server_config]
 
@@ -131,6 +123,37 @@ attack_effect_probability = 75
 attack_variance = 0
 defense_damage = 0
 evasion = 5
+category = "monster"
+speed = 45
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.monster.Bogged"
+attack_power = 3
+attack_probability = 75
+attack_variance = 1
+attack_effect = "poison"
+attack_effect_probability = 50
+defense_damage = 0
+evasion = 10
+category = "monster"
+speed = 20
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.monster.breeze.Breeze"
+attack_power = 1
+attack_probability = 50
+attack_effect = "unknown"
+attack_variance = 0
+defense_damage = 0
+evasion = 45
 category = "monster"
 speed = 45
 decision_attack_probability = 100
@@ -682,6 +705,21 @@ speed = 50
 decision_attack_probability = 0
 decision_defend_probability = 0
 decision_flee_probability = 100
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.armadillo.Armadillo"
+attack_power = 0
+attack_probability = 0
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 10
+category = "passive"
+speed = 20
+decision_attack_probability = 0
+decision_defend_probability = 50
+decision_flee_probability = 50
 ignore_battle = false
 
 [[server_config.entity]]

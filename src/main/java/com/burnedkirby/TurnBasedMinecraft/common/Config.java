@@ -37,10 +37,7 @@ public class Config
     private int fleeBadProbability = 35;
     private int minimumHitPercentage = 4;
     private int maxInBattle = 8;
-    private Set<String> musicBattleTypes;
-    private Set<String> musicSillyTypes;
     private boolean freezeCombatantsInBattle = false;
-    private int sillyMusicThreshold = 40;
     private int configVersion = 0;
     private Set<Integer> battleIgnoringPlayers = null;
     private boolean onlyOPsSelfDisableTB = true;
@@ -63,8 +60,6 @@ public class Config
         customEntityInfoMap = new HashMap<String, EntityInfo>();
         ignoreBattleTypes = new HashSet<String>();
         this.logger = logger;
-        musicBattleTypes = new HashSet<String>();
-        musicSillyTypes = new HashSet<String>();
         battleIgnoringPlayers = new HashSet<Integer>();
         possibleIgnoreHurtDamageSources = new HashSet<String>();
         ignoreHurtDamageSources = new HashSet<String>();
@@ -155,56 +150,6 @@ public class Config
     private boolean parseConfig(File configFile) throws IOException
     {
         CommentedFileConfig conf = getConfigObj(configFile);
-
-        // client config
-        try {
-            Collection<String> battle_music_categories = conf.get("client_config.battle_music");
-            if (battle_music_categories != null) {
-                for (String category : battle_music_categories) {
-                    musicBattleTypes.add(category);
-                }
-            } else {
-                musicBattleTypes.add("monster");
-                musicBattleTypes.add("animal");
-                musicBattleTypes.add("boss");
-                musicBattleTypes.add("player");
-                logNotFound("client_config.battle_music");
-            }
-        } catch (ClassCastException e) {
-            musicBattleTypes.add("monster");
-            musicBattleTypes.add("animal");
-            musicBattleTypes.add("boss");
-            musicBattleTypes.add("player");
-            logTOMLInvalidValue("client_config.battle_music");
-        }
-
-        try {
-            Collection<String> silly_music_categories = conf.get("client_config.silly_music");
-            if (silly_music_categories != null) {
-                for (String category : silly_music_categories) {
-                    musicSillyTypes.add(category);
-                }
-            } else {
-                musicSillyTypes.add("passive");
-                logNotFound("client_config.silly_music");
-            }
-        } catch (ClassCastException e) {
-            musicSillyTypes.add("passive");
-            logTOMLInvalidValue("client_config.silly_music");
-        }
-
-        try {
-            OptionalInt silly_music_threshold = conf.getOptionalInt("client_config.silly_music_threshold");
-            if(silly_music_threshold.isPresent()) {
-                this.sillyMusicThreshold = silly_music_threshold.getAsInt();
-            } else {
-                this.sillyMusicThreshold = 40;
-                logNotFound("client_config.silly_music_threshold", "40");
-            }
-        } catch (ClassCastException e) {
-            this.sillyMusicThreshold = 40;
-            logTOMLInvalidValue("client_config.silly_music_threshold", "40");
-        }
 
         // server_config
         try {
@@ -1328,16 +1273,6 @@ public class Config
         this.maxInBattle = maxInBattle;
     }
 
-    public boolean isBattleMusicType(String type)
-    {
-        return musicBattleTypes.contains(type.toLowerCase());
-    }
-
-    public boolean isSillyMusicType(String type)
-    {
-        return musicSillyTypes.contains(type.toLowerCase());
-    }
-
     public boolean isFreezeCombatantsEnabled()
     {
         return freezeCombatantsInBattle;
@@ -1345,11 +1280,6 @@ public class Config
 
     public void setFreezeCombatantsInBattle(boolean enabled) {
         freezeCombatantsInBattle = enabled;
-    }
-
-    public int getSillyMusicThreshold()
-    {
-        return sillyMusicThreshold;
     }
 
     public int getConfigVersion()

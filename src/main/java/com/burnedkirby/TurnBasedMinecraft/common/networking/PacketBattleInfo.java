@@ -1,16 +1,15 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
+import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
+import net.minecraftforge.event.network.CustomPayloadEvent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
-import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 
 public class PacketBattleInfo
 {
@@ -39,11 +38,11 @@ public class PacketBattleInfo
         this.turnTimerEnabled = turnTimerEnabled;
     }
 
-    public static class Encoder implements BiConsumer<PacketBattleInfo, FriendlyByteBuf> {
+    public static class Encoder implements BiConsumer<PacketBattleInfo, RegistryFriendlyByteBuf> {
         public Encoder() {}
 
         @Override
-        public void accept(PacketBattleInfo msg, FriendlyByteBuf buf) {
+        public void accept(PacketBattleInfo msg, RegistryFriendlyByteBuf buf) {
             buf.writeInt(msg.sideA.size());
             buf.writeInt(msg.sideB.size());
             for(Integer id : msg.sideA) {
@@ -58,11 +57,11 @@ public class PacketBattleInfo
         }
     }
 
-    public static class Decoder implements Function<FriendlyByteBuf, PacketBattleInfo> {
+    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketBattleInfo> {
         public Decoder() {}
 
         @Override
-        public PacketBattleInfo apply(FriendlyByteBuf buf) {
+        public PacketBattleInfo apply(RegistryFriendlyByteBuf buf) {
             int sideACount = buf.readInt();
             int sideBCount = buf.readInt();
             Collection<Integer> sideA = new ArrayList<Integer>(sideACount);

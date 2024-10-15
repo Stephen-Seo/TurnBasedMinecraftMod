@@ -94,13 +94,27 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void playBattleMusic() {
         Options gs = Minecraft.getInstance().options;
-        battleMusic.playBattle(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER));
+        float volume = ClientConfig.CLIENT.musicVolume.get().floatValue();
+        if (ClientConfig.CLIENT.volumeAffectedByMasterVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MASTER);
+        }
+        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MUSIC);
+        }
+        battleMusic.playBattle(volume);
     }
 
     @Override
     public void playSillyMusic() {
         Options gs = Minecraft.getInstance().options;
-        battleMusic.playSilly(gs.getSoundSourceVolume(SoundSource.MUSIC) * gs.getSoundSourceVolume(SoundSource.MASTER));
+        float volume = ClientConfig.CLIENT.musicVolume.get().floatValue();
+        if (ClientConfig.CLIENT.volumeAffectedByMasterVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MASTER);
+        }
+        if (ClientConfig.CLIENT.volumeAffectedByMusicVolume.get()) {
+            volume *= gs.getSoundSourceVolume(SoundSource.MUSIC);
+        }
+        battleMusic.playSilly(volume);
     }
 
     @Override
@@ -116,9 +130,9 @@ public class ClientProxy extends CommonProxy {
         if (localBattle == null) {
             return;
         }
-        if (type == null || type.isEmpty() || getConfig().isBattleMusicType(type)) {
+        if (type == null || type.isEmpty() || ClientConfig.CLIENT.battleMusicList.get().contains(type)) {
             ++battleMusicCount;
-        } else if (getConfig().isSillyMusicType(type)) {
+        } else if (ClientConfig.CLIENT.sillyMusicList.get().contains(type)) {
             ++sillyMusicCount;
         } else {
             ++battleMusicCount;
@@ -132,9 +146,9 @@ public class ClientProxy extends CommonProxy {
             battleMusicCount = 0;
             sillyMusicCount = 0;
             return;
-        } else if (type == null || type.isEmpty() || getConfig().isBattleMusicType(type)) {
+        } else if (type == null || type.isEmpty() || ClientConfig.CLIENT.battleMusicList.get().contains(type)) {
             --battleMusicCount;
-        } else if (getConfig().isSillyMusicType(type)) {
+        } else if (ClientConfig.CLIENT.sillyMusicList.get().contains(type)) {
             --sillyMusicCount;
         } else {
             --battleMusicCount;
@@ -185,7 +199,7 @@ public class ClientProxy extends CommonProxy {
             percentage = 100.0f * (float) sillyMusicCount / (float) (sillyMusicCount + battleMusicCount);
         }
 
-        if (percentage >= (float) getConfig().getSillyMusicThreshold()) {
+        if (percentage >= ClientConfig.CLIENT.sillyMusicThreshold.get().floatValue()) {
             if (battleMusic.isPlaying()) {
                 if (!battleMusic.isPlayingSilly() && battleMusic.hasSillyMusic()) {
                     stopMusic(false);
@@ -1459,5 +1473,10 @@ public class ClientProxy extends CommonProxy {
                     break;
             }
         }
+    }
+
+    @Override
+    public void showClientConfigGui() {
+        Minecraft.getInstance().setScreen(new ClientConfigGui());
     }
 }
