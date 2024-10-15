@@ -1,5 +1,7 @@
 # Upcoming changes
 
+# Version NeoForge-1.26.0
+
 Make it possible to open the client-config from the Mod-list GUI.
 
 Port to NeoForge 21.1.69 (Minecraft 1.21.1).
