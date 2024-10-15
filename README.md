@@ -38,7 +38,8 @@ a timestamp in the filename of when it was replaced. One can set a config option
 config to prevent it being overwritten if necessary.
 
 Some options in the config file only affect the Server, and ~~some only affect the Client~~.
-Client config has been moved to a separate system provided by NeoForge.
+Client config has been moved to a
+[separate system provided by NeoForge](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/FAQ.md#how-do-i-configure-battle-music).
 When playing multiplayer, some configuration of the config on the server may be needed.
 
 # Features
