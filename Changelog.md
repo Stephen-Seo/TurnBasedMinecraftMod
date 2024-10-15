@@ -1,5 +1,24 @@
 # Upcoming changes
 
+# Version NeoForge-1.26.0
+
+Make it possible to open the client-config from the Mod-list GUI.
+
+Port to NeoForge 21.1.69 (Minecraft 1.21.1).
+
+Fix volume handling of battle/silly music. (Previous implementation did not
+properly reduce volume based on Minecraft's "music volume" setting.)
+
+Move client-config to NeoForge's configuration.
+
+Add GUI to edit client-config that can be opened with /tbm-client-edit command.
+
+Add option in client-config to set battle/silly music volume, and an option for
+whether or not battle/silly music volume is affected by global music volume
+setting and whether or not it is affected by master volume setting.
+
+Added Armadillo, Bogged, and Breeze to mob list in config.
+
 # Version NeoForge-1.25.2
 
 Fix invalid use of throwable potions. (Previously, the Player would "drink"
