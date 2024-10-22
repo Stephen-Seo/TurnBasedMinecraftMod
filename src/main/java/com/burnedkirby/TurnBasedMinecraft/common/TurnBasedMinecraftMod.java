@@ -88,6 +88,8 @@ public class TurnBasedMinecraftMod {
 
         registrar.playToClient(PacketClientGUI.TYPE, PacketClientGUI.STREAM_CODEC, new PacketClientGUI.PayloadHandler());
 
+        registrar.playToClient(PacketBattlePing.TYPE, PacketBattlePing.STREAM_CODEC, new PacketBattlePing.PayloadHandler());
+
         logger.debug("Register packets com_burnedkirby_turnbasedminecraft");
     }
 

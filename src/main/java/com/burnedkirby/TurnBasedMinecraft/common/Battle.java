@@ -2,6 +2,7 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
+import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattlePing;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -49,7 +50,7 @@ public class Battle {
 
     private ResourceKey<Level> dimension;
 
-    private long infoNanos;
+    private long pingTimerNanos;
 
     public enum State {
         DECISION(0),
@@ -124,7 +125,7 @@ public class Battle {
         undecidedCount = new AtomicInteger(0);
         random = new Random();
         this.dimension = dimension;
-        infoNanos = 0;
+        pingTimerNanos = 0;
         if (sideA != null) {
             for (Entity e : sideA) {
                 EntityInfo entityInfo;
@@ -456,6 +457,16 @@ public class Battle {
         }
     }
 
+    protected void notifyPlayersBattlePing() {
+        if (!isServer) {
+            return;
+        }
+        PacketBattlePing pingPacket = new PacketBattlePing(getId());
+        for (Combatant p : players.values()) {
+            PacketDistributor.sendToPlayer((ServerPlayer)p.entity, pingPacket);
+        }
+    }
+
     protected void sendMessageToAllPlayers(PacketBattleMessage.MessageType type, int from, int to, int amount) {
         sendMessageToAllPlayers(type, from, to, amount, new String());
     }
@@ -654,10 +665,10 @@ public class Battle {
     }
 
     private boolean update(final long dt) {
-        infoNanos += dt;
-        if (infoNanos >= 4000000000L) {
-            infoNanos = 0;
-            notifyPlayersBattleInfo();
+        pingTimerNanos += dt;
+        if (pingTimerNanos >= 4000000000L) {
+            pingTimerNanos = 0;
+            notifyPlayersBattlePing();
         }
         if (battleEnded) {
             Collection<Combatant> combatants = new ArrayList<Combatant>();
