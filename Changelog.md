@@ -4,6 +4,9 @@ Minor fixes/refactorings that should make the mod more robust.
 
 Port to Forge 52.0.22 (Minecraft 1.21.1).
 
+Allow leaving battle GUI with Escape key (temporarily), and some refactorings
+to fix that pesky transient client-freeze-bug.
+
 # Version Forge-1.26.0
 
 Port to Forge 52.0.21 (Minecraft 1.21.1).
