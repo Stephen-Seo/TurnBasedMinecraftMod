@@ -229,6 +229,7 @@ public class BattleGui extends Screen {
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
 			// drawHoveringText("Waiting...", width / 2 - 50, height / 2);
 			drawString(guiGraphics, "Waiting...", width / 2 - 50, height / 2, 0xFFFFFFFF);
+			super.render(guiGraphics, mouseX, mouseY, partialTicks);
 			return;
 		}
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle().getState() == Battle.State.DECISION
