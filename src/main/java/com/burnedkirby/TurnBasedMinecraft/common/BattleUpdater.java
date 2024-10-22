@@ -26,7 +26,7 @@ public class BattleUpdater
 
     @SubscribeEvent
     public void update(TickEvent.ServerTickEvent tickEvent) {
-        if(tickEvent.phase != TickEvent.Phase.START && isRunning.get() && ++tick > tickLimit) {
+        if(tickEvent.phase != TickEvent.Phase.START && isRunning.get() && ++tick > tickLimit && tickEvent.haveTime()) {
             tick = 0;
             manager.battleMap.entrySet().removeIf(entry -> entry.getValue().update());
             manager.updateRecentlyLeftBattle();
