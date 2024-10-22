@@ -11,12 +11,14 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import org.jetbrains.annotations.NotNull;
 
-public record PacketBattlePing(int battleID) implements CustomPacketPayload {
+public record PacketBattlePing(int battleID, int remainingSeconds) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<PacketBattlePing> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattleping"));
 
     public static final StreamCodec<ByteBuf, PacketBattlePing> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT,
         PacketBattlePing::battleID,
+        ByteBufCodecs.VAR_INT,
+        PacketBattlePing::remainingSeconds,
         PacketBattlePing::new
     );
 
@@ -34,6 +36,7 @@ public record PacketBattlePing(int battleID) implements CustomPacketPayload {
                 }
                 TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
                 TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
+                TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.remainingSeconds);
             }).exceptionally(e -> {
                 ctx.disconnect(Component.literal("Exception handling PacketBattlePing! " + e.getMessage()));
                 return null;
