@@ -1,5 +1,9 @@
 # Upcoming changes
 
+Minor fixes/refactorings that should make the mod more robust.
+
+Port to NeoForge-21.1.72 (Minecraft 1.21.1).
+
 # Version Forge-1.26.0
 
 Port to Forge 52.0.21 (Minecraft 1.21.1).
