@@ -73,7 +73,7 @@ configured for them.)
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
 finished jar will be saved at
-`build/libs/TurnBasedMinecraft-Forge-1.26.0-all.jar`
+`build/libs/TurnBasedMinecraft-Forge-1.26.1-all.jar`
 
 # Reproducibility
 
