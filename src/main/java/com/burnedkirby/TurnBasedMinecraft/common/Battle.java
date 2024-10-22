@@ -49,6 +49,8 @@ public class Battle {
 
     private ResourceKey<Level> dimension;
 
+    private long infoNanos;
+
     public enum State {
         DECISION(0),
         ACTION(1),
@@ -122,6 +124,7 @@ public class Battle {
         undecidedCount = new AtomicInteger(0);
         random = new Random();
         this.dimension = dimension;
+        infoNanos = 0;
         if (sideA != null) {
             for (Entity e : sideA) {
                 EntityInfo entityInfo;
@@ -447,7 +450,7 @@ public class Battle {
         if (!isServer) {
             return;
         }
-        PacketBattleInfo infoPacket = new PacketBattleInfo(getSideAIDs(), getSideBIDs(), timer, TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
+        PacketBattleInfo infoPacket = new PacketBattleInfo(getId(), getSideAIDs(), getSideBIDs(), timer, TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever());
         for (Combatant p : players.values()) {
             PacketDistributor.sendToPlayer((ServerPlayer)p.entity, infoPacket);
         }
@@ -651,6 +654,11 @@ public class Battle {
     }
 
     private boolean update(final long dt) {
+        infoNanos += dt;
+        if (infoNanos >= 4000000000L) {
+            infoNanos = 0;
+            notifyPlayersBattleInfo();
+        }
         if (battleEnded) {
             Collection<Combatant> combatants = new ArrayList<Combatant>();
             combatants.addAll(sideA.values());

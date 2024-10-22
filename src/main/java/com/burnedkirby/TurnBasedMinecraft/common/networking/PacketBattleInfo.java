@@ -16,11 +16,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public record PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, long maxDecisionNanos, boolean turnTimerEnabled) implements CustomPacketPayload
+public record PacketBattleInfo(int battleID, Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, long maxDecisionNanos, boolean turnTimerEnabled) implements CustomPacketPayload
 {
     public static final CustomPacketPayload.Type<PacketBattleInfo> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattleinfo"));
 
     public static final StreamCodec<ByteBuf, PacketBattleInfo> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
+        PacketBattleInfo::battleID,
         CommonProxy.COLLECTION_INT_CODEC,
         PacketBattleInfo::sideA,
         CommonProxy.COLLECTION_INT_CODEC,
@@ -45,7 +47,7 @@ public record PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> si
             ctx.enqueueWork(() -> {
                 if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null)
                 {
-                    return;
+                    TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.battleID);
                 }
                 TurnBasedMinecraftMod.proxy.getLocalBattle().clearCombatants();
                 for(Integer id : pkt.sideA)
@@ -64,6 +66,7 @@ public record PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> si
                         TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(e);
                     }
                 }
+                TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
                 TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(pkt.decisionNanos / 1000000000L));
                 TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
                 TurnBasedMinecraftMod.proxy.setBattleGuiTurnTimerEnabled(pkt.turnTimerEnabled);

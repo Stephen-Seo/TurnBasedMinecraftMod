@@ -41,6 +41,7 @@ public record PacketBattleRequestInfo(int battleID) implements CustomPacketPaylo
                     return;
                 }
                 ctx.reply(new PacketBattleInfo(
+                        b.getId(),
                         b.getSideAIDs(),
                         b.getSideBIDs(),
                         b.getTimerNanos(),

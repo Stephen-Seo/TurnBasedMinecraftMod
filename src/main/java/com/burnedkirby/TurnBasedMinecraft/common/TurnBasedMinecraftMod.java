@@ -27,7 +27,6 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
@@ -53,7 +52,7 @@ public class TurnBasedMinecraftMod {
     public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
 
-    private static final String PROTOCOL_VERSION = Integer.toString(3);
+    private static final String PROTOCOL_VERSION = Integer.toString(4);
     private static final ResourceLocation HANDLER_ID = ResourceLocation.fromNamespaceAndPath(MODID, "main_channel");
     protected static Logger logger = LogManager.getLogger();
 
