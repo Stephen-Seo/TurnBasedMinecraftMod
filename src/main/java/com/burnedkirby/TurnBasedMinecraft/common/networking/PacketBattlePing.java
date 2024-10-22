@@ -9,13 +9,16 @@ import java.util.function.Function;
 
 public class PacketBattlePing {
     private int battleID;
+    private int decisionSeconds;
 
     public PacketBattlePing() {
         battleID = 0;
+        decisionSeconds = 1;
     }
 
-    public PacketBattlePing(int battleID) {
+    public PacketBattlePing(int battleID, int decisionSeconds) {
         this.battleID = battleID;
+        this.decisionSeconds = decisionSeconds;
     }
 
     public static class Encoder implements BiConsumer<PacketBattlePing, RegistryFriendlyByteBuf> {
@@ -24,6 +27,7 @@ public class PacketBattlePing {
         @Override
         public void accept(PacketBattlePing pkt, RegistryFriendlyByteBuf buf) {
             buf.writeInt(pkt.battleID);
+            buf.writeInt(pkt.decisionSeconds);
         }
     }
 
@@ -32,7 +36,7 @@ public class PacketBattlePing {
 
         @Override
         public PacketBattlePing apply(RegistryFriendlyByteBuf buf) {
-            return new PacketBattlePing(buf.readInt());
+            return new PacketBattlePing(buf.readInt(), buf.readInt());
         }
     }
 
@@ -46,6 +50,8 @@ public class PacketBattlePing {
                     TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.battleID);
                 }
                 TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
+                TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
+                TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.decisionSeconds);
             });
             ctx.setPacketHandled(true);
         }

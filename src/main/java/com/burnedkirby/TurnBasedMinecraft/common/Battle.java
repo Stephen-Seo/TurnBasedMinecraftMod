@@ -461,7 +461,7 @@ public class Battle {
         if (!isServer) {
             return;
         }
-        PacketBattlePing pingPacket = new PacketBattlePing(getId());
+        PacketBattlePing pingPacket = new PacketBattlePing(getId(), (int)(timer / 1000000000L));
         for (Combatant p : players.values()) {
             TurnBasedMinecraftMod.getHandler().send(pingPacket, PacketDistributor.PLAYER.with((ServerPlayer)p.entity));
         }
