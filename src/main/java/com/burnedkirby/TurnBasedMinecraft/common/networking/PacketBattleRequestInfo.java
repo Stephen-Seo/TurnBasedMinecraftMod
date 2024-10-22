@@ -47,7 +47,7 @@ public class PacketBattleRequestInfo
                 if(b == null) {
                     return;
                 }
-                TurnBasedMinecraftMod.getHandler().reply(new PacketBattleInfo(b.getSideAIDs(), b.getSideBIDs(), b.getTimerNanos(), TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever()), ctx);
+                TurnBasedMinecraftMod.getHandler().reply(new PacketBattleInfo(b.getId(), b.getSideAIDs(), b.getSideBIDs(), b.getTimerNanos(), TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos(), !TurnBasedMinecraftMod.proxy.getConfig().isBattleDecisionDurationForever()), ctx);
             });
             ctx.setPacketHandled(true);
         }

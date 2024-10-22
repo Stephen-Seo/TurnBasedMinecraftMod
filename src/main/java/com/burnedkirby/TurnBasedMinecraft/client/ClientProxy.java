@@ -370,6 +370,10 @@ public class ClientProxy extends CommonProxy {
                     break;
                 case TURN_BEGIN:
                     TurnBasedMinecraftMod.proxy.displayString("The turn begins!");
+                    if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null || TurnBasedMinecraftMod.proxy.getLocalBattle().getId() != pkt.getAmount()) {
+                        TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.getAmount());
+                    }
+                    TurnBasedMinecraftMod.proxy.battleStarted();
                     TurnBasedMinecraftMod.proxy.battleGuiTurnBegin();
                     break;
                 case TURN_END:

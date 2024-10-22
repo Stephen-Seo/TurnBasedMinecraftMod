@@ -13,6 +13,7 @@ import java.util.function.Function;
 
 public class PacketBattleInfo
 {
+    private int battleID;
     private Collection<Integer> sideA;
     private Collection<Integer> sideB;
     private long decisionNanos;
@@ -22,6 +23,7 @@ public class PacketBattleInfo
     
     public PacketBattleInfo()
     {
+        battleID = 0;
         sideA = new ArrayList<Integer>();
         sideB = new ArrayList<Integer>();
         decisionNanos = TurnBasedMinecraftMod.proxy.getConfig().getDecisionDurationNanos();
@@ -29,8 +31,9 @@ public class PacketBattleInfo
         turnTimerEnabled = false;
     }
 
-    public PacketBattleInfo(Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, long maxDecisionNanos, boolean turnTimerEnabled)
+    public PacketBattleInfo(int battleID, Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, long maxDecisionNanos, boolean turnTimerEnabled)
     {
+        this.battleID = battleID;
         this.sideA = sideA;
         this.sideB = sideB;
         this.decisionNanos = decisionNanos;
@@ -43,6 +46,7 @@ public class PacketBattleInfo
 
         @Override
         public void accept(PacketBattleInfo msg, RegistryFriendlyByteBuf buf) {
+            buf.writeInt(msg.battleID);
             buf.writeInt(msg.sideA.size());
             buf.writeInt(msg.sideB.size());
             for(Integer id : msg.sideA) {
@@ -62,6 +66,7 @@ public class PacketBattleInfo
 
         @Override
         public PacketBattleInfo apply(RegistryFriendlyByteBuf buf) {
+            int battleID = buf.readInt();
             int sideACount = buf.readInt();
             int sideBCount = buf.readInt();
             Collection<Integer> sideA = new ArrayList<Integer>(sideACount);
@@ -75,7 +80,7 @@ public class PacketBattleInfo
             long decisionNanos = buf.readLong();
             long maxDecisionNanos = buf.readLong();
             boolean turnTimerEnabled = buf.readBoolean();
-            return new PacketBattleInfo(sideA, sideB, decisionNanos, maxDecisionNanos, turnTimerEnabled);
+            return new PacketBattleInfo(battleID, sideA, sideB, decisionNanos, maxDecisionNanos, turnTimerEnabled);
         }
     }
 
@@ -87,7 +92,7 @@ public class PacketBattleInfo
             ctx.enqueueWork(() -> {
                 if(TurnBasedMinecraftMod.proxy.getLocalBattle() == null)
                 {
-                    return;
+                    TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.battleID);
                 }
                 TurnBasedMinecraftMod.proxy.getLocalBattle().clearCombatants();
                 for(Integer id : pkt.sideA)
@@ -106,6 +111,7 @@ public class PacketBattleInfo
                         TurnBasedMinecraftMod.proxy.getLocalBattle().addCombatantToSideB(e);
                     }
                 }
+                TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
                 TurnBasedMinecraftMod.proxy.setBattleGuiTime((int)(pkt.decisionNanos / 1000000000L));
                 TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
                 TurnBasedMinecraftMod.proxy.setBattleGuiTurnTimerEnabled(pkt.turnTimerEnabled);

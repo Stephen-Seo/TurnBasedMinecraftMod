@@ -50,7 +50,7 @@ public class TurnBasedMinecraftMod {
     public static final String MUSIC_SILLY = MUSIC_ROOT + "silly/";
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
 
-    private static final Integer PROTOCOL_VERSION = 4;
+    private static final Integer PROTOCOL_VERSION = 5;
     private static final ResourceLocation HANDLER_ID = ResourceLocation.fromNamespaceAndPath(MODID, "main_channel");
 
     private static final SimpleChannel HANDLER = ChannelBuilder

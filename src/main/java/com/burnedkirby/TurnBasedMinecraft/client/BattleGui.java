@@ -28,6 +28,7 @@ public class BattleGui extends Screen {
 	private MenuState state;
 	private boolean stateChanged;
 	private String info;
+	private Long waitMissingBattleTicks;
 
 	private enum MenuState {
 		MAIN_MENU(0), ATTACK_TARGET(1), ITEM_ACTION(2), WAITING(3), SWITCH_ITEM(4), USE_ITEM(5);
@@ -91,6 +92,7 @@ public class BattleGui extends Screen {
 		elapsedTime = 0;
 		state = MenuState.MAIN_MENU;
 		stateChanged = true;
+		waitMissingBattleTicks = null;
 	}
 
 	private void setState(MenuState state) {
@@ -224,13 +226,29 @@ public class BattleGui extends Screen {
 		}
 	}
 
+	private int colorFromTicks(final Long ticks) {
+		if (ticks < 20 * 10) {
+			double value = (20 * 10 - ticks.intValue()) / (20.0 * 10.0);
+			return 0xFF0000FF | (((int)(value * 255.0)) << 8) |  (((int)(value * 255.0)) << 16);
+		} else {
+			return 0xFF0000FF;
+		}
+	}
+
 	@Override
 	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
+			if (waitMissingBattleTicks == null) {
+				waitMissingBattleTicks = 0L;
+			} else {
+				waitMissingBattleTicks += 1L;
+			}
 			// drawHoveringText("Waiting...", width / 2 - 50, height / 2);
-			drawString(guiGraphics, "Waiting...", width / 2 - 50, height / 2, 0xFFFFFFFF);
+			drawString(guiGraphics, "Waiting...", width / 2 - 50, height / 2, colorFromTicks(waitMissingBattleTicks));
 			super.render(guiGraphics, mouseX, mouseY, partialTicks);
 			return;
+		} else {
+			waitMissingBattleTicks = null;
 		}
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle().getState() == Battle.State.DECISION
 				&& timeRemaining.get() > 0) {
@@ -354,9 +372,13 @@ public class BattleGui extends Screen {
 	}
 
 	@Override
-	public boolean keyPressed(int a, int b, int c) {
+	public boolean keyPressed(int keyCode, int b, int c) {
 		if (getMinecraft().player.isCreative()) {
-			return super.keyPressed(a, b, c);
+			return super.keyPressed(keyCode, b, c);
+		} else if (keyCode == 256) {
+			TurnBasedMinecraftMod.proxy.displayString("Leaving GUI, but the battle continues!");
+			getMinecraft().setScreen(null);
+			return true;
 		}
 		return false; // TODO verify return value
 	}
