@@ -15,7 +15,7 @@ public record PacketBattlePing(int battleID, int remainingSeconds) implements Cu
     public static final CustomPacketPayload.Type<PacketBattlePing> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattleping"));
 
     public static final StreamCodec<ByteBuf, PacketBattlePing> STREAM_CODEC = StreamCodec.composite(
-        ByteBufCodecs.VAR_INT,
+        ByteBufCodecs.INT,
         PacketBattlePing::battleID,
         ByteBufCodecs.VAR_INT,
         PacketBattlePing::remainingSeconds,
