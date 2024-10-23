@@ -1,10 +1,11 @@
 {
     "homepage": "https://github.com/Stephen-Seo/TurnBasedMinecraftMod",
     "1.21.1": {
+        "1.26.1": "Ported to NeoForge 21.1.72, leave BattleGUI with Escape key, MC music paused in battle properly.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md",
         "1.26.0": "Ported to NeoForge 21.1.69, client config.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md"
     },
     "promos": {
-        "1.21.1-latest": "1.26.0",
-        "1.21.1-recommended": "1.26.0"
+        "1.21.1-latest": "1.26.1",
+        "1.21.1-recommended": "1.26.1"
     }
 }
