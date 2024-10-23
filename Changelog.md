@@ -7,6 +7,9 @@ Port to Forge 52.0.22 (Minecraft 1.21.1).
 Allow leaving battle GUI with Escape key (temporarily), and some refactorings
 to (hopefully) fix that pesky transient client-freeze-bug.
 
+Minecraft's music should be paused during battle, even if it starts mid-battle.
+(Minecraft's music may play up to 4 seconds before it is paused by TBMM.)
+
 # Version Forge-1.26.0
 
 Port to Forge 52.0.21 (Minecraft 1.21.1).
