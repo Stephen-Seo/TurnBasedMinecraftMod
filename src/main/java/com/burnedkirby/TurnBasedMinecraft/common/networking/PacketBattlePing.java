@@ -37,6 +37,7 @@ public record PacketBattlePing(int battleID, int remainingSeconds) implements Cu
                 TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
                 TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
                 TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.remainingSeconds);
+                TurnBasedMinecraftMod.proxy.pauseMCMusic();
             }).exceptionally(e -> {
                 ctx.disconnect(Component.literal("Exception handling PacketBattlePing! " + e.getMessage()));
                 return null;

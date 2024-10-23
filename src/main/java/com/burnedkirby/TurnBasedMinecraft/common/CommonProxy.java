@@ -177,4 +177,7 @@ public class CommonProxy
     public static final StreamCodec<ByteBuf, Collection<Integer>> COLLECTION_INT_CODEC = ByteBufCodecs.INT.apply(ByteBufCodecs.collection(ArrayList::new));
 
     public void showClientConfigGui() {}
+
+    public void pauseMCMusic() {}
+    public void resumeMCMusic() {}
 }

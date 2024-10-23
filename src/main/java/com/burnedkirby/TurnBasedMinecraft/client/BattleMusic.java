@@ -180,7 +180,7 @@ public class BattleMusic
         if(initialized && next != null)
         {
             logger.debug("play called with file " + next.getName() + " and vol " + volume);
-        	Minecraft.getInstance().getSoundManager().pause();
+            TurnBasedMinecraftMod.proxy.pauseMCMusic();
             String suffix = next.getName().substring(next.getName().length() - 3).toLowerCase();
             if(suffix.equals("mid") && sequencer != null)
             {
@@ -362,7 +362,7 @@ public class BattleMusic
         }
         if(resumeMCSounds)
         {
-            Minecraft.getInstance().getSoundManager().resume();
+            TurnBasedMinecraftMod.proxy.resumeMCMusic();
         }
         isPlaying = false;
     }
