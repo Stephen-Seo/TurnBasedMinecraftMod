@@ -1,5 +1,19 @@
 # Upcoming changes
 
+# Version Forge-1.26.1
+
+Minor fixes/refactorings that should make the mod more robust.
+
+Port to Forge 52.0.22 (Minecraft 1.21.1).
+
+Allow leaving battle GUI with Escape key (temporarily), and some refactorings
+to (hopefully) fix that pesky transient client-freeze-bug.
+
+Minecraft's music should be paused during battle, even if it starts mid-battle.
+(Minecraft's music may play up to 4 seconds before it is paused by TBMM.)
+
+# Version NeoForge-1.26.1
+
 Minor fixes/refactorings that should make the mod more robust.
 
 Port to NeoForge-21.1.72 (Minecraft 1.21.1).
