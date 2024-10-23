@@ -175,4 +175,7 @@ public class CommonProxy
     public <MSG> void handlePacket(MSG msg,CustomPayloadEvent.Context ctx) {}
 
     public void showClientConfigGui() {}
+
+    public void pauseMCMusic() {}
+    public void resumeMCMusic() {}
 }

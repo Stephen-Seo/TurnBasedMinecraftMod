@@ -1483,4 +1483,14 @@ public class ClientProxy extends CommonProxy {
     public void showClientConfigGui() {
         Minecraft.getInstance().setScreen(new ClientConfigGui());
     }
+
+    @Override
+    public void pauseMCMusic() {
+        Minecraft.getInstance().getSoundManager().pause();
+    }
+
+    @Override
+    public void resumeMCMusic() {
+        Minecraft.getInstance().getSoundManager().resume();
+    }
 }

@@ -52,6 +52,7 @@ public class PacketBattlePing {
                 TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
                 TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
                 TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.decisionSeconds);
+                TurnBasedMinecraftMod.proxy.pauseMCMusic();
             });
             ctx.setPacketHandled(true);
         }
