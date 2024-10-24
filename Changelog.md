@@ -1,5 +1,7 @@
 # Upcoming changes
 
+Show battling Entities next to their attack button in the BattleGUI.
+
 # Version Forge-1.26.1
 
 Minor fixes/refactorings that should make the mod more robust.
