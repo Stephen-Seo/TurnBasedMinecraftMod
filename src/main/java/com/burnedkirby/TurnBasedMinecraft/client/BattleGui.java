@@ -10,7 +10,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ConcurrentModificationException;
@@ -29,6 +31,7 @@ public class BattleGui extends Screen {
 	private boolean stateChanged;
 	private String info;
 	private Long waitMissingBattleTicks;
+	private boolean showingEntities;
 
 	private enum MenuState {
 		MAIN_MENU(0), ATTACK_TARGET(1), ITEM_ACTION(2), WAITING(3), SWITCH_ITEM(4), USE_ITEM(5);
@@ -93,6 +96,7 @@ public class BattleGui extends Screen {
 		state = MenuState.MAIN_MENU;
 		stateChanged = true;
 		waitMissingBattleTicks = null;
+		showingEntities = false;
 	}
 
 	private void setState(MenuState state) {
@@ -127,6 +131,7 @@ public class BattleGui extends Screen {
 		}
 
 		stateChanged = false;
+		showingEntities = false;
 		clearWidgets();
 		switch (state) {
 		case MAIN_MENU:
@@ -147,6 +152,7 @@ public class BattleGui extends Screen {
 		case ATTACK_TARGET:
 			info = "Who will you attack?";
 			int y = 30;
+			showingEntities = true;
 			try {
 				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle()
 						.getSideAEntrySet()) {
@@ -262,6 +268,26 @@ public class BattleGui extends Screen {
 		}
 
 		updateState();
+		if (showingEntities) {
+			int y = 30;
+			try {
+				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideAEntrySet()) {
+					if (e.getValue().entity instanceof LivingEntity lEntity) {
+						InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width / 4 - 60 - 20, y, width / 4 - 60, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
+					}
+					y += 20;
+				}
+			} catch(ConcurrentModificationException e) {}
+			y = 30;
+			try {
+				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideBEntrySet()) {
+					if (e.getValue().entity instanceof LivingEntity lEntity) {
+						InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width * 3 / 4 - 60 + 120, y, width * 3 / 4 - 60 + 140, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
+					}
+					y += 20;
+				}
+			} catch(ConcurrentModificationException e) {}
+		}
 
 		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
