@@ -1,11 +1,19 @@
 # Upcoming changes
 
+# Version Forge-1.26.3
+
+Tweak to "Ping" packet to not create client-local Battle instance if it does
+not exist.
+
 # Version NeoForge-1.26.3
 
 Port to NeoForge 21.3.2-beta (MC 1.21.3).
 
 Note that MC 1.21.1 (NeoForge 21.1.72) will still be supported in a separate
 branch (neoforge\_mc1.21.1) until MC version 1.22 is released.
+
+Tweak to "Ping" packet to not create client-local Battle instance if it does
+not exist.
 
 # Version NeoForge-1.26.3-MC-1.21.1
 
