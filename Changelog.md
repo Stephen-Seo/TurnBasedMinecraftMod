@@ -4,6 +4,9 @@
 
 Port to NeoForge 21.3.2-beta (MC 1.21.3).
 
+Note that MC 1.21.1 (NeoForge 21.1.72) will still be supported in a separate
+branch (neoforge\_mc1.21.1) until MC version 1.22 is released.
+
 # Version Forge-1.26.2
 
 Show battling Entities next to their attack button in the BattleGUI.
