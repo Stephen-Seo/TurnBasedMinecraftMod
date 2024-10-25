@@ -31,13 +31,12 @@ public record PacketBattlePing(int battleID, int remainingSeconds) implements Cu
         @Override
         public void handle(final @NotNull PacketBattlePing pkt, IPayloadContext ctx) {
             ctx.enqueueWork(() -> {
-                if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
-                    TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.battleID);
+                if (TurnBasedMinecraftMod.proxy.getLocalBattle() != null) {
+                    TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
+                    TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
+                    TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.remainingSeconds);
+                    TurnBasedMinecraftMod.proxy.pauseMCMusic();
                 }
-                TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
-                TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
-                TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.remainingSeconds);
-                TurnBasedMinecraftMod.proxy.pauseMCMusic();
             }).exceptionally(e -> {
                 ctx.disconnect(Component.literal("Exception handling PacketBattlePing! " + e.getMessage()));
                 return null;
