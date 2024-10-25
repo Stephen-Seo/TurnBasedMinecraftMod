@@ -46,13 +46,12 @@ public class PacketBattlePing {
         @Override
         public void accept(PacketBattlePing pkt, CustomPayloadEvent.Context ctx) {
             ctx.enqueueWork(() -> {
-                if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
-                    TurnBasedMinecraftMod.proxy.createLocalBattle(pkt.battleID);
+                if (TurnBasedMinecraftMod.proxy.getLocalBattle() != null) {
+                    TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
+                    TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
+                    TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.decisionSeconds);
+                    TurnBasedMinecraftMod.proxy.pauseMCMusic();
                 }
-                TurnBasedMinecraftMod.proxy.setBattleGuiAsGui();
-                TurnBasedMinecraftMod.proxy.setBattleGuiBattleChanged();
-                TurnBasedMinecraftMod.proxy.setBattleGuiTime(pkt.decisionSeconds);
-                TurnBasedMinecraftMod.proxy.pauseMCMusic();
             });
             ctx.setPacketHandled(true);
         }
