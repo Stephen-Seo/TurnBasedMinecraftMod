@@ -1,5 +1,6 @@
 package com.burnedkirby.TurnBasedMinecraft.common;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -68,6 +69,6 @@ public class Utility
     }
 
     public static boolean isItemEdible(ItemStack itemStack, @Nullable LivingEntity entity) {
-        return itemStack.getFoodProperties(entity) != null;
+        return itemStack.get(DataComponents.CONSUMABLE) != null;
     }
 }

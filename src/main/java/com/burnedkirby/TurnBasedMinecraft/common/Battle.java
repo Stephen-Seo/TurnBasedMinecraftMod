@@ -6,6 +6,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattlePing;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -1134,7 +1135,13 @@ public class Battle {
                                     final int nextItemToUse = next.itemToUse;
                                     final int prevItem = ((Player)nextEntity).getInventory().selected;
                                     ((Player)nextEntity).getInventory().selected = nextItemToUse;
-                                    ((Player)nextEntity).getInventory().setItem(nextItemToUse, targetItem.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND).getObject());
+                                    InteractionResult interactionResult = targetItem.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND);
+                                    if (interactionResult instanceof InteractionResult.Success resultSuccess) {
+                                        ItemStack transformed = resultSuccess.heldItemTransformedTo();
+                                        if (transformed != null) {
+                                            ((Player) nextEntity).getInventory().setItem(nextItemToUse, transformed);
+                                        }
+                                    }
                                     ((Player)nextEntity).getInventory().selected = prevItem;
                                 }
                             }

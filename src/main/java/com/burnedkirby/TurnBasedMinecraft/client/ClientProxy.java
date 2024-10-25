@@ -168,7 +168,7 @@ public class ClientProxy extends CommonProxy {
         parentComponent.getSiblings().add(prefix);
         parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendSystemMessage(parentComponent);
+        Minecraft.getInstance().player.displayClientMessage(parentComponent, false);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class ClientProxy extends CommonProxy {
         parentComponent.getSiblings().add(prefix);
         parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendSystemMessage(parentComponent);
+        Minecraft.getInstance().player.displayClientMessage(parentComponent, false);
     }
 
     private void checkBattleTypes(boolean entityLeft) {
