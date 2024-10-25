@@ -1,5 +1,10 @@
 # Upcoming changes
 
+# Version NeoForge-1.26.3-MC-1.21.1
+
+Tweak to "Ping" packet to not create client-local Battle instance if it does
+not exist.
+
 # Version Forge-1.26.2
 
 Show battling Entities next to their attack button in the BattleGUI.
