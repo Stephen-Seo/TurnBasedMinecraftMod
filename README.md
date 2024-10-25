@@ -19,7 +19,7 @@ The `neoforge` branch tracks the version of the mod for Minecraft NeoForge.
 
 # What changed in what version
 
-See the [Changelog](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/master/Changelog.md)
+See the [Changelog](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md)
 
 # Things you may need to know about this mod
 
