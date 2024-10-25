@@ -1,5 +1,9 @@
 # Upcoming changes
 
+# Version NeoForge-1.26.3
+
+Port to NeoForge 21.3.2-beta (MC 1.21.3).
+
 # Version Forge-1.26.2
 
 Show battling Entities next to their attack button in the BattleGUI.
