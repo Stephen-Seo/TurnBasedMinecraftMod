@@ -1,6 +1,6 @@
 # Upcoming changes
 
-## Version Forge-1.26.2
+# Version Forge-1.26.2
 
 Show battling Entities next to their attack button in the BattleGUI.
 
