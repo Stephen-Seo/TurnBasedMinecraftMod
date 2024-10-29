@@ -9,3 +9,5 @@
 [Client-side config](client_config.md)
 
 [Server-side config](server_config.md)
+
+[Frequently Asked Questions](FAQ.md)

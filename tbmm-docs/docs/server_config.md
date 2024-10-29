@@ -98,7 +98,3 @@ defaults. This is due to new mob entries in the settings. Check the
 `.minecraft/config` folder (or `config` folder on the server) to see that the
 old settings file was renamed and the new settings file is in its place. You may
 have to compare the files to keep the settings you want.
-
-## Frequently Asked Questions
-
-[FAQ](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/FAQ.md)
