@@ -1,0 +1,28 @@
+name: deploy_gh_pages_mkdocs
+on:
+  push:
+    branches:
+      - mkdocs
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Python and Git
+        run: |
+          sudo apt-get update && sudo apt-get install python3 git
+      - name: Get mkdocs
+        run: |
+          sudo pip install mkdocs
+      - name: Clone and Checkout repository
+        run: |
+          git clone --depth=1 --no-single-branch https://github.com/Stephen-Seo/TurnBasedMinecraftMod.git TBMM
+          cd TBMM && git checkout mkdocs
+      - name: Publish with mkdocs
+        run: |
+          cd TBMM/tbmm-docs
+          git config --global user.name 'Stephen Seo'
+          git config --global user.email 'seo.disparate@gmail.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          mkdocs gh-deploy
