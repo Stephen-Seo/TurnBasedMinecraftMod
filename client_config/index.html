@@ -111,6 +111,10 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#client-side-config" class="nav-link">Client-side Config</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#battlesilly-music" class="nav-link">Battle/Silly Music</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -132,7 +136,28 @@ triggers the "battle" music or the "silly" music.</p>
 <p>"Silly Music Threshold" determines the percentage of silly-category-mobs in
 battle required to play silly music. This means if the setting is 49%, and there
 is one player, one zombie, and two sheep in battle, then the game will play
-silly music (since 50% of the combatants are sheep and is greater than 49%).</p></div>
+silly music (since 50% of the combatants are sheep and is greater than 49%).</p>
+<h2 id="battlesilly-music">Battle/Silly Music</h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The TurnBasedMinecraftMod (TBMM) configuration folders need to be
+generated. Run the mod once to generate them, then close Minecraft.</p>
+</div>
+<p>There are two folders in the <code>.minecraft/config/TurnBasedMinecraft/Music/</code>
+directory: <code>battle</code> and <code>silly</code>.</p>
+<p>Place your music files in those folders, and the appropriate music will play
+depending on if the battle is with <code>silly</code> mobs or not.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A random song will be picked in the <code>battle</code> folder on <code>battle</code> music, and
+in the <code>silly</code> music folder on <code>silly</code> music.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is recommended to use .ogg Vorbis files for music. There is support for
+.mp3 files, but currently .ogg Vorbis files are more stable in this mod.
+Note that .ogg Opus files are NOT supported, but .ogg Vorbis files are.</p>
+</div></div>
             </div>
         </div>
 
