@@ -95,7 +95,7 @@ which is licensed under the [MIT License](https://github.com/kevinstadler/JavaMP
 
 # Frequently Asked Questions
 
-[See the FAQ page.](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/master/FAQ.md)
+[See the FAQ page.](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/forge/FAQ.md)
 
 # Related Videos
 
