@@ -43,3 +43,7 @@ depending on if the battle is with `silly` mobs or not.
     It is recommended to use .ogg Vorbis files for music. There is support for
     .mp3 files, but currently .ogg Vorbis files are more stable in this mod.
     Note that .ogg Opus files are NOT supported, but .ogg Vorbis files are.
+
+!!! note
+    The following command can convert to .ogg Vorbis using ffmpeg:  
+    `ffmpeg -i <music_file> -map a:0 -c:a libvorbis output.ogg`
