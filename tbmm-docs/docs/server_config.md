@@ -64,7 +64,10 @@ attack instead of fleeing battle.
     config.
 
 Note that for sheep to enter battle, they must be removed from the "ignore
-battle categories" setting (remove the "passive" category).
+battle categories" setting (remove the "passive" category). Alternatively, one
+can set sheep to a category other than "passive", like "animal" or "monster". A
+category that isn't listed in the "ignore battle categories" setting will start
+turn-based-battle.
 
 ![server edit remove passive from ignore
 categories](tbm-edit-server-edit-ignore-battle-types.png)
