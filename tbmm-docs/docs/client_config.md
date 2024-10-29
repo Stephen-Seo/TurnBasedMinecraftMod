@@ -22,3 +22,24 @@ triggers the "battle" music or the "silly" music.
 battle required to play silly music. This means if the setting is 49%, and there
 is one player, one zombie, and two sheep in battle, then the game will play
 silly music (since 50% of the combatants are sheep and is greater than 49%).
+
+## Battle/Silly Music
+
+!!! note
+    The TurnBasedMinecraftMod (TBMM) configuration folders need to be
+    generated. Run the mod once to generate them, then close Minecraft.
+
+There are two folders in the `.minecraft/config/TurnBasedMinecraft/Music/`
+directory: `battle` and `silly`.
+
+Place your music files in those folders, and the appropriate music will play
+depending on if the battle is with `silly` mobs or not.
+
+!!! note
+    A random song will be picked in the `battle` folder on `battle` music, and
+    in the `silly` music folder on `silly` music.
+
+!!! warning
+    It is recommended to use .ogg Vorbis files for music. There is support for
+    .mp3 files, but currently .ogg Vorbis files are more stable in this mod.
+    Note that .ogg Opus files are NOT supported, but .ogg Vorbis files are.

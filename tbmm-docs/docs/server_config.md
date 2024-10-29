@@ -8,8 +8,9 @@ In this text area, yellow texts are setting names, green texts are setting
 values that can be set when clicked on, and dark-green texts are settings that
 display more settings when clicked on.
 
-You can hover/click these texts by pressing the "t" key to open the chatbox, and
-using the mouse.
+!!! note
+    You can hover/click these texts by pressing the "t" key to open the chatbox,
+    and using the mouse.
 
 ![tbm-server-edit info when hovered](tbm-server-edit-hover.png)
 
@@ -58,8 +59,9 @@ attack instead of fleeing battle.
 
 ![mob setting decision attack 100%](tbm-edit-decision-attack.png)
 
-Make sure to click on "Finished Editing" to save changes to the server-side
-config.
+!!! note
+    Make sure to click on "Finished Editing" to save changes to the server-side
+    config.
 
 Note that for sheep to enter battle, they must be removed from the "ignore
 battle categories" setting (remove the "passive" category).
@@ -84,8 +86,10 @@ Hit the named mob to start the editing process.
 ![tbm-edit custom editing](tbm-edit-custom-editing.jpg)
 
 Make your changes and click on "Finished Editing", and any mob with that exact
-name will have these battle settings applied. Note that these settings are also
-in the server-side config.
+name will have these battle settings applied.
+
+!!! note
+    These settings are also in the server-side config.
 
 ## Other Things to Know
 
@@ -94,3 +98,7 @@ defaults. This is due to new mob entries in the settings. Check the
 `.minecraft/config` folder (or `config` folder on the server) to see that the
 old settings file was renamed and the new settings file is in its place. You may
 have to compare the files to keep the settings you want.
+
+## Frequently Asked Questions
+
+[FAQ](https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/FAQ.md)
