@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>Client-Side Config - Docs for TurnBasedMinecraftMod</title>
+        <title>Frequently Asked Questions - Docs for TurnBasedMinecraftMod</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
         <link href="../css/fontawesome.min.css" rel="stylesheet">
         <link href="../css/brands.min.css" rel="stylesheet">
@@ -35,13 +35,13 @@
                         <!-- Main navigation -->
                         <ul class="nav navbar-nav">
                             <li class="nav-item">
-                                <a href="./" class="nav-link active" aria-current="page">Client-Side Config</a>
+                                <a href="../client_config/" class="nav-link">Client-Side Config</a>
                             </li>
                             <li class="nav-item">
                                 <a href="../server_config/" class="nav-link">Server-Side Config</a>
                             </li>
                             <li class="nav-item">
-                                <a href="../FAQ/" class="nav-link">Frequently Asked Questions</a>
+                                <a href="./" class="nav-link active" aria-current="page">Frequently Asked Questions</a>
                             </li>
                         </ul>
 
@@ -52,12 +52,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" class="nav-link disabled">
+                                <a rel="prev" href="../server_config/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../server_config/" class="nav-link">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -109,12 +109,8 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#client-side-config" class="nav-link">Client-side Config</a>
+            <li class="nav-item" data-bs-level="1"><a href="#frequently-asked-questions" class="nav-link">Frequently Asked Questions</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#battlesilly-music" class="nav-link">Battle/Silly Music</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -122,47 +118,8 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="client-side-config">Client-side Config</h1>
-<p>The client config can be opened in two ways.</p>
-<p>One way is via the mod-list (only works in NeoForge, not Forge).</p>
-<p><img alt="Mod list config button" src="../tbm-client-edit-modlist.jpg" /></p>
-<p>The other way is via the <code>/tbm-client-edit</code> command.</p>
-<p><img alt="tbm-client-edit command" src="../tbm-client-edit-cmd.png" /></p>
-<p>Currently, the client config allows for configuration for client-side music
-playback.</p>
-<p><img alt="client config" src="../tbm-client-edit-config.jpg" /></p>
-<p>The "categories" settings are comma-separated words that define what "category"
-triggers the "battle" music or the "silly" music.</p>
-<p>"Silly Music Threshold" determines the percentage of silly-category-mobs in
-battle required to play silly music. This means if the setting is 49%, and there
-is one player, one zombie, and two sheep in battle, then the game will play
-silly music (since 50% of the combatants are sheep and is greater than 49%).</p>
-<h2 id="battlesilly-music">Battle/Silly Music</h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The TurnBasedMinecraftMod (TBMM) configuration folders need to be
-generated. Run the mod once to generate them, then close Minecraft.</p>
-</div>
-<p>There are two folders in the <code>.minecraft/config/TurnBasedMinecraft/Music/</code>
-directory: <code>battle</code> and <code>silly</code>.</p>
-<p>Place your music files in those folders, and the appropriate music will play
-depending on if the battle is with <code>silly</code> mobs or not.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>A random song will be picked in the <code>battle</code> folder on <code>battle</code> music, and
-in the <code>silly</code> music folder on <code>silly</code> music.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>It is recommended to use .ogg Vorbis files for music. There is support for
-.mp3 files, but currently .ogg Vorbis files are more stable in this mod.
-Note that .ogg Opus files are NOT supported, but .ogg Vorbis files are.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The following command can convert to .ogg Vorbis using ffmpeg:<br />
-<code>ffmpeg -i &lt;music_file&gt; -map a:0 -c:a libvorbis output.ogg</code></p>
-</div></div>
+<h1 id="frequently-asked-questions">Frequently Asked Questions</h1>
+<p><a href="https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/FAQ.md">The FAQ is hosted on the repository.</a></p></div>
             </div>
         </div>
 
