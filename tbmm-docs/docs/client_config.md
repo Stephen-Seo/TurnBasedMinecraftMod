@@ -20,5 +20,5 @@ triggers the "battle" music or the "silly" music.
 
 "Silly Music Threshold" determines the percentage of silly-category-mobs in
 battle required to play silly music. This means if the setting is 49%, and there
-is one player, one zomibe, and two sheep in battle, then the game will play
+is one player, one zombie, and two sheep in battle, then the game will play
 silly music (since 50% of the combatants are sheep and is greater than 49%).
