@@ -11,6 +11,10 @@ https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files
 https://modrinth.com/mod/turnbasedmc  
 https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/releases
 
+# Documentation Page
+
+https://stephen-seo.github.io/TurnBasedMinecraftMod/
+
 # Forge or NeoForge
 
 The `forge` branch tracks the version of the mod for Minecraft Forge.
