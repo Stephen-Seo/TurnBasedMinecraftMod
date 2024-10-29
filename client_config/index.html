@@ -157,6 +157,11 @@ in the <code>silly</code> music folder on <code>silly</code> music.</p>
 <p>It is recommended to use .ogg Vorbis files for music. There is support for
 .mp3 files, but currently .ogg Vorbis files are more stable in this mod.
 Note that .ogg Opus files are NOT supported, but .ogg Vorbis files are.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following command can convert to .ogg Vorbis using ffmpeg:<br />
+<code>ffmpeg -i &lt;music_file&gt; -map a:0 -c:a libvorbis output.ogg</code></p>
 </div></div>
             </div>
         </div>
