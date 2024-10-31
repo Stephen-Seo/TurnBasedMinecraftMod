@@ -17,12 +17,15 @@ public class EntityInfo
     public int defenseDamageProbability;
     public int evasion;
     public int speed;
+    public int hasteSpeed;
+    public int slowSpeed;
     public String category;
     public int decisionAttack;
     public int decisionDefend;
     public int decisionFlee;
     public String customName;
-    
+    public String playerName;
+
     public enum Effect
     {
         SPEED,
@@ -366,11 +369,39 @@ public class EntityInfo
         defenseDamageProbability = 0;
         evasion = 15;
         speed = 50;
+        hasteSpeed = 80;
+        slowSpeed = 20;
         category = "unknown";
         decisionAttack = 70;
         decisionDefend = 20;
         decisionFlee = 10;
-        customName = new String();
+        customName = "";
+        playerName = "";
+    }
+
+    public EntityInfo(Class classType, boolean ignoreBattle, int attackPower, int attackProbability, int attackVariance,
+                      Effect attackEffect, int attackEffectProbability, int defenseDamage, int defenseDamageProbability,
+                      int evasion, int speed, int hasteSpeed, int slowSpeed, String category, int decisionAttack, int decisionDefend, int decisionFlee,
+                      String customName, String playerName) {
+        this.classType = classType;
+        this.ignoreBattle = ignoreBattle;
+        this.attackPower = attackPower;
+        this.attackProbability = attackProbability;
+        this.attackVariance = attackVariance;
+        this.attackEffect = attackEffect;
+        this.attackEffectProbability = attackEffectProbability;
+        this.defenseDamage = defenseDamage;
+        this.defenseDamageProbability = defenseDamageProbability;
+        this.evasion = evasion;
+        this.speed = speed;
+        this.hasteSpeed = hasteSpeed;
+        this.slowSpeed = slowSpeed;
+        this.category = category;
+        this.decisionAttack = decisionAttack;
+        this.decisionDefend = decisionDefend;
+        this.decisionFlee = decisionFlee;
+        this.customName = customName;
+        this.playerName = playerName;
     }
     
     public EntityInfo clone()
@@ -387,11 +418,14 @@ public class EntityInfo
         newEntityInfo.defenseDamageProbability = defenseDamageProbability;
         newEntityInfo.evasion = evasion;
         newEntityInfo.speed = speed;
+        newEntityInfo.hasteSpeed = hasteSpeed;
+        newEntityInfo.slowSpeed = slowSpeed;
         newEntityInfo.category = category;
         newEntityInfo.decisionAttack = decisionAttack;
         newEntityInfo.decisionDefend = decisionDefend;
         newEntityInfo.decisionFlee = decisionFlee;
-        newEntityInfo.customName = new String(customName);
+        newEntityInfo.customName = customName;
+        newEntityInfo.playerName = playerName;
         return newEntityInfo;
     }
 }

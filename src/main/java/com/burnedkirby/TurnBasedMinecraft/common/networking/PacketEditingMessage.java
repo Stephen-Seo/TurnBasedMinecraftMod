@@ -28,11 +28,14 @@ public class PacketEditingMessage
         EDIT_DEFENSE_DAMAGE_PROBABILITY(9),
         EDIT_EVASION(10),
         EDIT_SPEED(11),
+        EDIT_HASTE_SPEED(18),
+        EDIT_SLOW_SPEED(19),
         EDIT_CATEGORY(12),
         EDIT_DECISION_ATTACK(13),
         EDIT_DECISION_DEFEND(14),
         EDIT_DECISION_FLEE(15),
-        SERVER_EDIT(16);
+        SERVER_EDIT(16),
+        PICK_PLAYER(17);
 
         Type(int value)
         {
@@ -110,11 +113,14 @@ public class PacketEditingMessage
             buf.writeInt(pkt.entityInfo.defenseDamageProbability);
             buf.writeInt(pkt.entityInfo.evasion);
             buf.writeInt(pkt.entityInfo.speed);
+            buf.writeInt(pkt.entityInfo.hasteSpeed);
+            buf.writeInt(pkt.entityInfo.slowSpeed);
             buf.writeUtf(pkt.entityInfo.category);
             buf.writeInt(pkt.entityInfo.decisionAttack);
             buf.writeInt(pkt.entityInfo.decisionDefend);
             buf.writeInt(pkt.entityInfo.decisionFlee);
             buf.writeUtf(pkt.entityInfo.customName);
+            buf.writeUtf(pkt.entityInfo.playerName);
         }
     }
 
@@ -138,11 +144,14 @@ public class PacketEditingMessage
             einfo.defenseDamageProbability = buf.readInt();
             einfo.evasion = buf.readInt();
             einfo.speed = buf.readInt();
+            einfo.hasteSpeed = buf.readInt();
+            einfo.slowSpeed = buf.readInt();
             einfo.category = buf.readUtf();
             einfo.decisionAttack = buf.readInt();
             einfo.decisionDefend = buf.readInt();
             einfo.decisionFlee = buf.readInt();
             einfo.customName = buf.readUtf();
+            einfo.playerName = buf.readUtf();
             return new PacketEditingMessage(type, einfo);
         }
     }

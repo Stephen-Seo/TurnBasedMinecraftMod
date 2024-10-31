@@ -135,6 +135,9 @@ public class Battle {
                     entityInfo = null;
                 }
                 if (entityInfo == null) {
+                    entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getPlayerInfo(e.getName().getString());
+                }
+                if (entityInfo == null) {
                     entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
                 }
 
@@ -165,6 +168,9 @@ public class Battle {
                     entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getString());
                 } catch (NullPointerException exception) {
                     entityInfo = null;
+                }
+                if (entityInfo == null) {
+                    entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getPlayerInfo(e.getName().getString());
                 }
                 if (entityInfo == null) {
                     entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
@@ -269,6 +275,9 @@ public class Battle {
             entityInfo = null;
         }
         if (entityInfo == null) {
+            entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getPlayerInfo(e.getName().getString());
+        }
+        if (entityInfo == null) {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
         }
 
@@ -315,6 +324,9 @@ public class Battle {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getCustomEntityInfoReference(e.getCustomName().getString());
         } catch (NullPointerException exception) {
             entityInfo = null;
+        }
+        if (entityInfo == null) {
+            entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getPlayerInfo(e.getName().getString());
         }
         if (entityInfo == null) {
             entityInfo = TurnBasedMinecraftMod.proxy.getConfig().getMatchingEntityInfo(e);
@@ -781,7 +793,7 @@ public class Battle {
                         case ATTACK:
                             debugLog += " attack";
                             Combatant target = null;
-                            if (next.entity instanceof Player) {
+                            if (next.entity instanceof Player player) {
                                 debugLog += " as player";
                                 target = sideA.get(next.targetEntityID);
                                 if (target == null) {
@@ -790,10 +802,10 @@ public class Battle {
                                 if (target == null || !target.entity.isAlive() || target == next) {
                                     continue;
                                 }
-                                ItemStack heldItemStack = ((Player) next.entity).getMainHandItem();
+                                ItemStack heldItemStack = player.getMainHandItem();
                                 if (heldItemStack.getItem() instanceof BowItem) {
                                     debugLog += " with bow";
-                                    if (Utility.doesPlayerHaveArrows((Player) next.entity)) {
+                                    if (Utility.doesPlayerHaveArrows(player)) {
                                         final Entity nextEntity = next.entity;
                                         final Entity targetEntity = target.entity;
                                         final float yawDirection = Utility.yawDirection(next.entity.getX(), next.entity.getZ(), target.entity.getX(), target.entity.getZ());
@@ -815,8 +827,8 @@ public class Battle {
                                     continue;
                                 } else if (heldItemStack.getItem() instanceof CrossbowItem) {
                                     debugLog += " with crossbow";
-                                    if (Utility.doesPlayerHaveArrows((Player)next.entity)) {
                                         // Similar to attack with bow.
+                                    if (Utility.doesPlayerHaveArrows(player)) {
                                         final Entity nextEntity = next.entity;
                                         final Entity targetEntity = target.entity;
                                         final float yawDirection = Utility.yawDirection(next.entity.getX(), next.entity.getZ(), target.entity.getX(), target.entity.getZ());
@@ -829,7 +841,7 @@ public class Battle {
                                         ((ServerPlayer) nextEntity).connection.teleport(nextEntity.getX(), nextEntity.getY(), nextEntity.getZ(), yawDirection, pitchDirection);
                                         CrossbowItem itemCrossbow = (CrossbowItem) heldItemStack.getItem();
                                         TurnBasedMinecraftMod.proxy.getAttackerViaBowSet().add(new AttackerViaBow(nextEntity, getId()));
-                                        itemCrossbow.releaseUsing(((Player) nextEntity).getMainHandItem(), nextEntity.level(), (LivingEntity) nextEntity, -100);
+                                        itemCrossbow.releaseUsing(player.getMainHandItem(), nextEntity.level(), (LivingEntity) nextEntity, -100);
                                         itemCrossbow.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.FIRED_ARROW, nextEntity.getId(), targetEntity.getId(), 0);
                                     } else {
@@ -838,9 +850,18 @@ public class Battle {
                                     continue;
                                 }
                                 debugLog += " without bow";
-                                int hitChance = TurnBasedMinecraftMod.proxy.getConfig().getPlayerAttackProbability();
+                                int hitChance;
+                                if (next.entityInfo != null && !next.entityInfo.playerName.isEmpty()) {
+                                    hitChance = next.entityInfo.attackProbability;
+                                } else {
+                                    hitChance = TurnBasedMinecraftMod.proxy.getConfig().getPlayerAttackProbability();
+                                }
                                 if (target.entity instanceof Player) {
-                                    hitChance = hitChance * (100 - TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion()) / 100;
+                                    if (target.entityInfo != null && !target.entityInfo.playerName.isEmpty()) {
+                                        hitChance = hitChance * (100 - target.entityInfo.evasion) / 100;
+                                    } else {
+                                        hitChance = hitChance * (100 - TurnBasedMinecraftMod.proxy.getConfig().getPlayerEvasion()) / 100;
+                                    }
                                 } else {
                                     hitChance = hitChance * (100 - target.entityInfo.evasion) / 100;
                                 }
@@ -1021,48 +1042,111 @@ public class Battle {
                             int fastestEnemySpeed = 0;
                             if (next.isSideA) {
                                 for (Combatant c : sideB.values()) {
-                                    if (c.entity instanceof Player) {
-                                        int playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
-                                        if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SPEED)) {
-                                            playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
-                                        } else if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
-                                            playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                                    if (c.entity instanceof Player player) {
+                                        int playerSpeed;
+                                        if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
+                                            playerSpeed = c.entityInfo.speed;
+                                        } else {
+                                            playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
+                                        }
+                                        if (player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                            if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
+                                                playerSpeed = c.entityInfo.hasteSpeed;
+                                            } else {
+                                                playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
+                                            }
+                                        } else if (player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                            if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
+                                                playerSpeed = c.entityInfo.slowSpeed;
+                                            } else {
+                                                playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                                            }
                                         }
                                         if (playerSpeed > fastestEnemySpeed) {
                                             fastestEnemySpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                                         }
                                     } else {
-                                        if (c.entityInfo.speed > fastestEnemySpeed) {
+                                        if (c.entity instanceof LivingEntity livingEntity) {
+                                            if (livingEntity.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                                if (c.entityInfo.hasteSpeed > fastestEnemySpeed) {
+                                                    fastestEnemySpeed = c.entityInfo.hasteSpeed;
+                                                }
+                                            } else if (livingEntity.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                                if (c.entityInfo.slowSpeed > fastestEnemySpeed) {
+                                                    fastestEnemySpeed = c.entityInfo.slowSpeed;
+                                                }
+                                            } else if (c.entityInfo.speed > fastestEnemySpeed) {
+                                                fastestEnemySpeed = c.entityInfo.speed;
+                                            }
+                                        } else if (c.entityInfo.speed > fastestEnemySpeed) {
                                             fastestEnemySpeed = c.entityInfo.speed;
                                         }
                                     }
                                 }
                             } else {
                                 for (Combatant c : sideA.values()) {
-                                    if (c.entity instanceof Player) {
-                                        int playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
-                                        if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SPEED)) {
-                                            playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
-                                        } else if (((Player) c.entity).hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
-                                            playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                                    if (c.entity instanceof Player player) {
+                                        int playerSpeed;
+                                        if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
+                                            playerSpeed = c.entityInfo.speed;
+                                        } else {
+                                            playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
+                                        }
+                                        if (player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                            if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
+                                                playerSpeed = c.entityInfo.hasteSpeed;
+                                            } else {
+                                                playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
+                                            }
+                                        } else if (player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                            if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
+                                                playerSpeed = c.entityInfo.slowSpeed;
+                                            } else {
+                                                playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                                            }
                                         }
                                         if (playerSpeed > fastestEnemySpeed) {
                                             fastestEnemySpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                                         }
                                     } else {
-                                        if (c.entityInfo.speed > fastestEnemySpeed) {
+                                        if (c.entity instanceof LivingEntity livingEntity) {
+                                            if (livingEntity.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                                if (c.entityInfo.hasteSpeed > fastestEnemySpeed) {
+                                                    fastestEnemySpeed = c.entityInfo.hasteSpeed;
+                                                }
+                                            } else if (livingEntity.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                                if (c.entityInfo.slowSpeed > fastestEnemySpeed) {
+                                                    fastestEnemySpeed = c.entityInfo.slowSpeed;
+                                                }
+                                            } else if (c.entityInfo.speed > fastestEnemySpeed) {
+                                                fastestEnemySpeed = c.entityInfo.speed;
+                                            }
+                                        } else if (c.entityInfo.speed > fastestEnemySpeed) {
                                             fastestEnemySpeed = c.entityInfo.speed;
                                         }
                                     }
                                 }
                             }
                             int fleeProbability = 0;
-                            if (next.entity instanceof Player) {
-                                int playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
-                                if (((Player) next.entity).hasEffect(MobEffects.MOVEMENT_SPEED)) {
-                                    playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
-                                } else if (((Player) next.entity).hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
-                                    playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                            if (next.entity instanceof Player player) {
+                                int playerSpeed;
+                                if (next.entityInfo != null && !next.entityInfo.playerName.isEmpty()) {
+                                    playerSpeed = next.entityInfo.speed;
+                                } else {
+                                    playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
+                                }
+                                if (player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                    if (next.entityInfo != null && !next.entityInfo.playerName.isEmpty()) {
+                                        playerSpeed = next.entityInfo.hasteSpeed;
+                                    } else {
+                                        playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
+                                    }
+                                } else if (player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                    if (next.entityInfo != null && !next.entityInfo.playerName.isEmpty()) {
+                                        playerSpeed = next.entityInfo.slowSpeed;
+                                    } else {
+                                        playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSlowSpeed();
+                                    }
                                 }
                                 if (fastestEnemySpeed >= playerSpeed) {
                                     fleeProbability = TurnBasedMinecraftMod.proxy.getConfig().getFleeBadProbability();
