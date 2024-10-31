@@ -48,11 +48,14 @@ public class PacketEditingMessage implements CustomPacketPayload
         EDIT_DEFENSE_DAMAGE_PROBABILITY(9),
         EDIT_EVASION(10),
         EDIT_SPEED(11),
+        EDIT_HASTE_SPEED(18),
+        EDIT_SLOW_SPEED(19),
         EDIT_CATEGORY(12),
         EDIT_DECISION_ATTACK(13),
         EDIT_DECISION_DEFEND(14),
         EDIT_DECISION_FLEE(15),
-        SERVER_EDIT(16);
+        SERVER_EDIT(16),
+        PICK_PLAYER(17);
 
         Type(int value)
         {

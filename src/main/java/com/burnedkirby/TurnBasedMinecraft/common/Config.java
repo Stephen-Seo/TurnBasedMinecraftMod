@@ -24,6 +24,7 @@ public class Config
     private boolean battleDecisionDurationForever = false;
     private Map<String, EntityInfo> entityInfoMap;
     private Map<String, EntityInfo> customEntityInfoMap;
+    private Map<String, EntityInfo> customPlayerInfoMap;
     private Set<String> ignoreBattleTypes;
     private Logger logger;
     private int playerSpeed = 50;
@@ -57,6 +58,7 @@ public class Config
     {
         entityInfoMap = new HashMap<String, EntityInfo>();
         customEntityInfoMap = new HashMap<String, EntityInfo>();
+        customPlayerInfoMap = new HashMap<String, EntityInfo>();
         ignoreBattleTypes = new HashSet<String>();
         this.logger = logger;
         battleIgnoringPlayers = new HashSet<Integer>();
@@ -517,23 +519,33 @@ public class Config
                         logger.error("Entity with invalid custom_name (must be a string), skipping...");
                         continue;
                     }
+                } else if (nestedConf.contains("player_name")) {
+                    try {
+                        eInfo.playerName = nestedConf.get("player_name");
+                        name = eInfo.playerName;
+                    } catch (ClassCastException e) {
+                        logger.error("Entity with invalid player_name (must be a string), skipping...");
+                        continue;
+                    }
                 } else {
-                    logger.error("Entity must have \"name\" or \"custom_name\" entry");
+                    logger.error("Entity must have \"name\" or \"custom_name\" or \"player_name\" entry");
                     continue;
                 }
 
-                try {
-                    eInfo.attackPower = nestedConf.getInt("attack_power");
-                    if(eInfo.attackPower < 0) {
-                        logClampedValueEntity("attack_power", name, Integer.toString(eInfo.attackPower), "0");
-                        eInfo.attackPower = 0;
+                if (eInfo.playerName.isEmpty()) {
+                    try {
+                        eInfo.attackPower = nestedConf.getInt("attack_power");
+                        if (eInfo.attackPower < 0) {
+                            logClampedValueEntity("attack_power", name, Integer.toString(eInfo.attackPower), "0");
+                            eInfo.attackPower = 0;
+                        }
+                    } catch (ClassCastException e) {
+                        logEntityInvalidValue("attack_power", name, "3");
+                        eInfo.attackPower = 3;
+                    } catch (NullPointerException e) {
+                        logEntityMissingRequiredValue("attack_power", name, "3");
+                        eInfo.attackPower = 3;
                     }
-                } catch (ClassCastException e) {
-                    logEntityInvalidValue("attack_power", name, "3");
-                    eInfo.attackPower = 3;
-                } catch (NullPointerException e) {
-                    logEntityMissingRequiredValue("attack_power", name, "3");
-                    eInfo.attackPower = 3;
                 }
 
                 try {
@@ -553,77 +565,79 @@ public class Config
                     eInfo.attackProbability = 30;
                 }
 
-                try {
-                    eInfo.attackEffect = EntityInfo.Effect.fromString(nestedConf.get("attack_effect"));
-                    if(eInfo.attackEffect != EntityInfo.Effect.UNKNOWN) {
-                        try {
-                            eInfo.attackEffectProbability = nestedConf.getInt("attack_effect_probability");
-                            if(eInfo.attackEffectProbability < 0) {
-                                logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "1");
-                                eInfo.attackEffectProbability = 1;
-                            } else if(eInfo.attackEffectProbability > 100) {
-                                logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "100");
-                                eInfo.attackEffectProbability = 100;
+                if (eInfo.playerName.isEmpty()) {
+                    try {
+                        eInfo.attackEffect = EntityInfo.Effect.fromString(nestedConf.get("attack_effect"));
+                        if(eInfo.attackEffect != EntityInfo.Effect.UNKNOWN) {
+                            try {
+                                eInfo.attackEffectProbability = nestedConf.getInt("attack_effect_probability");
+                                if(eInfo.attackEffectProbability < 0) {
+                                    logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "1");
+                                    eInfo.attackEffectProbability = 1;
+                                } else if(eInfo.attackEffectProbability > 100) {
+                                    logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "100");
+                                    eInfo.attackEffectProbability = 100;
+                                }
+                            } catch (ClassCastException e) {
+                                eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                                logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is invalid, unsetting attack_effect");
+                            } catch (NullPointerException e) {
+                                eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                                logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is missing, unsetting attack_effect");
                             }
-                        } catch (ClassCastException e) {
-                            eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                            logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is invalid, unsetting attack_effect");
-                        } catch (NullPointerException e) {
-                            eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                            logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is missing, unsetting attack_effect");
                         }
+                    } catch (ClassCastException e) {
+                        eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                        logEntityInvalidValue("attack_effect", name, "unknown");
+                    } catch (NullPointerException e) {
+                        eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                        logEntityMissingOptionalValue("attack_effect", name, "unknown");
                     }
-                } catch (ClassCastException e) {
-                    eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                    logEntityInvalidValue("attack_effect", name, "unknown");
-                } catch (NullPointerException e) {
-                    eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                    logEntityMissingOptionalValue("attack_effect", name, "unknown");
-                }
 
-                try {
-                    eInfo.attackVariance = nestedConf.getInt("attack_variance");
-                    if(eInfo.attackVariance < 0) {
-                        logClampedValueEntity("attack_variance", name, Integer.toString(eInfo.attackVariance), "0");
+                    try {
+                        eInfo.attackVariance = nestedConf.getInt("attack_variance");
+                        if (eInfo.attackVariance < 0) {
+                            logClampedValueEntity("attack_variance", name, Integer.toString(eInfo.attackVariance), "0");
+                            eInfo.attackVariance = 0;
+                        }
+                    } catch (ClassCastException e) {
                         eInfo.attackVariance = 0;
+                        logEntityInvalidValue("attack_variance", name, "0");
+                    } catch (NullPointerException e) {
+                        eInfo.attackVariance = 0;
+                        logEntityMissingOptionalValue("attack_variance", name, "0");
                     }
-                } catch (ClassCastException e) {
-                    eInfo.attackVariance = 0;
-                    logEntityInvalidValue("attack_variance", name, "0");
-                } catch (NullPointerException e) {
-                    eInfo.attackVariance = 0;
-                    logEntityMissingOptionalValue("attack_variance", name, "0");
-                }
 
-                try {
-                    eInfo.defenseDamage = nestedConf.getInt("defense_damage");
-                    if(eInfo.defenseDamage < 0) {
-                        logClampedValueEntity("defense_damage", name, Integer.toString(eInfo.defenseDamage), "0");
-                        eInfo.defenseDamage = 0;
-                    } else if(eInfo.defenseDamage != 0) {
-                        try {
-                            eInfo.defenseDamageProbability = nestedConf.getInt("defense_damage_probability");
-                            if(eInfo.defenseDamageProbability < 1) {
-                                logClampedValueEntity("defense_damage_probability", name, Integer.toString(eInfo.defenseDamageProbability), "1");
-                                eInfo.defenseDamageProbability = 1;
-                            } else if(eInfo.defenseDamageProbability > 100) {
-                                logClampedValueEntity("defense_damage_probability", name, Integer.toString(eInfo.defenseDamageProbability), "100");
-                                eInfo.defenseDamageProbability = 100;
+                    try {
+                        eInfo.defenseDamage = nestedConf.getInt("defense_damage");
+                        if (eInfo.defenseDamage < 0) {
+                            logClampedValueEntity("defense_damage", name, Integer.toString(eInfo.defenseDamage), "0");
+                            eInfo.defenseDamage = 0;
+                        } else if (eInfo.defenseDamage != 0) {
+                            try {
+                                eInfo.defenseDamageProbability = nestedConf.getInt("defense_damage_probability");
+                                if (eInfo.defenseDamageProbability < 1) {
+                                    logClampedValueEntity("defense_damage_probability", name, Integer.toString(eInfo.defenseDamageProbability), "1");
+                                    eInfo.defenseDamageProbability = 1;
+                                } else if (eInfo.defenseDamageProbability > 100) {
+                                    logClampedValueEntity("defense_damage_probability", name, Integer.toString(eInfo.defenseDamageProbability), "100");
+                                    eInfo.defenseDamageProbability = 100;
+                                }
+                            } catch (ClassCastException e) {
+                                eInfo.defenseDamage = 0;
+                                logger.warn("Entity \"" + name + "\" has specified defense_damage but defense_damage_probability is invalid, disabling defense_damage");
+                            } catch (NullPointerException e) {
+                                eInfo.defenseDamage = 0;
+                                logger.warn("Entity \"" + name + "\" has specified defense_damage but defense_damage_probability is missing, disabling defense_damage");
                             }
-                        } catch (ClassCastException e) {
-                            eInfo.defenseDamage = 0;
-                            logger.warn("Entity \"" + name + "\" has specified defense_damage but defense_damage_probability is invalid, disabling defense_damage");
-                        } catch (NullPointerException e) {
-                            eInfo.defenseDamage = 0;
-                            logger.warn("Entity \"" + name + "\" has specified defense_damage but defense_damage_probability is missing, disabling defense_damage");
                         }
+                    } catch (ClassCastException e) {
+                        eInfo.defenseDamage = 0;
+                        logEntityInvalidValue("defense_damage", name, "0");
+                    } catch (NullPointerException e) {
+                        eInfo.defenseDamage = 0;
+                        logEntityMissingOptionalValue("defense_damage", name, "0");
                     }
-                } catch (ClassCastException e) {
-                    eInfo.defenseDamage = 0;
-                    logEntityInvalidValue("defense_damage", name, "0");
-                } catch (NullPointerException e) {
-                    eInfo.defenseDamage = 0;
-                    logEntityMissingOptionalValue("defense_damage", name, "0");
                 }
 
                 try {
@@ -654,82 +668,106 @@ public class Config
                 }
 
                 try {
-                    eInfo.ignoreBattle = nestedConf.get("ignore_battle");
+                    eInfo.hasteSpeed = nestedConf.getInt("haste_speed");
                 } catch (ClassCastException e) {
-                    logEntityInvalidValue("ignore_battle", name, "false");
-                    eInfo.ignoreBattle = false;
+                    logEntityInvalidValue("haste_speed", name, "80");
+                    eInfo.hasteSpeed = 80;
                 } catch (NullPointerException e) {
-                    logEntityMissingRequiredValue("ignore_battle", name, "false");
-                    eInfo.ignoreBattle = false;
+                    logEntityMissingOptionalValue("haste_speed", name, "80");
+                    eInfo.hasteSpeed = 80;
                 }
 
                 try {
-                    eInfo.category = nestedConf.get("category");
+                    eInfo.slowSpeed = nestedConf.getInt("slow_speed");
                 } catch (ClassCastException e) {
-                    logEntityInvalidValue("category", name, "unknown");
-                    eInfo.category = "unknown";
+                    logEntityInvalidValue("slow_speed", name, "20");
+                    eInfo.slowSpeed = 20;
                 } catch (NullPointerException e) {
-                    logEntityMissingRequiredValue("category", name, "unknown");
-                    eInfo.category = "unknown";
+                    logEntityMissingOptionalValue("slow_speed", name, "20");
+                    eInfo.slowSpeed = 20;
                 }
 
-                try {
-                    eInfo.decisionAttack = nestedConf.getInt("decision_attack_probability");
-                    if(eInfo.decisionAttack < 0) {
-                        logClampedValueEntity("decision_attack_probability", name, Integer.toString(eInfo.decisionAttack), "0");
-                        eInfo.decisionAttack = 0;
-                    } else if(eInfo.decisionAttack > 100) {
-                        logClampedValueEntity("decision_attack_probability", name, Integer.toString(eInfo.decisionAttack), "100");
-                        eInfo.decisionAttack = 100;
+                if (eInfo.playerName.isEmpty()) {
+                    try {
+                        eInfo.ignoreBattle = nestedConf.get("ignore_battle");
+                    } catch (ClassCastException e) {
+                        logEntityInvalidValue("ignore_battle", name, "false");
+                        eInfo.ignoreBattle = false;
+                    } catch (NullPointerException e) {
+                        logEntityMissingRequiredValue("ignore_battle", name, "false");
+                        eInfo.ignoreBattle = false;
                     }
-                } catch (ClassCastException e) {
-                    logEntityInvalidValue("decision_attack_probability", name, "70");
-                    eInfo.decisionAttack = 70;
-                } catch (NullPointerException e) {
-                    logEntityMissingRequiredValue("decision_attack_probability", name, "70");
-                    eInfo.decisionAttack = 70;
-                }
 
-                try {
-                    eInfo.decisionDefend = nestedConf.getInt("decision_defend_probability");
-                    if(eInfo.decisionDefend < 0) {
-                        logClampedValueEntity("decision_defend_probability", name, Integer.toString(eInfo.decisionDefend), "0");
-                        eInfo.decisionDefend = 0;
-                    } else if(eInfo.decisionDefend > 100) {
-                        logClampedValueEntity("decision_defend_probability", name, Integer.toString(eInfo.decisionDefend), "100");
-                        eInfo.decisionDefend = 100;
+                    try {
+                        eInfo.category = nestedConf.get("category");
+                    } catch (ClassCastException e) {
+                        logEntityInvalidValue("category", name, "unknown");
+                        eInfo.category = "unknown";
+                    } catch (NullPointerException e) {
+                        logEntityMissingRequiredValue("category", name, "unknown");
+                        eInfo.category = "unknown";
                     }
-                } catch (ClassCastException e) {
-                    logEntityInvalidValue("decision_defend_probability", name, "20");
-                    eInfo.decisionDefend = 20;
-                } catch (NullPointerException e) {
-                    logEntityMissingRequiredValue("decision_defend_probability", name, "20");
-                    eInfo.decisionDefend = 20;
-                }
 
-                try {
-                    eInfo.decisionFlee = nestedConf.getInt("decision_flee_probability");
-                    if(eInfo.decisionFlee < 0) {
-                        logClampedValueEntity("decision_flee_probability", name, Integer.toString(eInfo.decisionFlee), "0");
-                        eInfo.decisionFlee = 0;
-                    } else if(eInfo.decisionFlee > 100) {
-                        logClampedValueEntity("decision_flee_probability", name, Integer.toString(eInfo.decisionFlee), "100");
-                        eInfo.decisionFlee = 100;
+                    try {
+                        eInfo.decisionAttack = nestedConf.getInt("decision_attack_probability");
+                        if (eInfo.decisionAttack < 0) {
+                            logClampedValueEntity("decision_attack_probability", name, Integer.toString(eInfo.decisionAttack), "0");
+                            eInfo.decisionAttack = 0;
+                        } else if (eInfo.decisionAttack > 100) {
+                            logClampedValueEntity("decision_attack_probability", name, Integer.toString(eInfo.decisionAttack), "100");
+                            eInfo.decisionAttack = 100;
+                        }
+                    } catch (ClassCastException e) {
+                        logEntityInvalidValue("decision_attack_probability", name, "70");
+                        eInfo.decisionAttack = 70;
+                    } catch (NullPointerException e) {
+                        logEntityMissingRequiredValue("decision_attack_probability", name, "70");
+                        eInfo.decisionAttack = 70;
                     }
-                } catch (ClassCastException e) {
-                    logEntityInvalidValue("decision_flee_probability", name, "10");
-                    eInfo.decisionFlee = 10;
-                } catch (NullPointerException e) {
-                    logEntityMissingRequiredValue("decision_flee_probability", name, "10");
-                    eInfo.decisionFlee = 10;
+
+                    try {
+                        eInfo.decisionDefend = nestedConf.getInt("decision_defend_probability");
+                        if (eInfo.decisionDefend < 0) {
+                            logClampedValueEntity("decision_defend_probability", name, Integer.toString(eInfo.decisionDefend), "0");
+                            eInfo.decisionDefend = 0;
+                        } else if (eInfo.decisionDefend > 100) {
+                            logClampedValueEntity("decision_defend_probability", name, Integer.toString(eInfo.decisionDefend), "100");
+                            eInfo.decisionDefend = 100;
+                        }
+                    } catch (ClassCastException e) {
+                        logEntityInvalidValue("decision_defend_probability", name, "20");
+                        eInfo.decisionDefend = 20;
+                    } catch (NullPointerException e) {
+                        logEntityMissingRequiredValue("decision_defend_probability", name, "20");
+                        eInfo.decisionDefend = 20;
+                    }
+
+                    try {
+                        eInfo.decisionFlee = nestedConf.getInt("decision_flee_probability");
+                        if (eInfo.decisionFlee < 0) {
+                            logClampedValueEntity("decision_flee_probability", name, Integer.toString(eInfo.decisionFlee), "0");
+                            eInfo.decisionFlee = 0;
+                        } else if (eInfo.decisionFlee > 100) {
+                            logClampedValueEntity("decision_flee_probability", name, Integer.toString(eInfo.decisionFlee), "100");
+                            eInfo.decisionFlee = 100;
+                        }
+                    } catch (ClassCastException e) {
+                        logEntityInvalidValue("decision_flee_probability", name, "10");
+                        eInfo.decisionFlee = 10;
+                    } catch (NullPointerException e) {
+                        logEntityMissingRequiredValue("decision_flee_probability", name, "10");
+                        eInfo.decisionFlee = 10;
+                    }
                 }
 
                 if(eInfo.classType != null) {
                     entityInfoMap.put(eInfo.classType.getName(), eInfo);
                 } else if(!eInfo.customName.isEmpty()) {
                     customEntityInfoMap.put(eInfo.customName, eInfo);
+                } else if (!eInfo.playerName.isEmpty()) {
+                    customPlayerInfoMap.put(eInfo.playerName, eInfo);
                 } else {
-                    logger.error("Cannot add entity to internal config, no \"name\" or \"custom_name\"");
+                    logger.error("Cannot add entity to internal config, no \"name\" or \"custom_name\" or \"player_name\"");
                 }
             }
         }
@@ -795,6 +833,8 @@ public class Config
         newConf.set("defense_damage_probability", eInfo.defenseDamageProbability);
         newConf.set("evasion", eInfo.evasion);
         newConf.set("speed", eInfo.speed);
+        newConf.set("haste_speed", eInfo.hasteSpeed);
+        newConf.set("slow_speed", eInfo.slowSpeed);
         newConf.set("ignore_battle", eInfo.ignoreBattle);
         newConf.set("category", eInfo.category);
         newConf.set("decision_attack_probability", eInfo.decisionAttack);
@@ -824,9 +864,11 @@ public class Config
 
         boolean saved = false;
         try {
-            if (eInfo.classType != null || !eInfo.customName.isEmpty()) {
+            if (eInfo.classType != null || !eInfo.customName.isEmpty() || !eInfo.playerName.isEmpty()) {
                 for (com.electronwill.nightconfig.core.Config entity : entities) {
                     String entityName = entity.get("name");
+                    String customName = entity.get("custom_name");
+                    String playerName = entity.get("player_name");
                     if ((eInfo.classType != null && entityName != null && entityName.equals(eInfo.classType.getName()))) {
                         entity.set("attack_power", eInfo.attackPower);
                         entity.set("attack_probability", eInfo.attackProbability);
@@ -837,6 +879,8 @@ public class Config
                         entity.set("defense_damage_probability", eInfo.defenseDamageProbability);
                         entity.set("evasion", eInfo.evasion);
                         entity.set("speed", eInfo.speed);
+                        entity.set("haste_speed", eInfo.hasteSpeed);
+                        entity.set("slow_speed", eInfo.slowSpeed);
                         entity.set("ignore_battle", eInfo.ignoreBattle);
                         entity.set("category", eInfo.category);
                         entity.set("decision_attack_probability", eInfo.decisionAttack);
@@ -844,26 +888,33 @@ public class Config
                         entity.set("decision_flee_probability", eInfo.decisionFlee);
                         saved = true;
                         break;
-                    } else {
-                        String customName = entity.get("custom_name");
-                        if(!eInfo.customName.isEmpty() && customName != null && customName.equals(eInfo.customName)) {
-                            entity.set("attack_power", eInfo.attackPower);
-                            entity.set("attack_probability", eInfo.attackProbability);
-                            entity.set("attack_variance", eInfo.attackVariance);
-                            entity.set("attack_effect", eInfo.attackEffect.toString());
-                            entity.set("attack_effect_probability", eInfo.attackEffectProbability);
-                            entity.set("defense_damage", eInfo.defenseDamage);
-                            entity.set("defense_damage_probability", eInfo.defenseDamageProbability);
-                            entity.set("evasion", eInfo.evasion);
-                            entity.set("speed", eInfo.speed);
-                            entity.set("ignore_battle", eInfo.ignoreBattle);
-                            entity.set("category", eInfo.category);
-                            entity.set("decision_attack_probability", eInfo.decisionAttack);
-                            entity.set("decision_defend_probability", eInfo.decisionDefend);
-                            entity.set("decision_flee_probability", eInfo.decisionFlee);
-                            saved = true;
-                            break;
-                        }
+                    } else if (!eInfo.customName.isEmpty() && customName != null && customName.equals(eInfo.customName)) {
+                        entity.set("attack_power", eInfo.attackPower);
+                        entity.set("attack_probability", eInfo.attackProbability);
+                        entity.set("attack_variance", eInfo.attackVariance);
+                        entity.set("attack_effect", eInfo.attackEffect.toString());
+                        entity.set("attack_effect_probability", eInfo.attackEffectProbability);
+                        entity.set("defense_damage", eInfo.defenseDamage);
+                        entity.set("defense_damage_probability", eInfo.defenseDamageProbability);
+                        entity.set("evasion", eInfo.evasion);
+                        entity.set("speed", eInfo.speed);
+                        entity.set("haste_speed", eInfo.hasteSpeed);
+                        entity.set("slow_speed", eInfo.slowSpeed);
+                        entity.set("ignore_battle", eInfo.ignoreBattle);
+                        entity.set("category", eInfo.category);
+                        entity.set("decision_attack_probability", eInfo.decisionAttack);
+                        entity.set("decision_defend_probability", eInfo.decisionDefend);
+                        entity.set("decision_flee_probability", eInfo.decisionFlee);
+                        saved = true;
+                        break;
+                    } else if (!eInfo.playerName.isEmpty() && playerName != null && playerName.equals(eInfo.playerName)) {
+                        entity.set("attack_probability", eInfo.attackProbability);
+                        entity.set("evasion", eInfo.evasion);
+                        entity.set("speed", eInfo.speed);
+                        entity.set("haste_speed", eInfo.hasteSpeed);
+                        entity.set("slow_speed", eInfo.slowSpeed);
+                        saved = true;
+                        break;
                     }
                 }
                 if(!saved) {
@@ -872,25 +923,36 @@ public class Config
                         newEntry.set("name", eInfo.classType.getName());
                     } else if(!eInfo.customName.isEmpty()) {
                         newEntry.set("custom_name", eInfo.customName);
+                    } else if (!eInfo.playerName.isEmpty()) {
+                        newEntry.set("player_name", eInfo.playerName);
                     } else {
                         logger.error("Failed to save new entity entry into config, no name or custom_name");
                         conf.close();
                         return false;
                     }
-                    newEntry.set("attack_power", eInfo.attackPower);
+
+                    if (eInfo.playerName.isEmpty()) {
+                        newEntry.set("attack_power", eInfo.attackPower);
+                    }
                     newEntry.set("attack_probability", eInfo.attackProbability);
-                    newEntry.set("attack_variance", eInfo.attackVariance);
-                    newEntry.set("attack_effect", eInfo.attackEffect.toString());
-                    newEntry.set("attack_effect_probability", eInfo.attackEffectProbability);
-                    newEntry.set("defense_damage", eInfo.defenseDamage);
-                    newEntry.set("defense_damage_probability", eInfo.defenseDamageProbability);
+                    if (eInfo.playerName.isEmpty()) {
+                        newEntry.set("attack_variance", eInfo.attackVariance);
+                        newEntry.set("attack_effect", eInfo.attackEffect.toString());
+                        newEntry.set("attack_effect_probability", eInfo.attackEffectProbability);
+                        newEntry.set("defense_damage", eInfo.defenseDamage);
+                        newEntry.set("defense_damage_probability", eInfo.defenseDamageProbability);
+                    }
                     newEntry.set("evasion", eInfo.evasion);
                     newEntry.set("speed", eInfo.speed);
-                    newEntry.set("ignore_battle", eInfo.ignoreBattle);
-                    newEntry.set("category", eInfo.category);
-                    newEntry.set("decision_attack_probability", eInfo.decisionAttack);
-                    newEntry.set("decision_defend_probability", eInfo.decisionDefend);
-                    newEntry.set("decision_flee_probability", eInfo.decisionFlee);
+                    newEntry.set("haste_speed", eInfo.hasteSpeed);
+                    newEntry.set("slow_speed", eInfo.slowSpeed);
+                    if (eInfo.playerName.isEmpty()) {
+                        newEntry.set("ignore_battle", eInfo.ignoreBattle);
+                        newEntry.set("category", eInfo.category);
+                        newEntry.set("decision_attack_probability", eInfo.decisionAttack);
+                        newEntry.set("decision_defend_probability", eInfo.decisionDefend);
+                        newEntry.set("decision_flee_probability", eInfo.decisionFlee);
+                    }
                     entities.add(newEntry);
                     saved = true;
                 }
@@ -915,8 +977,10 @@ public class Config
 
         if(eInfo.classType != null) {
             entityInfoMap.put(eInfo.classType.getName(), eInfo);
-        } else if(!eInfo.customName.isEmpty()){
+        } else if(!eInfo.customName.isEmpty()) {
             customEntityInfoMap.put(eInfo.customName, eInfo);
+        } else if (!eInfo.playerName.isEmpty()) {
+            customPlayerInfoMap.put(eInfo.playerName, eInfo);
         } else {
             logger.warn("Failed to update entity info in memory");
         }
@@ -1096,12 +1160,35 @@ public class Config
         return eInfo;
     }
 
+    /**
+     * Returns a clone of an EntityInfo (to prevent editing it).
+     * @param playerName
+     * @return a clone of the stored custom EntityInfo or null if invalid String
+     */
+    public EntityInfo getPlayerInfo(String playerName) {
+        if (playerName == null) {
+            return null;
+        }
+        EntityInfo eInfo = customPlayerInfoMap.get(playerName);
+        if (eInfo != null) {
+            eInfo = eInfo.clone();
+        }
+        return eInfo;
+    }
+
     protected EntityInfo getCustomEntityInfoReference(String customName)
     {
         if(customName == null) {
             return null;
         }
         return customEntityInfoMap.get(customName);
+    }
+
+    protected EntityInfo getPlayerInfoReference(String playerName) {
+        if (playerName == null) {
+            return null;
+        }
+        return customPlayerInfoMap.get(playerName);
     }
 
     private int getConfigFileVersion(File configFile)

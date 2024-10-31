@@ -20,12 +20,15 @@ public class EntityInfo
     public int defenseDamageProbability;
     public int evasion;
     public int speed;
+    public int hasteSpeed;
+    public int slowSpeed;
     public String category;
     public int decisionAttack;
     public int decisionDefend;
     public int decisionFlee;
     public String customName;
-    
+    public String playerName;
+
     public enum Effect
     {
         SPEED,
@@ -369,17 +372,20 @@ public class EntityInfo
         defenseDamageProbability = 0;
         evasion = 15;
         speed = 50;
+        hasteSpeed = 80;
+        slowSpeed = 20;
         category = "unknown";
         decisionAttack = 70;
         decisionDefend = 20;
         decisionFlee = 10;
         customName = new String();
+        playerName = new String();
     }
 
     public EntityInfo(Class classType, boolean ignoreBattle, int attackPower, int attackProbability, int attackVariance,
                       Effect attackEffect, int attackEffectProbability, int defenseDamage, int defenseDamageProbability,
-                      int evasion, int speed, String category, int decisionAttack, int decisionDefend, int decisionFlee,
-                      String customName) {
+                      int evasion, int speed, int hasteSpeed, int slowSpeed, String category, int decisionAttack, int decisionDefend, int decisionFlee,
+                      String customName, String playerName) {
         this.classType = classType;
         this.ignoreBattle = ignoreBattle;
         this.attackPower = attackPower;
@@ -391,11 +397,14 @@ public class EntityInfo
         this.defenseDamageProbability = defenseDamageProbability;
         this.evasion = evasion;
         this.speed = speed;
+        this.hasteSpeed = hasteSpeed;
+        this.slowSpeed = slowSpeed;
         this.category = category;
         this.decisionAttack = decisionAttack;
         this.decisionDefend = decisionDefend;
         this.decisionFlee = decisionFlee;
         this.customName = customName;
+        this.playerName = playerName;
     }
     
     public EntityInfo clone()
@@ -412,11 +421,14 @@ public class EntityInfo
         newEntityInfo.defenseDamageProbability = defenseDamageProbability;
         newEntityInfo.evasion = evasion;
         newEntityInfo.speed = speed;
+        newEntityInfo.hasteSpeed = hasteSpeed;
+        newEntityInfo.slowSpeed = slowSpeed;
         newEntityInfo.category = category;
         newEntityInfo.decisionAttack = decisionAttack;
         newEntityInfo.decisionDefend = decisionDefend;
         newEntityInfo.decisionFlee = decisionFlee;
-        newEntityInfo.customName = new String(customName);
+        newEntityInfo.customName = customName;
+        newEntityInfo.playerName = playerName;
         return newEntityInfo;
     }
 
@@ -448,6 +460,8 @@ public class EntityInfo
         defenseDamageProbability = buffer.readInt();
         evasion = buffer.readInt();
         speed = buffer.readInt();
+        hasteSpeed = buffer.readInt();
+        slowSpeed = buffer.readInt();
 
         int category_len = buffer.readInt();
         ByteBuf category_bytes = buffer.readBytes(category_len);
@@ -463,6 +477,14 @@ public class EntityInfo
             customName = custom_bytes.toString(StandardCharsets.UTF_8);
         } else {
             customName = "";
+        }
+
+        int player_len = buffer.readInt();
+        if (player_len > 0) {
+            ByteBuf player_bytes = buffer.readBytes(player_len);
+            playerName = player_bytes.toString(StandardCharsets.UTF_8);
+        } else {
+            playerName = "";
         }
     }
 
@@ -491,6 +513,8 @@ public class EntityInfo
         buffer.writeInt(defenseDamageProbability);
         buffer.writeInt(evasion);
         buffer.writeInt(speed);
+        buffer.writeInt(hasteSpeed);
+        buffer.writeInt(slowSpeed);
 
         byte[] category_bytes = category.getBytes(StandardCharsets.UTF_8);
         buffer.writeInt(category_bytes.length);
@@ -506,6 +530,14 @@ public class EntityInfo
             byte[] custom_bytes = customName.getBytes(StandardCharsets.UTF_8);
             buffer.writeInt(custom_bytes.length);
             buffer.writeBytes(custom_bytes);
+        }
+
+        if (playerName.isEmpty()) {
+            buffer.writeInt(0);
+        } else {
+            byte[] player_bytes = playerName.getBytes(StandardCharsets.UTF_8);
+            buffer.writeInt(player_bytes.length);
+            buffer.writeBytes(player_bytes);
         }
     }
 }
