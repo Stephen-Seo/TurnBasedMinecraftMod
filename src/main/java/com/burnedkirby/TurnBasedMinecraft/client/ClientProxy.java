@@ -481,22 +481,27 @@ public class ClientProxy extends CommonProxy {
                     MutableComponent text = Component.literal("Edit what value? ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
-                    MutableComponent option = Component.literal("IgB");
-                    // HoverEvent.Action.SHOW_TEXT is probably SHOW_TEXT
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("IgnoreBattle"))));
-                    MutableComponent value = Component.literal("(" + pkt.getEntityInfo().ignoreBattle + ") ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                    MutableComponent option;
+                    MutableComponent value;
 
-                    option = Component.literal("AP");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackPower"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackPower"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().attackPower + ") ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                    if (pkt.getEntityInfo().playerName.isEmpty()) {
+                        option = Component.literal("IgB");
+                        // HoverEvent.Action.SHOW_TEXT is probably SHOW_TEXT
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("IgnoreBattle"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().ignoreBattle + ") ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
+
+                        option = Component.literal("AP");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackPower"))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackPower"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().attackPower + ") ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
+                    }
 
                     option = Component.literal("APr");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackProbability"))
@@ -506,45 +511,47 @@ public class ClientProxy extends CommonProxy {
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = Component.literal("AV");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackVariance"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackVariance"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().attackVariance + ") ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                    if (pkt.getEntityInfo().playerName.isEmpty()) {
+                        option = Component.literal("AV");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackVariance"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackVariance"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().attackVariance + ") ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
 
-                    option = Component.literal("AE");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffect"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().attackEffect.toString() + ") ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                        option = Component.literal("AE");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffect"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().attackEffect.toString() + ") ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
 
-                    option = Component.literal("AEPr");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffectProbability"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().attackEffectProbability + "%) ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                        option = Component.literal("AEPr");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffectProbability"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().attackEffectProbability + "%) ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
 
-                    option = Component.literal("DD");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamage"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamage"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().defenseDamage + ") ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                        option = Component.literal("DD");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamage"))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamage"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().defenseDamage + ") ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
 
-                    option = Component.literal("DDPr");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamageProbability"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamageProbability"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().defenseDamageProbability + "%) ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                        option = Component.literal("DDPr");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamageProbability"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamageProbability"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().defenseDamageProbability + "%) ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
+                    }
 
                     option = Component.literal("E");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit evasion"))
@@ -562,37 +569,55 @@ public class ClientProxy extends CommonProxy {
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = Component.literal("C");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Category"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().category + ") ");
+                    option = Component.literal("HS");
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit hasteSpeed"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("HasteSpeed"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().hasteSpeed + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = Component.literal("DecA");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionAttack"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionAttack"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().decisionAttack + "%) ");
+                    option = Component.literal("SS");
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit slowSpeed"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("SlowSpeed"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().slowSpeed + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
-                    option = Component.literal("DecD");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionDefend"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionDefend"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().decisionDefend + "%) ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                    if (pkt.getEntityInfo().playerName.isEmpty()) {
+                        option = Component.literal("C");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category"))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Category"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().category + ") ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
 
-                    option = Component.literal("DecF");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionFlee"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionFlee"))));
-                    value = Component.literal("(" + pkt.getEntityInfo().decisionFlee + "%) ");
-                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                    option.getSiblings().add(value);
-                    text.getSiblings().add(option);
+                        option = Component.literal("DecA");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionAttack"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionAttack"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().decisionAttack + "%) ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
+
+                        option = Component.literal("DecD");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionDefend"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionDefend"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().decisionDefend + "%) ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
+
+                        option = Component.literal("DecF");
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionFlee"))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionFlee"))));
+                        value = Component.literal("(" + pkt.getEntityInfo().decisionFlee + "%) ");
+                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                        option.getSiblings().add(value);
+                        text.getSiblings().add(option);
+                    }
 
                     option = Component.literal("Finished Editing");
                     option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit finish")));
@@ -1302,6 +1327,44 @@ public class ClientProxy extends CommonProxy {
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                     break;
                 }
+                case EDIT_HASTE_SPEED: {
+                    MutableComponent text = Component.literal("haste speed: ");
+                    text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
+
+                    for (int i = 0; i <= 100; i += 10) {
+                        MutableComponent option = Component.literal(Integer.toString(i));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit hasteSpeed " + Integer.toString(i))));
+                        text.getSiblings().add(option);
+                        if (i < 100) {
+                            text.getSiblings().add(Component.literal(", "));
+                        }
+                    }
+
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit hasteSpeed <integer>\")"));
+
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
+                    break;
+                }
+                case EDIT_SLOW_SPEED: {
+                    MutableComponent text = Component.literal("slow speed: ");
+                    text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
+
+                    for (int i = 0; i <= 100; i += 10) {
+                        MutableComponent option = Component.literal(Integer.toString(i));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit slowSpeed " + Integer.toString(i))));
+                        text.getSiblings().add(option);
+                        if (i < 100) {
+                            text.getSiblings().add(Component.literal(", "));
+                        }
+                    }
+
+                    text.getSiblings().add(Component.literal(" (or use command \"/tbm-edit edit slowSpeed <integer>\")"));
+
+                    parentComponent.getSiblings().add(text);
+                    TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
+                    break;
+                }
                 case EDIT_CATEGORY: {
                     MutableComponent text = Component.literal("category: ");
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
@@ -1470,6 +1533,10 @@ public class ClientProxy extends CommonProxy {
 
                     parentComponent.getSiblings().add(text);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
+                    break;
+                }
+                case PICK_PLAYER: {
+                    TurnBasedMinecraftMod.proxy.displayString("Use \"/tbm-edit player <player_name>\"");
                     break;
                 }
                 default:
