@@ -8,6 +8,7 @@ public class EditingInfo
     public EntityInfo entityInfo;
     public boolean isPendingEntitySelection;
     public boolean isEditingCustomName;
+    public boolean isEditingPlayer;
 
     public EditingInfo()
     {
@@ -15,6 +16,7 @@ public class EditingInfo
         entityInfo = null;
         isPendingEntitySelection = true;
         isEditingCustomName = false;
+        isEditingPlayer = false;
     }
 
     public EditingInfo(Player player)
@@ -23,5 +25,6 @@ public class EditingInfo
         entityInfo = null;
         isPendingEntitySelection = true;
         isEditingCustomName = false;
+        isEditingPlayer = false;
     }
 }
