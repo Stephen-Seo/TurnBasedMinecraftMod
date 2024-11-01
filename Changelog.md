@@ -1,5 +1,17 @@
 # Upcoming changes
 
+# Version Forge-1.26.4
+
+Add support for "per-player-stats" in Turn-Based-Battle.
+
+Update to Forge 52.0.24 (MC 1.21.1).
+
+# Version NeoForge-1.26.4-MC-1.21.1
+
+Add support for "per-player-stats" in Turn-Based-Battle.
+
+Update to Neoforge 21.1.73 (Minecraft 1.21.1).
+
 # Version NeoForge-1.26.4
 
 Add support for "per-player-stats" in Turn-Based-Battle.
