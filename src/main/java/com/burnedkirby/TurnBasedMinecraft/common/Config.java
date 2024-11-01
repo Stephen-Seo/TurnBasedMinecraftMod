@@ -565,35 +565,35 @@ public class Config
                     eInfo.attackProbability = 30;
                 }
 
-                if (eInfo.playerName.isEmpty()) {
-                    try {
-                        eInfo.attackEffect = EntityInfo.Effect.fromString(nestedConf.get("attack_effect"));
-                        if(eInfo.attackEffect != EntityInfo.Effect.UNKNOWN) {
-                            try {
-                                eInfo.attackEffectProbability = nestedConf.getInt("attack_effect_probability");
-                                if(eInfo.attackEffectProbability < 0) {
-                                    logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "1");
-                                    eInfo.attackEffectProbability = 1;
-                                } else if(eInfo.attackEffectProbability > 100) {
-                                    logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "100");
-                                    eInfo.attackEffectProbability = 100;
-                                }
-                            } catch (ClassCastException e) {
-                                eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                                logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is invalid, unsetting attack_effect");
-                            } catch (NullPointerException e) {
-                                eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                                logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is missing, unsetting attack_effect");
+                try {
+                    eInfo.attackEffect = EntityInfo.Effect.fromString(nestedConf.get("attack_effect"));
+                    if(eInfo.attackEffect != EntityInfo.Effect.UNKNOWN) {
+                        try {
+                            eInfo.attackEffectProbability = nestedConf.getInt("attack_effect_probability");
+                            if(eInfo.attackEffectProbability < 0) {
+                                logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "1");
+                                eInfo.attackEffectProbability = 1;
+                            } else if(eInfo.attackEffectProbability > 100) {
+                                logClampedValueEntity("attack_effect_probability", name, Integer.toString(eInfo.attackEffectProbability), "100");
+                                eInfo.attackEffectProbability = 100;
                             }
+                        } catch (ClassCastException e) {
+                            eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                            logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is invalid, unsetting attack_effect");
+                        } catch (NullPointerException e) {
+                            eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                            logger.warn("Entity \"" + name + "\" has specified attack_effect but attack_effect_probability is missing, unsetting attack_effect");
                         }
-                    } catch (ClassCastException e) {
-                        eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                        logEntityInvalidValue("attack_effect", name, "unknown");
-                    } catch (NullPointerException e) {
-                        eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
-                        logEntityMissingOptionalValue("attack_effect", name, "unknown");
                     }
+                } catch (ClassCastException e) {
+                    eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                    logEntityInvalidValue("attack_effect", name, "unknown");
+                } catch (NullPointerException e) {
+                    eInfo.attackEffect = EntityInfo.Effect.UNKNOWN;
+                    logEntityMissingOptionalValue("attack_effect", name, "unknown");
+                }
 
+                if (eInfo.playerName.isEmpty()) {
                     try {
                         eInfo.attackVariance = nestedConf.getInt("attack_variance");
                         if (eInfo.attackVariance < 0) {
@@ -909,6 +909,8 @@ public class Config
                         break;
                     } else if (!eInfo.playerName.isEmpty() && playerName != null && playerName.equals(eInfo.playerName)) {
                         entity.set("attack_probability", eInfo.attackProbability);
+                        entity.set("attack_effect", eInfo.attackEffect.toString());
+                        entity.set("attack_effect_probability", eInfo.attackEffectProbability);
                         entity.set("evasion", eInfo.evasion);
                         entity.set("speed", eInfo.speed);
                         entity.set("haste_speed", eInfo.hasteSpeed);
@@ -937,8 +939,10 @@ public class Config
                     newEntry.set("attack_probability", eInfo.attackProbability);
                     if (eInfo.playerName.isEmpty()) {
                         newEntry.set("attack_variance", eInfo.attackVariance);
-                        newEntry.set("attack_effect", eInfo.attackEffect.toString());
-                        newEntry.set("attack_effect_probability", eInfo.attackEffectProbability);
+                    }
+                    newEntry.set("attack_effect", eInfo.attackEffect.toString());
+                    newEntry.set("attack_effect_probability", eInfo.attackEffectProbability);
+                    if (eInfo.playerName.isEmpty()) {
                         newEntry.set("defense_damage", eInfo.defenseDamage);
                         newEntry.set("defense_damage_probability", eInfo.defenseDamageProbability);
                     }

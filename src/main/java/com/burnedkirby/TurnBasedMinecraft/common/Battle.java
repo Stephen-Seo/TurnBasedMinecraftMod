@@ -898,6 +898,13 @@ public class Battle {
                                         ((Player) nextEntity).attack(targetEntity);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), TurnBasedMinecraftMod.proxy.getAttackingDamage());
+                                        // Attack effect
+                                        if (next.entityInfo != null && next.entityInfo.attackEffect != EntityInfo.Effect.UNKNOWN && next.entityInfo.attackEffectProbability > 0) {
+                                            if (random.nextInt(100) < next.entityInfo.attackEffectProbability) {
+                                                next.entityInfo.attackEffect.applyEffectToEntity((LivingEntity)targetEntity);
+                                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.WAS_AFFECTED, nextEntity.getId(), targetEntity.getId(), 0, next.entityInfo.attackEffect.getAffectedString());
+                                            }
+                                        }
                                         if (defenseDamageTriggered) {
                                             // defense damage
                                             DamageSource defenseDamageSource = targetEntity.damageSources().mobAttack((LivingEntity) targetEntity);

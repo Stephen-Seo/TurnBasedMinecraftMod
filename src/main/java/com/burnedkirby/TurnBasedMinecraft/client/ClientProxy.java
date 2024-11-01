@@ -514,28 +514,30 @@ public class ClientProxy extends CommonProxy {
                     if (pkt.getEntityInfo().playerName.isEmpty()) {
                         option = Component.literal("AV");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackVariance"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackVariance"))));
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackVariance"))));
                         value = Component.literal("(" + pkt.getEntityInfo().attackVariance + ") ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
                         text.getSiblings().add(option);
+                    }
 
-                        option = Component.literal("AE");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffect"))));
-                        value = Component.literal("(" + pkt.getEntityInfo().attackEffect.toString() + ") ");
-                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        option.getSiblings().add(value);
-                        text.getSiblings().add(option);
+                    option = Component.literal("AE");
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect"))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffect"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().attackEffect.toString() + ") ");
+                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                    option.getSiblings().add(value);
+                    text.getSiblings().add(option);
 
-                        option = Component.literal("AEPr");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffectProbability"))));
-                        value = Component.literal("(" + pkt.getEntityInfo().attackEffectProbability + "%) ");
-                        value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
-                        option.getSiblings().add(value);
-                        text.getSiblings().add(option);
+                    option = Component.literal("AEPr");
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability"))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffectProbability"))));
+                    value = Component.literal("(" + pkt.getEntityInfo().attackEffectProbability + "%) ");
+                    value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
+                    option.getSiblings().add(value);
+                    text.getSiblings().add(option);
 
+                    if (pkt.getEntityInfo().playerName.isEmpty()) {
                         option = Component.literal("DD");
                         option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamage"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamage"))));
