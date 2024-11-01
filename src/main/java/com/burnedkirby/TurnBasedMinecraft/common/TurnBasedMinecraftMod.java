@@ -153,7 +153,6 @@ public class TurnBasedMinecraftMod {
                     for (ServerPlayer player : c.getSource().getServer().getPlayerList().getPlayers()) {
                         proxy.getConfig().addBattleIgnoringPlayer(player.getId());
                         PacketDistributor.sendToPlayer(player, new PacketGeneralMessage("OP disabled turn-based-combat for everyone"));
-                        PacketDistributor.sendToPlayer(player, new PacketGeneralMessage("OP disabled turn-based-combat for everyone"));
                     }
                     return 1;
                 }));
