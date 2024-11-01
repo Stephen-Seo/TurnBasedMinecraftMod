@@ -1,5 +1,11 @@
 # Upcoming changes
 
+Update TBM\_Config.toml to have haste\_speed and slow\_speed for all mob
+entries.
+
+Update ClientConfigGui to quit to mod-menu screen in NeoForge (before, it quit
+to the main screen or current game).
+
 # Version Forge-1.26.4
 
 [Add support for "per-player-stats" in Turn-Based-Battle.](https://stephen-seo.github.io/TurnBasedMinecraftMod/server_config/#per-player-settings)
