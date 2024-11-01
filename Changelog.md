@@ -2,19 +2,19 @@
 
 # Version Forge-1.26.4
 
-Add support for "per-player-stats" in Turn-Based-Battle.
+[Add support for "per-player-stats" in Turn-Based-Battle.](https://stephen-seo.github.io/TurnBasedMinecraftMod/server_config/#per-player-settings)
 
 Update to Forge 52.0.24 (MC 1.21.1).
 
 # Version NeoForge-1.26.4-MC-1.21.1
 
-Add support for "per-player-stats" in Turn-Based-Battle.
+[Add support for "per-player-stats" in Turn-Based-Battle.](https://stephen-seo.github.io/TurnBasedMinecraftMod/server_config/#per-player-settings)
 
 Update to Neoforge 21.1.73 (Minecraft 1.21.1).
 
 # Version NeoForge-1.26.4
 
-Add support for "per-player-stats" in Turn-Based-Battle.
+[Add support for "per-player-stats" in Turn-Based-Battle.](https://stephen-seo.github.io/TurnBasedMinecraftMod/server_config/#per-player-settings)
 
 Update to NeoForge 21.3.6-beta (MC 1.21.3).
 
