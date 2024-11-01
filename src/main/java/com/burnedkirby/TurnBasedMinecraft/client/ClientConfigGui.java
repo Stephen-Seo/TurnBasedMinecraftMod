@@ -20,6 +20,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
     private Checkbox affectedByMasterVolCheckbox = null;
     private Checkbox affectedByMusicVolCheckbox = null;
     private SliderPercentage volumeSlider = null;
+    private Screen parentScreen = null;
 
     public ClientConfigGui(ModContainer container, Screen parent) {
         super(Component.literal("TurnBasedMC Client Config"));
@@ -27,6 +28,8 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
         dirtyFlag = true;
 
         accepted = false;
+
+        this.parentScreen = parent;
     }
 
     public void onDirty() {
@@ -175,7 +178,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
         addRenderableWidget(volumeSlider);
 
         addRenderableWidget(Button.builder(Component.literal("Cancel"),
-                        (b) -> Minecraft.getInstance().setScreen(null))
+                        (b) -> Minecraft.getInstance().setScreen(this.parentScreen))
                 .bounds(this.width / 2 - widget_width + widget_x_offset,
                         this.height - widget_height, widget_width, widget_height).build());
         addRenderableWidget(Button.builder(Component.literal("Accept"), (b) -> {
@@ -225,7 +228,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if (accepted) {
             doAccepted();
-            Minecraft.getInstance().setScreen(null);
+            Minecraft.getInstance().setScreen(this.parentScreen);
             return;
         }
         if (dirtyFlag) {
