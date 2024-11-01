@@ -1,5 +1,11 @@
 # Upcoming changes
 
+# Version NeoForge-1.26.4-MC-1.21.1
+
+Add support for "per-player-stats" in Turn-Based-Battle.
+
+Update to Neoforge 21.1.73 (Minecraft 1.21.1).
+
 # Version Forge-1.26.3
 
 Tweak to "Ping" packet to not create client-local Battle instance if it does
