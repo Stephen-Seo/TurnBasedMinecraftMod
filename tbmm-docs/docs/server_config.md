@@ -94,6 +94,25 @@ name will have these battle settings applied.
 !!! note
     These settings are also in the server-side config.
 
+## Per-Player Settings
+
+As of TurnBasedMinecraftMod 1.26.4, one can add Player-specific config via a
+command `/tbm-edit player <PLAYER_NAME>`.
+
+![tbm-edit player command](tbm-edit-player-cmd.png)
+
+You can make changes as usual, though some options for regular mobs do not
+apply to the per-Player config.
+
+![tbm-edit player editing](tbm-edit-player-display.png)
+
+Don't forget to click on "Finished Editing" when done. Once saved, the
+server/single-player-game should use these settings for the specified Player in
+battle.
+
+!!! note
+    These settings are also in the server-side config.
+
 ## Other Things to Know
 
 Sometimes a mod update will "reset" the settings in the server-config to
