@@ -1,18 +1,20 @@
 {
     "homepage": "https://github.com/Stephen-Seo/TurnBasedMinecraftMod",
     "1.21.3": {
+        "1.26.4": "Add player-specific config, NeoForge 21.3.6-beta.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md",
         "1.26.3": "Ported to NeoForge 21.3.2-beta (MC 1.21.3), minor tweak to packet.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md"
     },
     "1.21.1": {
+        "1.26.4-MC-1.21.1": "Add player-specific config, NeoForge 21.1.73.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md",
         "1.26.3-MC-1.21.1": "Minor tweak to packet.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md",
         "1.26.2": "Display Entities on attack menu in BattleGUI.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md",
         "1.26.1": "Ported to NeoForge 21.1.72, leave BattleGUI with Escape key, MC music paused in battle properly.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md",
         "1.26.0": "Ported to NeoForge 21.1.69, client config.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md"
     },
     "promos": {
-        "1.21.3-latest": "1.26.3",
-        "1.21.3-recommended": "1.26.3",
-        "1.21.1-latest": "1.26.3-MC-1.21.1",
-        "1.21.1-recommended": "1.26.3-MC-1.21.1"
+        "1.21.3-latest": "1.26.4",
+        "1.21.3-recommended": "1.26.4",
+        "1.21.1-latest": "1.26.4-MC-1.21.1",
+        "1.21.1-recommended": "1.26.4-MC-1.21.1"
     }
 }
