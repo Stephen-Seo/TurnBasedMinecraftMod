@@ -1,10 +1,40 @@
 # Upcoming changes
 
+# Version Forge-1.26.5
+
+Update TBM\_Config.toml to have haste\_speed and slow\_speed for all mob
+entries.
+
+Update Config to merge in new changes. This means that the existing config will
+be overwritten much less frequently (if ever).
+
+Update to Forge 52.0.26 (MC 1.21.1).
+
+# Version NeoForge-1.26.5-MC-1.21.1
+
 Update TBM\_Config.toml to have haste\_speed and slow\_speed for all mob
 entries.
 
 Update ClientConfigGui to quit to mod-menu screen in NeoForge (before, it quit
 to the main screen or current game).
+
+Update Config to merge in new changes. This means that the existing config will
+be overwritten much less frequently (if ever).
+
+Update to NeoForge 21.1.74 (MC 1.21.1).
+
+# Version NeoForge-1.26.5
+
+Update TBM\_Config.toml to have haste\_speed and slow\_speed for all mob
+entries.
+
+Update ClientConfigGui to quit to mod-menu screen in NeoForge (before, it quit
+to the main screen or current game).
+
+Update Config to merge in new changes. This means that the existing config will
+be overwritten much less frequently (if ever).
+
+Update to NeoForge 21.3.11-beta (MC 1.21.3).
 
 # Version Forge-1.26.4
 
