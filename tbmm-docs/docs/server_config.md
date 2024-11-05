@@ -115,8 +115,8 @@ battle.
 
 ## Other Things to Know
 
-~~Sometimes a mod update will "reset" the settings in the server-config to
-defaults. This is due to new mob entries in the settings.~~  
+<s>Sometimes a mod update will "reset" the settings in the server-config to
+defaults. This is due to new mob entries in the settings.</s>  
 *As of version 1.26.5 of the mod, this should happen less frequently!*  
 Changes were added in 1.26.5 such that entries that exist in the default config
 but not in the current config will be appended to the current config.
