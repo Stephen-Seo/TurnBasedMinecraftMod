@@ -36,10 +36,14 @@ The config file `.minecraft/config/TurnBasedMinecraft/TBM_Config.toml` is commen
 with info on what each option does. ~~It will also be moved if a newer version
 of this mod has a newer version of the config file (usually renamed with a
 timestamp).~~ ~~I will try my best to not move the previous version config, but rather
-edit the previous version config to have new options.~~ When a new config version is made,
+edit the previous version config to have new options.~~ ~~When a new config version is made,
 usually because a new entry has been added, the existing config is renamed to a file with
 a timestamp in the filename of when it was replaced. One can set a config option in the
-config to prevent it being overwritten if necessary.
+config to prevent it being overwritten if necessary.~~
+
+*As of version 1.26.5 of this mod, this should happen less frequently!*  
+Version 1.26.5 introduces changes that allow entires that exist in the default
+config but not in the current config to be appended in the current config.
 
 Some options in the config file only affect the Server, and ~~some only affect the Client~~.
 Client config has been moved to a
