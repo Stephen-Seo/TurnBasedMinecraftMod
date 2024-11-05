@@ -79,6 +79,11 @@ command](https://youtu.be/9xkbHNWkcIY).
 
 ## I updated the mod, but now my config changes are back to default, what happened?
 
+*As of Version 1.26.5 and onwards, this should happen less often!*  
+Version 1.26.5 introduces more robust config updating such that entries that
+exist in the default config, but not in the current config will be appended to
+the current config.
+
 Sometimes, I add new mob entries to the config, and increment the version
 number of the config. When the server/client starts, it checks the default
 config's version number with the existing config's version number. If the
