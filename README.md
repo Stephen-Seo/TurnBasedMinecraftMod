@@ -42,7 +42,7 @@ a timestamp in the filename of when it was replaced. One can set a config option
 config to prevent it being overwritten if necessary.~~
 
 *As of version 1.26.5 of this mod, this should happen less frequently!*  
-Version 1.26.5 introduces changes that allow entires that exist in the default
+Version 1.26.5 introduces changes that allow entries that exist in the default
 config but not in the current config to be appended in the current config.
 
 Some options in the config file only affect the Server, and ~~some only affect the Client~~.
