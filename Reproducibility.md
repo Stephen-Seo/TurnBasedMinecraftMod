@@ -4,6 +4,45 @@ Starting with version 1.24.0 of this mod, this file will list what version of
 Java was used to compile the jars. In theory, using the same version of Java
 should result in an identical jar due to reproducible builds.
 
+## NeoForge 1.26.5
+
+    $ java --version
+    openjdk 21.0.5 2024-10-15
+    OpenJDK Runtime Environment (build 21.0.5+11)
+    OpenJDK 64-Bit Server VM (build 21.0.5+11, mixed mode, sharing)
+
+    $ javac --version
+    javac 21.0.5
+
+    $ sha256sum build/libs/TurnBasedMinecraft-NeoForge-1.26.5-all.jar
+    b02d0abf6f2fbc5c3b718b548309efacb159ec8f86c7d2d653fc0b73234e761a  build/libs/TurnBasedMinecraft-NeoForge-1.26.5-all.jar
+
+## NeoForge 1.26.5-MC-1.21.1
+
+    $ java --version
+    openjdk 21.0.5 2024-10-15
+    OpenJDK Runtime Environment (build 21.0.5+11)
+    OpenJDK 64-Bit Server VM (build 21.0.5+11, mixed mode, sharing)
+
+    $ javac --version
+    javac 21.0.5
+
+    $ sha256sum build/libs/TurnBasedMinecraft-NeoForge-1.26.5-MC-1.21.1-all.jar
+    c529ebe3dd48608afd27e3393b201036ce84d3be0a850cdf48039fbc4820629e  build/libs/TurnBasedMinecraft-NeoForge-1.26.5-MC-1.21.1-all.jar
+
+## Forge 1.26.5
+
+    $ java --version
+    openjdk 21.0.5 2024-10-15
+    OpenJDK Runtime Environment (build 21.0.5+11)
+    OpenJDK 64-Bit Server VM (build 21.0.5+11, mixed mode, sharing)
+
+    $ javac --version
+    javac 21.0.5
+
+    $ sha256sum build/libs/TurnBasedMinecraft-Forge-1.26.5-all.jar
+    c8ed6e2e9a433c40901d41ec604bc6260fc5b231f5d3859832ecbe76b0f5a9e2  build/libs/TurnBasedMinecraft-Forge-1.26.5-all.jar
+
 ## NeoForge 1.26.4
 
     $ java --version
