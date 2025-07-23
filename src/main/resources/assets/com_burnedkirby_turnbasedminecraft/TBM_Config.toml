@@ -1025,6 +1025,23 @@ decision_flee_probability = 5
 ignore_battle = false
 
 [[server_config.entity]]
+name = "net.minecraft.world.entity.animal.HappyGhast"
+attack_power = 0
+attack_probability = 0
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 30
+category = "passive"
+speed = 50
+haste_speed = 60
+slow_speed = 35
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 20
+ignore_battle = false
+
+[[server_config.entity]]
 name = "net.minecraft.world.entity.animal.horse.Llama"
 attack_power = 1
 attack_probability = 70
@@ -1431,6 +1448,23 @@ slow_speed = 25
 decision_attack_probability = 0
 decision_defend_probability = 10
 decision_flee_probability = 80
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.monster.creaking.Creaking"
+attack_power = 3
+attack_probability = 70
+attack_variance = 1
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 20
+category = "monster"
+speed = 70
+haste_speed = 90
+slow_speed = 50
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
