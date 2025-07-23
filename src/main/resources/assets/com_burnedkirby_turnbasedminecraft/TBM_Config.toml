@@ -1451,7 +1451,7 @@ decision_flee_probability = 80
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.monster.creaking"
+name = "net.minecraft.world.entity.monster.creaking.Creaking"
 attack_power = 3
 attack_probability = 70
 attack_variance = 1
