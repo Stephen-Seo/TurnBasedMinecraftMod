@@ -1,5 +1,10 @@
 # Upcoming changes
 
+Port `neoforge_dev` to NeoForge 21.8.10-MC1.21.8 and fixes related to new
+version changes (including a fix for custom buttons not responding to clicks).
+
+Added entries in the server-side config for "HappyGhast" and "Creaking".
+
 # Version Forge-1.26.5
 
 Update TBM\_Config.toml to have haste\_speed and slow\_speed for all mob
