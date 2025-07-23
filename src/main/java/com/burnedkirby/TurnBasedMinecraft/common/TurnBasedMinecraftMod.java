@@ -1103,11 +1103,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(category);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_battle_types remove " + category))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove category"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1646,11 +1644,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources remove " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove type"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1668,11 +1664,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.YELLOW)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources add " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to add type")
                                         )));
                                     response.getSiblings().add(subResponse);

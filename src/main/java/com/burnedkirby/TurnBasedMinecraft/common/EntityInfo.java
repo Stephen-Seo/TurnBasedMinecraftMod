@@ -208,23 +208,23 @@ public class EntityInfo
         public MobEffectInstance getPotionEffect(int duration, int amplifier) {
             switch(this) {
             case SPEED:
-                return new MobEffectInstance(MobEffects.MOVEMENT_SPEED, duration, amplifier);
+                return new MobEffectInstance(MobEffects.SPEED, duration, amplifier);
             case SLOW:
-                return new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, duration, amplifier);
+                return new MobEffectInstance(MobEffects.SLOWNESS, duration, amplifier);
             case HASTE:
-                return new MobEffectInstance(MobEffects.DIG_SPEED, duration, amplifier);
+                return new MobEffectInstance(MobEffects.HASTE, duration, amplifier);
             case MINING_FATIGUE:
-                return new MobEffectInstance(MobEffects.DIG_SLOWDOWN, duration, amplifier);
+                return new MobEffectInstance(MobEffects.MINING_FATIGUE, duration, amplifier);
             case STRENGTH:
-                return new MobEffectInstance(MobEffects.DAMAGE_BOOST, duration, amplifier);
+                return new MobEffectInstance(MobEffects.STRENGTH, duration, amplifier);
             case JUMP_BOOST:
-                return new MobEffectInstance(MobEffects.JUMP, duration, amplifier);
+                return new MobEffectInstance(MobEffects.JUMP_BOOST, duration, amplifier);
             case NAUSEA:
-                return new MobEffectInstance(MobEffects.CONFUSION, duration, amplifier);
+                return new MobEffectInstance(MobEffects.NAUSEA, duration, amplifier);
             case REGENERATION:
                 return new MobEffectInstance(MobEffects.REGENERATION, duration, amplifier);
             case RESISTANCE:
-                return new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, duration, amplifier);
+                return new MobEffectInstance(MobEffects.RESISTANCE, duration, amplifier);
             case FIRE_RESISTANCE:
                 return new MobEffectInstance(MobEffects.FIRE_RESISTANCE, duration, amplifier);
             case WATER_BREATHING:
