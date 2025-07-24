@@ -451,6 +451,7 @@ public class ClientProxy extends CommonProxy {
                     parentComponent.getSiblings().add(message);
                     TurnBasedMinecraftMod.proxy.displayComponent(parentComponent);
                 }
+                break;
                 case CROSSBOW_NO_AMMO: {
                     parentComponent.getSiblings().add(from);
                     parentComponent.getSiblings().add(Component.literal(" tried to use their crossbow but ran out of ammo!"));
