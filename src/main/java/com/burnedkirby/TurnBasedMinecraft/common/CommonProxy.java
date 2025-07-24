@@ -180,4 +180,8 @@ public class CommonProxy
 
     public void pauseMCMusic() {}
     public void resumeMCMusic() {}
+
+    public void finalInit() {
+        getConfig().verifyEntityNames();
+    }
 }

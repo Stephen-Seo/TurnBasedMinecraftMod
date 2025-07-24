@@ -26,6 +26,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -67,6 +68,7 @@ public class TurnBasedMinecraftMod {
         container.getEventBus().addListener(this::secondInitClient);
         container.getEventBus().addListener(this::secondInitServer);
         container.getEventBus().addListener(this::registerNetwork);
+        container.getEventBus().addListener(this::finalInit);
         NeoForge.EVENT_BUS.register(this);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_SPEC);
     }
@@ -117,6 +119,10 @@ public class TurnBasedMinecraftMod {
 
     private void secondInitServer(final FMLDedicatedServerSetupEvent event) {
         proxy.postInit();
+    }
+
+    private void finalInit(final FMLLoadCompleteEvent event) {
+        proxy.finalInit();
     }
 
     @SubscribeEvent
