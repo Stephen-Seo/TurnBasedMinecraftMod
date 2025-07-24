@@ -97,8 +97,9 @@ player_only_battles = false
 
 
 # Each "server_config.entity" entry uses the following options:
-# name: full class name of the entity, cannot also have option "custom_name"
-# custom_name: custom name-tag name, cannot also have option "name"
+# name: full class name of the entity, cannot also have option "custom_name" or "player_name"
+# custom_name: custom name-tag name, cannot also have option "name" or "player_name"
+# player_name: name of a player, cannot also have option "name" or "custom_name"
 # attack_power: how much damage an entity does on successful attack
 # attack_probability: percentage of attack success. (Usually calculated with enemy's evasion to determine actual percentage)
 # attack_variance (optional): determines how much a successful attack's damage varies.
