@@ -30,6 +30,7 @@ import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -109,6 +110,7 @@ public class TurnBasedMinecraftMod {
         NeoForge.EVENT_BUS.register(new PlayerJoinEventHandler());
         NeoForge.EVENT_BUS.register(new DimensionChangedHandler());
         NeoForge.EVENT_BUS.register(new HurtEventHandler());
+        NeoForge.EVENT_BUS.addListener(TurnBasedMinecraftMod::playerConnect);
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
@@ -133,6 +135,14 @@ public class TurnBasedMinecraftMod {
         }
 
         proxy.getConfig().clearBattleIgnoringPlayers();
+    }
+
+    private static void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
+        if (FMLEnvironment.dist.isClient()) {
+            return;
+        }
+        // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
+        proxy.getBattleManager().addRecentlyLeftBattleSilentPlayer(event.getEntity());
     }
 
     @SubscribeEvent
