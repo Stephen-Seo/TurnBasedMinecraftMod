@@ -4,6 +4,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattlePing;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -910,7 +911,7 @@ public class Battle {
                                             DamageSource defenseDamageSource = targetEntity.damageSources().mobAttack((LivingEntity) targetEntity);
                                             TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
                                             nextEntity.invulnerableTime = 0;
-                                            nextEntity.hurt(defenseDamageSource, targetEntityInfo.defenseDamage);
+                                            nextEntity.hurtServer((ServerLevel) nextEntity.level(), defenseDamageSource, targetEntityInfo.defenseDamage);
                                             TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getId(), nextEntity.getId(), targetEntityInfo.defenseDamage);
                                         }
@@ -1009,7 +1010,7 @@ public class Battle {
 
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         targetEntity.invulnerableTime = 0;
-                                        targetEntity.hurt(damageSource, finalDamageAmount);
+                                        targetEntity.hurtServer((ServerLevel) targetEntity.level(), damageSource, finalDamageAmount);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), finalDamageAmount);
                                         if (defenseDamageTriggered) {
@@ -1017,7 +1018,7 @@ public class Battle {
                                             DamageSource defenseDamageSource = targetEntity.damageSources().mobAttack((LivingEntity) targetEntity);
                                             TurnBasedMinecraftMod.proxy.setAttackingEntity(targetEntity);
                                             nextEntity.invulnerableTime = 0;
-                                            nextEntity.hurt(defenseDamageSource, targetEntityInfo.defenseDamage);
+                                            nextEntity.hurtServer((ServerLevel) nextEntity.level(), defenseDamageSource, targetEntityInfo.defenseDamage);
                                             TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENSE_DAMAGE, targetEntity.getId(), nextEntity.getId(), targetEntityInfo.defenseDamage);
                                         }
@@ -1297,7 +1298,7 @@ public class Battle {
 
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         targetEntity.invulnerableTime = 0;
-                                        targetEntity.hurt(nextEntity.damageSources().mobAttack((LivingEntity) nextEntity), finalDamageAmount);
+                                        targetEntity.hurtServer((ServerLevel) targetEntity.level(), nextEntity.damageSources().mobAttack((LivingEntity) nextEntity), finalDamageAmount);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), finalDamageAmount);
                                         if (attackEffectTriggered) {
@@ -1342,7 +1343,7 @@ public class Battle {
 
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         targetEntity.invulnerableTime = 0;
-                                        targetEntity.hurt(nextEntity.damageSources().mobAttack((LivingEntity) nextEntity), finalDamageAmount);
+                                        targetEntity.hurtServer((ServerLevel) targetEntity.level(), nextEntity.damageSources().mobAttack((LivingEntity) nextEntity), finalDamageAmount);
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(null);
                                         sendMessageToAllPlayers(PacketBattleMessage.MessageType.ATTACK, nextEntity.getId(), targetEntity.getId(), finalDamageAmount);
                                         if (attackEffectTriggered) {
