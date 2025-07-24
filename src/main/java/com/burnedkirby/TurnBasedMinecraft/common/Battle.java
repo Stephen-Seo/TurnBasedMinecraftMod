@@ -1354,6 +1354,7 @@ public class Battle {
                                 }
                             }
                             ((Creeper) nextEntity).setSwellDir(1000000);
+                            next.setWillCreeperExplode(true);
                         }
                         break;
                     }
@@ -1396,19 +1397,19 @@ public class Battle {
     private void defuseCreepers() {
         for (Combatant c : sideA.values()) {
             if (c.entity instanceof Creeper) {
-                if (c.creeperTurns <= TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
-                    ((Creeper) c.entity).setSwellDir(-10);
-                } else {
+                if (c.willCreeperExplode) {
                     ((Creeper) c.entity).setSwellDir(1000000);
+                } else {
+                    ((Creeper) c.entity).setSwellDir(-10);
                 }
             }
         }
         for (Combatant c : sideB.values()) {
             if (c.entity instanceof Creeper) {
-                if (c.creeperTurns <= TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
-                    ((Creeper) c.entity).setSwellDir(-10);
-                } else {
+                if (c.willCreeperExplode) {
                     ((Creeper) c.entity).setSwellDir(1000000);
+                } else {
+                    ((Creeper) c.entity).setSwellDir(-10);
                 }
             }
         }

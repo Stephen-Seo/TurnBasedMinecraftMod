@@ -26,6 +26,7 @@ public class Combatant
     public float pitch;
     public long time;
     public int creeperTurns;
+    public boolean willCreeperExplode;
     
     public Combatant()
     {
@@ -33,6 +34,7 @@ public class Combatant
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
         creeperTurns = 1;
+        willCreeperExplode = false;
     }
     
     public Combatant(Entity e, EntityInfo entityInfo)
@@ -43,6 +45,7 @@ public class Combatant
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
         creeperTurns = 1;
+        willCreeperExplode = false;
     }
     
     /**
@@ -134,5 +137,9 @@ public class Combatant
                 return 0;
             }
         }
+    }
+
+    public void setWillCreeperExplode(boolean willExplode) {
+        willCreeperExplode = willExplode;
     }
 }
