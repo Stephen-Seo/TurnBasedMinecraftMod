@@ -140,10 +140,8 @@ public class TurnBasedMinecraftMod {
     }
 
     private static void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
-        if (FMLEnvironment.dist.isClient()) {
-            return;
-        }
         // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
+        // Don't check if only on client or server side so that this works on singleplayer or multiplayer.
         proxy.getBattleManager().addRecentlyLeftBattleNotifyPlayer(event.getEntity());
     }
 
