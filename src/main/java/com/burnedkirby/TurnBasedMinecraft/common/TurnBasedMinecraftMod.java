@@ -28,6 +28,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -111,6 +112,7 @@ public class TurnBasedMinecraftMod {
         NeoForge.EVENT_BUS.register(new DimensionChangedHandler());
         NeoForge.EVENT_BUS.register(new HurtEventHandler());
         NeoForge.EVENT_BUS.addListener(TurnBasedMinecraftMod::playerConnect);
+        NeoForge.EVENT_BUS.addListener(TurnBasedMinecraftMod::playerLoggingOut);
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
@@ -143,6 +145,13 @@ public class TurnBasedMinecraftMod {
         }
         // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
         proxy.getBattleManager().addRecentlyLeftBattleNotifyPlayer(event.getEntity());
+    }
+
+    private static void playerLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        if (FMLEnvironment.dist.isClient()) {
+            // Stop playing battle music if player logged out.
+            proxy.stopMusic(true);
+        }
     }
 
     @SubscribeEvent
