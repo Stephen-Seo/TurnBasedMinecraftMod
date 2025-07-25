@@ -32,6 +32,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
     private SliderPercentage volumeSlider = null;
     private Screen parentScreen = null;
     private ScrollBar scrollBar = null;
+    private double scrollAmount = 0.0;
 
     public ClientConfigGui(ModContainer container, Screen parent) {
         super(Component.literal("TurnBasedMC Client Config"));
@@ -300,7 +301,9 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
         }
         if (dirtyFlag) {
             onDirty();
-        } else {
+        } else if (scrollBar != null && scrollAmount != scrollBar.scrollAmount()) {
+            scrollAmount = scrollBar.scrollAmount();
+
             int widget_width = this.width / 2 - widget_x_offset * 2;
             int top_offset = start_top_offset;
 
