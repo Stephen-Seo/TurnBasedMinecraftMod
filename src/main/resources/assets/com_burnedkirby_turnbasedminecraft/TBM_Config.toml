@@ -12,7 +12,8 @@ do_not_overwrite = false
 [server_config]
 
 # Number of seconds that an entity cannot enter battle after having just left
-# one. Minimum 1, maximum 10.
+# one. Also determines number of seconds before a Player can enter battle after
+# logging in. Minimum 1, maximum 10.
 leave_battle_cooldown = 5
 
 # Maximum distance for a monster to start battle by targeting a player or other

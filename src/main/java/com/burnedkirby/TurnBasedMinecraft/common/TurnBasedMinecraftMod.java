@@ -142,7 +142,7 @@ public class TurnBasedMinecraftMod {
             return;
         }
         // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
-        proxy.getBattleManager().addRecentlyLeftBattleSilentPlayer(event.getEntity());
+        proxy.getBattleManager().addRecentlyLeftBattleNotifyPlayer(event.getEntity());
     }
 
     @SubscribeEvent
