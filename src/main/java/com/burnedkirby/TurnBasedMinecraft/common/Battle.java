@@ -3,6 +3,7 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleMessage;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattlePing;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,12 +11,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.CreativeModeTabRegistry;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -978,6 +979,16 @@ public class Battle {
                                         }
                                         if (damageAmount < 0) {
                                             damageAmount = 0;
+                                        }
+                                        ItemStack heldItem = ((Mob) next.entity).getMainHandItem();
+                                        ItemAttributeModifiers modifiers = heldItem.getItem().components().get(DataComponents.ATTRIBUTE_MODIFIERS);
+                                        if (modifiers != null) {
+                                            for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
+                                                if (entry.attribute() == Attributes.ATTACK_DAMAGE && entry.modifier().is(Item.BASE_ATTACK_DAMAGE_ID) && entry.slot() == EquipmentSlotGroup.MAINHAND) {
+                                                    damageAmount += (int) Math.round(entry.modifier().amount());
+                                                    break;
+                                                }
+                                            }
                                         }
                                         // attack
                                         final Entity nextEntity = next.entity;
