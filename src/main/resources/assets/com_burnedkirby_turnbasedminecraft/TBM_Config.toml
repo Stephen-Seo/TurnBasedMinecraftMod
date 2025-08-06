@@ -1195,7 +1195,7 @@ decision_flee_probability = 100
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Sheep"
+name = "net.minecraft.world.entity.animal.sheep.Sheep"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1297,7 +1297,7 @@ decision_flee_probability = 80
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Wolf"
+name = "net.minecraft.world.entity.animal.wolf.Wolf"
 attack_power = 4
 attack_probability = 70
 attack_variance = 0
