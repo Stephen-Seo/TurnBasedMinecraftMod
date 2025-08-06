@@ -706,7 +706,7 @@ public class Battle {
         }
         defuseCreepers();
         switch (state) {
-            case DECISION:
+            case State.DECISION:
                 timer -= dt;
                 if ((!timerForever && timer <= 0) || undecidedCount.get() <= 0) {
                     for (Combatant c : sideA.values()) {
@@ -771,7 +771,7 @@ public class Battle {
                     }
                 }
                 break;
-            case ACTION: {
+            case State.ACTION: {
                 do {
                     // depend on BattleUpdater's tick limit as rate-of-update for doing Battle decisions
                     Combatant next = turnOrderQueue.poll();
@@ -787,11 +787,11 @@ public class Battle {
                     next.decision = Decision.UNDECIDED;
 
                     switch (decision) {
-                        case UNDECIDED:
+                        case Decision.UNDECIDED:
                             debugLog += " undecided";
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.DID_NOTHING, next.entity.getId(), 0, 0);
                             break;
-                        case ATTACK:
+                        case Decision.ATTACK:
                             debugLog += " attack";
                             Combatant target = null;
                             if (next.entity instanceof Player player) {
@@ -1040,12 +1040,12 @@ public class Battle {
                                 }
                             }
                             break;
-                        case DEFEND:
+                        case Decision.DEFEND:
                             debugLog += " defend";
                             next.remainingDefenses = TurnBasedMinecraftMod.proxy.getConfig().getDefenseDuration();
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.DEFENDING, next.entity.getId(), 0, 0);
                             break;
-                        case FLEE:
+                        case Decision.FLEE:
                             debugLog += " flee";
                             int fastestEnemySpeed = 0;
                             if (next.isSideA) {
@@ -1186,7 +1186,7 @@ public class Battle {
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.FLEE, next.entity.getId(), 0, 0);
                             }
                             break;
-                        case USE_ITEM:
+                        case Decision.USE_ITEM:
                             debugLog += " use item";
                             if (next.itemToUse < 0 || next.itemToUse > 8) {
                                 debugLog += " invalid";
@@ -1240,7 +1240,7 @@ public class Battle {
                                 }
                             }
                             break;
-                        case SWITCH_ITEM: {
+                        case Decision.SWITCH_ITEM: {
                             debugLog += " switch item";
                             if (next.itemToUse < 0 || next.itemToUse > 8) {
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getId(), 0, 0);
@@ -1252,7 +1252,7 @@ public class Battle {
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getId(), 0, 1);
                         }
                         break;
-                        case CREEPER_WAIT:
+                        case Decision.CREEPER_WAIT:
                             debugLog += " creeper wait";
                             if (next.creeperTurns < TurnBasedMinecraftMod.proxy.getConfig().getCreeperExplodeTurn()) {
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_WAIT, next.entity.getId(), 0, 0);
@@ -1260,7 +1260,7 @@ public class Battle {
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_WAIT_FINAL, next.entity.getId(), 0, 0);
                             }
                             break;
-                        case CREEPER_EXPLODE: {
+                        case Decision.CREEPER_EXPLODE: {
                             debugLog += " creeper explode";
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.CREEPER_EXPLODE, next.entity.getId(), 0, 0);
                             final Entity nextEntity = next.entity;
