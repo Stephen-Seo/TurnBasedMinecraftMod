@@ -29,6 +29,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.*;
@@ -75,6 +76,7 @@ public class TurnBasedMinecraftMod {
         FMLCommonSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::firstInit);
         FMLClientSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitClient);
         FMLDedicatedServerSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitServer);
+        FMLLoadCompleteEvent.getBus(ctx.getModBusGroup()).addListener(this::finalInit);
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -137,6 +139,10 @@ public class TurnBasedMinecraftMod {
 
     private void secondInitServer(final FMLDedicatedServerSetupEvent event) {
         proxy.postInit();
+    }
+
+    private void finalInit(final FMLLoadCompleteEvent event) {
+        proxy.finalInit();
     }
 
     @SubscribeEvent
