@@ -6,6 +6,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattlePing;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -1056,13 +1057,13 @@ public class Battle {
                                         } else {
                                             playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                                         }
-                                        if (player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                        if (player.hasEffect(MobEffects.SPEED)) {
                                             if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
                                                 playerSpeed = c.entityInfo.hasteSpeed;
                                             } else {
                                                 playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
                                             }
-                                        } else if (player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                        } else if (player.hasEffect(MobEffects.SLOWNESS)) {
                                             if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
                                                 playerSpeed = c.entityInfo.slowSpeed;
                                             } else {
@@ -1074,11 +1075,11 @@ public class Battle {
                                         }
                                     } else {
                                         if (c.entity instanceof LivingEntity livingEntity) {
-                                            if (livingEntity.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                            if (livingEntity.hasEffect(MobEffects.SPEED)) {
                                                 if (c.entityInfo.hasteSpeed > fastestEnemySpeed) {
                                                     fastestEnemySpeed = c.entityInfo.hasteSpeed;
                                                 }
-                                            } else if (livingEntity.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                            } else if (livingEntity.hasEffect(MobEffects.SLOWNESS)) {
                                                 if (c.entityInfo.slowSpeed > fastestEnemySpeed) {
                                                     fastestEnemySpeed = c.entityInfo.slowSpeed;
                                                 }
@@ -1099,13 +1100,13 @@ public class Battle {
                                         } else {
                                             playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                                         }
-                                        if (player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                        if (player.hasEffect(MobEffects.SPEED)) {
                                             if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
                                                 playerSpeed = c.entityInfo.hasteSpeed;
                                             } else {
                                                 playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
                                             }
-                                        } else if (player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                        } else if (player.hasEffect(MobEffects.SLOWNESS)) {
                                             if (c.entityInfo != null && !c.entityInfo.playerName.isEmpty()) {
                                                 playerSpeed = c.entityInfo.slowSpeed;
                                             } else {
@@ -1117,11 +1118,11 @@ public class Battle {
                                         }
                                     } else {
                                         if (c.entity instanceof LivingEntity livingEntity) {
-                                            if (livingEntity.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                            if (livingEntity.hasEffect(MobEffects.SPEED)) {
                                                 if (c.entityInfo.hasteSpeed > fastestEnemySpeed) {
                                                     fastestEnemySpeed = c.entityInfo.hasteSpeed;
                                                 }
-                                            } else if (livingEntity.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                            } else if (livingEntity.hasEffect(MobEffects.SLOWNESS)) {
                                                 if (c.entityInfo.slowSpeed > fastestEnemySpeed) {
                                                     fastestEnemySpeed = c.entityInfo.slowSpeed;
                                                 }
@@ -1142,13 +1143,13 @@ public class Battle {
                                 } else {
                                     playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerSpeed();
                                 }
-                                if (player.hasEffect(MobEffects.MOVEMENT_SPEED)) {
+                                if (player.hasEffect(MobEffects.SPEED)) {
                                     if (next.entityInfo != null && !next.entityInfo.playerName.isEmpty()) {
                                         playerSpeed = next.entityInfo.hasteSpeed;
                                     } else {
                                         playerSpeed = TurnBasedMinecraftMod.proxy.getConfig().getPlayerHasteSpeed();
                                     }
-                                } else if (player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN)) {
+                                } else if (player.hasEffect(MobEffects.SLOWNESS)) {
                                     if (next.entityInfo != null && !next.entityInfo.playerName.isEmpty()) {
                                         playerSpeed = next.entityInfo.slowSpeed;
                                     } else {
@@ -1224,10 +1225,18 @@ public class Battle {
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_INVALID.getValue(), targetItemStack.getDisplayName().getString());
                                     final Entity nextEntity = next.entity;
                                     final int nextItemToUse = next.itemToUse;
-                                    final int prevItem = ((Player)nextEntity).getInventory().selected;
-                                    ((Player)nextEntity).getInventory().selected = nextItemToUse;
-                                    ((Player)nextEntity).getInventory().setItem(nextItemToUse, targetItem.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND).getObject());
-                                    ((Player)nextEntity).getInventory().selected = prevItem;
+                                    final int prevItem = ((Player)nextEntity).getInventory().getSelectedSlot();
+                                    ((Player)nextEntity).getInventory().setSelectedSlot(nextItemToUse);
+                                    InteractionResult interactionResult = targetItem.use(nextEntity.level(), (Player)nextEntity, InteractionHand.MAIN_HAND);
+                                    if (interactionResult instanceof InteractionResult.Success success) {
+                                        ItemStack result = success.heldItemTransformedTo();
+                                        if (result != null) {
+                                            ((Player) nextEntity).getInventory().setItem(nextItemToUse, result);
+                                        } else {
+                                            ((Player) nextEntity).getInventory().setItem(nextItemToUse, ItemStack.EMPTY);
+                                        }
+                                    }
+                                    ((Player)nextEntity).getInventory().setSelectedSlot(prevItem);
                                 }
                             }
                             break;
@@ -1239,7 +1248,7 @@ public class Battle {
                             }
                             final Entity nextEntity = next.entity;
                             final int nextItemToUse = next.itemToUse;
-                            ((Player) nextEntity).getInventory().selected = nextItemToUse;
+                            ((Player) nextEntity).getInventory().setSelectedSlot(nextItemToUse);
                             sendMessageToAllPlayers(PacketBattleMessage.MessageType.SWITCHED_ITEM, next.entity.getId(), 0, 1);
                         }
                         break;

@@ -168,7 +168,7 @@ public class ClientProxy extends CommonProxy {
         parentComponent.getSiblings().add(prefix);
         parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendSystemMessage(parentComponent);
+        Minecraft.getInstance().player.displayClientMessage(parentComponent, false);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class ClientProxy extends CommonProxy {
         parentComponent.getSiblings().add(prefix);
         parentComponent.getSiblings().add(text);
         // UUID is required by sendMessage, but appears to be unused, so just give dummy UUID
-        Minecraft.getInstance().player.sendSystemMessage(parentComponent);
+        Minecraft.getInstance().player.displayClientMessage(parentComponent, false);
     }
 
     private void checkBattleTypes(boolean entityLeft) {
@@ -471,7 +471,7 @@ public class ClientProxy extends CommonProxy {
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     MutableComponent cancel = Component.literal("Cancel");
-                    cancel.setStyle(cancel.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit cancel")));
+                    cancel.setStyle(cancel.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit cancel")));
 
                     parentComponent.getSiblings().add(text);
                     parentComponent.getSiblings().add(cancel);
@@ -488,16 +488,16 @@ public class ClientProxy extends CommonProxy {
                     if (pkt.getEntityInfo().playerName.isEmpty()) {
                         option = Component.literal("IgB");
                         // HoverEvent.Action.SHOW_TEXT is probably SHOW_TEXT
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("IgnoreBattle"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit ignoreBattle"))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("IgnoreBattle"))));
                         value = Component.literal("(" + pkt.getEntityInfo().ignoreBattle + ") ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
                         text.getSiblings().add(option);
 
                         option = Component.literal("AP");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackPower"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackPower"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackPower"))
+                                .withHoverEvent(new HoverEvent.ShowText(Component.literal("AttackPower"))));
                         value = Component.literal("(" + pkt.getEntityInfo().attackPower + ") ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
@@ -505,8 +505,8 @@ public class ClientProxy extends CommonProxy {
                     }
 
                     option = Component.literal("APr");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackProbability"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackProbability"))));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackProbability"))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("AttackProbability"))));
                     value = Component.literal("(" + pkt.getEntityInfo().attackProbability + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
@@ -514,8 +514,8 @@ public class ClientProxy extends CommonProxy {
 
                     if (pkt.getEntityInfo().playerName.isEmpty()) {
                         option = Component.literal("AV");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackVariance"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackVariance"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackVariance"))
+                                .withHoverEvent(new HoverEvent.ShowText(Component.literal("AttackVariance"))));
                         value = Component.literal("(" + pkt.getEntityInfo().attackVariance + ") ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
@@ -523,16 +523,16 @@ public class ClientProxy extends CommonProxy {
                     }
 
                     option = Component.literal("AE");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffect"))));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackEffect"))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("AttackEffect"))));
                     value = Component.literal("(" + pkt.getEntityInfo().attackEffect.toString() + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
                     option = Component.literal("AEPr");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("AttackEffectProbability"))));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackEffectProbability"))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("AttackEffectProbability"))));
                     value = Component.literal("(" + pkt.getEntityInfo().attackEffectProbability + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
@@ -540,16 +540,16 @@ public class ClientProxy extends CommonProxy {
 
                     if (pkt.getEntityInfo().playerName.isEmpty()) {
                         option = Component.literal("DD");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamage"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamage"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit defenseDamage"))
+                                .withHoverEvent(new HoverEvent.ShowText(Component.literal("DefenseDamage"))));
                         value = Component.literal("(" + pkt.getEntityInfo().defenseDamage + ") ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
                         text.getSiblings().add(option);
 
                         option = Component.literal("DDPr");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamageProbability"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DefenseDamageProbability"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit defenseDamageProbability"))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("DefenseDamageProbability"))));
                         value = Component.literal("(" + pkt.getEntityInfo().defenseDamageProbability + "%) ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
@@ -557,32 +557,32 @@ public class ClientProxy extends CommonProxy {
                     }
 
                     option = Component.literal("E");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit evasion"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Evasion"))));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit evasion"))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("Evasion"))));
                     value = Component.literal("(" + pkt.getEntityInfo().evasion + "%) ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
                     option = Component.literal("S");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit speed"))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Speed"))));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit speed"))
+                        .withHoverEvent(new HoverEvent.ShowText(Component.literal("Speed"))));
                     value = Component.literal("(" + pkt.getEntityInfo().speed + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
                     option = Component.literal("HS");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit hasteSpeed"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("HasteSpeed"))));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit hasteSpeed"))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("HasteSpeed"))));
                     value = Component.literal("(" + pkt.getEntityInfo().hasteSpeed + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
                     text.getSiblings().add(option);
 
                     option = Component.literal("SS");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit slowSpeed"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("SlowSpeed"))));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit slowSpeed"))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("SlowSpeed"))));
                     value = Component.literal("(" + pkt.getEntityInfo().slowSpeed + ") ");
                     value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                     option.getSiblings().add(value);
@@ -590,32 +590,32 @@ public class ClientProxy extends CommonProxy {
 
                     if (pkt.getEntityInfo().playerName.isEmpty()) {
                         option = Component.literal("C");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Category"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit category"))
+                                .withHoverEvent(new HoverEvent.ShowText(Component.literal("Category"))));
                         value = Component.literal("(" + pkt.getEntityInfo().category + ") ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
                         text.getSiblings().add(option);
 
                         option = Component.literal("DecA");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionAttack"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionAttack"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit decisionAttack"))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("DecisionAttack"))));
                         value = Component.literal("(" + pkt.getEntityInfo().decisionAttack + "%) ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
                         text.getSiblings().add(option);
 
                         option = Component.literal("DecD");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionDefend"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionDefend"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit decisionDefend"))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("DecisionDefend"))));
                         value = Component.literal("(" + pkt.getEntityInfo().decisionDefend + "%) ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
                         text.getSiblings().add(option);
 
                         option = Component.literal("DecF");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionFlee"))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("DecisionFlee"))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit decisionFlee"))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.literal("DecisionFlee"))));
                         value = Component.literal("(" + pkt.getEntityInfo().decisionFlee + "%) ");
                         value.setStyle(value.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
                         option.getSiblings().add(value);
@@ -623,12 +623,12 @@ public class ClientProxy extends CommonProxy {
                     }
 
                     option = Component.literal("Finished Editing");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit finish")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit finish")));
                     text.getSiblings().add(option);
                     text.getSiblings().add(Component.literal(" "));
 
                     option = Component.literal("Cancel");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit cancel")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit cancel")));
                     text.getSiblings().add(option);
 
                     parentComponent.getSiblings().add(text);
@@ -647,8 +647,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit leave_battle_cooldown " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -660,16 +659,14 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("5 ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit aggro_start_battle_max_distance 5")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("8 ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit aggro_start_battle_max_distance 8")));
                     parent.getSiblings().add(sub);
 
@@ -677,8 +674,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit aggro_start_battle_max_distance " + String.valueOf(i))));
                         parent.getSiblings().add(sub);
                     }
@@ -686,8 +682,7 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("old_battle_behavior ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("If enabled, battles only start on a hit, not including mobs targeting players")))
                         .withBold(true));
                     parent.getSiblings().add(sub);
@@ -695,24 +690,21 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit old_battle_behavior true")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit old_battle_behavior false")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("anyone_can_disable_tbm_for_self ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Allows use for /tbm-disable and /tbm-enable for all")))
                         .withBold(true));
                     parent.getSiblings().add(sub);
@@ -720,16 +712,14 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit anyone_can_disable_tbm_for_self true")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit anyone_can_disable_tbm_for_self false")));
                     parent.getSiblings().add(sub);
 
@@ -740,8 +730,7 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("2 ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit max_in_battle 2")));
                     parent.getSiblings().add(sub);
 
@@ -749,8 +738,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit max_in_battle " + String.valueOf(i))));
                         parent.getSiblings().add(sub);
                     }
@@ -762,8 +750,7 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit freeze_battle_combatants true"
                         )));
                     parent.getSiblings().add(sub);
@@ -771,8 +758,7 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit freeze_battle_combatants false"
                         )));
                     parent.getSiblings().add(sub);
@@ -780,11 +766,9 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("ignore_battle_types ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.DARK_GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit ignore_battle_types"))
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Click to show current ignored categories, or use /tbm-server-edit ignore_battle_types add/remove <category_name>")
                         ))
                         .withBold(true));
@@ -794,8 +778,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Player default speed"))));
                     parent.getSiblings().add(sub);
 
@@ -803,7 +786,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit player_speed " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -812,8 +795,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Player speed when under the effects of \"Speed\"")
                         )));
                     parent.getSiblings().add(sub);
@@ -822,7 +804,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit player_haste_speed " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -831,8 +813,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Player speed when under the effects of \"Slow\"")
                         )));
                     parent.getSiblings().add(sub);
@@ -841,7 +822,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit player_slow_speed " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -850,8 +831,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Base Player attack probability in percentage")
                         )));
                     parent.getSiblings().add(sub);
@@ -861,13 +841,13 @@ public class ClientProxy extends CommonProxy {
                             sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit player_attack_probability 1")));
                         } else {
                             sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit player_attack_probability " + i)));
                         }
                         parent.getSiblings().add(sub);
@@ -877,8 +857,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Base Player evasion rate in percentage")
                         )));
                     parent.getSiblings().add(sub);
@@ -887,7 +866,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit player_evasion " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -896,8 +875,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Number of attacks that a \"Defend\" move blocks (lasts until next action)")
                         )));
                     parent.getSiblings().add(sub);
@@ -906,7 +884,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit defense_duration " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -915,8 +893,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Probability of flee success when Player's speed is higher than the fastest opposing Entity")
                         )));
                     parent.getSiblings().add(sub);
@@ -926,13 +903,13 @@ public class ClientProxy extends CommonProxy {
                             sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit flee_good_probability 1")));
                         } else {
                             sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit flee_good_probability " + i)));
                         }
                         parent.getSiblings().add(sub);
@@ -942,8 +919,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Probability of flee success when Player's speed is lower than the fastest opposing Entity")
                         )));
                     parent.getSiblings().add(sub);
@@ -953,13 +929,13 @@ public class ClientProxy extends CommonProxy {
                             sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit flee_bad_probability 1")));
                         } else {
                             sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit flee_bad_probability " + i)));
                         }
                         parent.getSiblings().add(sub);
@@ -969,8 +945,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("The minimum percentage possible when calculating hit percentage for any attacker")
                         )));
                     parent.getSiblings().add(sub);
@@ -980,13 +955,13 @@ public class ClientProxy extends CommonProxy {
                             sub = Component.literal("1 ");
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit minimum_hit_percentage 1")));
                         } else {
                             sub = Component.literal(String.valueOf(i) + ' ');
                             sub.setStyle(sub.getStyle()
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                                .withClickEvent(new ClickEvent.RunCommand(
                                     "/tbm-server-edit minimum_hit_percentage " + i)));
                         }
                         parent.getSiblings().add(sub);
@@ -996,19 +971,18 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Disables the turn timer (recommended to leave this to false)"))
                         ));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("true ");
-                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent.RunCommand(
                         "/tbm-server-edit battle_turn_wait_forever true")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("false ");
-                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                    sub.setStyle(sub.getStyle().withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent.RunCommand(
                         "/tbm-server-edit battle_turn_wait_forever false")));
                     parent.getSiblings().add(sub);
 
@@ -1016,8 +990,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("The time in seconds to wait for all Players to choose their move")
                         )));
                     parent.getSiblings().add(sub);
@@ -1026,7 +999,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit battle_turn_time_seconds " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -1035,8 +1008,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("The number of turns it takes for a creeper to explode")
                         )));
                     parent.getSiblings().add(sub);
@@ -1045,7 +1017,7 @@ public class ClientProxy extends CommonProxy {
                         sub = Component.literal(String.valueOf(i) + ' ');
                         sub.setStyle(sub.getStyle()
                             .withColor(ChatFormatting.GREEN)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                            .withClickEvent(new ClickEvent.RunCommand(
                                 "/tbm-server-edit creeper_explode_turn " + i)));
                         parent.getSiblings().add(sub);
                     }
@@ -1054,8 +1026,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Stops creepers from exploding when they leave battle (during leave battle cooldown)")
                         )));
                     parent.getSiblings().add(sub);
@@ -1063,14 +1034,14 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit creeper_stop_explode_on_leave_battle true")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit creeper_stop_explode_on_leave_battle false")));
                     parent.getSiblings().add(sub);
 
@@ -1078,8 +1049,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Allows creepers to damage anyone who just left battle (in cooldown)")
                         )));
                     parent.getSiblings().add(sub);
@@ -1087,25 +1057,23 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("true ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit creeper_always_allow_damage true")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("false ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit creeper_always_allow_damage false")));
                     parent.getSiblings().add(sub);
 
                     sub = Component.literal("ignore_damage_sources ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.DARK_GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit ignore_damage_sources"))
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Click to show current ignored damage sources (during battle), or use /tbm-server-edit ignore_damage_sources add/remove <type>")
                         ))
                         .withBold(true));
@@ -1115,8 +1083,7 @@ public class ClientProxy extends CommonProxy {
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.YELLOW)
                         .withBold(true)
-                        .withHoverEvent(new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
+                        .withHoverEvent(new HoverEvent.ShowText(
                             Component.literal("Disables battle for non-player entities")
                         )));
                     parent.getSiblings().add(sub);
@@ -1124,8 +1091,7 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("enable ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit player_only_battles true"
                         )));
                     parent.getSiblings().add(sub);
@@ -1133,8 +1099,7 @@ public class ClientProxy extends CommonProxy {
                     sub = Component.literal("disable ");
                     sub.setStyle(sub.getStyle()
                         .withColor(ChatFormatting.GREEN)
-                        .withClickEvent(new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
+                        .withClickEvent(new ClickEvent.RunCommand(
                             "/tbm-server-edit player_only_battles false"
                         )));
                     parent.getSiblings().add(sub);
@@ -1147,13 +1112,13 @@ public class ClientProxy extends CommonProxy {
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     MutableComponent option = Component.literal("true");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle true")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFF00FF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit ignoreBattle true")));
                     text.getSiblings().add(option);
 
                     text.getSiblings().add(Component.literal(" "));
 
                     option = Component.literal("false");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit ignoreBattle false")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFF0000)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit ignoreBattle false")));
                     text.getSiblings().add(option);
 
                     parentComponent.getSiblings().add(text);
@@ -1166,7 +1131,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 15; ++i) {
                         MutableComponent option = Component.literal(Integer.toString(i));
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackPower " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackPower " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 15) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1185,7 +1150,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 10; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i) + "%");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackProbability " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackProbability " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1204,7 +1169,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 10; ++i) {
                         MutableComponent option = Component.literal(Integer.toString(i));
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackVariance " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackVariance " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 10) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1223,7 +1188,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (EntityInfo.Effect e : EntityInfo.Effect.values()) {
                         MutableComponent option = Component.literal(e.toString());
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffect " + e.toString())));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackEffect " + e.toString())));
                         text.getSiblings().add(option);
                         if (e != EntityInfo.Effect.UNKNOWN) {
                             // TODO find a better way to handle printing comma for items before last
@@ -1241,7 +1206,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i) + "%");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit attackEffectProbability " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit attackEffectProbability " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1260,7 +1225,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 15; ++i) {
                         MutableComponent option = Component.literal(Integer.toString(i));
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamage " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit defenseDamage " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 15) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1279,7 +1244,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i) + "%");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit defenseDamageProbability " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit defenseDamageProbability " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1298,7 +1263,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i) + "%");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit evasion " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit evasion " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1317,7 +1282,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i));
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit speed " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit speed " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1336,7 +1301,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i));
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit hasteSpeed " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit hasteSpeed " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1355,7 +1320,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i));
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit slowSpeed " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit slowSpeed " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1373,7 +1338,7 @@ public class ClientProxy extends CommonProxy {
                     text.setStyle(text.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)).withBold(false));
 
                     MutableComponent option = Component.literal("monster");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category monster")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit category monster")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("monster")) {
                         MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
@@ -1395,7 +1360,7 @@ public class ClientProxy extends CommonProxy {
                     text.getSiblings().add(Component.literal(", "));
 
                     option = Component.literal("animal");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category animal")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit category animal")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("animal")) {
                         MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
@@ -1417,7 +1382,7 @@ public class ClientProxy extends CommonProxy {
                     text.getSiblings().add(Component.literal(", "));
 
                     option = Component.literal("passive");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category passive")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit category passive")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("passive")) {
                         MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
@@ -1439,7 +1404,7 @@ public class ClientProxy extends CommonProxy {
                     text.getSiblings().add(Component.literal(", "));
 
                     option = Component.literal("boss");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category boss")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit category boss")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("boss")) {
                         MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
@@ -1461,7 +1426,7 @@ public class ClientProxy extends CommonProxy {
                     text.getSiblings().add(Component.literal(", "));
 
                     option = Component.literal("player");
-                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit category player")));
+                    option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit category player")));
                     if (TurnBasedMinecraftMod.proxy.getConfig().isIgnoreBattleType("player")) {
                         MutableComponent optionInfo = Component.literal("(battle-");
                         optionInfo.setStyle(optionInfo.getStyle().withColor(TextColor.fromRgb(0xFFFFFFFF)));
@@ -1493,7 +1458,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i) + "%");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionAttack " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit decisionAttack " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1510,7 +1475,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i) + "%");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionDefend " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit decisionDefend " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1527,7 +1492,7 @@ public class ClientProxy extends CommonProxy {
 
                     for (int i = 0; i <= 100; i += 10) {
                         MutableComponent option = Component.literal(Integer.toString(i) + "%");
-                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tbm-edit edit decisionFlee " + Integer.toString(i))));
+                        option.setStyle(option.getStyle().withColor(TextColor.fromRgb(0xFFFFFF00)).withClickEvent(new ClickEvent.RunCommand("/tbm-edit edit decisionFlee " + Integer.toString(i))));
                         text.getSiblings().add(option);
                         if (i < 100) {
                             text.getSiblings().add(Component.literal(", "));
@@ -1555,7 +1520,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void pauseMCMusic() {
-        Minecraft.getInstance().getSoundManager().pause();
+        Minecraft.getInstance().getSoundManager().pauseAllExcept();
     }
 
     @Override

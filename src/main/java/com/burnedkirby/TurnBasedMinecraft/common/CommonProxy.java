@@ -5,7 +5,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +34,13 @@ public class CommonProxy
     {
         attackerViaBow = new HashSet<AttackerViaBow>();
         editingPlayers = new Hashtable<Integer, EditingInfo>();
+
+        LivingAttackEvent.BUS.addListener(AttackEventHandler::entityAttacked);
+        LivingChangeTargetEvent.BUS.addListener(AttackEventHandler::entityTargeted);
+        EntityTravelToDimensionEvent.BUS.addListener(Priority.NORMAL, DimensionChangedHandler::dimensionChanged);
+        LivingHurtEvent.BUS.addListener(HurtEventHandler::handleHurtEvent);
+        EntityJoinLevelEvent.BUS.addListener(Priority.NORMAL, PlayerJoinEventHandler::entityJoinHandler);
+
         initializeClient();
         logger.debug("Init proxy for com_burnedkirby_turnbasedminecraft");
     }

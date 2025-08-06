@@ -5,6 +5,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -44,7 +45,9 @@ public class PacketClientGui {
         @Override
         public void accept(PacketClientGui pkt, CustomPayloadEvent.Context ctx) {
             ctx.enqueueWork(() -> {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.showClientConfigGui());
+                if (FMLEnvironment.dist.isClient()) {
+                    TurnBasedMinecraftMod.proxy.showClientConfigGui();
+                }
             });
             ctx.setPacketHandled(true);
         }

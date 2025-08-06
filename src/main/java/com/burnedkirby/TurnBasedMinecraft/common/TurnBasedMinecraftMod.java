@@ -23,14 +23,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,9 +72,9 @@ public class TurnBasedMinecraftMod {
     public static CommonProxy proxy;
 
     public TurnBasedMinecraftMod(FMLJavaModLoadingContext ctx) {
-        ctx.getModEventBus().addListener(this::firstInit);
-        ctx.getModEventBus().addListener(this::secondInitClient);
-        ctx.getModEventBus().addListener(this::secondInitServer);
+        FMLCommonSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::firstInit);
+        FMLClientSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitClient);
+        FMLDedicatedServerSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitServer);
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -82,7 +82,7 @@ public class TurnBasedMinecraftMod {
     }
 
     private void firstInit(final FMLCommonSetupEvent event) {
-        proxy = DistExecutor.unsafeRunForDist(() -> () -> new ClientProxy(), () -> () -> new CommonProxy());
+        proxy = FMLEnvironment.dist.isClient() ? new ClientProxy() : new CommonProxy();
         proxy.setLogger(logger);
         proxy.initialize();
 
@@ -127,12 +127,6 @@ public class TurnBasedMinecraftMod {
             .decoder(new PacketBattlePing.Decoder())
             .consumerNetworkThread(new PacketBattlePing.Consumer())
             .add();
-
-        // register event handler(s)
-        MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
-        MinecraftForge.EVENT_BUS.register(new PlayerJoinEventHandler());
-        MinecraftForge.EVENT_BUS.register(new DimensionChangedHandler());
-        MinecraftForge.EVENT_BUS.register(new HurtEventHandler());
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
@@ -1129,11 +1123,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(category);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_battle_types remove " + category))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove category"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1672,11 +1664,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources remove " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove type"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1694,11 +1684,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.YELLOW)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources add " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to add type")
                                         )));
                                     response.getSiblings().add(subResponse);

@@ -11,12 +11,11 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
 
 public class AttackEventHandler
 {
-    private boolean isAttackerValid(LivingAttackEvent event)
+    private static boolean isAttackerValid(LivingAttackEvent event)
     {
         if(event.getSource().getEntity() == null)
         {
@@ -58,12 +57,12 @@ public class AttackEventHandler
         }
     }
     
-    @SubscribeEvent
-    public void entityAttacked(LivingAttackEvent event)
+    public static boolean entityAttacked(LivingAttackEvent event)
     {
+        boolean ret = false;
         if(event.getEntity().level().isClientSide)
         {
-            return;
+            return ret;
         }
         CommonProxy proxy = TurnBasedMinecraftMod.proxy;
         Config config = proxy.getConfig();
@@ -76,14 +75,14 @@ public class AttackEventHandler
                 if(editingInfo != null && editingInfo.isPendingEntitySelection)
                 {
                     editingInfo.isPendingEntitySelection = false;
-                    event.setCanceled(true);
+                    ret = true;
                     if(editingInfo.isEditingCustomName)
                     {
                     	if(!event.getEntity().hasCustomName())
                         {
                             TurnBasedMinecraftMod.logger.error("Cannot edit custom name from entity without custom name");
                             TurnBasedMinecraftMod.getHandler().send(new PacketGeneralMessage("Cannot edit custom name from entity without custom name"), PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor));
-                            return;
+                            return ret;
                         }
                         editingInfo.entityInfo = config.getCustomEntityInfo(event.getEntity().getCustomName().getString());
                         if(editingInfo.entityInfo == null)
@@ -111,19 +110,19 @@ public class AttackEventHandler
                         TurnBasedMinecraftMod.logger.info("Begin editing \"" + editingInfo.entityInfo.classType.getName() + "\"");
                         TurnBasedMinecraftMod.getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.PICK_EDIT, editingInfo.entityInfo), PacketDistributor.PLAYER.with((ServerPlayer)editingInfo.editor));
                     }
-                    return;
+                    return ret;
                 }
             }
         }
         if(event.getEntity() != null && event.getSource().getEntity() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getId()) || battleManager.isRecentlyLeftBattle(event.getSource().getEntity().getId())))
         {
             if(event.getSource().getEntity() instanceof Creeper && TurnBasedMinecraftMod.proxy.getConfig().getCreeperAlwaysAllowDamage()) {
-                event.setCanceled(false);
+                ret = false;
             } else {
 //            TurnBasedMinecraftMod.logger.debug("Canceled attack");
-                event.setCanceled(true);
+                ret = true;
             }
-            return;
+            return ret;
         }
         else if(!isAttackerValid(event)
                 && event.getEntity() != null
@@ -135,7 +134,7 @@ public class AttackEventHandler
                 && battleManager.checkAttack(event))
         {
 //            TurnBasedMinecraftMod.logger.debug("Canceled LivingAttackEvent between " + TurnBasedMinecraftMod.proxy.getAttackingEntity() + " and " + event.getEntity());
-            event.setCanceled(true);
+            ret = true;
         } else {
 //            TurnBasedMinecraftMod.logger.debug("Did not cancel attack");
         }
@@ -144,10 +143,11 @@ public class AttackEventHandler
         {
             TurnBasedMinecraftMod.proxy.setAttackingDamage((int) event.getAmount());
         }
+
+        return ret;
     }
     
-    @SubscribeEvent
-    public void entityTargeted(LivingChangeTargetEvent event)
+    public static void entityTargeted(LivingChangeTargetEvent event)
     {
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
         BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();

@@ -376,7 +376,7 @@ public class BattleGui extends Screen {
 					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.SWITCH_ITEM, button.getID()),
 					PacketDistributor.SERVER.noArg());
 				if (button.getID() >= 0 && button.getID() < 9) {
-					Minecraft.getInstance().player.getInventory().selected = button.getID();
+					Minecraft.getInstance().player.getInventory().setSelectedSlot(button.getID());
 				}
 				setState(MenuState.WAITING);
 				break;
