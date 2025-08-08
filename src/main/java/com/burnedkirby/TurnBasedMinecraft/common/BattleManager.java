@@ -327,6 +327,14 @@ public class BattleManager
         recentlyLeftBattle.put(c.entity.getId(), c);
         entityToBattleMap.remove(new EntityIDDimPair(c.entity));
     }
+
+    protected void addRecentlyLeftBattleNotifyPlayer(Player p) {
+        Combatant c = new Combatant();
+        c.time = System.nanoTime();
+        c.entity = p;
+        recentlyLeftBattle.put(p.getId(), c);
+        TurnBasedMinecraftMod.getHandler().send(new PacketGeneralMessage("Just logged in, battle disabled for " + TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownSeconds() + " seconds..."), PacketDistributor.PLAYER.with((ServerPlayer) p));
+    }
     
     protected void updateRecentlyLeftBattle()
     {

@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
@@ -123,6 +124,13 @@ public class TurnBasedMinecraftMod {
         }
 
         proxy.getConfig().clearBattleIgnoringPlayers();
+    }
+
+    @SubscribeEvent
+    public void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
+        // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
+        // Don't check if only on client or server side so that this works on singleplayer or multiplayer.
+        proxy.getBattleManager().addRecentlyLeftBattleNotifyPlayer(event.getEntity());
     }
 
     @SubscribeEvent
