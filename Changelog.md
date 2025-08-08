@@ -1,5 +1,37 @@
 # Upcoming changes
 
+Update to Forge 58.0.5-MC1.21.8.
+
+Fix custom buttons not working due to button implementation changes since last
+MC version.
+
+Add config for mobs "HappyGhast" and "Creaking".
+
+Fix config entries for mobs "Sheep" and "Wolf".
+
+Add a comment/note in TBM\_Config.toml about entity entries' names.
+
+Add a check for entity entries that do not exist as a class in Modded MC that
+will print warnings.
+
+Internal refactorings related to Battle.java (explicit enums in switch stmts).
+
+Fix "Creeper" behavior in turn-based battle.
+
+Fix usage of deprecated functions, including reworking registration of networked
+packets.
+
+Add a "battle-cooldown" for Players on join that lasts as long as post-battle
+cooldown.
+
+Fix battle music still playing after logging out of server or leaving a
+single-player world.
+
+Implement mobs holding weapons in their main hand to have the weapon's damage as
+part of damage calculations during turn-based battle.
+
+Add a scroll-bar to client-config-GUI.
+
 # Version Forge-1.26.5
 
 Update TBM\_Config.toml to have haste\_speed and slow\_speed for all mob
