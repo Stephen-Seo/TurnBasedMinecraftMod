@@ -1515,7 +1515,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void showClientConfigGui() {
-        Minecraft.getInstance().setScreen(new ClientConfigGui());
+        Minecraft.getInstance().setScreen(new ClientConfigGui(null));
     }
 
     @Override
