@@ -1,48 +1,34 @@
 package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import com.burnedkirby.TurnBasedMinecraft.common.Battle;
-import com.burnedkirby.TurnBasedMinecraft.common.Battle.Decision;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-public class PacketBattleDecision
+public record PacketBattleDecision(int battleID, int decision, int targetIDOrItemID) implements CustomPacketPayload
 {
-    private int battleID;
-    private Battle.Decision decision;
-    private int targetIDOrItemID;
-    
-    public PacketBattleDecision() {}
-    
-    public PacketBattleDecision(int battleID, Battle.Decision decision, int targetIDOrItemID)
-    {
-        this.battleID = battleID;
-        this.decision = decision;
-        this.targetIDOrItemID = targetIDOrItemID;
-    }
+    public static final CustomPacketPayload.Type<PacketBattleDecision> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattledecision"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketBattleDecision> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
+            PacketBattleDecision::battleID,
+            ByteBufCodecs.VAR_INT,
+            PacketBattleDecision::decision,
+            ByteBufCodecs.INT,
+            PacketBattleDecision::targetIDOrItemID,
+            PacketBattleDecision::new
+    );
 
-    public static class Encoder implements BiConsumer<PacketBattleDecision, RegistryFriendlyByteBuf> {
-        public Encoder() {}
-
-        @Override
-        public void accept(PacketBattleDecision pkt, RegistryFriendlyByteBuf buf) {
-            buf.writeInt(pkt.battleID);
-            buf.writeInt(pkt.decision.getValue());
-            buf.writeInt(pkt.targetIDOrItemID);
-        }
-    }
-
-    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketBattleDecision> {
-        public Decoder() {}
-
-        @Override
-        public PacketBattleDecision apply(RegistryFriendlyByteBuf buf) {
-            return new PacketBattleDecision(buf.readInt(), Decision.valueOf(buf.readInt()), buf.readInt());
-        }
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public static class Consumer implements BiConsumer<PacketBattleDecision, CustomPayloadEvent.Context> {
@@ -55,7 +41,7 @@ public class PacketBattleDecision
                 if(b != null)
                 {
                     ServerPlayer player = ctx.getSender();
-                    b.setDecision(player.getId(), pkt.decision, pkt.targetIDOrItemID);
+                    b.setDecision(player.getId(), Battle.Decision.valueOf(pkt.decision), pkt.targetIDOrItemID);
                 }
             });
             ctx.setPacketHandled(true);

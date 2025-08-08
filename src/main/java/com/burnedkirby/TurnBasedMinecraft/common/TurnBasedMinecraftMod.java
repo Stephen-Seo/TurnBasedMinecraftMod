@@ -89,46 +89,16 @@ public class TurnBasedMinecraftMod {
         proxy.initialize();
 
         // register packets
-        HANDLER.messageBuilder(PacketBattleInfo.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketBattleInfo.Encoder())
-            .decoder(new PacketBattleInfo.Decoder())
-            .consumerNetworkThread(new PacketBattleInfo.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattleRequestInfo.class, NetworkDirection.PLAY_TO_SERVER)
-            .encoder(new PacketBattleRequestInfo.Encoder())
-            .decoder(new PacketBattleRequestInfo.Decoder())
-            .consumerNetworkThread(new PacketBattleRequestInfo.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattleDecision.class, NetworkDirection.PLAY_TO_SERVER)
-            .encoder(new PacketBattleDecision.Encoder())
-            .decoder(new PacketBattleDecision.Decoder())
-            .consumerNetworkThread(new PacketBattleDecision.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattleMessage.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketBattleMessage.Encoder())
-            .decoder(new PacketBattleMessage.Decoder())
-            .consumerNetworkThread(new PacketBattleMessage.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketGeneralMessage.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketGeneralMessage.Encoder())
-            .decoder(new PacketGeneralMessage.Decoder())
-            .consumerNetworkThread(new PacketGeneralMessage.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketEditingMessage.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketEditingMessage.Encoder())
-            .decoder(new PacketEditingMessage.Decoder())
-            .consumerNetworkThread(new PacketEditingMessage.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketClientGui.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketClientGui.Encoder())
-            .decoder(new PacketClientGui.Decoder())
-            .consumerNetworkThread(new PacketClientGui.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattlePing.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketBattlePing.Encoder())
-            .decoder(new PacketBattlePing.Decoder())
-            .consumerNetworkThread(new PacketBattlePing.Consumer())
-            .add();
+        HANDLER.play().clientbound()
+            .add(PacketBattleInfo.class, PacketBattleInfo.STREAM_CODEC, new PacketBattleInfo.Consumer())
+            .add(PacketBattleMessage.class, PacketBattleMessage.STREAM_CODEC, new PacketBattleMessage.Consumer())
+            .add(PacketGeneralMessage.class, PacketGeneralMessage.STREAM_CODEC, new PacketGeneralMessage.Consumer())
+            .add(PacketEditingMessage.class, PacketEditingMessage.STREAM_CODEC, new PacketEditingMessage.Consumer())
+            .add(PacketClientGui.class, PacketClientGui.STREAM_CODEC, new PacketClientGui.Consumer())
+            .add(PacketBattlePing.class, PacketBattlePing.STREAM_CODEC, new PacketBattlePing.Consumer());
+        HANDLER.play().serverbound()
+            .add(PacketBattleRequestInfo.class, PacketBattleRequestInfo.STREAM_CODEC, new PacketBattleRequestInfo.Consumer())
+            .add(PacketBattleDecision.class, PacketBattleDecision.STREAM_CODEC, new PacketBattleDecision.Consumer());
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
@@ -1788,7 +1758,7 @@ public class TurnBasedMinecraftMod {
         event.getDispatcher().register(
             Commands.literal("tbm-client-edit").executes(c -> {
                 ServerPlayer player = c.getSource().getPlayerOrException();
-                getHandler().send(new PacketClientGui(), PacketDistributor.PLAYER.with(player));
+                getHandler().send(new PacketClientGui(0), PacketDistributor.PLAYER.with(player));
                 return 1;
             })
         );
