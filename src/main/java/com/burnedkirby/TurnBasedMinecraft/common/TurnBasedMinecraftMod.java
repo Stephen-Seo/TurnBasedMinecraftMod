@@ -19,6 +19,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -131,6 +132,14 @@ public class TurnBasedMinecraftMod {
         // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
         // Don't check if only on client or server side so that this works on singleplayer or multiplayer.
         proxy.getBattleManager().addRecentlyLeftBattleNotifyPlayer(event.getEntity());
+    }
+
+    @SubscribeEvent
+    public void playerLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        if (FMLEnvironment.dist.isClient()) {
+            // Stop playing battle music if player logged out.
+            proxy.stopMusic(true);
+        }
     }
 
     @SubscribeEvent
