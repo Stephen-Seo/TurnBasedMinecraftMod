@@ -21,9 +21,6 @@ Internal refactorings related to Battle.java (explicit enums in switch stmts).
 
 Fix usage of some deprecated functions.
 
-Add a "battle-cooldown" for Players on join that lasts as long as post-battle
-cooldown.
-
 Fix "Creeper" behavior in turn-based battle.
 
 Add a "battle-cooldown" for Players on join that lasts as long as post-battle
