@@ -10,10 +10,16 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -268,28 +274,27 @@ public class BattleGui extends Screen {
 		}
 
 		updateState();
+
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+
 		if (showingEntities) {
 			int y = 30;
-			try {
-				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideAEntrySet()) {
-					if (e.getValue().entity instanceof LivingEntity lEntity) {
-						InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width / 4 - 60 - 20, y, width / 4 - 60, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
-					}
-					y += 20;
-				}
-			} catch(ConcurrentModificationException e) {}
+            for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideAEntrySet()) {
+                if (e.getValue().entity instanceof LivingEntity) {
+                    //InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width / 4 - 60 - 20, y, width / 4 - 60, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
+                    drawEntity(guiGraphics, (LivingEntity) e.getValue().entity, width / 4 - 60 - 20, y, width / 4 - 60, y + 20, mouseX, mouseY, width, height);
+                }
+                y += 20;
+            }
 			y = 30;
-			try {
-				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideBEntrySet()) {
-					if (e.getValue().entity instanceof LivingEntity lEntity) {
-						InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width * 3 / 4 - 60 + 120, y, width * 3 / 4 - 60 + 140, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
-					}
-					y += 20;
-				}
-			} catch(ConcurrentModificationException e) {}
+            for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideBEntrySet()) {
+                if (e.getValue().entity instanceof LivingEntity) {
+                    //InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width * 3 / 4 - 60 + 120, y, width * 3 / 4 - 60 + 140, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
+                    drawEntity(guiGraphics, (LivingEntity) e.getValue().entity, width * 3 / 4 - 60 + 120, y, width * 3 / 4 - 60 + 140, y + 20, mouseX, mouseY, width, height);
+                }
+                y += 20;
+            }
 		}
-
-		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
 		String timeRemainingString = "Time remaining: ";
 		int timeRemainingInt = timeRemaining.get();
@@ -437,4 +442,36 @@ public class BattleGui extends Screen {
 	public void setTurnTimerMax(int timerMax) {
 		this.timerMax = timerMax;
 	}
+
+    public static void drawEntity(GuiGraphics guiGraphics, LivingEntity entity, int x1, int y1, int x2, int y2, int mouseX, int mouseY, int width, int height) {
+        guiGraphics.enableScissor(x1, y1, x2, y2);
+
+        final float prev_y_rot_body = entity.yBodyRot;
+        entity.yBodyRot = 0.0F;
+
+        final float prev_y_rot_head = entity.yHeadRot;
+        entity.yHeadRot = 0.0F;
+
+        // -1.0 is up, 1.0 is down
+        final float upToDown = ((float)mouseY / (float)height - 0.5F) * 2.0F;
+        // -1.0 is left, 1.0 is right
+        final float leftToRight = ((float)mouseX / (float)width - 0.5F) * 2.0F;
+
+        final Vector3f v3f = new Vector3f(0.0F, entity.getBbHeight() / 2.0F, 0.0F);
+        Quaternionf q1 = new Quaternionf()
+                .rotateZ((float)Math.PI)
+                .rotateY((float)Math.PI + leftToRight * (float)Math.PI / 3.0F)
+                .rotateX(upToDown * (float)Math.PI / 8.0F);
+        final float scale = 7.0F / entity.getScale();
+        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        EntityRenderer<? super LivingEntity, ?> entityRenderer = entityRenderDispatcher.getRenderer(entity);
+        EntityRenderState entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
+        entityRenderState.hitboxesRenderState = null;
+        guiGraphics.submitEntityRenderState(entityRenderState, scale, v3f, q1, new Quaternionf(), x1, y1, x2, y2);
+
+        entity.yBodyRot = prev_y_rot_body;
+        entity.yHeadRot = prev_y_rot_head;
+
+        guiGraphics.disableScissor();
+    }
 }
