@@ -71,7 +71,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Recommended for development - enables more descriptive errors at the cost of slower startup and registration.
-            property 'eventbus.api.strictRuntimeChecks', 'true'
+            //property 'eventbus.api.strictRuntimeChecks', 'true'
 
 //            arg "-mixin.config=${mod_id}.mixins.json"
         }
