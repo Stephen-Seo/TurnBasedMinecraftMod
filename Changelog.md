@@ -1,5 +1,7 @@
 # Upcoming changes
 
+Bump mod version to 1.27.0 .
+
 Port `neoforge_dev` to NeoForge 21.8.23-MC1.21.8 and fixes related to new
 version changes (including a fix for custom buttons not responding to clicks).
 
