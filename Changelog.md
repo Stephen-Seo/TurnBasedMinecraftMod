@@ -1,8 +1,10 @@
 # Upcoming changes
 
+# Version Forge-1.27.0
+
 Bump mod version to 1.27.0
 
-Update to Forge 58.0.5-MC1.21.8.
+Update to Forge 58.0.10-MC1.21.8.
 
 Fix custom buttons not working due to button implementation changes since last
 MC version.
