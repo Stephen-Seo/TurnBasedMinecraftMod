@@ -3,17 +3,35 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 import com.burnedkirby.TurnBasedMinecraft.common.EntityInfo;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class PacketEditingMessage
+public class PacketEditingMessage implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<PacketEditingMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packeteditingmessage"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketEditingMessage> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT.map(Type::valueOf, Type::getValue),
+            PacketEditingMessage::getType,
+            StreamCodec.ofMember(EntityInfo::encode, EntityInfo::new),
+            PacketEditingMessage::getEntityInfo,
+            PacketEditingMessage::new
+    );
+
+    @Override
+    public CustomPacketPayload.@NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
     public enum Type
     {
         ATTACK_ENTITY(0),
@@ -162,7 +180,9 @@ public class PacketEditingMessage
         @Override
         public void accept(PacketEditingMessage pkt, CustomPayloadEvent.Context ctx) {
             ctx.enqueueWork(() -> {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
+                if (FMLEnvironment.dist.isClient()) {
+                    TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
+                }
             });
             ctx.setPacketHandled(true);
         }

@@ -2,40 +2,30 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class PacketClientGui {
-    int reserved;
+public record PacketClientGui(int reserved) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<PacketClientGui> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetclientgui"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketClientGui> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
+            PacketClientGui::reserved,
+            PacketClientGui::new
+    );
 
-    public PacketClientGui() {
-        reserved = 0;
-    }
-
-    public PacketClientGui(int reserved) {
-        this.reserved = reserved;
-    }
-
-    public static class Encoder implements BiConsumer<PacketClientGui, RegistryFriendlyByteBuf> {
-        public Encoder() {}
-
-        @Override
-        public void accept(PacketClientGui pkt, RegistryFriendlyByteBuf buf) {
-            buf.writeInt(pkt.reserved);
-        }
-    }
-
-    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketClientGui> {
-        public Decoder() {}
-
-        @Override
-        public PacketClientGui apply(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-            return new PacketClientGui(registryFriendlyByteBuf.readInt());
-        }
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public static class Consumer implements BiConsumer<PacketClientGui, CustomPayloadEvent.Context> {
@@ -44,7 +34,9 @@ public class PacketClientGui {
         @Override
         public void accept(PacketClientGui pkt, CustomPayloadEvent.Context ctx) {
             ctx.enqueueWork(() -> {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.showClientConfigGui());
+                if (FMLEnvironment.dist.isClient()) {
+                    TurnBasedMinecraftMod.proxy.showClientConfigGui();
+                }
             });
             ctx.setPacketHandled(true);
         }

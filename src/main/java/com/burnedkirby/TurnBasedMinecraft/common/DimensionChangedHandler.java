@@ -3,12 +3,10 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
 
 public class DimensionChangedHandler {
-    @SubscribeEvent
-    public void dimensionChanged(EntityTravelToDimensionEvent event) {
+    public static void dimensionChanged(EntityTravelToDimensionEvent event) {
         if(event.getEntity().level().isClientSide) {
             return;
         }

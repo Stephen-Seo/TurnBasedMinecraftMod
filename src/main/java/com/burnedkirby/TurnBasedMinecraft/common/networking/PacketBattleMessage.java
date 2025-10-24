@@ -3,19 +3,44 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.burnedkirby.TurnBasedMinecraft.common.Utility;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-public class PacketBattleMessage
+public class PacketBattleMessage implements CustomPacketPayload
 {
+    public static final CustomPacketPayload.Type<PacketBattleMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattlemessage"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketBattleMessage> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT.map(MessageType::valueOf, MessageType::getValue),
+            PacketBattleMessage::getMessageType,
+            ByteBufCodecs.INT,
+            PacketBattleMessage::getEntityIDFrom,
+            ByteBufCodecs.INT,
+            PacketBattleMessage::getEntityIDTo,
+            ByteBufCodecs.STRING_UTF8.map(Utility::deserializeDimension, Utility::serializeDimension),
+            PacketBattleMessage::getDimension,
+            ByteBufCodecs.INT,
+            PacketBattleMessage::getAmount,
+            ByteBufCodecs.STRING_UTF8,
+            PacketBattleMessage::getCustom,
+            PacketBattleMessage::new
+    );
+
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
     public enum MessageType
     {
         ENTERED(0),
@@ -155,43 +180,15 @@ public class PacketBattleMessage
         this.custom = custom;
     }
 
-    public static class Encoder implements BiConsumer<PacketBattleMessage, RegistryFriendlyByteBuf> {
-        public Encoder() {}
-
-        @Override
-        public void accept(PacketBattleMessage pkt, RegistryFriendlyByteBuf buf) {
-            buf.writeInt(pkt.messageType.getValue());
-            buf.writeInt(pkt.entityIDFrom);
-            buf.writeInt(pkt.entityIDTo);
-            buf.writeUtf(Utility.serializeDimension(pkt.dimension));
-            buf.writeInt(pkt.amount);
-            buf.writeUtf(pkt.custom);
-        }
-    }
-
-    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketBattleMessage> {
-        public Decoder() {}
-
-        @Override
-        public PacketBattleMessage apply(RegistryFriendlyByteBuf buf) {
-            return new PacketBattleMessage(
-                MessageType.valueOf(
-                    buf.readInt()),
-                buf.readInt(),
-                buf.readInt(),
-                Utility.deserializeDimension(buf.readUtf()),
-                buf.readInt(),
-                buf.readUtf());
-        }
-    }
-
     public static class Consumer implements BiConsumer<PacketBattleMessage, CustomPayloadEvent.Context> {
         public Consumer() {}
 
         @Override
         public void accept(PacketBattleMessage pkt, CustomPayloadEvent.Context ctx) {
             ctx.enqueueWork(() -> {
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx));
+                if (FMLEnvironment.dist.isClient()) {
+                    TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
+                }
             });
             ctx.setPacketHandled(true);
         }

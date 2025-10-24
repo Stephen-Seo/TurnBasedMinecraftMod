@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
+import net.minecraftforge.eventbus.api.listener.EventListener;
 import net.minecraftforge.network.PacketDistributor;
 import org.apache.logging.log4j.Logger;
 
@@ -24,6 +25,7 @@ public class BattleManager
     private BattleUpdater battleUpdater;
     private Map<EntityIDDimPair, Integer> entityToBattleMap;
     private EntityIDDimPair tempIDPair;
+    private Collection<EventListener> eventListeners;
 
     public BattleManager(Logger logger)
     {
@@ -32,8 +34,8 @@ public class BattleManager
         recentlyLeftBattle = new HashMap<Integer, Combatant>();
         battleUpdater = new BattleUpdater(this);
         entityToBattleMap = new HashMap<EntityIDDimPair, Integer>();
-        MinecraftForge.EVENT_BUS.register(battleUpdater);
         tempIDPair = new EntityIDDimPair();
+        eventListeners = new LinkedList<>();
     }
     
     /**
@@ -307,7 +309,10 @@ public class BattleManager
     public void cleanup()
     {
         battleUpdater.setRunning(false);
-        MinecraftForge.EVENT_BUS.unregister(battleUpdater);
+        if (!eventListeners.isEmpty()) {
+            MinecraftForge.EVENT_BUS.unregister(eventListeners);
+        }
+        eventListeners.clear();
         battleMap.clear();
         battleUpdater = null;
     }
@@ -321,6 +326,14 @@ public class BattleManager
         }
         recentlyLeftBattle.put(c.entity.getId(), c);
         entityToBattleMap.remove(new EntityIDDimPair(c.entity));
+    }
+
+    protected void addRecentlyLeftBattleNotifyPlayer(Player p) {
+        Combatant c = new Combatant();
+        c.time = System.nanoTime();
+        c.entity = p;
+        recentlyLeftBattle.put(p.getId(), c);
+        TurnBasedMinecraftMod.getHandler().send(new PacketGeneralMessage("Just logged in, battle disabled for " + TurnBasedMinecraftMod.proxy.getConfig().getLeaveBattleCooldownSeconds() + " seconds..."), PacketDistributor.PLAYER.with((ServerPlayer) p));
     }
     
     protected void updateRecentlyLeftBattle()
@@ -368,5 +381,9 @@ public class BattleManager
             tempIDPair.dim = entity.level().dimension();
             return entityToBattleMap.keySet().contains(tempIDPair);
         }
+    }
+
+    protected void addEventListener(Collection<EventListener> listeners) {
+        eventListeners.addAll(listeners);
     }
 }

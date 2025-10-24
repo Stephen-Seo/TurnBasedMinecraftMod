@@ -26,6 +26,7 @@ public class Combatant
     public float pitch;
     public long time;
     public int creeperTurns;
+    public boolean willCreeperExplode;
     
     public Combatant()
     {
@@ -33,6 +34,7 @@ public class Combatant
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
         creeperTurns = 1;
+        willCreeperExplode = false;
     }
     
     public Combatant(Entity e, EntityInfo entityInfo)
@@ -43,6 +45,7 @@ public class Combatant
         recalcSpeedOnCompare = false;
         remainingDefenses = 0;
         creeperTurns = 1;
+        willCreeperExplode = false;
     }
     
     /**
@@ -60,11 +63,11 @@ public class Combatant
                 boolean isSlow = false;
                 for(MobEffectInstance e : c0Entity.getActiveEffects())
                 {
-                    if(e.getEffect().equals(MobEffects.MOVEMENT_SPEED) || e.getEffect().equals(MobEffects.DIG_SPEED))
+                    if(e.getEffect().equals(MobEffects.SPEED) || e.getEffect().equals(MobEffects.HASTE))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffect().equals(MobEffects.MOVEMENT_SLOWDOWN) || e.getEffect().equals(MobEffects.DIG_SLOWDOWN))
+                    else if(e.getEffect().equals(MobEffects.SLOWNESS) || e.getEffect().equals(MobEffects.MINING_FATIGUE))
                     {
                         isSlow = true;
                     }
@@ -94,11 +97,11 @@ public class Combatant
                 boolean isSlow = false;
                 for(MobEffectInstance e : c1Entity.getActiveEffects())
                 {
-                    if(e.getEffect().equals(MobEffects.MOVEMENT_SPEED))
+                    if(e.getEffect().equals(MobEffects.SPEED))
                     {
                         isHaste = true;
                     }
-                    else if(e.getEffect().equals(MobEffects.MOVEMENT_SLOWDOWN))
+                    else if(e.getEffect().equals(MobEffects.SLOWNESS))
                     {
                         isSlow = true;
                     }
@@ -134,5 +137,9 @@ public class Combatant
                 return 0;
             }
         }
+    }
+
+    public void setWillCreeperExplode(boolean willExplode) {
+        willCreeperExplode = willExplode;
     }
 }

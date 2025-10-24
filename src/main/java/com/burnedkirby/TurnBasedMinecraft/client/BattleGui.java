@@ -321,7 +321,7 @@ public class BattleGui extends Screen {
 			break;
 		case DEFEND:
 			TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
-				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.DEFEND, 0),
+				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.DEFEND.getValue(), 0),
 				PacketDistributor.SERVER.noArg());
 			setState(MenuState.WAITING);
 			break;
@@ -330,7 +330,7 @@ public class BattleGui extends Screen {
 			break;
 		case FLEE:
 			TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
-				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.FLEE, 0),
+				TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.FLEE.getValue(), 0),
 				PacketDistributor.SERVER.noArg());
 			setState(MenuState.WAITING);
 			break;
@@ -361,7 +361,7 @@ public class BattleGui extends Screen {
 	protected void entityButtonActionEvent(EntitySelectionButton button, ButtonAction action) {
 		if (action.equals(ButtonAction.ATTACK_TARGET)) {
 			TurnBasedMinecraftMod.getHandler().send(new PacketBattleDecision(
-					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.ATTACK, button.getID()),
+					TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.ATTACK.getValue(), button.getID()),
 				PacketDistributor.SERVER.noArg());
 			setState(MenuState.WAITING);
 		} else {
@@ -373,16 +373,16 @@ public class BattleGui extends Screen {
 		switch (action) {
 			case DO_ITEM_SWITCH:
 				TurnBasedMinecraftMod.getHandler().send(
-					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.SWITCH_ITEM, button.getID()),
+					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.SWITCH_ITEM.getValue(), button.getID()),
 					PacketDistributor.SERVER.noArg());
 				if (button.getID() >= 0 && button.getID() < 9) {
-					Minecraft.getInstance().player.getInventory().selected = button.getID();
+					Minecraft.getInstance().player.getInventory().setSelectedSlot(button.getID());
 				}
 				setState(MenuState.WAITING);
 				break;
 			case DO_USE_ITEM:
 				TurnBasedMinecraftMod.getHandler().send(
-					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.USE_ITEM, button.getID()),
+					new PacketBattleDecision(TurnBasedMinecraftMod.proxy.getLocalBattle().getId(), Battle.Decision.USE_ITEM.getValue(), button.getID()),
 					PacketDistributor.SERVER.noArg());
 				setState(MenuState.WAITING);
 				break;

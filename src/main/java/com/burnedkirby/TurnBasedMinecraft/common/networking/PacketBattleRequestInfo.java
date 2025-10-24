@@ -3,38 +3,27 @@ package com.burnedkirby.TurnBasedMinecraft.common.networking;
 import com.burnedkirby.TurnBasedMinecraft.common.Battle;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.network.CustomPayloadEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-public class PacketBattleRequestInfo
+public record PacketBattleRequestInfo(int battleID) implements CustomPacketPayload
 {
-    private int battleID;
-    
-    public PacketBattleRequestInfo() {}
-    
-    public PacketBattleRequestInfo(int battleID)
-    {
-        this.battleID = battleID;
-    }
+    public static final CustomPacketPayload.Type<PacketBattleRequestInfo> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattlerequestinfo"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketBattleRequestInfo> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
+            PacketBattleRequestInfo::battleID,
+            PacketBattleRequestInfo::new
+    );
 
-    public static class Encoder implements BiConsumer<PacketBattleRequestInfo, RegistryFriendlyByteBuf> {
-        public Encoder() {}
-
-        @Override
-        public void accept(PacketBattleRequestInfo pkt, RegistryFriendlyByteBuf buf) {
-            buf.writeInt(pkt.battleID);
-        }
-    }
-
-    public static class Decoder implements Function<RegistryFriendlyByteBuf, PacketBattleRequestInfo> {
-        public Decoder() {}
-
-        @Override
-        public PacketBattleRequestInfo apply(RegistryFriendlyByteBuf buf) {
-            return new PacketBattleRequestInfo(buf.readInt());
-        }
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public static class Consumer implements BiConsumer<PacketBattleRequestInfo, CustomPayloadEvent.Context> {

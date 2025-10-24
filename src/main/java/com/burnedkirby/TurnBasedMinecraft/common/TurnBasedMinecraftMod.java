@@ -19,18 +19,21 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +42,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.26.5";
+    public static final String VERSION = "1.27.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -72,9 +75,10 @@ public class TurnBasedMinecraftMod {
     public static CommonProxy proxy;
 
     public TurnBasedMinecraftMod(FMLJavaModLoadingContext ctx) {
-        ctx.getModEventBus().addListener(this::firstInit);
-        ctx.getModEventBus().addListener(this::secondInitClient);
-        ctx.getModEventBus().addListener(this::secondInitServer);
+        FMLCommonSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::firstInit);
+        FMLClientSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitClient);
+        FMLDedicatedServerSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitServer);
+        FMLLoadCompleteEvent.getBus(ctx.getModBusGroup()).addListener(this::finalInit);
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -82,57 +86,21 @@ public class TurnBasedMinecraftMod {
     }
 
     private void firstInit(final FMLCommonSetupEvent event) {
-        proxy = DistExecutor.unsafeRunForDist(() -> () -> new ClientProxy(), () -> () -> new CommonProxy());
+        proxy = FMLEnvironment.dist.isClient() ? new ClientProxy() : new CommonProxy();
         proxy.setLogger(logger);
         proxy.initialize();
 
         // register packets
-        HANDLER.messageBuilder(PacketBattleInfo.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketBattleInfo.Encoder())
-            .decoder(new PacketBattleInfo.Decoder())
-            .consumerNetworkThread(new PacketBattleInfo.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattleRequestInfo.class, NetworkDirection.PLAY_TO_SERVER)
-            .encoder(new PacketBattleRequestInfo.Encoder())
-            .decoder(new PacketBattleRequestInfo.Decoder())
-            .consumerNetworkThread(new PacketBattleRequestInfo.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattleDecision.class, NetworkDirection.PLAY_TO_SERVER)
-            .encoder(new PacketBattleDecision.Encoder())
-            .decoder(new PacketBattleDecision.Decoder())
-            .consumerNetworkThread(new PacketBattleDecision.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattleMessage.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketBattleMessage.Encoder())
-            .decoder(new PacketBattleMessage.Decoder())
-            .consumerNetworkThread(new PacketBattleMessage.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketGeneralMessage.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketGeneralMessage.Encoder())
-            .decoder(new PacketGeneralMessage.Decoder())
-            .consumerNetworkThread(new PacketGeneralMessage.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketEditingMessage.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketEditingMessage.Encoder())
-            .decoder(new PacketEditingMessage.Decoder())
-            .consumerNetworkThread(new PacketEditingMessage.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketClientGui.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketClientGui.Encoder())
-            .decoder(new PacketClientGui.Decoder())
-            .consumerNetworkThread(new PacketClientGui.Consumer())
-            .add();
-        HANDLER.messageBuilder(PacketBattlePing.class, NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(new PacketBattlePing.Encoder())
-            .decoder(new PacketBattlePing.Decoder())
-            .consumerNetworkThread(new PacketBattlePing.Consumer())
-            .add();
-
-        // register event handler(s)
-        MinecraftForge.EVENT_BUS.register(new AttackEventHandler());
-        MinecraftForge.EVENT_BUS.register(new PlayerJoinEventHandler());
-        MinecraftForge.EVENT_BUS.register(new DimensionChangedHandler());
-        MinecraftForge.EVENT_BUS.register(new HurtEventHandler());
+        HANDLER.play().clientbound()
+            .add(PacketBattleInfo.class, PacketBattleInfo.STREAM_CODEC, new PacketBattleInfo.Consumer())
+            .add(PacketBattleMessage.class, PacketBattleMessage.STREAM_CODEC, new PacketBattleMessage.Consumer())
+            .add(PacketGeneralMessage.class, PacketGeneralMessage.STREAM_CODEC, new PacketGeneralMessage.Consumer())
+            .add(PacketEditingMessage.class, PacketEditingMessage.STREAM_CODEC, new PacketEditingMessage.Consumer())
+            .add(PacketClientGui.class, PacketClientGui.STREAM_CODEC, new PacketClientGui.Consumer())
+            .add(PacketBattlePing.class, PacketBattlePing.STREAM_CODEC, new PacketBattlePing.Consumer());
+        HANDLER.play().serverbound()
+            .add(PacketBattleRequestInfo.class, PacketBattleRequestInfo.STREAM_CODEC, new PacketBattleRequestInfo.Consumer())
+            .add(PacketBattleDecision.class, PacketBattleDecision.STREAM_CODEC, new PacketBattleDecision.Consumer());
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
@@ -145,6 +113,10 @@ public class TurnBasedMinecraftMod {
         proxy.postInit();
     }
 
+    private void finalInit(final FMLLoadCompleteEvent event) {
+        proxy.finalInit();
+    }
+
     @SubscribeEvent
     public void serverStarting(ServerStartingEvent event) {
         logger.debug("About to initialize BattleManager");
@@ -153,6 +125,21 @@ public class TurnBasedMinecraftMod {
         }
 
         proxy.getConfig().clearBattleIgnoringPlayers();
+    }
+
+    @SubscribeEvent
+    public void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
+        // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
+        // Don't check if only on client or server side so that this works on singleplayer or multiplayer.
+        proxy.getBattleManager().addRecentlyLeftBattleNotifyPlayer(event.getEntity());
+    }
+
+    @SubscribeEvent
+    public void playerLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        if (FMLEnvironment.dist.isClient()) {
+            // Stop playing battle music if player logged out.
+            proxy.stopMusic(true);
+        }
     }
 
     @SubscribeEvent
@@ -1129,11 +1116,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(category);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_battle_types remove " + category))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove category"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1672,11 +1657,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources remove " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove type"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1694,11 +1677,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.YELLOW)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources add " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to add type")
                                         )));
                                     response.getSiblings().add(subResponse);
@@ -1794,7 +1775,7 @@ public class TurnBasedMinecraftMod {
         event.getDispatcher().register(
             Commands.literal("tbm-client-edit").executes(c -> {
                 ServerPlayer player = c.getSource().getPlayerOrException();
-                getHandler().send(new PacketClientGui(), PacketDistributor.PLAYER.with(player));
+                getHandler().send(new PacketClientGui(0), PacketDistributor.PLAYER.with(player));
                 return 1;
             })
         );
