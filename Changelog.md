@@ -1,5 +1,43 @@
 # Upcoming changes
 
+# Version NeoForge-1.27.0
+
+Bump mod version to 1.27.0 .
+
+Port `neoforge_dev` to NeoForge 21.8.23-MC1.21.8 and fixes related to new
+version changes (including a fix for custom buttons not responding to clicks).
+
+Added entries in the server-side config for "HappyGhast" and "Creaking".
+
+Fix custom buttons not working due to button implementation changes since last
+MC version.
+
+Fix config entries for mobs "Sheep" and "Wolf".
+
+Add a comment/note in TBM\_Config.toml about entity entries' names.
+
+Add a check for entity entries that do not exist as a class in Modded MC that
+will print warnings.
+
+Minor fix in code "switch" block missing a "break" statement.
+
+Internal refactorings related to Battle.java (explicit enums in switch stmts).
+
+Fix usage of some deprecated functions.
+
+Fix "Creeper" behavior in turn-based battle.
+
+Add a "battle-cooldown" for Players on join that lasts as long as post-battle
+cooldown.
+
+Fix battle music still playing after logging out of server or leaving a
+single-player world.
+
+Add a scroll-bar to client-config-GUI.
+
+Implement mobs holding weapons in their main hand to have the weapon's damage as
+part of damage calculations during turn-based battle.
+
 # Version Forge-1.27.0
 
 Bump mod version to 1.27.0
