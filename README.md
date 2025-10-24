@@ -9,7 +9,6 @@ https://seodisparate.com/static/tbm_releases/
 https://burnedkirby.com/tbmm_downloads/  
 https://www.curseforge.com/minecraft/mc-mods/turnbasedminecraft/files  
 https://modrinth.com/mod/turnbasedmc  
-https://git.seodisparate.com/stephenseo/TurnBasedMinecraftMod/releases
 
 # Documentation Page
 
@@ -82,7 +81,7 @@ configured for them.)
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
 finished jar will be saved at
-`build/libs/TurnBasedMinecraft-NeoForge-1.26.5-all.jar`
+`build/libs/TurnBasedMinecraft-NeoForge-1.27.0-all.jar`
 
 # Reproducibility
 

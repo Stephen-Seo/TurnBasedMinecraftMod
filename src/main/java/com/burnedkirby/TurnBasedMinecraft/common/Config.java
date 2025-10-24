@@ -1953,4 +1953,36 @@ public class Config
             logger.warn(e);
         }
     }
+
+    public void verifyEntityNames() {
+        logger.info("Begin verifying Entity names for TurnBasedMC.");
+
+        File configFile = new File(TurnBasedMinecraftMod.CONFIG_FILE_PATH);
+        if (!configFile.exists()) {
+            logger.error("ERROR: TBM_Config.toml not found when verifying!");
+            logger.info("End verifying Entity names for TurnBasedMC with ERROR.");
+            return;
+        }
+        CommentedFileConfig conf = getConfigObj(configFile);
+
+        Collection<com.electronwill.nightconfig.core.Config> entities = conf.get("server_config.entity");
+        if (entities == null) {
+            logger.error("ERROR: TBM_Config.toml does not have [[server_config.entity]] options!");
+            logger.info("End verifying Entity names for TurnBasedMC with ERROR.");
+            return;
+        }
+
+        for (com.electronwill.nightconfig.core.Config nestedConf : entities) {
+            if (nestedConf.contains("name")) {
+                try {
+                    Class<?> c = Class.forName(nestedConf.get("name"));
+                } catch (Exception e) {
+                    logger.warn("WARNING: name \"{}\" from [[server_config.entity]] does not exist!", nestedConf.get("name").toString());
+                }
+            }
+        }
+
+        conf.close();
+        logger.info("End verifying Entity names for TurnBasedMC.");
+    }
 }

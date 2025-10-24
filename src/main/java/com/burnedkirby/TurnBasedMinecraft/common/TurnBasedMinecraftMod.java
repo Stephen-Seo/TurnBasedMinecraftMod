@@ -26,9 +26,12 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -41,7 +44,7 @@ import org.apache.logging.log4j.Logger;
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.26.5";
+    public static final String VERSION = "1.27.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -67,6 +70,7 @@ public class TurnBasedMinecraftMod {
         container.getEventBus().addListener(this::secondInitClient);
         container.getEventBus().addListener(this::secondInitServer);
         container.getEventBus().addListener(this::registerNetwork);
+        container.getEventBus().addListener(this::finalInit);
         NeoForge.EVENT_BUS.register(this);
         container.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_SPEC);
     }
@@ -107,6 +111,8 @@ public class TurnBasedMinecraftMod {
         NeoForge.EVENT_BUS.register(new PlayerJoinEventHandler());
         NeoForge.EVENT_BUS.register(new DimensionChangedHandler());
         NeoForge.EVENT_BUS.register(new HurtEventHandler());
+        NeoForge.EVENT_BUS.addListener(TurnBasedMinecraftMod::playerConnect);
+        NeoForge.EVENT_BUS.addListener(TurnBasedMinecraftMod::playerLoggingOut);
 
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
@@ -119,6 +125,10 @@ public class TurnBasedMinecraftMod {
         proxy.postInit();
     }
 
+    private void finalInit(final FMLLoadCompleteEvent event) {
+        proxy.finalInit();
+    }
+
     @SubscribeEvent
     public void serverStarting(ServerStartingEvent event) {
         logger.debug("About to initialize BattleManager");
@@ -127,6 +137,19 @@ public class TurnBasedMinecraftMod {
         }
 
         proxy.getConfig().clearBattleIgnoringPlayers();
+    }
+
+    private static void playerConnect(PlayerEvent.PlayerLoggedInEvent event) {
+        // Add newly connected players to "end of battle" cooldown so they don't immediately start battle.
+        // Don't check if only on client or server side so that this works on singleplayer or multiplayer.
+        proxy.getBattleManager().addRecentlyLeftBattleNotifyPlayer(event.getEntity());
+    }
+
+    private static void playerLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        if (FMLEnvironment.dist.isClient()) {
+            // Stop playing battle music if player logged out.
+            proxy.stopMusic(true);
+        }
     }
 
     @SubscribeEvent
@@ -1103,11 +1126,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(category);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_battle_types remove " + category))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove category"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1646,11 +1667,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.GREEN)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources remove " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to remove type"))));
                                     response.getSiblings().add(subResponse);
                                     isFirst = false;
@@ -1668,11 +1687,9 @@ public class TurnBasedMinecraftMod {
                                     subResponse = Component.literal(type);
                                     subResponse.setStyle(subResponse.getStyle()
                                         .withColor(ChatFormatting.YELLOW)
-                                        .withClickEvent(new ClickEvent(
-                                            ClickEvent.Action.RUN_COMMAND,
+                                        .withClickEvent(new ClickEvent.RunCommand(
                                             "/tbm-server-edit ignore_damage_sources add " + type))
-                                        .withHoverEvent(new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
+                                        .withHoverEvent(new HoverEvent.ShowText(
                                             Component.literal("Click to add type")
                                         )));
                                     response.getSiblings().add(subResponse);

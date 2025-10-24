@@ -65,10 +65,15 @@ public class ItemSelectionButton implements Renderable, GuiEventListener, Narrat
 
     @Override
     public boolean mouseClicked(double x, double y, int unknown) {
-        if (unknown == 0 && x >= this.x && y >= this.y && x <= (double)(this.x + this.width) && y <= (double)(this.y + this.height)) {
+        if (unknown == 0 && isMouseOver(x, y)) {
             onPress();
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 }

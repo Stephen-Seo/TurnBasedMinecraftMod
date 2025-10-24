@@ -12,7 +12,8 @@ do_not_overwrite = false
 [server_config]
 
 # Number of seconds that an entity cannot enter battle after having just left
-# one. Minimum 1, maximum 10.
+# one. Also determines number of seconds before a Player can enter battle after
+# logging in. Minimum 1, maximum 10.
 leave_battle_cooldown = 5
 
 # Maximum distance for a monster to start battle by targeting a player or other
@@ -97,8 +98,9 @@ player_only_battles = false
 
 
 # Each "server_config.entity" entry uses the following options:
-# name: full class name of the entity, cannot also have option "custom_name"
-# custom_name: custom name-tag name, cannot also have option "name"
+# name: full class name of the entity, cannot also have option "custom_name" or "player_name"
+# custom_name: custom name-tag name, cannot also have option "name" or "player_name"
+# player_name: name of a player, cannot also have option "name" or "custom_name"
 # attack_power: how much damage an entity does on successful attack
 # attack_probability: percentage of attack success. (Usually calculated with enemy's evasion to determine actual percentage)
 # attack_variance (optional): determines how much a successful attack's damage varies.
@@ -1025,6 +1027,23 @@ decision_flee_probability = 5
 ignore_battle = false
 
 [[server_config.entity]]
+name = "net.minecraft.world.entity.animal.HappyGhast"
+attack_power = 0
+attack_probability = 0
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 30
+category = "passive"
+speed = 50
+haste_speed = 60
+slow_speed = 35
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 20
+ignore_battle = false
+
+[[server_config.entity]]
 name = "net.minecraft.world.entity.animal.horse.Llama"
 attack_power = 1
 attack_probability = 70
@@ -1178,7 +1197,7 @@ decision_flee_probability = 100
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Sheep"
+name = "net.minecraft.world.entity.animal.sheep.Sheep"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1280,7 +1299,7 @@ decision_flee_probability = 80
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Wolf"
+name = "net.minecraft.world.entity.animal.wolf.Wolf"
 attack_power = 4
 attack_probability = 70
 attack_variance = 0
@@ -1431,6 +1450,23 @@ slow_speed = 25
 decision_attack_probability = 0
 decision_defend_probability = 10
 decision_flee_probability = 80
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.monster.creaking.Creaking"
+attack_power = 3
+attack_probability = 70
+attack_variance = 1
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 20
+category = "monster"
+speed = 70
+haste_speed = 90
+slow_speed = 50
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
