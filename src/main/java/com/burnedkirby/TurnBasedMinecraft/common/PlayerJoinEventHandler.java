@@ -9,7 +9,7 @@ public class PlayerJoinEventHandler
     @SubscribeEvent
     public void entityJoinHandler(EntityJoinLevelEvent event)
     {
-        if(event.getLevel().isClientSide)
+        if(event.getLevel().isClientSide())
         {
             return;
         }
