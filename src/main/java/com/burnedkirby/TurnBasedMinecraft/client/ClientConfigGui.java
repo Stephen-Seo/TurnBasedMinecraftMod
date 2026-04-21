@@ -402,7 +402,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
 
         @Override
         protected void extractWidgetRenderState(GuiGraphicsExtractor guiGraphicsExtractor, int x, int y, float a) {
-            extractRenderState(guiGraphicsExtractor, x, y, a);
+            guiGraphicsExtractor.fill(this.scrollBarX(), this.scrollBarY(), this.scrollBarX() + this.scrollbarWidth(), this.scrollBarY() + contentHeight / 4, 0xFFAAAAAA);
         }
 
         @Override
