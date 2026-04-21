@@ -395,7 +395,7 @@ decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.IronGolem"
+name = "net.minecraft.world.entity.animal.golem.IronGolem"
 attack_power = 14
 attack_probability = 85
 attack_variance = 7
@@ -857,7 +857,7 @@ attack_effect_probability = 50
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Cat"
+name = "net.minecraft.world.entity.animal.feline.Cat"
 attack_power = 1
 attack_probability = 70
 attack_variance = 1
@@ -874,7 +874,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Chicken"
+name = "net.minecraft.world.entity.animal.chicken.Chicken"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -891,7 +891,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Cow"
+name = "net.minecraft.world.entity.animal.cow.Cow"
 attack_power = 0
 attack_probability = 50
 attack_variance = 0
@@ -908,7 +908,7 @@ decision_flee_probability = 80
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Dolphin"
+name = "net.minecraft.world.entity.animal.dolphin.Dolphin"
 attack_power = 3
 attack_probability = 80
 attack_variance = 1
@@ -925,7 +925,7 @@ decision_flee_probability = 30
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Fox"
+name = "net.minecraft.world.entity.animal.fox.Fox"
 attack_power = 2
 attack_probability = 70
 attack_variance = 0
@@ -976,7 +976,7 @@ decision_flee_probability = 100
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.horse.Donkey"
+name = "net.minecraft.world.entity.animal.equine.Donkey"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -993,7 +993,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.horse.Horse"
+name = "net.minecraft.world.entity.animal.equine.Horse"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1027,7 +1027,7 @@ decision_flee_probability = 5
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.HappyGhast"
+name = "net.minecraft.world.entity.animal.happyghast.HappyGhast"
 attack_power = 0
 attack_probability = 0
 attack_variance = 0
@@ -1044,7 +1044,41 @@ decision_flee_probability = 20
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.horse.Llama"
+name = "net.minecraft.world.entity.animal.nautilus.Nautilus"
+attack_power = 3
+attack_probability = 70
+attack_variance = 1
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 30
+category = "passive"
+speed = 40
+haste_speed = 60
+slow_speed = 20
+decision_attack_probability = 80
+decision_defend_probability = 0
+decision_flee_probability = 20
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.nautilus.ZombieNautilus"
+attack_power = 3
+attack_probability = 70
+attack_variance = 2
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 30
+category = "passive"
+speed = 40
+haste_speed = 60
+slow_speed = 20
+decision_attack_probability = 90
+decision_defend_probability = 0
+decision_flee_probability = 10
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.equine.Llama"
 attack_power = 1
 attack_probability = 70
 attack_variance = 0
@@ -1061,7 +1095,7 @@ decision_flee_probability = 25
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.MushroomCow"
+name = "net.minecraft.world.entity.animal.cow.MushroomCow"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1078,7 +1112,7 @@ decision_flee_probability = 80
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.horse.Mule"
+name = "net.minecraft.world.entity.animal.equine.Mule"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1095,7 +1129,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Ocelot"
+name = "net.minecraft.world.entity.animal.feline.Ocelot"
 attack_power = 1
 attack_probability = 70
 attack_variance = 1
@@ -1112,7 +1146,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Panda"
+name = "net.minecraft.world.entity.animal.panda.Panda"
 attack_power = 6
 attack_probability = 60
 attack_variance = 0
@@ -1129,7 +1163,7 @@ decision_flee_probability = 30
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Parrot"
+name = "net.minecraft.world.entity.animal.parrot.Parrot"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1146,7 +1180,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Pig"
+name = "net.minecraft.world.entity.animal.pig.Pig"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1163,7 +1197,7 @@ decision_flee_probability = 85
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.PolarBear"
+name = "net.minecraft.world.entity.animal.polarbear.PolarBear"
 attack_power = 6
 attack_probability = 67
 attack_variance = 0
@@ -1180,7 +1214,7 @@ decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Rabbit"
+name = "net.minecraft.world.entity.animal.rabbit.Rabbit"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1214,7 +1248,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.horse.SkeletonHorse"
+name = "net.minecraft.world.entity.animal.equine.SkeletonHorse"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1231,7 +1265,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.SnowGolem"
+name = "net.minecraft.world.entity.animal.golem.SnowGolem"
 attack_power = 0
 attack_probability = 80
 attack_variance = 0
@@ -1248,7 +1282,24 @@ decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Squid"
+name = "net.minecraft.world.entity.animal.golem.CopperGolem"
+attack_power = 0
+attack_probability = 80
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 5
+category = "passive"
+speed = 40
+haste_speed = 55
+slow_speed = 25
+decision_attack_probability = 0
+decision_defend_probability = 10
+decision_flee_probability = 90
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.squid.Squid"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1265,7 +1316,24 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.horse.TraderLlama"
+name = "net.minecraft.world.entity.animal.squid.GlowSquid"
+attack_power = 0
+attack_probability = 70
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 15
+category = "passive"
+speed = 50
+haste_speed = 80
+slow_speed = 35
+decision_attack_probability = 0
+decision_defend_probability = 0
+decision_flee_probability = 100
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.equine.TraderLlama"
 attack_power = 1
 attack_probability = 70
 attack_variance = 0
@@ -1282,7 +1350,7 @@ decision_flee_probability = 25
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.npc.Villager"
+name = "net.minecraft.world.entity.npc.villager.Villager"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1316,7 +1384,7 @@ decision_flee_probability = 5
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.horse.ZombieHorse"
+name = "net.minecraft.world.entity.animal.equine.ZombieHorse"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1333,7 +1401,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Cod"
+name = "net.minecraft.world.entity.animal.fish.Cod"
 attack_power = 0
 attack_probability = 50
 attack_variance = 0
@@ -1350,7 +1418,7 @@ decision_flee_probability = 75
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Pufferfish"
+name = "net.minecraft.world.entity.animal.fish.Pufferfish"
 attack_power = 0
 attack_probability = 50
 attack_variance = 0
@@ -1368,7 +1436,7 @@ decision_flee_probability = 65
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Salmon"
+name = "net.minecraft.world.entity.animal.fish.Salmon"
 attack_power = 0
 attack_probability = 50
 attack_variance = 0
@@ -1402,7 +1470,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.TropicalFish"
+name = "net.minecraft.world.entity.animal.fish.TropicalFish"
 attack_power = 0
 attack_probability = 50
 attack_variance = 0
@@ -1419,7 +1487,7 @@ decision_flee_probability = 75
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Turtle"
+name = "net.minecraft.world.entity.animal.turtle.Turtle"
 attack_power = 0
 attack_probability = 20
 attack_variance = 0
@@ -1436,7 +1504,7 @@ decision_flee_probability = 60
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.npc.WanderingTrader"
+name = "net.minecraft.world.entity.npc.wanderingtrader.WanderingTrader"
 attack_power = 0
 attack_probability = 70
 attack_variance = 0
@@ -1519,6 +1587,23 @@ slow_speed = 35
 decision_attack_probability = 0
 decision_defend_probability = 0
 decision_flee_probability = 90
+ignore_battle = false
+
+[[server_config.entity]]
+name = "net.minecraft.world.entity.animal.camel.CamelHusk"
+attack_power = 0
+attack_probability = 70
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 10
+category = "passive"
+speed = 45
+haste_speed = 65
+slow_speed = 25
+decision_attack_probability = 50
+decision_defend_probability = 0
+decision_flee_probability = 20
 ignore_battle = false
 
 [[server_config.entity]]
