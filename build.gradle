@@ -22,7 +22,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 jarJar.register()
 
 tasks.named('jar') {
-    archiveClassifier = 'slim'
+    archiveClassifier = null
     manifest {
         attributes([
             'Specification-Title'     : mod_id,
