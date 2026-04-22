@@ -1,5 +1,11 @@
 # Upcoming changes
 
+# Version NeoForge-1.28.0
+
+Updated for NeoForge 26.1.2-26.1.2.22-beta .
+
+Updated TBMM config file for changed class names for mobs and for new mobs.
+
 # Version Forge-1.28.0
 
 Updated for Forge 26.1.2-64.0.4 .
