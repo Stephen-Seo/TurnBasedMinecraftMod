@@ -3,7 +3,7 @@ package com.burnedkirby.TurnBasedMinecraft.common;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArrowItem;
@@ -61,7 +61,7 @@ public class Utility
     }
 
     public static ResourceKey<Level> deserializeDimension(String dimString) {
-        ResourceLocation dimRes = ResourceLocation.parse(dimString);
+        Identifier dimRes = Identifier.parse(dimString);
         return ResourceKey.create(Registries.DIMENSION, dimRes);
     }
 

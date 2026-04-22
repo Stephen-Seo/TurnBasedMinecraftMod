@@ -7,7 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -19,7 +19,7 @@ import java.util.function.BiConsumer;
 
 public class PacketBattleMessage implements CustomPacketPayload
 {
-    public static final CustomPacketPayload.Type<PacketBattleMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattlemessage"));
+    public static final CustomPacketPayload.Type<PacketBattleMessage> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattlemessage"));
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketBattleMessage> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT.map(MessageType::valueOf, MessageType::getValue),
             PacketBattleMessage::getMessageType,

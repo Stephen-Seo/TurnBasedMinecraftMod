@@ -60,7 +60,7 @@ public class AttackEventHandler
     public static boolean entityAttacked(LivingAttackEvent event)
     {
         boolean ret = false;
-        if(event.getEntity().level().isClientSide)
+        if(event.getEntity().level().isClientSide())
         {
             return ret;
         }
@@ -151,7 +151,7 @@ public class AttackEventHandler
     {
         Config config = TurnBasedMinecraftMod.proxy.getConfig();
         BattleManager battleManager = TurnBasedMinecraftMod.proxy.getBattleManager();
-        if(event.getEntity().level().isClientSide
+        if(event.getEntity().level().isClientSide()
                 || config.isOldBattleBehaviorEnabled()
                 || (event.getEntity() != null && battleManager.isRecentlyLeftBattle(event.getEntity().getId()))
                 || (event.getNewTarget() != null && battleManager.isRecentlyLeftBattle(event.getNewTarget().getId()))

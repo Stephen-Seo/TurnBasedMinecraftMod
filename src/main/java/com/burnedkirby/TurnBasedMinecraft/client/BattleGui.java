@@ -6,11 +6,12 @@ import com.burnedkirby.TurnBasedMinecraft.common.Config;
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketBattleDecision;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.PacketDistributor;
@@ -242,7 +243,7 @@ public class BattleGui extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+	public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		if (TurnBasedMinecraftMod.proxy.getLocalBattle() == null) {
 			if (waitMissingBattleTicks == null) {
 				waitMissingBattleTicks = 0L;
@@ -251,7 +252,7 @@ public class BattleGui extends Screen {
 			}
 			// drawHoveringText("Waiting...", width / 2 - 50, height / 2);
 			drawString(guiGraphics, "Waiting...", width / 2 - 50, height / 2, colorFromTicks(waitMissingBattleTicks));
-			super.render(guiGraphics, mouseX, mouseY, partialTicks);
+			super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 			return;
 		} else {
 			waitMissingBattleTicks = null;
@@ -273,7 +274,7 @@ public class BattleGui extends Screen {
 			try {
 				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideAEntrySet()) {
 					if (e.getValue().entity instanceof LivingEntity lEntity) {
-						InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width / 4 - 60 - 20, y, width / 4 - 60, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
+						InventoryScreen.extractEntityInInventoryFollowsMouse(guiGraphics, width / 4 - 60 - 20, y, width / 4 - 60, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
 					}
 					y += 20;
 				}
@@ -282,14 +283,14 @@ public class BattleGui extends Screen {
 			try {
 				for (Map.Entry<Integer, Combatant> e : TurnBasedMinecraftMod.proxy.getLocalBattle().getSideBEntrySet()) {
 					if (e.getValue().entity instanceof LivingEntity lEntity) {
-						InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, width * 3 / 4 - 60 + 120, y, width * 3 / 4 - 60 + 140, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
+						InventoryScreen.extractEntityInInventoryFollowsMouse(guiGraphics, width * 3 / 4 - 60 + 120, y, width * 3 / 4 - 60 + 140, y + 20, 7, 0.0F, mouseX, mouseY, lEntity);
 					}
 					y += 20;
 				}
 			} catch(ConcurrentModificationException e) {}
 		}
 
-		super.render(guiGraphics, mouseX, mouseY, partialTicks);
+		super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
 
 		String timeRemainingString = "Time remaining: ";
 		int timeRemainingInt = timeRemaining.get();
@@ -398,10 +399,10 @@ public class BattleGui extends Screen {
 	}
 
 	@Override
-	public boolean keyPressed(int keyCode, int b, int c) {
+	public boolean keyPressed(KeyEvent event) {
 		if (getMinecraft().player.isCreative()) {
-			return super.keyPressed(keyCode, b, c);
-		} else if (keyCode == 256) {
+			return super.keyPressed(event);
+		} else if (event.key() == 256) {
 			TurnBasedMinecraftMod.proxy.displayString("Leaving GUI, but the battle continues!");
 			getMinecraft().setScreen(null);
 			return true;
@@ -410,14 +411,14 @@ public class BattleGui extends Screen {
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics p_283688_, int p_299421_, int p_298679_, float p_297268_) {
+	public void extractBackground(GuiGraphicsExtractor p_283688_, int p_299421_, int p_298679_, float p_297268_) {
 		// Left blank to not render background.
 	}
 
 	@Override
-	public boolean keyReleased(int a, int b, int c) {
+	public boolean keyReleased(KeyEvent event) {
 		if (getMinecraft().player.isCreative()) {
-			return super.keyReleased(a, b, c);
+			return super.keyReleased(event);
 		}
 		return false; // TODO verify return value
 	}
@@ -426,8 +427,8 @@ public class BattleGui extends Screen {
 		timeRemaining.set(remaining);
 	}
 
-	private void drawString(GuiGraphics guiGraphics, String string, int x, int y, int color) {
-		guiGraphics.drawString(font, string, x, y, color);
+	private void drawString(GuiGraphicsExtractor guiGraphics, String string, int x, int y, int color) {
+		guiGraphics.text(font, string, x, y, color);
 	}
 
 	public void setTurnTimerEnabled(boolean enabled) {

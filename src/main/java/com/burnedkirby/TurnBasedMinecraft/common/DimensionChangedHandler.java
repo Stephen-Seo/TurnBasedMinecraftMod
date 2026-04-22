@@ -7,7 +7,7 @@ import net.minecraftforge.network.PacketDistributor;
 
 public class DimensionChangedHandler {
     public static void dimensionChanged(EntityTravelToDimensionEvent event) {
-        if(event.getEntity().level().isClientSide) {
+        if(event.getEntity().level().isClientSide()) {
             return;
         }
         if(TurnBasedMinecraftMod.proxy.getBattleManager().forceLeaveBattle(new EntityIDDimPair(event.getEntity()))
