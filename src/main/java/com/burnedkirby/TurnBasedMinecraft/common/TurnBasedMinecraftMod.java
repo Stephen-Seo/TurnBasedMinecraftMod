@@ -27,6 +27,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -40,11 +41,13 @@ import net.minecraftforge.network.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.invoke.MethodHandles;
+
 @Mod(TurnBasedMinecraftMod.MODID)
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.27.0";
+    public static final String VERSION = "1.28.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -82,11 +85,12 @@ public class TurnBasedMinecraftMod {
         FMLDedicatedServerSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitServer);
         FMLLoadCompleteEvent.getBus(ctx.getModBusGroup()).addListener(this::finalInit);
 
-        MinecraftForge.EVENT_BUS.register(this);
+        BusGroup.DEFAULT.register(MethodHandles.lookup(), this);
 
         ctx.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_SPEC);
     }
 
+    @SubscribeEvent
     private void firstInit(final FMLCommonSetupEvent event) {
         proxy = FMLEnvironment.dist.isClient() ? new ClientProxy() : new CommonProxy();
         proxy.setLogger(logger);
@@ -107,14 +111,17 @@ public class TurnBasedMinecraftMod {
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
 
+    @SubscribeEvent
     private void secondInitClient(final FMLClientSetupEvent event) {
         proxy.postInit();
     }
 
+    @SubscribeEvent
     private void secondInitServer(final FMLDedicatedServerSetupEvent event) {
         proxy.postInit();
     }
 
+    @SubscribeEvent
     private void finalInit(final FMLLoadCompleteEvent event) {
         proxy.finalInit();
     }
