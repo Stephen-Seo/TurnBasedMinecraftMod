@@ -2,13 +2,14 @@ package com.burnedkirby.TurnBasedMinecraft.client;
 
 import com.burnedkirby.TurnBasedMinecraft.common.TurnBasedMinecraftMod;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -55,8 +56,8 @@ public class EntitySelectionButton implements Renderable, GuiEventListener, Narr
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.nestedButton.render(guiGraphics, mouseX, mouseY, partialTicks);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.nestedButton.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
         Entity e = Minecraft.getInstance().level.getEntity(entityID);
         if (e != null && e instanceof LivingEntity && ((LivingEntity) e).isAlive()) {
             int health = (int) (((LivingEntity) e).getHealth() + 0.5f);
@@ -131,8 +132,8 @@ public class EntitySelectionButton implements Renderable, GuiEventListener, Narr
     }
 
     @Override
-    public boolean mouseClicked(double x, double y, int unknown) {
-        if (unknown == 0 && isMouseOver(x, y)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == 0 && isMouseOver(x, y)) {
             onPress();
             return true;
         }

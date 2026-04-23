@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class PacketEditingMessage implements CustomPacketPayload
 {
-    public static final CustomPacketPayload.Type<PacketEditingMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packeteditingmessage"));
+    public static final CustomPacketPayload.Type<PacketEditingMessage> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packeteditingmessage"));
 
     public static final StreamCodec<ByteBuf, PacketEditingMessage> STREAM_CODEC = StreamCodec.composite(
         ByteBufCodecs.INT.map(Type::valueOf, Type::getValue),
@@ -139,7 +139,7 @@ public class PacketEditingMessage implements CustomPacketPayload
         @Override
         public void handle(final @NotNull PacketEditingMessage pkt, final IPayloadContext ctx) {
             ctx.enqueueWork(() -> {
-                if (FMLEnvironment.dist.isClient()) {
+                if (FMLEnvironment.getDist().isClient()) {
                     TurnBasedMinecraftMod.proxy.handlePacket(pkt, ctx);
                 }
             }).exceptionally(e -> {

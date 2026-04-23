@@ -1,11 +1,12 @@
 package com.burnedkirby.TurnBasedMinecraft.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 
 public class ItemSelectionButton implements Renderable, GuiEventListener, NarratableEntry {
     private int x;
@@ -30,7 +31,7 @@ public class ItemSelectionButton implements Renderable, GuiEventListener, Narrat
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float unk) {
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float unk) {
         boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
         if (hovered) {
             guiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, 0x80FFFFFF);
@@ -64,8 +65,8 @@ public class ItemSelectionButton implements Renderable, GuiEventListener, Narrat
     }
 
     @Override
-    public boolean mouseClicked(double x, double y, int unknown) {
-        if (unknown == 0 && isMouseOver(x, y)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClicked) {
+        if (event.button() == 0 && isMouseOver(x, y)) {
             onPress();
             return true;
         }
