@@ -7,7 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
 
 public record PacketBattleInfo(int battleID, Collection<Integer> sideA, Collection<Integer> sideB, long decisionNanos, long maxDecisionNanos, boolean turnTimerEnabled) implements CustomPacketPayload
 {
-    public static final CustomPacketPayload.Type<PacketBattleInfo> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattleinfo"));
+    public static final CustomPacketPayload.Type<PacketBattleInfo> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattleinfo"));
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketBattleInfo> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,
             PacketBattleInfo::battleID,

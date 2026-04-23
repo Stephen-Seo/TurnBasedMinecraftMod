@@ -17,14 +17,17 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -38,11 +41,13 @@ import net.minecraftforge.network.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.invoke.MethodHandles;
+
 @Mod(TurnBasedMinecraftMod.MODID)
 public class TurnBasedMinecraftMod {
     public static final String MODID = "com_burnedkirby_turnbasedminecraft";
     public static final String NAME = "Turn Based Minecraft Mod";
-    public static final String VERSION = "1.27.0";
+    public static final String VERSION = "1.28.0";
     public static final String CONFIG_FILENAME = "TBM_Config.toml";
     public static final String DEFAULT_CONFIG_FILENAME = "TBM_Config_DEFAULT.toml";
     public static final String CONFIG_DIRECTORY = "config/TurnBasedMinecraft/";
@@ -54,7 +59,7 @@ public class TurnBasedMinecraftMod {
     public static final String MUSIC_BATTLE = MUSIC_ROOT + "battle/";
 
     private static final Integer PROTOCOL_VERSION = 5;
-    private static final ResourceLocation HANDLER_ID = ResourceLocation.fromNamespaceAndPath(MODID, "main_channel");
+    private static final Identifier HANDLER_ID = Identifier.fromNamespaceAndPath(MODID, "main_channel");
 
     private static final SimpleChannel HANDLER = ChannelBuilder
         .named(HANDLER_ID)
@@ -64,7 +69,7 @@ public class TurnBasedMinecraftMod {
         .simpleChannel();
     protected static Logger logger = LogManager.getLogger();
 
-    public static ResourceLocation getNetResourceLocation() {
+    public static Identifier getNetResourceLocation() {
         return HANDLER_ID;
     }
 
@@ -80,11 +85,12 @@ public class TurnBasedMinecraftMod {
         FMLDedicatedServerSetupEvent.getBus(ctx.getModBusGroup()).addListener(this::secondInitServer);
         FMLLoadCompleteEvent.getBus(ctx.getModBusGroup()).addListener(this::finalInit);
 
-        MinecraftForge.EVENT_BUS.register(this);
+        BusGroup.DEFAULT.register(MethodHandles.lookup(), this);
 
         ctx.registerConfig(ModConfig.Type.CLIENT, ClientConfig.CLIENT_SPEC);
     }
 
+    @SubscribeEvent
     private void firstInit(final FMLCommonSetupEvent event) {
         proxy = FMLEnvironment.dist.isClient() ? new ClientProxy() : new CommonProxy();
         proxy.setLogger(logger);
@@ -105,14 +111,17 @@ public class TurnBasedMinecraftMod {
         logger.debug("Init com_burnedkirby_turnbasedminecraft");
     }
 
+    @SubscribeEvent
     private void secondInitClient(final FMLClientSetupEvent event) {
         proxy.postInit();
     }
 
+    @SubscribeEvent
     private void secondInitServer(final FMLDedicatedServerSetupEvent event) {
         proxy.postInit();
     }
 
+    @SubscribeEvent
     private void finalInit(final FMLLoadCompleteEvent event) {
         proxy.finalInit();
     }
@@ -148,7 +157,8 @@ public class TurnBasedMinecraftMod {
         event.getDispatcher().register(
             Commands.literal("tbm-disable")
                 .requires(c -> {
-                    return !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermission(2);
+                    boolean hasPermission = c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS));
+                    return !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || hasPermission;
                 })
                 .executes(c -> {
                     proxy.getConfig().addBattleIgnoringPlayer(c.getSource().getPlayerOrException().getId());
@@ -159,7 +169,7 @@ public class TurnBasedMinecraftMod {
         event.getDispatcher().register(
             Commands.literal("tbm-disable-all")
                 .requires(c -> {
-                    return c.hasPermission(2);
+                    return c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS));
                 })
                 .executes(c -> {
                     proxy.getConfig().setBattleDisabledForAll(true);
@@ -172,7 +182,7 @@ public class TurnBasedMinecraftMod {
         // tbm-enable
         event.getDispatcher().register(
             Commands.literal("tbm-enable")
-                .requires(c -> !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.hasPermission(2))
+                .requires(c -> !proxy.getConfig().getIfOnlyOPsCanDisableTurnBasedForSelf() || c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS)))
                 .executes(c -> {
                     proxy.getConfig().removeBattleIgnoringPlayer(c.getSource().getPlayerOrException().getId());
                     c.getSource().sendSuccess(() -> Component.literal("Enabled turn-based-combat for current player"), true);
@@ -181,7 +191,7 @@ public class TurnBasedMinecraftMod {
         // tbm-enable-all
         event.getDispatcher().register(
             Commands.literal("tbm-enable-all")
-                .requires(c -> c.hasPermission(2))
+                .requires(c -> c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS)))
                 .executes(c -> {
                     proxy.getConfig().setBattleDisabledForAll(false);
                     proxy.getConfig().clearBattleIgnoringPlayers();
@@ -193,7 +203,7 @@ public class TurnBasedMinecraftMod {
         // tbm-set-enable
         event.getDispatcher().register(
             Commands.literal("tbm-set-enable")
-                .requires(c -> c.hasPermission(2))
+                .requires(c -> c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS)))
                 .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
                     for (ServerPlayer player : EntityArgument.getPlayers(c, "targets")) {
                         proxy.getConfig().addBattleIgnoringPlayer(player.getId());
@@ -205,7 +215,7 @@ public class TurnBasedMinecraftMod {
         // tbm-set-disable
         event.getDispatcher().register(
             Commands.literal("tbm-set-disable")
-                .requires(c -> c.hasPermission(2))
+                .requires(c -> c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS)))
                 .then(Commands.argument("targets", EntityArgument.players()).executes(c -> {
                     for (ServerPlayer player : EntityArgument.getPlayers(c, "targets")) {
                         proxy.getConfig().removeBattleIgnoringPlayer(player.getId());
@@ -217,7 +227,7 @@ public class TurnBasedMinecraftMod {
         // tbm-edit
         event.getDispatcher().register(
             Commands.literal("tbm-edit")
-                .requires(c -> c.hasPermission(2))
+                .requires(c -> c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS)))
                 .executes(c -> {
                     ServerPlayer player = c.getSource().getPlayerOrException();
                     EditingInfo editingInfo = proxy.getEditingInfo(player.getId());
@@ -866,7 +876,7 @@ public class TurnBasedMinecraftMod {
         // tbm-server-edit
         event.getDispatcher().register(
             Commands.literal("tbm-server-edit")
-                .requires(c -> c.hasPermission(2))
+                .requires(c -> c.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.MODERATORS)))
                 .executes(c -> {
                     ServerPlayer player = c.getSource().getPlayerOrException();
                     getHandler().send(new PacketEditingMessage(PacketEditingMessage.Type.SERVER_EDIT), PacketDistributor.PLAYER.with(player));

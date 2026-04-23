@@ -5,14 +5,14 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
 
 public record PacketBattlePing(int battleID, int decisionSeconds) implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<PacketBattlePing> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattleping"));
+    public static final CustomPacketPayload.Type<PacketBattlePing> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetbattleping"));
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketBattlePing> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,
             PacketBattlePing::battleID,

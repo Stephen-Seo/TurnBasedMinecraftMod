@@ -1222,7 +1222,7 @@ public class Battle {
                                 ((Player) nextEntity).getInventory().setItem(nextItemToUse, targetItem.finishUsingItem(targetItemStack, nextEntity.level(), (LivingEntity) nextEntity));
                             } else {
                                 // then check vanilla foods
-                                final CreativeModeTab foodAndDrinksTab = CreativeModeTabRegistry.getTab(CreativeModeTabs.FOOD_AND_DRINKS.location());
+                                final CreativeModeTab foodAndDrinksTab = CreativeModeTabRegistry.getTab(CreativeModeTabs.FOOD_AND_DRINKS.identifier());
                                 if (foodAndDrinksTab.contains(targetItemStack) && Utility.isItemEdible(targetItemStack)) {
                                     debugLog += " food";
                                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());

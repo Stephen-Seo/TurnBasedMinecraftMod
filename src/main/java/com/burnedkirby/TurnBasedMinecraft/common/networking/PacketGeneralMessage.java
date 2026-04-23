@@ -5,7 +5,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 
 public record PacketGeneralMessage(String message) implements CustomPacketPayload
 {
-    public static final CustomPacketPayload.Type<PacketGeneralMessage> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetgeneralmessage"));
+    public static final CustomPacketPayload.Type<PacketGeneralMessage> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(TurnBasedMinecraftMod.MODID, "network_packetgeneralmessage"));
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketGeneralMessage> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
             PacketGeneralMessage::message,

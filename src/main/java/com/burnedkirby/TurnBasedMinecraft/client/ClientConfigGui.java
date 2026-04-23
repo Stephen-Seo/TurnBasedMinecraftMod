@@ -1,11 +1,13 @@
 package com.burnedkirby.TurnBasedMinecraft.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -180,7 +182,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
                 !affectedByMasterVolCheckbox.selected()) ||
                 (!ClientConfig.CLIENT.volumeAffectedByMasterVolume.get() &&
                         affectedByMasterVolCheckbox.selected())) {
-            affectedByMasterVolCheckbox.onPress();
+            affectedByMasterVolCheckbox.onPress(new MouseButtonInfo(0, 0));
         }
         addRenderableWidget(affectedByMasterVolCheckbox);
 
@@ -210,7 +212,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
                 !affectedByMusicVolCheckbox.selected()) ||
                 (!ClientConfig.CLIENT.volumeAffectedByMusicVolume.get() &&
                         affectedByMusicVolCheckbox.selected())) {
-            affectedByMusicVolCheckbox.onPress();
+            affectedByMusicVolCheckbox.onPress(new MouseButtonInfo(0, 0));
         }
         addRenderableWidget(affectedByMusicVolCheckbox);
 
@@ -292,7 +294,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void extractRenderState(GuiGraphicsExtractor pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if (accepted) {
             doAccepted();
             Minecraft.getInstance().setScreen(null);
@@ -345,13 +347,13 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
             volumeSlider.setPosition(this.width / 2 + widget_x_offset,
                     top_offset - (int)scrollBar.scrollAmount());
         }
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        super.extractRenderState(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
 
     @Override
-    public void resize(Minecraft pMinecraft, int pWidth, int pHeight) {
+    public void resize(int pWidth, int pHeight) {
         dirtyFlag = true;
-        super.resize(pMinecraft, pWidth, pHeight);
+        super.resize(pWidth, pHeight);
     }
 
     private static class SliderPercentage extends AbstractSliderButton {
@@ -380,7 +382,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
         double scrollRate = 8;
 
         public ScrollBar(int x, int y, int width, int height) {
-            super(x, y, width, height, Component.literal("Client Config Scroll Bar"));
+            super(x, y, width, height, Component.literal("Client Config Scroll Bar"), AbstractScrollArea.defaultSettings(3));
         }
 
         public void setContentHeight(int contentHeight) {
@@ -398,8 +400,9 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int i1, float v) {
-            renderScrollbar(guiGraphics);
+        protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+            graphics.fill(this.scrollBarX(), this.scrollBarY(), this.scrollBarX() + this.scrollbarWidth(), this.scrollBarY() + this.scrollerHeight(), 0xFF000000);
+            graphics.fill(this.scrollBarX() + 1, this.scrollBarY() + 1, this.scrollBarX() + this.scrollbarWidth() - 1, this.scrollBarY() + this.scrollerHeight() - 1, 0xFFAAAAAA);
         }
 
         @Override
