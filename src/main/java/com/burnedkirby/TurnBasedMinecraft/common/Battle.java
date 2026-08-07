@@ -155,7 +155,6 @@ public class Battle {
                 newCombatant.battleID = getId();
                 this.sideA.put(e.getId(), newCombatant);
                 if (e instanceof Player) {
-                    newCombatant.recalcSpeedOnCompare = true;
                     playerCount.incrementAndGet();
                     players.put(e.getId(), newCombatant);
                 }
@@ -190,7 +189,6 @@ public class Battle {
                 newCombatant.battleID = getId();
                 this.sideB.put(e.getId(), newCombatant);
                 if (e instanceof Player) {
-                    newCombatant.recalcSpeedOnCompare = true;
                     playerCount.incrementAndGet();
                     players.put(e.getId(), newCombatant);
                 }
@@ -299,7 +297,6 @@ public class Battle {
             sideA.put(e.getId(), newCombatant);
         }
         if (e instanceof Player) {
-            newCombatant.recalcSpeedOnCompare = true;
             playerCount.incrementAndGet();
             players.put(e.getId(), newCombatant);
             if (state == State.DECISION) {
@@ -350,7 +347,6 @@ public class Battle {
             sideB.put(e.getId(), newCombatant);
         }
         if (e instanceof Player) {
-            newCombatant.recalcSpeedOnCompare = true;
             playerCount.incrementAndGet();
             players.put(e.getId(), newCombatant);
             if (state == State.DECISION) {
