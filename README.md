@@ -81,7 +81,7 @@ configured for them.)
 
 Simply invoke `./gradlew build` in the mod directory and after some time the
 finished jar will be saved at
-`build/libs/TurnBasedMinecraftMod-1.28.0.jar`
+`build/libs/TurnBasedMinecraftMod-1.29.0.jar`
 
 # Reproducibility
 
