@@ -14,7 +14,6 @@ public class Combatant
     public Battle.Decision decision;
     public int itemToUse;
     public EntityInfo entityInfo;
-    public boolean recalcSpeedOnCompare;
     public int targetEntityID;
     public boolean isSideA;
     public int remainingDefenses;
@@ -31,7 +30,6 @@ public class Combatant
     public Combatant()
     {
         decision = Battle.Decision.UNDECIDED;
-        recalcSpeedOnCompare = false;
         remainingDefenses = 0;
         creeperTurns = 1;
         willCreeperExplode = false;
@@ -42,7 +40,6 @@ public class Combatant
         entity = e;
         decision = Battle.Decision.UNDECIDED;
         this.entityInfo = entityInfo;
-        recalcSpeedOnCompare = false;
         remainingDefenses = 0;
         creeperTurns = 1;
         willCreeperExplode = false;
@@ -56,7 +53,7 @@ public class Combatant
         @Override
         public int compare(Combatant c0, Combatant c1)
         {
-            if(c0.entity instanceof Player && c0.recalcSpeedOnCompare)
+            if(c0.entity instanceof LivingEntity)
             {
                 LivingEntity c0Entity = (LivingEntity)c0.entity;
                 boolean isHaste = false;
@@ -90,7 +87,7 @@ public class Combatant
                 }
             }
             
-            if(c1.entity instanceof Player && c1.recalcSpeedOnCompare)
+            if(c1.entity instanceof LivingEntity)
             {
                 LivingEntity c1Entity = (LivingEntity)c1.entity;
                 boolean isHaste = false;
