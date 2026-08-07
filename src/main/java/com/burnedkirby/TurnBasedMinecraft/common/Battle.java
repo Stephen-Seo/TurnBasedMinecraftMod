@@ -1215,6 +1215,13 @@ public class Battle {
                                 debugLog += " null";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_NOTHING.getValue());
                                 break;
+                            } else if (targetItem.equals(Items.MILK_BUCKET)) {
+                                debugLog += " milk";
+                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
+                                final Entity nextEntity = next.entity;
+                                final int nextItemToUse = next.itemToUse;
+                                ((Player) nextEntity).getInventory().setItem(nextItemToUse, Items.BUCKET.getDefaultInstance());
+                                ((LivingEntity)nextEntity).removeAllEffects();
                             } else if (Utility.isItemEdible(targetItemStack)) {
                                 debugLog += " food";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
