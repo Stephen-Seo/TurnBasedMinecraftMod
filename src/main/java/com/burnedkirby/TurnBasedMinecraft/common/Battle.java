@@ -891,6 +891,7 @@ public class Battle {
                                         }
                                         // have player look at attack target
                                         ((ServerPlayer) nextEntity).connection.teleport(nextEntity.getX(), nextEntity.getY(), nextEntity.getZ(), yawDirection, pitchDirection);
+                                        // Do attack
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         TurnBasedMinecraftMod.proxy.setAttackingDamage(0);
                                         ((Player) nextEntity).attack(targetEntity);
@@ -972,6 +973,10 @@ public class Battle {
                                         int damageAmount = next.entityInfo.attackPower;
                                         if (next.entityInfo.attackVariance > 0) {
                                             damageAmount += random.nextInt(next.entityInfo.attackVariance * 2 + 1) - next.entityInfo.attackVariance;
+                                        }
+                                        // Apply "weakness" manually
+                                        if (((LivingEntity)next.entity).hasEffect(MobEffects.WEAKNESS)) {
+                                            damageAmount /= 2;
                                         }
                                         if (damageAmount < 0) {
                                             damageAmount = 0;
