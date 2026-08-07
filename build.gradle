@@ -77,8 +77,8 @@ repositories {
 }
 
 dependencies {
-    implementation minecraft.dependency('net.minecraftforge:forge:26.1.2-64.0.4')
-    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.1'
+    implementation minecraft.dependency('net.minecraftforge:forge:26.1.2-64.1.0')
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.5'
 
 
     implementation 'fr.delthas:javamp3:1.0.3'
