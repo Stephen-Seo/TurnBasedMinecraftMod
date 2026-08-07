@@ -139,9 +139,10 @@ public class AttackEventHandler
 //            TurnBasedMinecraftMod.logger.debug("Did not cancel attack");
         }
 
-        if(TurnBasedMinecraftMod.proxy.getAttackingDamage() < (int) event.getAmount())
+        final int attackerDamage = (int)event.getAmount();
+        if(TurnBasedMinecraftMod.proxy.getAttackingDamage() < attackerDamage)
         {
-            TurnBasedMinecraftMod.proxy.setAttackingDamage((int) event.getAmount());
+            TurnBasedMinecraftMod.proxy.setAttackingDamage(attackerDamage);
         }
 
         return ret;
