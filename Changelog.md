@@ -1,5 +1,17 @@
 # Upcoming changes
 
+# Version Forge-1.29.0
+
+Fix "slowness" having no effect in battle (should apply "slow-speed" which
+determines attack order in battle).
+
+Fix "weakness" having no effect on mobs (should halve mob attack damage when
+they are under the effect of "weakness").
+
+Fix milk-buckets consuming the bucket too when used in battle.
+
+Update for Forge 26.1.2-64.1.0 .
+
 # Version NeoForge-1.29.0
 
 Fix "slowness" having no effect in battle (should apply "slow-speed" which
