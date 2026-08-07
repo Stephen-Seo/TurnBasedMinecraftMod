@@ -1,6 +1,7 @@
 {
     "homepage": "https://github.com/Stephen-Seo/TurnBasedMinecraftMod",
     "26.1.2": {
+        "1.19.0": "Updated for NeoForge v26.1.2.94\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md",
         "1.28.0": "Updated for MC version 26.1.2\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md"
     },
     "1.21.8": {
@@ -20,8 +21,8 @@
         "1.26.0": "Ported to NeoForge 21.1.69, client config.\n  https://github.com/Stephen-Seo/TurnBasedMinecraftMod/blob/neoforge/Changelog.md"
     },
     "promos": {
-        "26.1.2-latest": "1.28.0",
-        "26.1.2-recommended": "1.28.0",
+        "26.1.2-latest": "1.29.0",
+        "26.1.2-recommended": "1.29.0",
         "1.21.8-latest": "1.27.0",
         "1.21.8-recommended": "1.27.0",
         "1.21.3-latest": "1.26.5",

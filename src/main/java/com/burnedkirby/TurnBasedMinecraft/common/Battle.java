@@ -152,7 +152,6 @@ public class Battle {
                 newCombatant.battleID = getId();
                 this.sideA.put(e.getId(), newCombatant);
                 if (e instanceof Player) {
-                    newCombatant.recalcSpeedOnCompare = true;
                     playerCount.incrementAndGet();
                     players.put(e.getId(), newCombatant);
                 }
@@ -187,7 +186,6 @@ public class Battle {
                 newCombatant.battleID = getId();
                 this.sideB.put(e.getId(), newCombatant);
                 if (e instanceof Player) {
-                    newCombatant.recalcSpeedOnCompare = true;
                     playerCount.incrementAndGet();
                     players.put(e.getId(), newCombatant);
                 }
@@ -296,7 +294,6 @@ public class Battle {
             sideA.put(e.getId(), newCombatant);
         }
         if (e instanceof Player) {
-            newCombatant.recalcSpeedOnCompare = true;
             playerCount.incrementAndGet();
             players.put(e.getId(), newCombatant);
             if (state == State.DECISION) {
@@ -347,7 +344,6 @@ public class Battle {
             sideB.put(e.getId(), newCombatant);
         }
         if (e instanceof Player) {
-            newCombatant.recalcSpeedOnCompare = true;
             playerCount.incrementAndGet();
             players.put(e.getId(), newCombatant);
             if (state == State.DECISION) {
@@ -895,6 +891,7 @@ public class Battle {
                                         }
                                         // have player look at attack target
                                         ((ServerPlayer) nextEntity).connection.teleport(nextEntity.getX(), nextEntity.getY(), nextEntity.getZ(), yawDirection, pitchDirection);
+                                        // Do attack
                                         TurnBasedMinecraftMod.proxy.setAttackingEntity(nextEntity);
                                         TurnBasedMinecraftMod.proxy.setAttackingDamage(0);
                                         ((Player) nextEntity).attack(targetEntity);
@@ -976,6 +973,10 @@ public class Battle {
                                         int damageAmount = next.entityInfo.attackPower;
                                         if (next.entityInfo.attackVariance > 0) {
                                             damageAmount += random.nextInt(next.entityInfo.attackVariance * 2 + 1) - next.entityInfo.attackVariance;
+                                        }
+                                        // Apply "weakness" manually
+                                        if (((LivingEntity)next.entity).hasEffect(MobEffects.WEAKNESS)) {
+                                            damageAmount /= 2;
                                         }
                                         if (damageAmount < 0) {
                                             damageAmount = 0;
@@ -1210,6 +1211,13 @@ public class Battle {
                                 debugLog += " null";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_NOTHING.getValue());
                                 break;
+                            } else if (targetItem.equals(Items.MILK_BUCKET)) {
+                                debugLog += " milk";
+                                sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
+                                final Entity nextEntity = next.entity;
+                                final int nextItemToUse = next.itemToUse;
+                                ((Player) nextEntity).getInventory().setItem(nextItemToUse, Items.BUCKET.getDefaultInstance());
+                                ((LivingEntity)nextEntity).removeAllEffects();
                             } else if (Utility.isItemEdible(targetItemStack, (LivingEntity)next.entity)) {
                                 debugLog += " food";
                                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.USED_ITEM, next.entity.getId(), 0, PacketBattleMessage.UsedItemAction.USED_FOOD.getValue(), targetItemStack.getDisplayName().getString());
