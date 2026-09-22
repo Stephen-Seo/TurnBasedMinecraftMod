@@ -412,7 +412,7 @@ decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.monster.MagmaCube"
+name = "net.minecraft.world.entity.monster.cubemob.MagmaCube"
 attack_power = 3
 attack_probability = 35
 attack_effect = "unknown"
@@ -565,7 +565,7 @@ decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.monster.Slime"
+name = "net.minecraft.world.entity.monster.cubemob.Slime"
 attack_power = 2
 attack_probability = 35
 attack_variance = 0
@@ -839,7 +839,7 @@ decision_flee_probability = 90
 ignore_battle = false
 
 [[server_config.entity]]
-name = "net.minecraft.world.entity.animal.Bee"
+name = "net.minecraft.world.entity.animal.bee.Bee"
 attack_power = 2
 attack_probability = 65
 attack_variance = 0
