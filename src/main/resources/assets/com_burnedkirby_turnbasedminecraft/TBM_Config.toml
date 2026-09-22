@@ -582,6 +582,23 @@ decision_flee_probability = 0
 ignore_battle = false
 
 [[server_config.entity]]
+name = "net.minecraft.world.entity.monster.cubemob.SulfurCube"
+attack_power = 1
+attack_probability = 35
+attack_variance = 0
+attack_effect = "unknown"
+defense_damage = 0
+evasion = 10
+category = "monster"
+speed = 30
+haste_speed = 50
+slow_speed = 10
+decision_attack_probability = 100
+decision_defend_probability = 0
+decision_flee_probability = 0
+ignore_battle = false
+
+[[server_config.entity]]
 name = "net.minecraft.world.entity.monster.spider.Spider"
 attack_power = 2
 attack_probability = 70
