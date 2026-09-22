@@ -61,8 +61,7 @@ public class AttackEventHandler
     @SubscribeEvent
     public void entityAttacked(LivingIncomingDamageEvent event)
     {
-        if(event.getEntity().level().isClientSide())
-        {
+        if (event.getEntity().level().isClientSide()) {
             return;
         }
         CommonProxy proxy = TurnBasedMinecraftMod.proxy;

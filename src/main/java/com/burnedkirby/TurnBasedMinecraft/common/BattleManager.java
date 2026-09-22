@@ -180,8 +180,13 @@ public class BattleManager
             } else if (event.getSource().getEntity() instanceof SulfurCube) {
                 SulfurCube e = (SulfurCube)event.getSource().getEntity();
                 if (e.hasBodyItem()) {
-                    logger.debug("Attack Canceled: Hit by SulfurCube with block");
-                    return true;
+                    if (e.isPrimed()) {
+                        logger.debug("Attack not Canceled: Hit by exploding SulfurCube");
+                        return false;
+                    } else {
+                        logger.debug("Attack Canceled: Hit by SulfurCube with block");
+                        return true;
+                    }
                 }
             }
 
