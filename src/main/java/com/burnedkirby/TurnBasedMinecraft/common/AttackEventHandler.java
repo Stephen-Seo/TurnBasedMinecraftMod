@@ -6,6 +6,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.cubemob.SulfurCube;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -117,6 +118,8 @@ public class AttackEventHandler
         if(event.getEntity() != null && event.getSource().getEntity() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getId()) || battleManager.isRecentlyLeftBattle(event.getSource().getEntity().getId())))
         {
             if(event.getSource().getEntity() instanceof Creeper && TurnBasedMinecraftMod.proxy.getConfig().getCreeperAlwaysAllowDamage()) {
+                event.setCanceled(false);
+            } else if (event.getEntity() instanceof SulfurCube && ((SulfurCube)event.getEntity()).hasBodyItem()) {
                 event.setCanceled(false);
             } else {
 //            TurnBasedMinecraftMod.logger.debug("Canceled attack");

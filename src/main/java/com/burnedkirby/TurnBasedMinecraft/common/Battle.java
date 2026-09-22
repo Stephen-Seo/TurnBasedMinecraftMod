@@ -14,6 +14,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.cubemob.SulfurCube;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -30,6 +31,7 @@ public class Battle {
     private Map<Integer, Combatant> sideA;
     private Map<Integer, Combatant> sideB;
     private Map<Integer, Combatant> players;
+    private Map<Integer, SulfurCube> sulfurCubes;
     private PriorityQueue<Combatant> turnOrderQueue;
     private Queue<Combatant> sideAEntryQueue;
     private Queue<Combatant> sideBEntryQueue;
@@ -128,6 +130,7 @@ public class Battle {
         undecidedCount = new AtomicInteger(0);
         random = new Random();
         this.dimension = dimension;
+        this.sulfurCubes = new HashMap<>();
         pingTimerNanos = 0;
         if (sideA != null) {
             for (Entity e : sideA) {
@@ -160,6 +163,9 @@ public class Battle {
                     newCombatant.z = e.getZ();
                     newCombatant.yaw = e.getXRot();
                     newCombatant.pitch = e.getYRot();
+                }
+                if (e instanceof SulfurCube) {
+                    sulfurCubes.put(e.getId(), (SulfurCube)e);
                 }
             }
         }
@@ -194,6 +200,9 @@ public class Battle {
                     newCombatant.z = e.getZ();
                     newCombatant.yaw = e.getXRot();
                     newCombatant.pitch = e.getYRot();
+                }
+                if (e instanceof SulfurCube) {
+                    sulfurCubes.put(e.getId(), (SulfurCube)e);
                 }
             }
         }
@@ -306,6 +315,9 @@ public class Battle {
             newCombatant.yaw = e.getXRot();
             newCombatant.pitch = e.getYRot();
         }
+        if (e instanceof SulfurCube) {
+            sulfurCubes.put(e.getId(), (SulfurCube)e);
+        }
         if (isServer) {
             if (newCombatant.entityInfo != null) {
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getId(), 0, id, newCombatant.entityInfo.category);
@@ -356,6 +368,9 @@ public class Battle {
             newCombatant.yaw = e.getXRot();
             newCombatant.pitch = e.getYRot();
         }
+        if (e instanceof SulfurCube) {
+            sulfurCubes.put(e.getId(), (SulfurCube)e);
+        }
         if (isServer) {
             if (newCombatant.entityInfo != null) {
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getId(), 0, id, newCombatant.entityInfo.category);
@@ -376,6 +391,7 @@ public class Battle {
         players.clear();
         playerCount.set(0);
         undecidedCount.set(0);
+        sulfurCubes.clear();
     }
 
     public Collection<Combatant> getSideA() {
@@ -624,6 +640,7 @@ public class Battle {
                 break;
             }
         }
+        sulfurCubes.remove(e.id);
     }
 
     private void setDecisionState() {
@@ -665,6 +682,9 @@ public class Battle {
                 changed = true;
             }
             if (isCreativeCheck()) {
+                changed = true;
+            }
+            if (sulfurCubeCheck()) {
                 changed = true;
             }
             sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 1);
@@ -765,6 +785,9 @@ public class Battle {
                         combatantsChanged = true;
                     }
                     if (isCreativeCheck()) {
+                        combatantsChanged = true;
+                    }
+                    if (sulfurCubeCheck()) {
                         combatantsChanged = true;
                     }
                 }
@@ -1387,6 +1410,9 @@ public class Battle {
                     if (isCreativeCheck()) {
                         combatantsChanged = true;
                     }
+                    if (sulfurCubeCheck()) {
+                        combatantsChanged = true;
+                    }
                     debugLog += ", adding task";
                     sendMessageToAllPlayers(PacketBattleMessage.MessageType.TURN_END, 0, 0, 0);
                 }
@@ -1431,6 +1457,24 @@ public class Battle {
                     ((Creeper) c.entity).setSwellDir(-10);
                 }
             }
+        }
+    }
+
+    private boolean sulfurCubeCheck() {
+        Collection<Entity> to_remove = new ArrayList<>();
+        for (Map.Entry<Integer, SulfurCube> e : sulfurCubes.entrySet()) {
+            if (e.getValue().hasBodyItem()) {
+                to_remove.add(e.getValue());
+            }
+        }
+
+        if (to_remove.isEmpty()) {
+            return false;
+        } else {
+            for (Entity e : to_remove) {
+                forceRemoveCombatant(new EntityIDDimPair(e));
+            }
+            return true;
         }
     }
 }
