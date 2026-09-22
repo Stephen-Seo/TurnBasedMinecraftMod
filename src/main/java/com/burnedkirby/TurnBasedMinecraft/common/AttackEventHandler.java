@@ -61,8 +61,7 @@ public class AttackEventHandler
     public static boolean entityAttacked(LivingAttackEvent event)
     {
         boolean ret = false;
-        if(event.getEntity().level().isClientSide())
-        {
+        if (event.getEntity().level().isClientSide()) {
             return ret;
         }
         CommonProxy proxy = TurnBasedMinecraftMod.proxy;
