@@ -404,7 +404,7 @@ public class BattleGui extends Screen {
 			return super.keyPressed(event);
 		} else if (event.key() == 256) {
 			TurnBasedMinecraftMod.proxy.displayString("Leaving GUI, but the battle continues!");
-			getMinecraft().setScreen(null);
+			getMinecraft().gui.setScreen(null);
 			return true;
 		}
 		return false; // TODO verify return value

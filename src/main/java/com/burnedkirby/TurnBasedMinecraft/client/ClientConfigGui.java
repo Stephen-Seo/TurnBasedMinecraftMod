@@ -243,7 +243,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
         addRenderableWidget(volumeSlider);
 
         addRenderableWidget(Button.builder(Component.literal("Cancel"),
-                        (b) -> Minecraft.getInstance().setScreen(this.parentScreen))
+                        (b) -> Minecraft.getInstance().gui.setScreen(this.parentScreen))
                 .bounds(this.width / 2 - widget_width + widget_x_offset,
                         this.height - widget_height, widget_width, widget_height).build());
         addRenderableWidget(Button.builder(Component.literal("Accept"), (b) -> {
@@ -297,7 +297,7 @@ public class ClientConfigGui extends net.minecraft.client.gui.screens.Screen {
     public void extractRenderState(GuiGraphicsExtractor pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if (accepted) {
             doAccepted();
-            Minecraft.getInstance().setScreen(null);
+            Minecraft.getInstance().gui.setScreen(this.parentScreen);
             return;
         }
         if (dirtyFlag) {

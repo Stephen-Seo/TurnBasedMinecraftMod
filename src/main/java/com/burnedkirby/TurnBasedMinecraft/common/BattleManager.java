@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.cubemob.SulfurCube;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
@@ -137,6 +138,22 @@ public class BattleManager
             return true;
         } else if(attackerBattle == null && defenderBattle == null) {
             // neither entity is in battle
+
+            // Check if either entity is a SulfurCube holding a block
+            if (event.getEntity() instanceof SulfurCube) {
+                SulfurCube e = (SulfurCube)event.getEntity();
+                if (e.hasBodyItem()) {
+                    logger.debug("Attack Not Canceled: Hitting SulfurCube with block");
+                    return false;
+                }
+            } else if (event.getSource().getEntity() instanceof SulfurCube) {
+                SulfurCube e = (SulfurCube)event.getSource().getEntity();
+                if (e.hasBodyItem()) {
+                    logger.debug("Attack Not Canceled: Hit by SulfurCube with block");
+                    return false;
+                }
+            }
+
             if(event.getEntity() instanceof Player || event.getSource().getEntity() instanceof Player)
             {
                 // at least one of the entities is a player, create Battle
@@ -154,6 +171,27 @@ public class BattleManager
             return false;
         } else {
             // at this point only one entity is in battle, so add entity to other side
+
+            // SulfurCube check
+            if (event.getEntity() instanceof SulfurCube) {
+                SulfurCube e = (SulfurCube)event.getEntity();
+                if (e.hasBodyItem()) {
+                    logger.debug("Attack Canceled: SulfurCube with block");
+                    return true;
+                }
+            } else if (event.getSource().getEntity() instanceof SulfurCube) {
+                SulfurCube e = (SulfurCube)event.getSource().getEntity();
+                if (e.hasBodyItem()) {
+                    if (e.isPrimed()) {
+                        logger.debug("Attack not Canceled: Hit by exploding SulfurCube");
+                        return false;
+                    } else {
+                        logger.debug("Attack Canceled: Hit by SulfurCube with block");
+                        return true;
+                    }
+                }
+            }
+
             if(attackerBattle != null) {
                 if (attackerBattle.getSize() >= config.getMaxInBattle()) {
                     // battle limit reached, cannot add to battle

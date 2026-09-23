@@ -8,6 +8,7 @@ import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketEditingMessage
 import com.burnedkirby.TurnBasedMinecraft.common.networking.PacketGeneralMessage;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.cubemob.SulfurCube;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
@@ -60,8 +61,7 @@ public class AttackEventHandler
     public static boolean entityAttacked(LivingAttackEvent event)
     {
         boolean ret = false;
-        if(event.getEntity().level().isClientSide())
-        {
+        if (event.getEntity().level().isClientSide()) {
             return ret;
         }
         CommonProxy proxy = TurnBasedMinecraftMod.proxy;
@@ -117,6 +117,8 @@ public class AttackEventHandler
         if(event.getEntity() != null && event.getSource().getEntity() != null && (battleManager.isRecentlyLeftBattle(event.getEntity().getId()) || battleManager.isRecentlyLeftBattle(event.getSource().getEntity().getId())))
         {
             if(event.getSource().getEntity() instanceof Creeper && TurnBasedMinecraftMod.proxy.getConfig().getCreeperAlwaysAllowDamage()) {
+                ret = false;
+            } else if (event.getEntity() instanceof SulfurCube && ((SulfurCube)event.getEntity()).hasBodyItem()) {
                 ret = false;
             } else {
 //            TurnBasedMinecraftMod.logger.debug("Canceled attack");
