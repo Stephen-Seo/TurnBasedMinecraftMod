@@ -523,6 +523,7 @@ public class Battle {
             if (!entry.getValue().entity.isAlive()) {
                 iter.remove();
                 players.remove(entry.getKey());
+                sulfurCubes.remove(entry.getKey());
                 removeCombatantPostRemove(entry.getValue());
                 didRemove = true;
                 String category = null;
@@ -539,6 +540,7 @@ public class Battle {
             if (!entry.getValue().entity.isAlive()) {
                 iter.remove();
                 players.remove(entry.getKey());
+                sulfurCubes.remove(entry.getKey());
                 removeCombatantPostRemove(entry.getValue());
                 didRemove = true;
                 String category = null;
@@ -613,6 +615,7 @@ public class Battle {
         if (players.remove(c.entity.getId()) != null) {
             playerCount.decrementAndGet();
         }
+        sulfurCubes.remove(c.entity.getId());
         removeCombatantPostRemove(c);
     }
 
