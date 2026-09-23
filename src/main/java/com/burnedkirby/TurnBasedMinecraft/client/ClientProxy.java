@@ -46,9 +46,9 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void setBattleGuiAsGui() {
-        if (Minecraft.getInstance().screen != battleGui) {
+        if (Minecraft.getInstance().gui.screen() != battleGui) {
             battleGui.turnEnd();
-            Minecraft.getInstance().setScreen(battleGui);
+            Minecraft.getInstance().gui.setScreen(battleGui);
         }
     }
 
@@ -80,7 +80,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void battleEnded() {
         localBattle = null;
-        Minecraft.getInstance().setScreen(null);
+        Minecraft.getInstance().gui.setScreen(null);
         stopMusic(true);
         battleMusicCount = 0;
         sillyMusicCount = 0;
@@ -1518,7 +1518,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void showClientConfigGui() {
-        Minecraft.getInstance().setScreen(new ClientConfigGui(null, null));
+        Minecraft.getInstance().gui.setScreen(new ClientConfigGui(null, null));
     }
 
     @Override
