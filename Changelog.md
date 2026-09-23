@@ -1,5 +1,15 @@
 # Upcoming changes
 
+# Version Forge-1.30.0
+
+Update for Forge 26.2-65.1.3 .
+
+Handle SulfurCubes so that they work as expected even during turn-based battle.
+
+Refactor how Creepers are handled in battle.
+
+Update some Entity names in the config file.
+
 # Version NeoForge-1.30.0
 
 Update for NeoForge 26.2.0.88 .
