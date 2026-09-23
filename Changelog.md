@@ -10,6 +10,16 @@ Refactor how Creepers are handled in battle.
 
 Update some Entity names in the config file.
 
+# Version NeoForge-1.30.0
+
+Update for NeoForge 26.2.0.88 .
+
+Handle SulfurCubes so that they work as expected even during turn-based battle.
+
+Refactor how Creepers are handled in battle.
+
+Update some Entity names in the config file.
+
 # Version Forge-1.29.0
 
 Fix "slowness" having no effect in battle (should apply "slow-speed" which
