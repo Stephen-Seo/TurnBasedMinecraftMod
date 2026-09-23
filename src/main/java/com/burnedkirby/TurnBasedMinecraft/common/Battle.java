@@ -32,6 +32,7 @@ public class Battle {
     private Map<Integer, Combatant> sideB;
     private Map<Integer, Combatant> players;
     private Map<Integer, SulfurCube> sulfurCubes;
+    private Map<Integer, Combatant> creepers;
     private PriorityQueue<Combatant> turnOrderQueue;
     private Queue<Combatant> sideAEntryQueue;
     private Queue<Combatant> sideBEntryQueue;
@@ -131,6 +132,7 @@ public class Battle {
         random = new Random();
         this.dimension = dimension;
         this.sulfurCubes = new HashMap<>();
+        this.creepers = new HashMap<>();
         pingTimerNanos = 0;
         if (sideA != null) {
             for (Entity e : sideA) {
@@ -166,6 +168,9 @@ public class Battle {
                 }
                 if (e instanceof SulfurCube) {
                     sulfurCubes.put(e.getId(), (SulfurCube)e);
+                }
+                if (e instanceof Creeper) {
+                    creepers.put(e.getId(), newCombatant);
                 }
             }
         }
@@ -203,6 +208,9 @@ public class Battle {
                 }
                 if (e instanceof SulfurCube) {
                     sulfurCubes.put(e.getId(), (SulfurCube)e);
+                }
+                if (e instanceof Creeper) {
+                    creepers.put(e.getId(), newCombatant);
                 }
             }
         }
@@ -318,6 +326,9 @@ public class Battle {
         if (e instanceof SulfurCube) {
             sulfurCubes.put(e.getId(), (SulfurCube)e);
         }
+        if (e instanceof Creeper) {
+            creepers.put(e.getId(), newCombatant);
+        }
         if (isServer) {
             if (newCombatant.entityInfo != null) {
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getId(), 0, id, newCombatant.entityInfo.category);
@@ -371,6 +382,9 @@ public class Battle {
         if (e instanceof SulfurCube) {
             sulfurCubes.put(e.getId(), (SulfurCube)e);
         }
+        if (e instanceof Creeper) {
+            creepers.put(e.getId(), newCombatant);
+        }
         if (isServer) {
             if (newCombatant.entityInfo != null) {
                 sendMessageToAllPlayers(PacketBattleMessage.MessageType.ENTERED, newCombatant.entity.getId(), 0, id, newCombatant.entityInfo.category);
@@ -392,6 +406,7 @@ public class Battle {
         playerCount.set(0);
         undecidedCount.set(0);
         sulfurCubes.clear();
+        creepers.clear();
     }
 
     public Collection<Combatant> getSideA() {
@@ -521,6 +536,7 @@ public class Battle {
                 iter.remove();
                 players.remove(entry.getKey());
                 sulfurCubes.remove(entry.getKey());
+                creepers.remove(entry.getKey());
                 removeCombatantPostRemove(entry.getValue());
                 didRemove = true;
                 String category = null;
@@ -538,6 +554,7 @@ public class Battle {
                 iter.remove();
                 players.remove(entry.getKey());
                 sulfurCubes.remove(entry.getKey());
+                creepers.remove(entry.getKey());
                 removeCombatantPostRemove(entry.getValue());
                 didRemove = true;
                 String category = null;
@@ -613,6 +630,7 @@ public class Battle {
             playerCount.decrementAndGet();
         }
         sulfurCubes.remove(c.entity.getId());
+        creepers.remove(c.entity.getId());
         removeCombatantPostRemove(c);
     }
 
@@ -644,6 +662,7 @@ public class Battle {
             }
         }
         sulfurCubes.remove(e.id);
+        creepers.remove(e.id);
     }
 
     private void setDecisionState() {
@@ -1443,22 +1462,11 @@ public class Battle {
     } // update(final long dt)
 
     private void defuseCreepers() {
-        for (Combatant c : sideA.values()) {
-            if (c.entity instanceof Creeper) {
-                if (c.willCreeperExplode) {
-                    ((Creeper) c.entity).setSwellDir(1000000);
-                } else {
-                    ((Creeper) c.entity).setSwellDir(-10);
-                }
-            }
-        }
-        for (Combatant c : sideB.values()) {
-            if (c.entity instanceof Creeper) {
-                if (c.willCreeperExplode) {
-                    ((Creeper) c.entity).setSwellDir(1000000);
-                } else {
-                    ((Creeper) c.entity).setSwellDir(-10);
-                }
+        for (Map.Entry<Integer, Combatant> e : creepers.entrySet()) {
+            if (e.getValue().willCreeperExplode) {
+                ((Creeper)e.getValue().entity).setSwellDir(1000000);
+            } else {
+                ((Creeper)e.getValue().entity).setSwellDir(-10);
             }
         }
     }
