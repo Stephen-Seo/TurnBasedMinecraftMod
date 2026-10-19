@@ -4,6 +4,12 @@ Starting with version 1.24.0 of this mod, this file will list what version of
 Java was used to compile the jars. In theory, using the same version of Java
 should result in an identical jar due to reproducible builds.
 
+## Notice
+
+Recently, it has been difficult to reproduce Forge builds so the hash may not
+match up. However, there doesn't seem to be an issue with NeoForge builds (for
+now).
+
 ## Forge 1.30.0
 
     $ java --version
